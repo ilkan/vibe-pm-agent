@@ -19,22 +19,17 @@ export const TOOL_SCHEMAS = {
     properties: {
       intent: {
         type: "string",
-        description: "Raw developer intent in natural language",
-        minLength: 10,
-        maxLength: 5000
+        description: "Raw developer intent in natural language"
       },
       parameters: {
         type: "object",
         properties: {
           expectedUserVolume: {
             type: "number",
-            minimum: 1,
-            maximum: 1000000,
             description: "Expected number of users or requests"
           },
           costConstraints: {
             type: "number",
-            minimum: 0,
             description: "Maximum acceptable cost in dollars"
           },
           performanceSensitivity: {
@@ -42,12 +37,10 @@ export const TOOL_SCHEMAS = {
             enum: ["low", "medium", "high"],
             description: "How sensitive the application is to performance"
           }
-        },
-        additionalProperties: false
+        }
       }
     },
-    required: ["intent"],
-    additionalProperties: false
+    required: ["intent"]
   } as JSONSchema,
 
   analyzeWorkflow: {
@@ -70,13 +63,13 @@ export const TOOL_SCHEMAS = {
                 description: { type: "string" },
                 inputs: { type: "array", items: { type: "string" } },
                 outputs: { type: "array", items: { type: "string" } },
-                quotaCost: { type: "number", minimum: 0 }
+                quotaCost: { type: "number" }
               },
               required: ["id", "type", "description", "quotaCost"]
             }
           },
           dataFlow: { type: "array" },
-          estimatedComplexity: { type: "number", minimum: 0 }
+          estimatedComplexity: { type: "number" }
         },
         required: ["id", "steps"]
       },
@@ -89,8 +82,7 @@ export const TOOL_SCHEMAS = {
         description: "Specific consulting techniques to apply (optional)"
       }
     },
-    required: ["workflow"],
-    additionalProperties: false
+    required: ["workflow"]
   } as JSONSchema,
 
   generateROIAnalysis: {
@@ -115,8 +107,7 @@ export const TOOL_SCHEMAS = {
         description: "Optional zero-based redesign solution"
       }
     },
-    required: ["workflow"],
-    additionalProperties: false
+    required: ["workflow"]
   } as JSONSchema,
 
   getConsultingSummary: {
@@ -137,8 +128,7 @@ export const TOOL_SCHEMAS = {
         description: "Specific techniques to focus on in the summary"
       }
     },
-    required: ["analysis"],
-    additionalProperties: false
+    required: ["analysis"]
   } as JSONSchema
 };
 

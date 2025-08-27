@@ -96,8 +96,8 @@ export class MCPErrorHandler {
     }
 
     const errorContent: MCPContent = {
-      type: "json",
-      json: {
+      type: "text",
+      text: JSON.stringify({
         error: true,
         code: errorDetails.code,
         message: errorDetails.message,
@@ -106,7 +106,7 @@ export class MCPErrorHandler {
         retryable: errorDetails.retryable,
         suggestedAction: errorDetails.suggestedAction,
         context: errorDetails.context
-      }
+      }, null, 2)
     };
 
     return {
@@ -278,12 +278,12 @@ export class MCPResponseFormatter {
 
       case 'json':
         content.push({
-          type: 'json',
-          json: {
+          type: 'text',
+          text: JSON.stringify({
             success: true,
             data,
             timestamp: new Date().toISOString()
-          }
+          }, null, 2)
         });
         break;
 
