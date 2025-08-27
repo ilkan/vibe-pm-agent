@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "pm-agent-intent-optimizer": {
+      "command": "node",
+      "args": ["path/to/pm-agent-intent-optimizer/bin/mcp-server.js"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": [
+        "optimize_intent",
+        "analyze_workflow",
+        "generate_roi_analysis",
+        "get_consulting_summary"
+      ]
+    }
+  }
+}

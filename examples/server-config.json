@@ -1,0 +1,23 @@
+{
+  "logLevel": "info",
+  "enableLogging": true,
+  "enableMetrics": true,
+  "enableHealthCheck": true,
+  "customSettings": {
+    "maxConcurrentRequests": 10,
+    "requestTimeout": 30000,
+    "cacheEnabled": true,
+    "cacheTTL": 300000,
+    "maxCacheSize": 100
+  },
+  "performance": {
+    "enableProfiling": false,
+    "maxResponseTime": 10000,
+    "memoryThreshold": 512
+  },
+  "security": {
+    "enableRateLimiting": false,
+    "maxRequestsPerMinute": 60,
+    "enableInputSanitization": true
+  }
+}
