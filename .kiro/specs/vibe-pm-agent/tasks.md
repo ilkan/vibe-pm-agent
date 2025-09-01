@@ -231,17 +231,189 @@
     - Test real-world scenarios with various complexity levels and domains
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 6.1, 6.2, 6.3, 6.4_
 
-- [x] 14. Create MCP Server executable entry point
-  - [x] 14.1 Create MCP server startup script
-    - Create executable entry point for MCP server (bin/mcp-server.js)
-    - Add proper command-line argument handling
-    - Implement graceful shutdown handling
-    - Add configuration options for logging and performance
-    - _Requirements: 1.1, 1.4_
+- [x] 14. Implement PM Document Generator component for executive-ready documents
+  - [x] 14.1 Create PM Document Generator core infrastructure
+    - Create PMDocumentGenerator class with base interfaces and methods
+    - Implement data structures for ManagementOnePager, PRFAQ, PMRequirements, DesignOptions, TaskPlan
+    - Add utility methods for Pyramid Principle structuring and MoSCoW prioritization
+    - Create unit tests for core PM document data structures
+    - _Requirements: 7.1, 7.2, 8.1, 9.1_
 
-  - [x] 14.2 Add deployment and packaging configuration
-    - Update package.json with proper bin entry and MCP server scripts
-    - Create README with MCP server setup and usage instructions
-    - Add example MCP client configuration
-    - Document tool schemas and usage examples
-    - _Requirements: 1.1, 1.4_
+  - [x] 14.2 Implement Management One-Pager generation
+    - Code generateManagementOnePager method with answer-first Pyramid Principle structure
+    - Implement ROI table generation with Conservative/Balanced/Bold options
+    - Add risk and mitigation analysis with structured recommendations
+    - Create unit tests for one-pager format and content quality
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9_
+
+  - [x] 14.3 Implement Amazon-style PR-FAQ generation
+    - Write generatePRFAQ method with future-dated press release formatting
+    - Implement FAQ generation with exactly 10 required questions and structured answers
+    - Add launch checklist creation with scope freeze, owners, timeline, dependencies
+    - Create unit tests for PR-FAQ format compliance and completeness
+    - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
+
+  - [x] 14.4 Implement structured requirements generation with MoSCoW prioritization
+    - Code generateRequirements method with Business Goal extraction and User Needs analysis
+    - Implement MoSCoW prioritization with 1-line justification for each category
+    - Add Go/No-Go timing decision logic based on value and timing analysis
+    - Create unit tests for requirements structure and prioritization accuracy
+    - _Requirements: 9.1, 9.2, 9.3_
+
+  - [x] 14.5 Implement design options generation with Impact vs Effort analysis
+    - Write generateDesignOptions method with Conservative/Balanced/Bold alternatives
+    - Implement Impact vs Effort matrix placement and scoring logic
+    - Add problem framing and right-time recommendation generation
+    - Create unit tests for design option quality and matrix accuracy
+    - _Requirements: 9.4, 9.5_
+
+  - [x] 14.6 Implement phased task plan generation with guardrails
+    - Code generateTaskPlan method with Guardrails Check as Task 0
+    - Implement task breakdown into Immediate Wins, Short-Term, and Long-Term phases
+    - Add task detail generation with ID/Name/Description/Acceptance Criteria/Effort/Impact/Priority
+    - Create unit tests for task plan structure and actionability
+    - _Requirements: 9.6, 9.7, 9.8_
+
+- [x] 15. Expand MCP Server interface with new PM-focused tools
+  - [x] 15.1 Add new MCP tool definitions and schemas
+    - Define generate_management_onepager tool with input schema for requirements/design/tasks/ROI inputs
+    - Create generate_pr_faq tool schema with requirements/design/target_date parameters
+    - Add generate_requirements tool schema with raw_intent and optional context
+    - Define generate_design_options and generate_task_plan tool schemas
+    - Create unit tests for new tool schema validation
+    - _Requirements: 10.5, 10.6, 10.7, 10.8, 10.9_
+
+  - [x] 15.2 Implement new MCP tool handlers
+    - Code handleGenerateManagementOnePager with proper response formatting
+    - Implement handleGeneratePRFAQ with press release, FAQ, and checklist formatting
+    - Create handleGenerateRequirements with structured requirements output
+    - Add handleGenerateDesignOptions and handleGenerateTaskPlan handlers
+    - Write unit tests for each new tool handler
+    - _Requirements: 10.5, 10.6, 10.7, 10.8, 10.9, 10.10, 10.11_
+
+  - [x] 15.3 Update AI Agent Pipeline with PM document methods
+    - Add generateManagementOnePager, generatePRFAQ, generateRequirements methods to pipeline
+    - Implement generateDesignOptions and generateTaskPlan pipeline methods
+    - Create formatting utilities for markdown output of PM documents
+    - Write integration tests for PM document pipeline methods
+    - _Requirements: 10.5, 10.6, 10.7, 10.8, 10.9_
+
+- [x] 16. Integrate PM Document Generator into existing pipeline
+  - [x] 16.1 Update main pipeline orchestration
+    - Integrate PMDocumentGenerator into AIAgentPipeline class
+    - Add PM document generation capabilities to existing workflow optimization
+    - Update processIntent method to optionally include PM document generation
+    - Create integration tests for combined optimization and PM document workflows
+    - _Requirements: 7.1, 8.1, 9.1, 10.1_
+
+  - [x] 16.2 Add cross-document consistency validation
+    - Implement validation to ensure PM documents align with requirements and design
+    - Create consistency checks between management one-pagers and PR-FAQs
+    - Add validation for task plans matching design options and requirements
+    - Write tests for cross-document consistency and alignment
+    - _Requirements: 7.1, 8.1, 9.1_
+
+- [x] 17. Enhance error handling for PM document generation
+  - [x] 17.1 Add PM-specific input validation
+    - Create validation for management one-pager inputs (requirements, design, ROI data)
+    - Implement PR-FAQ input validation (requirements, design, target dates)
+    - Add validation for requirements generation (raw intent, context parameters)
+    - Write unit tests for PM document input validation
+    - _Requirements: 7.9, 8.7, 9.3, 10.11_
+
+  - [x] 17.2 Implement PM document error handling and fallbacks
+    - Add error handling for incomplete or malformed PM document inputs
+    - Create fallback strategies for missing data in PM document generation
+    - Implement graceful degradation when PM documents cannot be fully generated
+    - Write tests for PM document error scenarios and recovery
+    - _Requirements: 7.1, 8.1, 9.1, 10.11_
+
+- [x] 18. Create comprehensive PM document test suite
+  - [x] 18.1 Implement PM document format validation tests
+    - Create tests for management one-pager format compliance (under 120 lines, proper structure)
+    - Add PR-FAQ format tests (press release under 250 words, 20 Q&As max)
+    - Implement requirements format tests (MoSCoW structure, right-time verdicts)
+    - Write design options and task plan format validation tests
+    - _Requirements: 7.9, 8.3, 8.5, 9.3, 9.8_
+
+  - [x] 18.2 Add PM document content quality tests
+    - Create tests for Pyramid Principle application in management one-pagers
+    - Implement tests for Amazon PR-FAQ question completeness and quality
+    - Add tests for MoSCoW prioritization accuracy and justification quality
+    - Write tests for Impact vs Effort matrix accuracy and task plan actionability
+    - _Requirements: 7.1, 7.2, 8.1, 8.4, 9.2, 9.4, 9.8_
+
+  - [x] 18.3 Implement end-to-end PM workflow tests
+    - Create tests for complete PM workflow: raw intent → requirements → design → tasks → PR-FAQ → one-pager
+    - Add tests for PM document consistency across the full workflow
+    - Implement performance tests for PM document generation speed and quality
+    - Write integration tests with realistic PM scenarios and stakeholder needs
+    - _Requirements: 7.1, 8.1, 9.1, 10.1_
+
+- [x] 19. Implement quick idea validation tool (NEW - Simple is best!)
+  - [x] 19.1 Create validate_idea_quick tool implementation
+    - Implement fast validation logic that provides PASS/FAIL verdict with 1-line reasoning
+    - Create option generation that provides exactly 3 choices (A/B/C) for next steps
+    - Add logic to suggest improvements for failed validations and next steps for passed ones
+    - Write unit tests for quick validation accuracy and option quality
+    - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
+
+  - [x] 19.2 Add MCP tool handler for quick validation
+    - Implement handleValidateIdeaQuick with proper input validation and response formatting
+    - Create structured output format for PASS/FAIL verdict and 3 options
+    - Add integration with existing pipeline components for quick analysis
+    - Write tests for quick validation tool handler and response format
+    - _Requirements: 11.1, 11.2, 11.6, 11.7, 10.10_
+
+- [x] 20. Update MCP Server configuration and documentation
+  - [x] 20.1 Update MCP Server configuration for quick validation tool
+    - Add validate_idea_quick tool to MCPServerConfig with proper description and schema
+    - Update tool registration and discovery to include the quick validation tool
+    - Create comprehensive tool documentation with input/output examples for quick validation
+    - Write configuration tests for the quick validation tool
+    - _Requirements: 10.1, 10.10, 11.1_
+
+  - [x] 20.2 Create comprehensive usage documentation
+    - Write documentation for PM workflow usage patterns and quick validation
+    - Create examples of management one-pager and PR-FAQ generation
+    - Add guidance for requirements → design → tasks → PM documents workflow
+    - Document best practices for PM document quality and stakeholder communication
+    - Document quick validation usage patterns and best practices
+    - _Requirements: 7.1, 8.1, 9.1, 10.1, 11.1_
+
+- [x] 21. Create MCP Server executable entry point and finalize deployment
+  - [x] 21.1 Update MCP server startup script for complete functionality
+    - Update executable entry point to support all MCP tools including quick validation
+    - Add configuration options for PM document generation features and quick validation
+    - Implement enhanced logging for all workflows including quick validation
+    - Create startup tests for complete MCP server functionality
+    - _Requirements: 10.1, 10.10, 10.11, 11.1_
+
+  - [x] 21.2 Finalize deployment and packaging
+    - Update package.json with complete MCP server capabilities
+    - Create comprehensive README with all workflow examples including quick validation
+    - Add example MCP client configurations for all tools
+    - Document all tool schemas with usage examples
+    - _Requirements: 10.1, 10.10, 10.11, 11.1_
+
+- [ ] 22. Fix test failures after project rename to vibe-pm-agent
+  - [ ] 22.1 Fix TypeScript compilation errors in test files
+    - Fix null assignment errors in mcp-server-startup.test.ts
+    - Fix undefined property access errors in mcp-client-simulation.test.ts
+    - Fix type compatibility issues in edge-case-validation.test.ts
+    - Update test expectations to match new project structure
+    - _Requirements: 10.11, 11.1_
+
+  - [ ] 22.2 Fix mock configuration and test expectations
+    - Update mock pipeline methods to use proper Jest mock functions
+    - Fix test expectations for array lengths and object structures
+    - Update test data to match actual implementation outputs
+    - Fix performance test thresholds and validation logic
+    - _Requirements: 10.11, 11.1_
+
+  - [ ] 22.3 Update integration test scenarios and validation
+    - Fix workflow consistency validation in PM workflow tests
+    - Update quota estimation test expectations to match implementation
+    - Fix consulting technique selection test expectations
+    - Update spec format validation to match actual output structure
+    - _Requirements: 1.1, 2.1, 4.1, 6.1, 7.1, 8.1, 9.1_

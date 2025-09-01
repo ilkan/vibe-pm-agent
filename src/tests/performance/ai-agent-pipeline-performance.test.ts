@@ -370,7 +370,7 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
       let gcCount = 0;
       if (global.gc) {
         const originalGc = global.gc;
-        global.gc = () => {
+        global.gc = async () => {
           gcCount++;
           return originalGc();
         };

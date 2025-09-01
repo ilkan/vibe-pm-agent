@@ -20,8 +20,8 @@ jest.mock('../../pipeline/ai-agent-pipeline');
 
 // Mock client for testing MCP protocol interactions
 class MockMCPClient {
-  private server: PMAgentMCPServer;
-  private requestId: number = 1;
+  protected server: PMAgentMCPServer;
+  protected requestId: number = 1;
 
   constructor(server: PMAgentMCPServer) {
     this.server = server;
@@ -108,14 +108,14 @@ describe('MCP Client Simulation Tests', () => {
       
       const optimizeIntentTool = toolsResponse.tools.find((tool: any) => tool.name === 'optimize_intent');
       expect(optimizeIntentTool).toBeDefined();
-      expect(optimizeIntentTool.inputSchema.required).toContain('intent');
-      expect(optimizeIntentTool.inputSchema.properties.intent).toBeDefined();
-      expect(optimizeIntentTool.inputSchema.properties.parameters).toBeDefined();
+      expect(optimizeIntentTool!.inputSchema.required).toContain('intent');
+      expect(optimizeIntentTool!.inputSchema.properties?.intent).toBeDefined();
+      expect(optimizeIntentTool!.inputSchema.properties?.parameters).toBeDefined();
 
       const analyzeWorkflowTool = toolsResponse.tools.find((tool: any) => tool.name === 'analyze_workflow');
       expect(analyzeWorkflowTool).toBeDefined();
-      expect(analyzeWorkflowTool.inputSchema.required).toContain('workflow');
-      expect(analyzeWorkflowTool.inputSchema.properties.workflow).toBeDefined();
+      expect(analyzeWorkflowTool!.inputSchema.required).toContain('workflow');
+      expect(analyzeWorkflowTool!.inputSchema.properties?.workflow).toBeDefined();
     });
   });
 

@@ -37,4 +37,39 @@ export interface OptionalParams {
     maxCostDollars?: number;
   };
   performanceSensitivity?: 'low' | 'medium' | 'high';
+  generatePMDocuments?: {
+    managementOnePager?: boolean;
+    prfaq?: boolean;
+    requirements?: boolean;
+    designOptions?: boolean;
+    taskPlan?: boolean;
+    targetDate?: string; // For PR-FAQ
+    context?: {
+      roadmapTheme?: string;
+      budget?: number;
+      deadlines?: string;
+    };
+  };
+}
+
+// Quick validation interfaces
+export interface QuickValidationContext {
+  urgency?: 'low' | 'medium' | 'high';
+  budget_range?: 'small' | 'medium' | 'large';
+  team_size?: number;
+}
+
+export interface QuickValidationOption {
+  id: 'A' | 'B' | 'C';
+  title: string;
+  description: string;
+  tradeoffs: string[];
+  nextStep: string;
+}
+
+export interface QuickValidationResult {
+  verdict: 'PASS' | 'FAIL';
+  reasoning: string;
+  options: [QuickValidationOption, QuickValidationOption, QuickValidationOption];
+  processingTimeMs: number;
 }

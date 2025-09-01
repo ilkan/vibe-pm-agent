@@ -22,6 +22,12 @@ import {
   AnalyzeWorkflowArgs,
   GenerateROIArgs,
   ConsultingSummaryArgs,
+  ManagementOnePagerArgs,
+  PRFAQArgs,
+  RequirementsArgs,
+  DesignOptionsArgs,
+  TaskPlanArgs,
+  ValidateIdeaQuickArgs,
   LogLevel
 } from '../models/mcp';
 import { MCP_SERVER_CONFIG, MCPToolRegistry } from './server-config';
@@ -148,6 +154,24 @@ export class PMAgentMCPServer {
             break;
           case 'get_consulting_summary':
             result = await this.handleConsultingSummary(args as unknown as ConsultingSummaryArgs, context);
+            break;
+          case 'generate_management_onepager':
+            result = await this.handleGenerateManagementOnePager(args as unknown as ManagementOnePagerArgs, context);
+            break;
+          case 'generate_pr_faq':
+            result = await this.handleGeneratePRFAQ(args as unknown as PRFAQArgs, context);
+            break;
+          case 'generate_requirements':
+            result = await this.handleGenerateRequirements(args as unknown as RequirementsArgs, context);
+            break;
+          case 'generate_design_options':
+            result = await this.handleGenerateDesignOptions(args as unknown as DesignOptionsArgs, context);
+            break;
+          case 'generate_task_plan':
+            result = await this.handleGenerateTaskPlan(args as unknown as TaskPlanArgs, context);
+            break;
+          case 'validate_idea_quick':
+            result = await this.handleValidateIdeaQuick(args as unknown as ValidateIdeaQuickArgs, context);
             break;
           default:
             throw MCPErrorHandler.createError(
@@ -387,6 +411,249 @@ export class PMAgentMCPServer {
   }
 
   /**
+   * Handle generate_management_onepager tool calls
+   */
+  async handleGenerateManagementOnePager(args: ManagementOnePagerArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      MCPLogger.debug('Generating management one-pager', context, { 
+        requirementsLength: args.requirements.length,
+        designLength: args.design.length,
+        hasTasks: !!args.tasks,
+        hasROIInputs: !!args.roi_inputs
+      });
+      
+      const onePager = await this.pipeline.generateManagementOnePager(
+        args.requirements, 
+        args.design, 
+        args.tasks, 
+        args.roi_inputs
+      );
+      
+      MCPLogger.info('Management one-pager generated successfully', context, {
+        answerLength: onePager.one_pager_markdown.length,
+        optionsCount: 3,
+        risksCount: onePager.one_pager_markdown.match(/Risk:/g)?.length || 0
+      });
+
+      return MCPResponseFormatter.formatSuccess(
+        onePager.one_pager_markdown,
+        'markdown',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 2 // One-pager generation typically uses 2 quota units
+        }
+      );
+    } catch (error) {
+      MCPLogger.error('generate_management_onepager handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle generate_pr_faq tool calls
+   */
+  async handleGeneratePRFAQ(args: PRFAQArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      MCPLogger.debug('Generating PR-FAQ', context, { 
+        requirementsLength: args.requirements.length,
+        designLength: args.design.length,
+        targetDate: args.target_date
+      });
+      
+      const prfaq = await this.pipeline.generatePRFAQ(
+        args.requirements, 
+        args.design, 
+        args.target_date
+      );
+      
+      MCPLogger.info('PR-FAQ generated successfully', context, {
+        pressReleaseLength: prfaq.press_release_markdown.length,
+        faqCount: prfaq.faq_markdown.match(/\*\*Q\d+:/g)?.length || 0,
+        checklistItems: prfaq.launch_checklist_markdown.match(/- \[ \]/g)?.length || 0
+      });
+
+      const combinedContent = `# Press Release\n\n${prfaq.press_release_markdown}\n\n# FAQ\n\n${prfaq.faq_markdown}\n\n# Launch Checklist\n\n${prfaq.launch_checklist_markdown}`;
+
+      return MCPResponseFormatter.formatSuccess(
+        combinedContent,
+        'markdown',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 3 // PR-FAQ generation typically uses 3 quota units
+        }
+      );
+    } catch (error) {
+      MCPLogger.error('generate_pr_faq handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle generate_requirements tool calls
+   */
+  async handleGenerateRequirements(args: RequirementsArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      MCPLogger.debug('Generating requirements', context, { 
+        intentLength: args.raw_intent.length,
+        hasContext: !!args.context,
+        contextKeys: args.context ? Object.keys(args.context) : []
+      });
+      
+      const requirements = await this.pipeline.generateRequirements(args.raw_intent, args.context);
+      
+      MCPLogger.info('Requirements generated successfully', context, {
+        businessGoalLength: requirements.businessGoal.length,
+        functionalRequirementsCount: requirements.functionalRequirements.length,
+        mustHaveCount: requirements.priority.must.length,
+        rightTimeDecision: requirements.rightTimeVerdict.decision
+      });
+
+      return MCPResponseFormatter.formatSuccess(
+        requirements,
+        'json',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 2 // Requirements generation typically uses 2 quota units
+        }
+      );
+    } catch (error) {
+      MCPLogger.error('generate_requirements handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle generate_design_options tool calls
+   */
+  async handleGenerateDesignOptions(args: DesignOptionsArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      MCPLogger.debug('Generating design options', context, { 
+        requirementsLength: args.requirements.length
+      });
+      
+      const designOptions = await this.pipeline.generateDesignOptions(args.requirements);
+      
+      MCPLogger.info('Design options generated successfully', context, {
+        problemFramingLength: designOptions.problemFraming.length,
+        optionsCount: 3,
+        matrixQuadrants: Object.keys(designOptions.impactEffortMatrix).length
+      });
+
+      return MCPResponseFormatter.formatSuccess(
+        designOptions,
+        'json',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 2 // Design options generation typically uses 2 quota units
+        }
+      );
+    } catch (error) {
+      MCPLogger.error('generate_design_options handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle generate_task_plan tool calls
+   */
+  async handleGenerateTaskPlan(args: TaskPlanArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      MCPLogger.debug('Generating task plan', context, { 
+        designLength: args.design.length,
+        hasLimits: !!args.limits,
+        limits: args.limits
+      });
+      
+      const taskPlanResult = await this.pipeline.generateTaskPlan(args.design, args.limits);
+      
+      MCPLogger.info('Task plan generated successfully', context, {
+        immediateWinsCount: taskPlanResult.task_plan.immediateWins.length,
+        shortTermCount: taskPlanResult.task_plan.shortTerm.length,
+        longTermCount: taskPlanResult.task_plan.longTerm.length,
+        guardrailsLimits: taskPlanResult.task_plan.guardrailsCheck.limits
+      });
+
+      return MCPResponseFormatter.formatSuccess(
+        taskPlanResult,
+        'json',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 2 // Task plan generation typically uses 2 quota units
+        }
+      );
+    } catch (error) {
+      MCPLogger.error('generate_task_plan handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle validate_idea_quick tool calls
+   */
+  async handleValidateIdeaQuick(args: ValidateIdeaQuickArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      MCPLogger.debug('Starting quick idea validation', context, { 
+        ideaLength: args.idea.length,
+        hasContext: !!args.context,
+        urgency: args.context?.urgency,
+        budgetRange: args.context?.budget_range,
+        teamSize: args.context?.team_size
+      });
+      
+      const validationResult = await this.pipeline.validateIdeaQuick(args.idea, args.context);
+      
+      MCPLogger.info('Quick validation completed successfully', context, {
+        verdict: validationResult.verdict,
+        processingTime: validationResult.processingTimeMs,
+        optionsCount: validationResult.options.length,
+        reasoning: validationResult.reasoning.substring(0, 100) // Log first 100 chars of reasoning
+      });
+
+      // Format the response as structured text for better readability
+      const formattedResponse = this.formatQuickValidationResponse(validationResult);
+
+      return MCPResponseFormatter.formatSuccess(
+        formattedResponse,
+        'text',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 1 // Quick validation uses 1 quota unit
+        }
+      );
+    } catch (error) {
+      MCPLogger.error('validate_idea_quick handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Format quick validation result for better readability
+   */
+  private formatQuickValidationResponse(result: any): string {
+    const { verdict, reasoning, options } = result;
+    
+    let response = `# Quick Validation Result\n\n`;
+    response += `**Verdict:** ${verdict}\n`;
+    response += `**Reasoning:** ${reasoning}\n\n`;
+    response += `## Next Steps (Choose One)\n\n`;
+    
+    options.forEach((option: any, index: number) => {
+      response += `### Option ${option.id}: ${option.title}\n`;
+      response += `${option.description}\n\n`;
+      response += `**Trade-offs:**\n`;
+      option.tradeoffs.forEach((tradeoff: string) => {
+        response += `- ${tradeoff}\n`;
+      });
+      response += `\n**Next Step:** ${option.nextStep}\n`;
+      if (index < options.length - 1) {
+        response += `\n---\n\n`;
+      }
+    });
+    
+    return response;
+  }
+
+  /**
    * Start the MCP server
    */
   async start(): Promise<void> {
@@ -417,6 +684,11 @@ export class PMAgentMCPServer {
    */
   async stop(): Promise<void> {
     try {
+      // Clean up pipeline resources first
+      if (this.pipeline && typeof (this.pipeline as any).cleanup === 'function') {
+        await (this.pipeline as any).cleanup();
+      }
+      
       await this.server.close();
       MCPLogger.info('MCP Server stopped', undefined, {
         uptime: Date.now() - this.startTime,

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The PM Agent Intent-to-Spec Optimizer is designed as an **MCP Server** that functions as an AI agent, providing intelligent consulting-grade analysis through Model Context Protocol tools. The system transforms unstructured developer intent into optimized Kiro specifications using a multi-stage processing pipeline that employs natural language processing, business analysis techniques, and optimization algorithms to minimize quota consumption while preserving functionality.
+The Vibe PM Agent is designed as an **MCP Server** that functions as an AI agent, providing intelligent consulting-grade analysis through Model Context Protocol tools. The system transforms unstructured developer intent into optimized Kiro specifications using a multi-stage processing pipeline that employs natural language processing, business analysis techniques, and optimization algorithms to minimize quota consumption while preserving functionality.
 
 The MCP Server exposes AI agent capabilities through well-defined tools that can be called by other AI systems (like Kiro), enabling seamless integration while maintaining the sophisticated multi-phase analysis pipeline internally.
 
@@ -20,38 +20,56 @@ graph TD
         E[analyze_workflow] 
         F[generate_roi_analysis]
         G[get_consulting_summary]
+        H[generate_management_onepager]
+        I[generate_pr_faq]
+        J[generate_requirements]
+        K[generate_design_options]
+        L[generate_task_plan]
     end
     
     subgraph "Internal AI Agent Pipeline"
-        H[Intent Interpreter]
-        I[Business Analyzer]
-        J[Workflow Optimizer]
-        K[Quota Forecaster]
-        L[Consulting Summary Generator]
-        M[Spec Generator]
+        M[Intent Interpreter]
+        N[Business Analyzer]
+        O[Workflow Optimizer]
+        P[Quota Forecaster]
+        Q[Consulting Summary Generator]
+        R[PM Document Generator]
+        S[Spec Generator]
     end
     
     B --> D
     B --> E
     B --> F
     B --> G
+    B --> H
+    B --> I
+    B --> J
+    B --> K
+    B --> L
     
-    D --> H
-    H --> I
-    I --> J
-    J --> K
-    K --> L
-    L --> M
-    M --> N[Enhanced Kiro Spec + ROI Analysis]
+    D --> M
+    M --> N
+    N --> O
+    O --> P
+    P --> Q
+    Q --> R
+    R --> S
+    S --> T[Enhanced Kiro Spec + ROI Analysis + PM Documents]
 ```
 
 ### MCP Server Interface
 
 **Primary MCP Tools**:
-1. **`optimize_intent`**: Main tool that takes raw developer intent and returns optimized Kiro spec with consulting analysis
-2. **`analyze_workflow`**: Analyzes existing workflows for optimization opportunities
-3. **`generate_roi_analysis`**: Creates ROI comparison between different optimization approaches
-4. **`get_consulting_summary`**: Provides detailed consulting-style analysis using selected techniques
+1. **`validate_idea_quick`**: Fast unit-test-like validation with PASS/FAIL verdict and 3 structured options (NEW - Simple is best!)
+2. **`optimize_intent`**: Main tool that takes raw developer intent and returns optimized Kiro spec with consulting analysis
+3. **`analyze_workflow`**: Analyzes existing workflows for optimization opportunities
+4. **`generate_roi_analysis`**: Creates ROI comparison between different optimization approaches
+5. **`get_consulting_summary`**: Provides detailed consulting-style analysis using selected techniques
+6. **`generate_management_onepager`**: Creates executive-ready one-pager with Pyramid Principle structure
+7. **`generate_pr_faq`**: Generates Amazon-style PR-FAQ documents for product communication
+8. **`generate_requirements`**: Creates PM-grade requirements with MoSCoW prioritization and right-time decisions
+9. **`generate_design_options`**: Produces Conservative/Balanced/Bold design options with Impact vs Effort analysis
+10. **`generate_task_plan`**: Creates phased implementation plans with guardrails and structured task breakdown
 
 ### Internal AI Agent Components
 
@@ -60,9 +78,38 @@ graph TD
 3. **Workflow Optimizer**: Restructures operations for efficiency
 4. **Quota Forecaster**: Generates comprehensive ROI analysis with multiple scenarios
 5. **Consulting Summary Generator**: Creates professional consulting-style analysis using Pyramid Principle
-6. **Spec Generator**: Produces final Kiro-compatible specifications with consulting insights
+6. **PM Document Generator**: Creates management one-pagers, PR-FAQs, requirements, design options, and task plans
+7. **Spec Generator**: Produces final Kiro-compatible specifications with consulting insights
 
 ## MCP Server Tool Definitions
+
+### Tool: validate_idea_quick
+
+**Description**: Fast unit-test-like validation that provides PASS/FAIL verdict with 3 structured options for next steps. Acts like a unit test for ideas - quick feedback with clear choices.
+
+**Input Schema**:
+```json
+{
+  "type": "object",
+  "properties": {
+    "idea": {
+      "type": "string",
+      "description": "Raw idea or intent to validate quickly"
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "urgency": {"type": "string", "enum": ["low", "medium", "high"]},
+        "budget_range": {"type": "string", "enum": ["small", "medium", "large"]},
+        "team_size": {"type": "number"}
+      }
+    }
+  },
+  "required": ["idea"]
+}
+```
+
+**Output**: Quick validation result with PASS/FAIL verdict, reasoning, and exactly 3 options (A/B/C) for next steps
 
 ### Tool: optimize_intent
 
@@ -153,6 +200,147 @@ graph TD
 ```
 
 **Output**: Professional consulting summary with structured recommendations
+
+### Tool: generate_management_onepager
+
+**Description**: Creates executive-ready management one-pager using Pyramid Principle with answer-first clarity and timing rationale.
+
+**Input Schema**:
+```json
+{
+  "type": "object",
+  "properties": {
+    "requirements": {
+      "type": "string",
+      "description": "Requirements document content"
+    },
+    "design": {
+      "type": "string", 
+      "description": "Design document content"
+    },
+    "tasks": {
+      "type": "string",
+      "description": "Task plan content (optional)"
+    },
+    "roi_inputs": {
+      "type": "object",
+      "properties": {
+        "cost_naive": {"type": "number"},
+        "cost_balanced": {"type": "number"},
+        "cost_bold": {"type": "number"}
+      }
+    }
+  },
+  "required": ["requirements", "design"]
+}
+```
+
+**Output**: Executive one-pager with decision, rationale, options, ROI table, and timing recommendation
+
+### Tool: generate_pr_faq
+
+**Description**: Generates Amazon-style PR-FAQ document with future-dated press release and comprehensive FAQ.
+
+**Input Schema**:
+```json
+{
+  "type": "object",
+  "properties": {
+    "requirements": {
+      "type": "string",
+      "description": "Requirements document content"
+    },
+    "design": {
+      "type": "string",
+      "description": "Design document content"
+    },
+    "target_date": {
+      "type": "string",
+      "description": "Target launch date (optional, defaults to 3 months from now)"
+    }
+  },
+  "required": ["requirements", "design"]
+}
+```
+
+**Output**: PR-FAQ with press release, FAQ, and launch checklist
+
+### Tool: generate_requirements
+
+**Description**: Creates PM-grade requirements with Business Goal extraction, MoSCoW prioritization, and Go/No-Go timing decision.
+
+**Input Schema**:
+```json
+{
+  "type": "object",
+  "properties": {
+    "raw_intent": {
+      "type": "string",
+      "description": "Raw developer intent in natural language"
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "roadmap_theme": {"type": "string"},
+        "budget": {"type": "number"},
+        "quotas": {"type": "object"},
+        "deadlines": {"type": "string"}
+      }
+    }
+  },
+  "required": ["raw_intent"]
+}
+```
+
+**Output**: Structured requirements with Business Goal, User Needs, Functional Requirements, Constraints/Risks, MoSCoW prioritization, and Right-Time verdict
+
+### Tool: generate_design_options
+
+**Description**: Translates approved requirements into Conservative/Balanced/Bold design options with Impact vs Effort analysis.
+
+**Input Schema**:
+```json
+{
+  "type": "object",
+  "properties": {
+    "requirements": {
+      "type": "string",
+      "description": "Approved requirements document content"
+    }
+  },
+  "required": ["requirements"]
+}
+```
+
+**Output**: Design options with problem framing, three alternatives, Impact vs Effort matrix, and right-time recommendation
+
+### Tool: generate_task_plan
+
+**Description**: Creates phased implementation plan with Guardrails Check, Immediate Wins, Short-Term, and Long-Term tasks.
+
+**Input Schema**:
+```json
+{
+  "type": "object",
+  "properties": {
+    "design": {
+      "type": "string",
+      "description": "Approved design document content"
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "max_vibes": {"type": "number"},
+        "max_specs": {"type": "number"},
+        "budget_usd": {"type": "number"}
+      }
+    }
+  },
+  "required": ["design"]
+}
+```
+
+**Output**: Phased task plan with Guardrails Check, task breakdown with ID/Name/Description/Acceptance Criteria/Effort/Impact/Priority
 
 ## Components and Interfaces
 
@@ -355,6 +543,128 @@ interface Evidence {
 }
 ```
 
+### PM Document Generator
+
+**Purpose**: Creates executive-ready PM documents including management one-pagers, PR-FAQs, requirements, design options, and task plans
+
+**Key Methods**:
+- `generateManagementOnePager(requirements: string, design: string, tasks?: string, roiInputs?: ROIInputs): ManagementOnePager`
+- `generatePRFAQ(requirements: string, design: string, targetDate?: string): PRFAQ`
+- `generateRequirements(rawIntent: string, context?: RequirementsContext): PMRequirements`
+- `generateDesignOptions(requirements: string): DesignOptions`
+- `generateTaskPlan(design: string, limits?: TaskLimits): TaskPlan`
+- `applyPyramidPrinciple(content: any): StructuredContent`
+- `createImpactEffortMatrix(options: DesignOption[]): ImpactEffortMatrix`
+- `applyMoSCoWPrioritization(requirements: Requirement[]): PrioritizedRequirements`
+
+**Data Structures**:
+```typescript
+interface ManagementOnePager {
+  answer: string; // 1-line decision and timing
+  because: string[]; // 3 core reasons
+  whatScopeToday: string[]; // scope bullets
+  risksAndMitigations: RiskMitigation[]; // 3 key risks with mitigations
+  options: {
+    conservative: OptionSummary;
+    balanced: OptionSummary; // marked as recommended
+    bold: OptionSummary;
+  };
+  roiSnapshot: ROITable;
+  rightTimeRecommendation: string; // 2-4 lines
+}
+
+interface PRFAQ {
+  pressRelease: {
+    date: string;
+    headline: string;
+    subHeadline: string;
+    body: string; // problem, solution, why now, customer quote, availability
+  };
+  faq: FAQItem[]; // exactly the 10 required questions
+  launchChecklist: ChecklistItem[];
+}
+
+interface PMRequirements {
+  businessGoal: string; // WHY - 1-3 lines
+  userNeeds: {
+    jobs: string[];
+    pains: string[];
+    gains: string[];
+  };
+  functionalRequirements: string[]; // WHAT
+  constraintsRisks: string[];
+  priority: {
+    must: PriorityItem[];
+    should: PriorityItem[];
+    could: PriorityItem[];
+    wont: PriorityItem[];
+  };
+  rightTimeVerdict: {
+    decision: 'do_now' | 'do_later';
+    reasoning: string;
+  };
+}
+
+interface DesignOptions {
+  problemFraming: string; // why now - 3-5 lines
+  options: {
+    conservative: DesignOption;
+    balanced: DesignOption; // recommended
+    bold: DesignOption; // zero-based
+  };
+  impactEffortMatrix: ImpactEffortMatrix;
+  rightTimeRecommendation: string; // 2-4 lines
+}
+
+interface TaskPlan {
+  guardrailsCheck: GuardrailsTask; // Task 0 - fail fast if limits exceeded
+  immediateWins: Task[]; // 1-3 tasks
+  shortTerm: Task[]; // 3-6 tasks
+  longTerm: Task[]; // 2-4 tasks
+}
+
+interface Task {
+  id: string;
+  name: string;
+  description: string;
+  acceptanceCriteria: string[];
+  effort: 'S' | 'M' | 'L';
+  impact: 'Low' | 'Med' | 'High';
+  priority: 'Must' | 'Should' | 'Could' | 'Won\'t';
+}
+
+interface DesignOption {
+  name: string;
+  summary: string;
+  keyTradeoffs: string[];
+  impact: 'Low' | 'Medium' | 'High';
+  effort: 'Low' | 'Medium' | 'High';
+  majorRisks: string[];
+}
+
+interface ImpactEffortMatrix {
+  highImpactLowEffort: DesignOption[];
+  highImpactHighEffort: DesignOption[];
+  lowImpactLowEffort: DesignOption[];
+  lowImpactHighEffort: DesignOption[];
+}
+
+interface ROITable {
+  options: {
+    conservative: ROIRow;
+    balanced: ROIRow;
+    bold: ROIRow;
+  };
+}
+
+interface ROIRow {
+  effort: 'Low' | 'Med' | 'High';
+  impact: 'Med' | 'High' | 'VeryH';
+  estimatedCost: string;
+  timing: 'Now' | 'Later';
+}
+```
+
 ### Spec Generator
 
 **Purpose**: Produces final Kiro-compatible specifications with consulting insights
@@ -370,7 +680,7 @@ interface Evidence {
 
 ```typescript
 interface MCPServerConfig {
-  name: "pm-agent-intent-optimizer";
+  name: "vibe-pm-agent";
   version: "1.0.0";
   description: "AI agent for optimizing developer intent into efficient Kiro specs using consulting techniques";
   tools: MCPTool[];
@@ -452,6 +762,67 @@ class PMAgentMCPServer {
       }]
     };
   }
+
+  async handleGenerateManagementOnePager(args: ManagementOnePagerArgs): Promise<MCPToolResult> {
+    const onePager = await this.pipeline.generateManagementOnePager(
+      args.requirements, 
+      args.design, 
+      args.tasks, 
+      args.roi_inputs
+    );
+    return {
+      content: [{
+        type: "text",
+        text: onePager.one_pager_markdown
+      }]
+    };
+  }
+
+  async handleGeneratePRFAQ(args: PRFAQArgs): Promise<MCPToolResult> {
+    const prfaq = await this.pipeline.generatePRFAQ(
+      args.requirements, 
+      args.design, 
+      args.target_date
+    );
+    return {
+      content: [
+        {
+          type: "text",
+          text: `# Press Release\n\n${prfaq.press_release_markdown}\n\n# FAQ\n\n${prfaq.faq_markdown}\n\n# Launch Checklist\n\n${prfaq.launch_checklist_markdown}`
+        }
+      ]
+    };
+  }
+
+  async handleGenerateRequirements(args: RequirementsArgs): Promise<MCPToolResult> {
+    const requirements = await this.pipeline.generateRequirements(args.raw_intent, args.context);
+    return {
+      content: [{
+        type: "text",
+        text: JSON.stringify(requirements, null, 2)
+      }]
+    };
+  }
+
+  async handleGenerateDesignOptions(args: DesignOptionsArgs): Promise<MCPToolResult> {
+    const designOptions = await this.pipeline.generateDesignOptions(args.requirements);
+    return {
+      content: [{
+        type: "text",
+        text: JSON.stringify(designOptions, null, 2)
+      }]
+    };
+  }
+
+  async handleGenerateTaskPlan(args: TaskPlanArgs): Promise<MCPToolResult> {
+    const taskPlan = await this.pipeline.generateTaskPlan(args.design, args.limits);
+    return {
+      content: [{
+        type: "text",
+        text: JSON.stringify(taskPlan, null, 2)
+      }]
+    };
+  }
 }
 ```
 
@@ -464,6 +835,7 @@ class AIAgentPipeline {
   private workflowOptimizer: WorkflowOptimizer;
   private quotaForecaster: QuotaForecaster;
   private consultingSummaryGenerator: ConsultingSummaryGenerator;
+  private pmDocumentGenerator: PMDocumentGenerator;
   private specGenerator: SpecGenerator;
 
   async processIntent(intent: string, params?: OptionalParams): Promise<EnhancedKiroSpec> {
@@ -476,6 +848,83 @@ class AIAgentPipeline {
     const enhancedSpec = await this.specGenerator.generateEnhanced(optimizedWorkflow, consultingSummary, roiAnalysis);
     
     return enhancedSpec;
+  }
+
+  async generateManagementOnePager(requirements: string, design: string, tasks?: string, roiInputs?: ROIInputs): Promise<{one_pager_markdown: string}> {
+    const onePager = await this.pmDocumentGenerator.generateManagementOnePager(requirements, design, tasks, roiInputs);
+    return {
+      one_pager_markdown: this.formatManagementOnePager(onePager)
+    };
+  }
+
+  async generatePRFAQ(requirements: string, design: string, targetDate?: string): Promise<{press_release_markdown: string, faq_markdown: string, launch_checklist_markdown: string}> {
+    const prfaq = await this.pmDocumentGenerator.generatePRFAQ(requirements, design, targetDate);
+    return {
+      press_release_markdown: this.formatPressRelease(prfaq.pressRelease),
+      faq_markdown: this.formatFAQ(prfaq.faq),
+      launch_checklist_markdown: this.formatLaunchChecklist(prfaq.launchChecklist)
+    };
+  }
+
+  async generateRequirements(rawIntent: string, context?: RequirementsContext): Promise<PMRequirements> {
+    return await this.pmDocumentGenerator.generateRequirements(rawIntent, context);
+  }
+
+  async generateDesignOptions(requirements: string): Promise<DesignOptions> {
+    return await this.pmDocumentGenerator.generateDesignOptions(requirements);
+  }
+
+  async generateTaskPlan(design: string, limits?: TaskLimits): Promise<TaskPlan> {
+    return await this.pmDocumentGenerator.generateTaskPlan(design, limits);
+  }
+
+  private formatManagementOnePager(onePager: ManagementOnePager): string {
+    return `# Management One-Pager
+
+## Answer
+${onePager.answer}
+
+## Because
+${onePager.because.map(reason => `- ${reason}`).join('\n')}
+
+## What (Scope Today)
+${onePager.whatScopeToday.map(item => `- ${item}`).join('\n')}
+
+## Risks & Mitigations
+${onePager.risksAndMitigations.map(rm => `- **Risk:** ${rm.risk}\n  **Mitigation:** ${rm.mitigation}`).join('\n')}
+
+## Options
+- **Conservative:** ${onePager.options.conservative.summary}
+- **Balanced ✅:** ${onePager.options.balanced.summary}
+- **Bold (ZBD):** ${onePager.options.bold.summary}
+
+## ROI Snapshot
+| Option        | Effort | Impact | Est. Cost | Timing |
+|---------------|--------|--------|-----------|--------|
+| Conservative  | ${onePager.roiSnapshot.options.conservative.effort} | ${onePager.roiSnapshot.options.conservative.impact} | ${onePager.roiSnapshot.options.conservative.estimatedCost} | ${onePager.roiSnapshot.options.conservative.timing} |
+| Balanced ✅   | ${onePager.roiSnapshot.options.balanced.effort} | ${onePager.roiSnapshot.options.balanced.impact} | ${onePager.roiSnapshot.options.balanced.estimatedCost} | ${onePager.roiSnapshot.options.balanced.timing} |
+| Bold (ZBD)    | ${onePager.roiSnapshot.options.bold.effort} | ${onePager.roiSnapshot.options.bold.impact} | ${onePager.roiSnapshot.options.bold.estimatedCost} | ${onePager.roiSnapshot.options.bold.timing} |
+
+## Right-Time Recommendation
+${onePager.rightTimeRecommendation}`;
+  }
+
+  private formatPressRelease(pr: PRFAQ['pressRelease']): string {
+    return `**${pr.date}**
+
+# ${pr.headline}
+
+## ${pr.subHeadline}
+
+${pr.body}`;
+  }
+
+  private formatFAQ(faq: FAQItem[]): string {
+    return faq.map((item, index) => `**Q${index + 1}: ${item.question}**\n\n${item.answer}`).join('\n\n');
+  }
+
+  private formatLaunchChecklist(checklist: ChecklistItem[]): string {
+    return checklist.map(item => `- [ ] ${item.task} (Owner: ${item.owner}, Due: ${item.dueDate})`).join('\n');
   }
 }
 ```

@@ -1,11 +1,11 @@
 {
-  "name": "pm-agent-intent-optimizer",
+  "name": "vibe-pm-agent",
   "version": "1.0.0",
-  "description": "AI-powered system that transforms raw developer intent into structured, efficient Kiro specifications",
+  "description": "Vibe PM Agent - AI-powered MCP server that transforms raw developer intent into structured, efficient Kiro specifications using consulting techniques, with quick validation and comprehensive PM document generation",
   "main": "dist/main.js",
   "bin": {
     "mcp-server": "./bin/mcp-server.js",
-    "pm-agent-mcp": "./bin/mcp-server.js"
+    "vibe-pm-agent": "./bin/mcp-server.js"
   },
   "scripts": {
     "build": "tsc",
@@ -18,17 +18,29 @@
     "mcp:start": "node bin/mcp-server.js",
     "mcp:start:debug": "node bin/mcp-server.js --log-level debug",
     "mcp:start:health": "node bin/mcp-server.js --health-check",
+    "mcp:start:full": "node bin/mcp-server.js --log-level debug --health-check",
+    "mcp:start:minimal": "node bin/mcp-server.js --no-logging --no-metrics",
     "mcp:validate": "node bin/mcp-server.js --help",
+    "mcp:test": "npm run test && node bin/mcp-server.js --help",
     "prepublishOnly": "npm run build && npm run test"
   },
   "keywords": [
+    "mcp",
+    "model-context-protocol",
     "kiro",
     "optimization",
     "workflow",
     "intent-parsing",
-    "quota-management"
+    "quota-management",
+    "consulting-techniques",
+    "pm-documents",
+    "quick-validation",
+    "roi-analysis",
+    "pyramid-principle",
+    "mece-framework",
+    "ai-agent"
   ],
-  "author": "PM Agent Intent Optimizer Team",
+  "author": "Vibe PM Agent Team",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.0",

@@ -1,0 +1,155 @@
+{
+  "mcpServers": {
+    "vibe-pm-agent": {
+      "command": "node",
+      "args": [
+        "./node_modules/vibe-pm-agent/bin/mcp-server.js",
+        "--log-level", "info",
+        "--health-check"
+      ],
+      "env": {
+        "LOG_LEVEL": "info",
+        "HEALTH_PORT": "3001"
+      },
+      "description": "AI-powered PM agent with consulting techniques, quick validation, and comprehensive document generation",
+      "tools": [
+        {
+          "name": "validate_idea_quick",
+          "description": "Fast PASS/FAIL validation with 3 structured options - like unit tests for ideas",
+          "example": {
+            "idea": "Build a real-time collaboration tool for remote teams",
+            "context": {
+              "urgency": "high",
+              "budget_range": "medium",
+              "team_size": 5
+            }
+          }
+        },
+        {
+          "name": "optimize_intent",
+          "description": "Complete intent optimization with consulting analysis and ROI forecasting",
+          "example": {
+            "intent": "Create a dashboard that analyzes user behavior patterns and generates automated insights for product managers",
+            "parameters": {
+              "expectedUserVolume": 1000,
+              "costConstraints": 500,
+              "performanceSensitivity": "high"
+            }
+          }
+        },
+        {
+          "name": "analyze_workflow",
+          "description": "Analyze existing workflows using consulting techniques for optimization opportunities",
+          "example": {
+            "workflow": {
+              "id": "user-feedback-analysis",
+              "steps": [
+                {
+                  "id": "collect-feedback",
+                  "type": "data_retrieval",
+                  "description": "Gather user feedback from multiple sources",
+                  "quotaCost": 5
+                },
+                {
+                  "id": "analyze-sentiment",
+                  "type": "analysis",
+                  "description": "Perform sentiment analysis on feedback",
+                  "quotaCost": 10
+                }
+              ],
+              "estimatedComplexity": 7
+            },
+            "techniques": ["MECE", "ValueDriverTree"]
+          }
+        },
+        {
+          "name": "generate_roi_analysis",
+          "description": "Generate comprehensive ROI analysis with Conservative/Balanced/Bold scenarios",
+          "example": {
+            "workflow": {
+              "id": "current-process",
+              "steps": [],
+              "estimatedComplexity": 5
+            },
+            "optimizedWorkflow": {
+              "id": "optimized-process",
+              "optimizations": [],
+              "efficiencyGains": {
+                "totalSavingsPercentage": 35
+              }
+            }
+          }
+        },
+        {
+          "name": "get_consulting_summary",
+          "description": "Professional consulting-style analysis using Pyramid Principle",
+          "example": {
+            "analysis": {
+              "techniquesUsed": [
+                {
+                  "name": "MECE",
+                  "relevanceScore": 0.9
+                }
+              ],
+              "totalQuotaSavings": 40,
+              "keyFindings": ["Significant batching opportunities identified"]
+            }
+          }
+        },
+        {
+          "name": "generate_management_onepager",
+          "description": "Executive one-pager with Pyramid Principle structure and timing rationale",
+          "example": {
+            "requirements": "Business Goal: Improve user engagement by 25% through personalized recommendations...",
+            "design": "Architecture: React-based dashboard with ML recommendation engine...",
+            "roi_inputs": {
+              "cost_naive": 1000,
+              "cost_balanced": 600,
+              "cost_bold": 300
+            }
+          }
+        },
+        {
+          "name": "generate_pr_faq",
+          "description": "Amazon-style PR-FAQ with press release, FAQ, and launch checklist",
+          "example": {
+            "requirements": "User needs analysis showing demand for real-time collaboration...",
+            "design": "Technical architecture using WebRTC and real-time synchronization...",
+            "target_date": "2024-06-15"
+          }
+        },
+        {
+          "name": "generate_requirements",
+          "description": "PM-grade requirements with MoSCoW prioritization and Go/No-Go decision",
+          "example": {
+            "raw_intent": "Build an AI-powered code review system that automatically detects bugs and suggests improvements",
+            "context": {
+              "roadmap_theme": "Developer productivity",
+              "budget": 50000,
+              "deadlines": "Q2 2024"
+            }
+          }
+        },
+        {
+          "name": "generate_design_options",
+          "description": "Conservative/Balanced/Bold design options with Impact vs Effort analysis",
+          "example": {
+            "requirements": "Business Goal: Reduce code review time by 50%\nUser Needs: Faster feedback, consistent quality...\nFunctional Requirements: Automated analysis, integration with Git..."
+          }
+        },
+        {
+          "name": "generate_task_plan",
+          "description": "Phased implementation plan with guardrails and structured task breakdown",
+          "example": {
+            "design": "Architecture: Microservices with ML pipeline for code analysis...\nComponents: Parser, Analyzer, Feedback Generator...",
+            "limits": {
+              "max_vibes": 100,
+              "max_specs": 20,
+              "budget_usd": 10000
+            }
+          }
+        }
+      ]
+    }
+  }
+}

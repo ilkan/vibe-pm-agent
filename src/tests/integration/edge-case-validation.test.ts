@@ -84,7 +84,7 @@ describe('Edge Case and Error Scenario Validation', () => {
         intent: 'Create a scalable system for massive user base',
         parameters: {
           expectedUserVolume: 1000000, // Maximum allowed value
-          costConstraints: 0.01, // Very low cost constraint
+          costConstraints: { maxCostDollars: 0.01 }, // Very low cost constraint
           performanceSensitivity: 'high'
         }
       };
@@ -103,7 +103,7 @@ describe('Edge Case and Error Scenario Validation', () => {
       const efficiencySummary = responseData.data.efficiencySummary;
       
       // Should respect extreme cost constraints
-      expect(efficiencySummary.optimizedApproach.estimatedCost).toBeLessThanOrEqual(args.parameters!.costConstraints! * 10); // Allow significant tolerance for extreme constraints
+      expect(efficiencySummary.optimizedApproach.estimatedCost).toBeLessThanOrEqual(args.parameters!.costConstraints!.maxCostDollars! * 10); // Allow significant tolerance for extreme constraints
       
       // Should acknowledge high user volume in optimization
       const specContent = JSON.stringify(responseData.data.enhancedKiroSpec).toLowerCase();
@@ -145,9 +145,9 @@ describe('Edge Case and Error Scenario Validation', () => {
           { id: 'step-3', type: 'vibe', description: 'Process C', inputs: ['output-b'], outputs: ['output-c'], quotaCost: 2 }
         ],
         dataFlow: [
-          { from: 'step-1', to: 'step-2', dataType: 'output-a' },
-          { from: 'step-2', to: 'step-3', dataType: 'output-b' },
-          { from: 'step-3', to: 'step-1', dataType: 'output-c' } // Circular dependency
+          { from: 'step-1', to: 'step-2', dataType: 'output-a', required: true },
+          { from: 'step-2', to: 'step-3', dataType: 'output-b', required: true },
+          { from: 'step-3', to: 'step-1', dataType: 'output-c', required: true } // Circular dependency
         ],
         estimatedComplexity: 3
       };
@@ -244,14 +244,14 @@ describe('Edge Case and Error Scenario Validation', () => {
       const invalidParameterSets = [
         {
           expectedUserVolume: -100, // Negative value
-          performanceSensitivity: 'medium'
+          performanceSensitivity: 'medium' as const
         },
         {
           expectedUserVolume: 1000000000, // Extremely high value
-          costConstraints: -50 // Negative cost
+          costConstraints: { maxCostDollars: -50 } // Negative cost
         },
         {
-          costConstraints: 0, // Zero cost constraint
+          costConstraints: { maxCostDollars: 0 }, // Zero cost constraint
           performanceSensitivity: 'invalid' as any // Invalid enum value
         }
       ];
@@ -345,7 +345,8 @@ describe('Edge Case and Error Scenario Validation', () => {
         dataFlow: Array.from({ length: 999 }, (_, index) => ({
           from: `step-${index}`,
           to: `step-${index + 1}`,
-          dataType: `output-${index}`
+          dataType: `output-${index}`,
+          required: true
         })),
         estimatedComplexity: 1000
       };
@@ -446,7 +447,7 @@ describe('Edge Case and Error Scenario Validation', () => {
         intent: timeIntensiveIntent,
         parameters: {
           expectedUserVolume: 1000000,
-          costConstraints: 10000,
+          costConstraints: { maxCostDollars: 10000 },
           performanceSensitivity: 'high'
         }
       };
@@ -615,7 +616,7 @@ describe('Edge Case and Error Scenario Validation', () => {
           { id: 'step-2', type: 'spec', description: 'Data storage', inputs: ['processed'], outputs: [], quotaCost: 2 }
         ],
         dataFlow: [
-          { from: 'step-1', to: 'step-2', dataType: 'processed' }
+          { from: 'step-1', to: 'step-2', dataType: 'processed', required: true }
         ],
         estimatedComplexity: 2
       };

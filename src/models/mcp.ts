@@ -167,6 +167,58 @@ export interface ConsultingSummaryArgs {
   techniques?: string[];
 }
 
+export interface ManagementOnePagerArgs {
+  requirements: string;
+  design: string;
+  tasks?: string;
+  roi_inputs?: {
+    cost_naive?: number;
+    cost_balanced?: number;
+    cost_bold?: number;
+  };
+}
+
+export interface PRFAQArgs {
+  requirements: string;
+  design: string;
+  target_date?: string;
+}
+
+export interface RequirementsArgs {
+  raw_intent: string;
+  context?: {
+    roadmap_theme?: string;
+    budget?: number;
+    quotas?: {
+      maxVibes?: number;
+      maxSpecs?: number;
+    };
+    deadlines?: string;
+  };
+}
+
+export interface DesignOptionsArgs {
+  requirements: string;
+}
+
+export interface TaskPlanArgs {
+  design: string;
+  limits?: {
+    max_vibes?: number;
+    max_specs?: number;
+    budget_usd?: number;
+  };
+}
+
+export interface ValidateIdeaQuickArgs {
+  idea: string;
+  context?: {
+    urgency?: 'low' | 'medium' | 'high';
+    budget_range?: 'small' | 'medium' | 'large';
+    team_size?: number;
+  };
+}
+
 /**
  * MCP Server status and health check
  */
@@ -236,6 +288,10 @@ export interface MCPServerOptions {
   host?: string;
   enableLogging?: boolean;
   enableMetrics?: boolean;
+  logLevel?: LogLevel;
+  enableQuickValidation?: boolean;
+  enablePMDocuments?: boolean;
   maxConcurrentRequests?: number;
   requestTimeout?: number;
+  enablePerformanceMonitoring?: boolean;
 }
