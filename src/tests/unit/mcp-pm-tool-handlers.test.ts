@@ -156,7 +156,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
       expect(result.content[0].json.data.options.conservative).toBeDefined();
       expect(result.content[0].json.data.options.balanced).toBeDefined();
       expect(result.content[0].json.data.options.bold).toBeDefined();
-      expect(result.content[0].json.impactEffortMatrix).toBeDefined();
+      expect(result.content[0].json.data.impactEffortMatrix).toBeDefined();
       expect(result.metadata?.quotaUsed).toBe(2);
     });
   });
@@ -182,7 +182,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
       expect(result.content[0].json.data.guardrailsCheck.limits.maxVibes).toBe(1000);
       expect(result.content[0].json.data.immediateWins).toBeInstanceOf(Array);
       expect(result.content[0].json.data.shortTerm).toBeInstanceOf(Array);
-      expect(result.content[0].json.longTerm).toBeInstanceOf(Array);
+      expect(result.content[0].json.data.longTerm).toBeInstanceOf(Array);
       expect(result.metadata?.quotaUsed).toBe(2);
     });
 

@@ -396,22 +396,22 @@
     - Document all tool schemas with usage examples
     - _Requirements: 10.1, 10.10, 10.11, 11.1_
 
-- [ ] 22. Fix test failures after project rename to vibe-pm-agent
-  - [ ] 22.1 Fix TypeScript compilation errors in test files
+- [x] 22. Fix test failures after project rename to vibe-pm-agent
+  - [x] 22.1 Fix TypeScript compilation errors in test files
     - Fix null assignment errors in mcp-server-startup.test.ts
     - Fix undefined property access errors in mcp-client-simulation.test.ts
     - Fix type compatibility issues in edge-case-validation.test.ts
     - Update test expectations to match new project structure
     - _Requirements: 10.11, 11.1_
 
-  - [ ] 22.2 Fix mock configuration and test expectations
+  - [x] 22.2 Fix mock configuration and test expectations
     - Update mock pipeline methods to use proper Jest mock functions
     - Fix test expectations for array lengths and object structures
     - Update test data to match actual implementation outputs
     - Fix performance test thresholds and validation logic
     - _Requirements: 10.11, 11.1_
 
-  - [ ] 22.3 Update integration test scenarios and validation
+  - [x] 22.3 Update integration test scenarios and validation
     - Fix workflow consistency validation in PM workflow tests
     - Update quota estimation test expectations to match implementation
     - Fix consulting technique selection test expectations
