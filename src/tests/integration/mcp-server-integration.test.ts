@@ -61,7 +61,7 @@ describe('MCP Server Integration Tests', () => {
       const registry = MCPToolRegistry.createDefault();
       const tools = registry.getAllTools();
       
-      expect(tools).toHaveLength(4);
+      expect(tools).toHaveLength(10);
       
       const toolNames = tools.map(tool => tool.name);
       expect(toolNames).toContain('optimize_intent');
@@ -121,7 +121,13 @@ describe('MCP Server Integration Tests', () => {
         'optimize_intent',
         'analyze_workflow', 
         'generate_roi_analysis',
-        'get_consulting_summary'
+        'get_consulting_summary',
+        'generate_management_onepager',
+        'generate_pr_faq',
+        'generate_requirements',
+        'generate_design_options',
+        'generate_task_plan',
+        'validate_idea_quick'
       ]);
     });
   });
@@ -926,7 +932,7 @@ describe('MCP Server Integration Tests', () => {
       const status = server.getStatus();
 
       expect(status.status).toBe('healthy');
-      expect(status.toolsRegistered).toBe(4);
+      expect(status.toolsRegistered).toBe(10);
       expect(status.performance).toBeDefined();
       expect(status.uptime).toBeGreaterThanOrEqual(0);
     });

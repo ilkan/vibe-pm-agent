@@ -4,7 +4,7 @@
 ```
 .kiro/
 ├── specs/                    # Kiro specifications and project documentation
-│   └── pm-agent-intent-optimizer/
+│   └── vibe-pm-agent/
 │       ├── requirements.md   # Detailed requirements and user stories
 │       ├── design.md        # Architecture and component design
 │       └── tasks.md         # Implementation plan and task breakdown

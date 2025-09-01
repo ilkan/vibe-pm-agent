@@ -7,7 +7,8 @@ import {
   OptimizeIntentArgs,
   AnalyzeWorkflowArgs,
   GenerateROIArgs,
-  ConsultingSummaryArgs
+  ConsultingSummaryArgs,
+  ValidateIdeaQuickArgs
 } from '../models/mcp';
 
 /**
@@ -19,18 +20,27 @@ export const TOOL_SCHEMAS = {
     properties: {
       intent: {
         type: "string",
-        description: "Raw developer intent in natural language"
+        description: "Raw developer intent in natural language",
+        minLength: 10,
+        maxLength: 5000
       },
       parameters: {
         type: "object",
         properties: {
           expectedUserVolume: {
             type: "number",
-            description: "Expected number of users or requests"
+            description: "Expected number of users or requests",
+            minimum: 1,
+            maximum: 1000000
           },
           costConstraints: {
-            type: "number",
-            description: "Maximum acceptable cost in dollars"
+            type: "object",
+            description: "Cost constraints for the optimization",
+            properties: {
+              maxVibes: { type: "number", minimum: 0 },
+              maxSpecs: { type: "number", minimum: 0 },
+              maxCostDollars: { type: "number", minimum: 0 }
+            }
           },
           performanceSensitivity: {
             type: "string",
@@ -129,6 +139,146 @@ export const TOOL_SCHEMAS = {
       }
     },
     required: ["analysis"]
+  } as JSONSchema,
+
+  generateManagementOnePager: {
+    type: "object",
+    properties: {
+      requirements: {
+        type: "string",
+        description: "Requirements document content"
+      },
+      design: {
+        type: "string", 
+        description: "Design document content"
+      },
+      tasks: {
+        type: "string",
+        description: "Task plan content (optional)"
+      },
+      roi_inputs: {
+        type: "object",
+        properties: {
+          cost_naive: { type: "number" },
+          cost_balanced: { type: "number" },
+          cost_bold: { type: "number" }
+        },
+        description: "Optional ROI cost inputs for different scenarios"
+      }
+    },
+    required: ["requirements", "design"]
+  } as JSONSchema,
+
+  generatePRFAQ: {
+    type: "object",
+    properties: {
+      requirements: {
+        type: "string",
+        description: "Requirements document content"
+      },
+      design: {
+        type: "string",
+        description: "Design document content"
+      },
+      target_date: {
+        type: "string",
+        description: "Target launch date (YYYY-MM-DD format, optional, defaults to 3 months from now)"
+      }
+    },
+    required: ["requirements", "design"]
+  } as JSONSchema,
+
+  generateRequirements: {
+    type: "object",
+    properties: {
+      raw_intent: {
+        type: "string",
+        description: "Raw developer intent in natural language"
+      },
+      context: {
+        type: "object",
+        properties: {
+          roadmap_theme: { type: "string" },
+          budget: { type: "number" },
+          quotas: {
+            type: "object",
+            properties: {
+              maxVibes: { type: "number" },
+              maxSpecs: { type: "number" }
+            }
+          },
+          deadlines: { type: "string" }
+        },
+        description: "Optional context for requirements generation"
+      }
+    },
+    required: ["raw_intent"]
+  } as JSONSchema,
+
+  generateDesignOptions: {
+    type: "object",
+    properties: {
+      requirements: {
+        type: "string",
+        description: "Approved requirements document content"
+      }
+    },
+    required: ["requirements"]
+  } as JSONSchema,
+
+  generateTaskPlan: {
+    type: "object",
+    properties: {
+      design: {
+        type: "string",
+        description: "Approved design document content"
+      },
+      limits: {
+        type: "object",
+        properties: {
+          max_vibes: { type: "number" },
+          max_specs: { type: "number" },
+          budget_usd: { type: "number" }
+        },
+        description: "Optional project limits for guardrails check"
+      }
+    },
+    required: ["design"]
+  } as JSONSchema,
+
+  validateIdeaQuick: {
+    type: "object",
+    properties: {
+      idea: {
+        type: "string",
+        description: "Raw idea or intent to validate quickly",
+        minLength: 5,
+        maxLength: 2000
+      },
+      context: {
+        type: "object",
+        properties: {
+          urgency: {
+            type: "string",
+            enum: ["low", "medium", "high"],
+            description: "How urgent this idea is"
+          },
+          budget_range: {
+            type: "string", 
+            enum: ["small", "medium", "large"],
+            description: "Available budget range"
+          },
+          team_size: {
+            type: "number",
+            minimum: 1,
+            maximum: 100,
+            description: "Size of the team working on this"
+          }
+        },
+        description: "Optional context for validation"
+      }
+    },
+    required: ["idea"]
   } as JSONSchema
 };
 
@@ -136,7 +286,7 @@ export const TOOL_SCHEMAS = {
  * MCP Server configuration with tool definitions
  */
 export const MCP_SERVER_CONFIG: MCPServerConfig = {
-  name: "pm-agent-intent-optimizer",
+  name: "vibe-pm-agent",
   version: "1.0.0",
   description: "AI agent for optimizing developer intent into efficient Kiro specs using consulting techniques",
   tools: [
@@ -162,6 +312,42 @@ export const MCP_SERVER_CONFIG: MCPServerConfig = {
       name: "get_consulting_summary",
       description: "Provides detailed consulting-style summary using Pyramid Principle for any analysis",
       inputSchema: TOOL_SCHEMAS.getConsultingSummary,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "generate_management_onepager",
+      description: "Creates executive-ready management one-pager using Pyramid Principle with answer-first clarity and timing rationale",
+      inputSchema: TOOL_SCHEMAS.generateManagementOnePager,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "generate_pr_faq",
+      description: "Generates Amazon-style PR-FAQ document with future-dated press release and comprehensive FAQ",
+      inputSchema: TOOL_SCHEMAS.generatePRFAQ,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "generate_requirements",
+      description: "Creates PM-grade requirements with Business Goal extraction, MoSCoW prioritization, and Go/No-Go timing decision",
+      inputSchema: TOOL_SCHEMAS.generateRequirements,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "generate_design_options",
+      description: "Translates approved requirements into Conservative/Balanced/Bold design options with Impact vs Effort analysis",
+      inputSchema: TOOL_SCHEMAS.generateDesignOptions,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "generate_task_plan",
+      description: "Creates phased implementation plan with Guardrails Check, Immediate Wins, Short-Term, and Long-Term tasks",
+      inputSchema: TOOL_SCHEMAS.generateTaskPlan,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "validate_idea_quick",
+      description: "Fast unit-test-like validation that provides PASS/FAIL verdict with 3 structured options for next steps. Acts like a unit test for ideas - quick feedback with clear choices.",
+      inputSchema: TOOL_SCHEMAS.validateIdeaQuick,
       handler: async () => { throw new Error("Handler not implemented"); }
     }
   ]

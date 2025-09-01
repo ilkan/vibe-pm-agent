@@ -6,7 +6,7 @@ import { MCPTool } from '../../models/mcp';
 describe('MCP Server Configuration', () => {
   describe('MCP_SERVER_CONFIG', () => {
     it('should have correct server metadata', () => {
-      expect(MCP_SERVER_CONFIG.name).toBe('pm-agent-intent-optimizer');
+      expect(MCP_SERVER_CONFIG.name).toBe('vibe-pm-agent');
       expect(MCP_SERVER_CONFIG.version).toBe('1.0.0');
       expect(MCP_SERVER_CONFIG.description).toContain('AI agent for optimizing developer intent');
     });
@@ -16,7 +16,13 @@ describe('MCP Server Configuration', () => {
         'optimize_intent',
         'analyze_workflow', 
         'generate_roi_analysis',
-        'get_consulting_summary'
+        'get_consulting_summary',
+        'generate_management_onepager',
+        'generate_pr_faq',
+        'generate_requirements',
+        'generate_design_options',
+        'generate_task_plan',
+        'validate_idea_quick'
       ];
 
       const toolNames = MCP_SERVER_CONFIG.tools.map(tool => tool.name);
@@ -132,6 +138,116 @@ describe('MCP Server Configuration', () => {
         expect(analysis.required).toContain('techniquesUsed');
         expect(analysis.required).toContain('keyFindings');
         expect(analysis.required).toContain('totalQuotaSavings');
+      });
+    });
+
+    describe('validateIdeaQuick schema', () => {
+      const schema = TOOL_SCHEMAS.validateIdeaQuick;
+
+      it('should require idea parameter', () => {
+        expect(schema.required).toContain('idea');
+      });
+
+      it('should have proper idea validation', () => {
+        expect(schema.properties?.idea).toBeDefined();
+        expect(schema.properties?.idea.type).toBe('string');
+        expect(schema.properties?.idea.minLength).toBe(5);
+        expect(schema.properties?.idea.maxLength).toBe(2000);
+      });
+
+      it('should have optional context with proper validation', () => {
+        const context = schema.properties?.context;
+        expect(context).toBeDefined();
+        expect(context.type).toBe('object');
+        
+        const urgency = context.properties?.urgency;
+        expect(urgency?.enum).toEqual(['low', 'medium', 'high']);
+
+        const budgetRange = context.properties?.budget_range;
+        expect(budgetRange?.enum).toEqual(['small', 'medium', 'large']);
+
+        const teamSize = context.properties?.team_size;
+        expect(teamSize?.type).toBe('number');
+        expect(teamSize?.minimum).toBe(1);
+        expect(teamSize?.maximum).toBe(100);
+      });
+    });
+
+    describe('generateManagementOnePager schema', () => {
+      const schema = TOOL_SCHEMAS.generateManagementOnePager;
+
+      it('should require requirements and design parameters', () => {
+        expect(schema.required).toContain('requirements');
+        expect(schema.required).toContain('design');
+      });
+
+      it('should have optional tasks and roi_inputs', () => {
+        expect(schema.properties?.tasks).toBeDefined();
+        expect(schema.properties?.roi_inputs).toBeDefined();
+        expect(schema.required).not.toContain('tasks');
+        expect(schema.required).not.toContain('roi_inputs');
+      });
+
+      it('should validate roi_inputs structure', () => {
+        const roiInputs = schema.properties?.roi_inputs;
+        expect(roiInputs.properties?.cost_naive?.type).toBe('number');
+        expect(roiInputs.properties?.cost_balanced?.type).toBe('number');
+        expect(roiInputs.properties?.cost_bold?.type).toBe('number');
+      });
+    });
+
+    describe('generatePRFAQ schema', () => {
+      const schema = TOOL_SCHEMAS.generatePRFAQ;
+
+      it('should require requirements and design parameters', () => {
+        expect(schema.required).toContain('requirements');
+        expect(schema.required).toContain('design');
+      });
+
+      it('should have optional target_date', () => {
+        expect(schema.properties?.target_date).toBeDefined();
+        expect(schema.required).not.toContain('target_date');
+      });
+    });
+
+    describe('generateRequirements schema', () => {
+      const schema = TOOL_SCHEMAS.generateRequirements;
+
+      it('should require raw_intent parameter', () => {
+        expect(schema.required).toContain('raw_intent');
+      });
+
+      it('should have optional context with proper structure', () => {
+        const context = schema.properties?.context;
+        expect(context).toBeDefined();
+        expect(context.properties?.roadmap_theme?.type).toBe('string');
+        expect(context.properties?.budget?.type).toBe('number');
+        expect(context.properties?.quotas?.properties?.maxVibes?.type).toBe('number');
+        expect(context.properties?.quotas?.properties?.maxSpecs?.type).toBe('number');
+      });
+    });
+
+    describe('generateDesignOptions schema', () => {
+      const schema = TOOL_SCHEMAS.generateDesignOptions;
+
+      it('should require requirements parameter', () => {
+        expect(schema.required).toContain('requirements');
+      });
+    });
+
+    describe('generateTaskPlan schema', () => {
+      const schema = TOOL_SCHEMAS.generateTaskPlan;
+
+      it('should require design parameter', () => {
+        expect(schema.required).toContain('design');
+      });
+
+      it('should have optional limits with proper structure', () => {
+        const limits = schema.properties?.limits;
+        expect(limits).toBeDefined();
+        expect(limits.properties?.max_vibes?.type).toBe('number');
+        expect(limits.properties?.max_specs?.type).toBe('number');
+        expect(limits.properties?.budget_usd?.type).toBe('number');
       });
     });
   });
@@ -262,6 +378,12 @@ describe('MCP Server Configuration', () => {
         expect(toolNames).toContain('analyze_workflow');
         expect(toolNames).toContain('generate_roi_analysis');
         expect(toolNames).toContain('get_consulting_summary');
+        expect(toolNames).toContain('generate_management_onepager');
+        expect(toolNames).toContain('generate_pr_faq');
+        expect(toolNames).toContain('generate_requirements');
+        expect(toolNames).toContain('generate_design_options');
+        expect(toolNames).toContain('generate_task_plan');
+        expect(toolNames).toContain('validate_idea_quick');
       });
 
       it('should have all tools from MCP_SERVER_CONFIG', () => {

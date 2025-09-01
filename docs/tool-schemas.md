@@ -439,7 +439,7 @@ Common error scenarios:
 ### Kiro Integration
 ```typescript
 // Example of calling the MCP tool from Kiro
-const result = await kiro.callMCPTool('pm-agent-intent-optimizer', 'optimize_intent', {
+const result = await kiro.callMCPTool('vibe-pm-agent', 'optimize_intent', {
   intent: 'Create a blog platform with user authentication and content management',
   parameters: {
     expectedUserVolume: 1000,
@@ -456,7 +456,7 @@ if (!result.isError) {
 ### CLI Integration
 ```bash
 # Using MCP CLI tools (if available)
-mcp-client call pm-agent-intent-optimizer optimize_intent \
+mcp-client call vibe-pm-agent optimize_intent \
   --intent "Build a task management system" \
   --parameters '{"expectedUserVolume": 500}'
 ```

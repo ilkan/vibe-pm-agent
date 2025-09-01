@@ -174,7 +174,7 @@ export function validateWorkflow(workflow: Workflow): void {
       throw new ValidationError(`Workflow step ${index} must have a valid ID`, `steps[${index}].id`);
     }
 
-    if (!step.type || !['vibe', 'spec', 'data_retrieval', 'processing'].includes(step.type)) {
+    if (!step.type || !['vibe', 'spec', 'data_retrieval', 'processing', 'analysis'].includes(step.type)) {
       throw new ValidationError(`Workflow step ${index} must have a valid type`, `steps[${index}].type`);
     }
 

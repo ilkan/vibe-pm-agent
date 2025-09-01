@@ -12,23 +12,25 @@ import { Workflow, OptimizedWorkflow } from '../../models/workflow';
 import { ConsultingAnalysis } from '../../components/business-analyzer';
 
 // Mock the AIAgentPipeline
-jest.mock('../../main', () => ({
+const mockProcessIntent = jest.fn();
+const mockAnalyzeWorkflow = jest.fn();
+const mockGenerateROIAnalysis = jest.fn();
+const mockGenerateConsultingSummary = jest.fn();
+
+jest.mock('../../pipeline', () => ({
   AIAgentPipeline: jest.fn().mockImplementation(() => ({
-    processIntent: jest.fn(),
-    analyzeWorkflow: jest.fn(),
-    generateROIAnalysis: jest.fn(),
-    generateConsultingSummary: jest.fn()
+    processIntent: mockProcessIntent,
+    analyzeWorkflow: mockAnalyzeWorkflow,
+    generateROIAnalysis: mockGenerateROIAnalysis,
+    generateConsultingSummary: mockGenerateConsultingSummary
   }))
 }));
 
 describe('MCP Tool Handlers', () => {
   let server: PMAgentMCPServer;
-  let mockPipeline: any;
 
   beforeEach(() => {
     server = new PMAgentMCPServer();
-    // Access the private pipeline property for mocking
-    mockPipeline = (server as any).pipeline;
   });
 
   afterEach(() => {
@@ -126,11 +128,11 @@ describe('MCP Tool Handlers', () => {
         }
       };
 
-      mockPipeline.processIntent.mockResolvedValue(mockResult);
+      mockProcessIntent.mockResolvedValue(mockResult);
 
       const result = await server.handleOptimizeIntent(args, mockContext);
 
-      expect(mockPipeline.processIntent).toHaveBeenCalledWith(args.intent, args.parameters);
+      expect(mockProcessIntent).toHaveBeenCalledWith(args.intent, args.parameters);
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
@@ -157,7 +159,7 @@ describe('MCP Tool Handlers', () => {
         }
       };
 
-      mockPipeline.processIntent.mockResolvedValue(mockResult);
+      mockProcessIntent.mockResolvedValue(mockResult);
 
       const result = await server.handleOptimizeIntent(args, mockContext);
 
@@ -175,7 +177,7 @@ describe('MCP Tool Handlers', () => {
         intent: 'Test intent'
       };
 
-      mockPipeline.processIntent.mockRejectedValue(new Error('Pipeline crashed'));
+      mockProcessIntent.mockRejectedValue(new Error('Pipeline crashed'));
 
       const result = await server.handleOptimizeIntent(args, mockContext);
 
@@ -222,11 +224,11 @@ describe('MCP Tool Handlers', () => {
         }
       };
 
-      mockPipeline.processIntent.mockResolvedValue(mockResult);
+      mockProcessIntent.mockResolvedValue(mockResult);
 
       const result = await server.handleOptimizeIntent(args, mockContext);
 
-      expect(mockPipeline.processIntent).toHaveBeenCalledWith(args.intent, undefined);
+      expect(mockProcessIntent).toHaveBeenCalledWith(args.intent, undefined);
       expect(result.isError).toBeFalsy();
       expect(result.content[0].type).toBe('json');
     });
@@ -301,11 +303,11 @@ describe('MCP Tool Handlers', () => {
         }
       };
 
-      mockPipeline.analyzeWorkflow.mockResolvedValue(mockAnalysis);
+      mockAnalyzeWorkflow.mockResolvedValue(mockAnalysis);
 
       const result = await server.handleAnalyzeWorkflow(args, mockContext);
 
-      expect(mockPipeline.analyzeWorkflow).toHaveBeenCalledWith(mockWorkflow, ['MECE', 'ValueDriverTree']);
+      expect(mockAnalyzeWorkflow).toHaveBeenCalledWith(mockWorkflow, ['MECE', 'ValueDriverTree']);
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('markdown');
@@ -328,11 +330,11 @@ describe('MCP Tool Handlers', () => {
         implementationComplexity: 'low'
       };
 
-      mockPipeline.analyzeWorkflow.mockResolvedValue(mockAnalysis);
+      mockAnalyzeWorkflow.mockResolvedValue(mockAnalysis);
 
       const result = await server.handleAnalyzeWorkflow(args, mockContext);
 
-      expect(mockPipeline.analyzeWorkflow).toHaveBeenCalledWith(mockWorkflow, undefined);
+      expect(mockAnalyzeWorkflow).toHaveBeenCalledWith(mockWorkflow, undefined);
       expect(result.isError).toBeFalsy();
       expect(result.content[0].type).toBe('markdown');
     });
@@ -342,7 +344,7 @@ describe('MCP Tool Handlers', () => {
         workflow: mockWorkflow
       };
 
-      mockPipeline.analyzeWorkflow.mockRejectedValue(new Error('Analysis failed'));
+      mockAnalyzeWorkflow.mockRejectedValue(new Error('Analysis failed'));
 
       const result = await server.handleAnalyzeWorkflow(args, mockContext);
 
@@ -413,11 +415,11 @@ describe('MCP Tool Handlers', () => {
         riskAssessment: 'Low risk with high reward'
       };
 
-      mockPipeline.generateROIAnalysis.mockResolvedValue(mockROIAnalysis);
+      mockGenerateROIAnalysis.mockResolvedValue(mockROIAnalysis);
 
       const result = await server.handleGenerateROI(args, mockContext);
 
-      expect(mockPipeline.generateROIAnalysis).toHaveBeenCalledWith(mockWorkflow, undefined, undefined);
+      expect(mockGenerateROIAnalysis).toHaveBeenCalledWith(mockWorkflow, undefined, undefined);
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
@@ -475,11 +477,11 @@ describe('MCP Tool Handlers', () => {
         riskAssessment: 'Low risk, high reward'
       };
 
-      mockPipeline.generateROIAnalysis.mockResolvedValue(mockROIAnalysis);
+      mockGenerateROIAnalysis.mockResolvedValue(mockROIAnalysis);
 
       const result = await server.handleGenerateROI(args, mockContext);
 
-      expect(mockPipeline.generateROIAnalysis).toHaveBeenCalledWith(mockWorkflow, optimizedWorkflow, undefined);
+      expect(mockGenerateROIAnalysis).toHaveBeenCalledWith(mockWorkflow, optimizedWorkflow, undefined);
       expect(result.isError).toBeFalsy();
       expect(result.content[0].type).toBe('json');
     });
@@ -489,7 +491,7 @@ describe('MCP Tool Handlers', () => {
         workflow: mockWorkflow
       };
 
-      mockPipeline.generateROIAnalysis.mockRejectedValue(new Error('ROI calculation failed'));
+      mockGenerateROIAnalysis.mockRejectedValue(new Error('ROI calculation failed'));
 
       const result = await server.handleGenerateROI(args, mockContext);
 
@@ -568,11 +570,11 @@ describe('MCP Tool Handlers', () => {
         ]
       };
 
-      mockPipeline.generateConsultingSummary.mockResolvedValue(mockSummary);
+      mockGenerateConsultingSummary.mockResolvedValue(mockSummary);
 
       const result = await server.handleConsultingSummary(args, mockContext);
 
-      expect(mockPipeline.generateConsultingSummary).toHaveBeenCalledWith(mockAnalysis, ['MECE', 'Pyramid']);
+      expect(mockGenerateConsultingSummary).toHaveBeenCalledWith(mockAnalysis, ['MECE', 'Pyramid']);
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('markdown');
@@ -594,11 +596,11 @@ describe('MCP Tool Handlers', () => {
         supportingEvidence: []
       };
 
-      mockPipeline.generateConsultingSummary.mockResolvedValue(mockSummary);
+      mockGenerateConsultingSummary.mockResolvedValue(mockSummary);
 
       const result = await server.handleConsultingSummary(args, mockContext);
 
-      expect(mockPipeline.generateConsultingSummary).toHaveBeenCalledWith(mockAnalysis, undefined);
+      expect(mockGenerateConsultingSummary).toHaveBeenCalledWith(mockAnalysis, undefined);
       expect(result.isError).toBeFalsy();
       expect(result.content[0].type).toBe('markdown');
     });
@@ -608,7 +610,7 @@ describe('MCP Tool Handlers', () => {
         analysis: mockAnalysis
       };
 
-      mockPipeline.generateConsultingSummary.mockRejectedValue(new Error('Summary generation failed'));
+      mockGenerateConsultingSummary.mockRejectedValue(new Error('Summary generation failed'));
 
       const result = await server.handleConsultingSummary(args, mockContext);
 

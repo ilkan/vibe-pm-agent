@@ -21,7 +21,7 @@ describe('Pipeline Integration', () => {
       expect(result.success).toBeDefined();
       
       if (result.success) {
-        expect(result.kiroSpec).toBeDefined();
+        expect(result.enhancedKiroSpec).toBeDefined();
         expect(result.efficiencySummary).toBeDefined();
       } else {
         expect(result.error).toBeDefined();

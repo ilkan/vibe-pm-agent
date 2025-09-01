@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "pm-agent-intent-optimizer": {
+    "vibe-pm-agent": {
       "command": "node",
-      "args": ["path/to/pm-agent-intent-optimizer/bin/mcp-server.js"],
+      "args": ["path/to/vibe-pm-agent/bin/mcp-server.js"],
       "env": {},
       "disabled": false,
       "autoApprove": [

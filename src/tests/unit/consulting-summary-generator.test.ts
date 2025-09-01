@@ -1,9 +1,9 @@
 import { 
   ConsultingSummaryGenerator, 
-  ConsultingAnalysis, 
   AnalysisFindings,
   ExecutiveSummary 
 } from '../../components/consulting-summary-generator';
+import { ConsultingAnalysis } from '../../components/business-analyzer';
 import {
   ConsultingTechnique,
   MECEAnalysis,

@@ -6,8 +6,17 @@ import {
   WorkflowOptimizer,
   QuotaForecaster,
   SpecGenerator,
-  ConsultingSummaryGenerator
+  ConsultingSummaryGenerator,
+  QuickValidator
 } from '../components';
+import { 
+  PMDocumentGenerator, 
+  ManagementOnePager, 
+  PRFAQ, 
+  PMRequirements, 
+  DesignOptions, 
+  TaskPlan 
+} from '../components/pm-document-generator';
 import { 
   OptionalParams, 
   KiroSpec, 
@@ -18,8 +27,15 @@ import {
   EnhancedKiroSpec,
   ConsultingSummary,
   ROIAnalysis,
-  QuotaForecast
+  QuotaForecast,
+  QuickValidationResult,
+  QuickValidationContext
 } from '../models';
+import { 
+  PMDocumentConsistencyValidator,
+  ConsistencyValidationResult,
+  validatePMDocumentConsistency
+} from '../utils/pm-document-consistency-validation';
 import { ConsultingAnalysis } from '../components/business-analyzer';
 import { validateRawIntent, validateOptionalParams, ValidationError } from '../utils/validation';
 import { ErrorHandler, RetryHandler, ProcessingFailureError } from '../utils/error-handling';
@@ -38,6 +54,17 @@ export interface PipelineResult {
   consultingSummary?: ConsultingSummary;
   roiAnalysis?: ROIAnalysis;
   efficiencySummary?: any; // Add efficiency summary for MCP server compatibility
+  pmDocuments?: {
+    managementOnePager?: string; // Formatted markdown
+    prfaq?: {
+      pressRelease: string;
+      faq: string;
+      launchChecklist: string;
+    };
+    requirements?: any; // PMRequirements object
+    designOptions?: any; // DesignOptions object
+    taskPlan?: any; // TaskPlan object
+  };
   error?: ProcessingError;
   metadata?: {
     executionTime: number;
@@ -59,6 +86,8 @@ export class AIAgentPipeline {
   private quotaForecaster: QuotaForecaster;
   private consultingSummaryGenerator: ConsultingSummaryGenerator;
   private specGenerator: SpecGenerator;
+  private pmDocumentGenerator: PMDocumentGenerator;
+  private quickValidator: QuickValidator;
   
   // Performance optimization components
   private cache: PipelineCache;
@@ -72,6 +101,8 @@ export class AIAgentPipeline {
     this.quotaForecaster = new QuotaForecaster();
     this.consultingSummaryGenerator = new ConsultingSummaryGenerator();
     this.specGenerator = new SpecGenerator();
+    this.pmDocumentGenerator = new PMDocumentGenerator();
+    this.quickValidator = new QuickValidator();
     
     // Initialize performance optimization components
     this.cache = new PipelineCache({
@@ -81,6 +112,25 @@ export class AIAgentPipeline {
     });
     this.parallelProcessor = new ParallelProcessor(4); // Max 4 concurrent operations
     this.performanceMonitor = new PerformanceMonitor();
+  }
+
+  /**
+   * Clean up pipeline resources
+   */
+  async cleanup(): Promise<void> {
+    try {
+      // Destroy cache and clear timers
+      if (this.cache) {
+        this.cache.destroy();
+      }
+      
+      // Reset performance monitor
+      if (this.performanceMonitor) {
+        this.performanceMonitor.reset();
+      }
+    } catch (error) {
+      // Ignore cleanup errors
+    }
   }
 
   /**
@@ -220,6 +270,25 @@ export class AIAgentPipeline {
       quotaUsed += 1; // Spec generation uses 1 quota unit
       this.logInfo('Enhanced spec generation completed', { sessionId, tasksGenerated: enhancedSpec.tasks.length });
       
+      // Stage 7: Optional PM Document Generation
+      let pmDocuments: PipelineResult['pmDocuments'] = undefined;
+      if (params?.generatePMDocuments) {
+        this.logInfo('Stage 7: Generating PM documents', { sessionId, stage: 'pm_documents' });
+        pmDocuments = await this.generatePMDocumentsWithErrorHandling(
+          parsedIntent,
+          enhancedSpec,
+          consultingSummary,
+          roiAnalysis,
+          params.generatePMDocuments,
+          sessionId
+        );
+        quotaUsed += Object.keys(pmDocuments || {}).length; // Each PM document uses 1 quota unit
+        this.logInfo('PM documents generation completed', { 
+          sessionId, 
+          documentsGenerated: Object.keys(pmDocuments || {}).length 
+        });
+      }
+      
       const executionTime = Date.now() - startTime;
       
       // Record performance metrics
@@ -251,6 +320,7 @@ export class AIAgentPipeline {
         consultingSummary,
         roiAnalysis,
         efficiencySummary,
+        pmDocuments,
         metadata: {
           executionTime,
           sessionId,
@@ -449,6 +519,42 @@ export class AIAgentPipeline {
       const executionTime = Date.now() - startTime;
       this.logError('Consulting summary generation failed', error, { sessionId, executionTime });
       throw new Error(`Consulting summary generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Fast idea validation method (used by MCP tools)
+   * Provides PASS/FAIL verdict with 3 structured options for next steps
+   */
+  async validateIdeaQuick(idea: string, context?: QuickValidationContext): Promise<QuickValidationResult> {
+    const sessionId = this.generateSessionId();
+    const startTime = Date.now();
+    
+    try {
+      this.logInfo('Starting quick idea validation', { 
+        sessionId, 
+        ideaLength: idea.length,
+        hasContext: !!context 
+      });
+      
+      const result = await this.quickValidator.validateIdeaQuick(idea, context);
+      
+      const executionTime = Date.now() - startTime;
+      this.performanceMonitor.recordExecution(executionTime, false, 0);
+      this.logInfo('Quick validation completed', { 
+        sessionId, 
+        executionTime, 
+        verdict: result.verdict,
+        processingTime: result.processingTimeMs
+      });
+      
+      return result;
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.performanceMonitor.recordError();
+      this.performanceMonitor.recordExecution(executionTime, false, 0);
+      this.logError('Quick validation failed', error, { sessionId, executionTime });
+      throw new Error(`Quick validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -751,6 +857,132 @@ export class AIAgentPipeline {
     }
   }
 
+  private async generatePMDocumentsWithErrorHandling(
+    parsedIntent: ParsedIntent,
+    enhancedSpec: EnhancedKiroSpec,
+    consultingSummary: ConsultingSummary,
+    roiAnalysis: ROIAnalysis,
+    pmOptions: NonNullable<OptionalParams['generatePMDocuments']>,
+    sessionId?: string
+  ): Promise<PipelineResult['pmDocuments']> {
+    const pmDocuments: PipelineResult['pmDocuments'] = {};
+    
+    try {
+      // Generate requirements document if requested
+      if (pmOptions.requirements) {
+        this.logInfo('Generating PM requirements document', { sessionId });
+        const requirements = await this.pmDocumentGenerator.generateRequirements(
+          parsedIntent.businessObjective,
+          pmOptions.context
+        );
+        pmDocuments.requirements = requirements;
+      }
+
+      // Generate design options if requested
+      if (pmOptions.designOptions && pmDocuments.requirements) {
+        this.logInfo('Generating design options document', { sessionId });
+        const designOptions = await this.pmDocumentGenerator.generateDesignOptions(
+          JSON.stringify(pmDocuments.requirements)
+        );
+        pmDocuments.designOptions = designOptions;
+      }
+
+      // Generate task plan if requested
+      if (pmOptions.taskPlan && pmDocuments.designOptions) {
+        this.logInfo('Generating task plan document', { sessionId });
+        const taskPlan = await this.pmDocumentGenerator.generateTaskPlan(
+          JSON.stringify(pmDocuments.designOptions),
+          pmOptions.context ? {
+            maxVibes: pmOptions.context.budget ? Math.floor(pmOptions.context.budget * 0.7) : undefined,
+            maxSpecs: pmOptions.context.budget ? Math.floor(pmOptions.context.budget * 0.3) : undefined,
+            budgetUSD: pmOptions.context.budget
+          } : undefined
+        );
+        pmDocuments.taskPlan = taskPlan;
+      }
+
+      // Generate management one-pager if requested
+      if (pmOptions.managementOnePager && pmDocuments.requirements && pmDocuments.designOptions) {
+        this.logInfo('Generating management one-pager', { sessionId });
+        const onePager = await this.pmDocumentGenerator.generateManagementOnePager(
+          JSON.stringify(pmDocuments.requirements),
+          JSON.stringify(pmDocuments.designOptions),
+          pmDocuments.taskPlan ? JSON.stringify(pmDocuments.taskPlan) : undefined,
+          {
+            cost_naive: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))?.forecast.estimatedCost,
+            cost_balanced: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast.estimatedCost,
+            cost_bold: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('bold'))?.forecast.estimatedCost
+          }
+        );
+        pmDocuments.managementOnePager = this.formatManagementOnePager(onePager);
+      }
+
+      // Generate PR-FAQ if requested
+      if (pmOptions.prfaq && pmDocuments.requirements && pmDocuments.designOptions) {
+        this.logInfo('Generating PR-FAQ document', { sessionId });
+        const prfaq = await this.pmDocumentGenerator.generatePRFAQ(
+          JSON.stringify(pmDocuments.requirements),
+          JSON.stringify(pmDocuments.designOptions),
+          pmOptions.targetDate
+        );
+        pmDocuments.prfaq = {
+          pressRelease: this.formatPressRelease(prfaq.pressRelease),
+          faq: this.formatFAQ(prfaq.faq),
+          launchChecklist: this.formatLaunchChecklist(prfaq.launchChecklist)
+        };
+      }
+
+      // Validate cross-document consistency
+      const validationResult = this.validatePMDocumentConsistency(pmDocuments);
+      
+      if (!validationResult.isValid) {
+        this.logWarning('PM document consistency issues detected', {
+          sessionId,
+          issues: validationResult.issues,
+          warnings: validationResult.warnings
+        });
+        
+        // Log issues but don't fail the pipeline - return documents with warnings
+        validationResult.issues.forEach(issue => {
+          this.logWarning(`PM Document Consistency Issue: ${issue}`, { sessionId });
+        });
+      }
+      
+      if (validationResult.warnings.length > 0) {
+        this.logInfo('PM document consistency warnings', {
+          sessionId,
+          warnings: validationResult.warnings
+        });
+      }
+
+      return pmDocuments;
+    } catch (error) {
+      this.logError('PM documents generation failed', error, { sessionId, requestedDocs: Object.keys(pmOptions) });
+      
+      // Return partial results if some documents were generated successfully
+      if (Object.keys(pmDocuments).length > 0) {
+        this.logWarning('Returning partial PM documents due to error', { 
+          sessionId, 
+          generatedDocs: Object.keys(pmDocuments),
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+        
+        // Still validate partial documents for consistency
+        const validationResult = this.validatePMDocumentConsistency(pmDocuments);
+        if (validationResult.warnings.length > 0) {
+          this.logWarning('Partial PM documents have consistency warnings', {
+            sessionId,
+            warnings: validationResult.warnings
+          });
+        }
+        
+        return pmDocuments;
+      }
+      
+      throw this.createStageError('analysis', 'pm_documents_failed', error, 'Review input parameters and try again. Consider generating documents individually.');
+    }
+  }
+
   private calculateSavingsPercentage(baseline: QuotaForecast, optimized: QuotaForecast): number {
     if (baseline.estimatedCost === 0) return 0;
     return Math.round(((baseline.estimatedCost - optimized.estimatedCost) / baseline.estimatedCost) * 100);
@@ -915,6 +1147,841 @@ export class AIAgentPipeline {
   }
 
   /**
+   * Generate management one-pager with Pyramid Principle structure
+   */
+  async generateManagementOnePager(
+    requirements: string, 
+    design: string, 
+    tasks?: string, 
+    roiInputs?: { cost_naive?: number; cost_balanced?: number; cost_bold?: number }
+  ): Promise<{ one_pager_markdown: string; validation_result?: ConsistencyValidationResult }> {
+    const sessionId = this.generateSessionId();
+    const startTime = Date.now();
+    
+    try {
+      this.logInfo('Starting management one-pager generation', { 
+        sessionId, 
+        requirementsLength: requirements.length,
+        designLength: design.length,
+        hasTasks: !!tasks,
+        hasROIInputs: !!roiInputs
+      });
+      
+      const onePager = await this.pmDocumentGenerator.generateManagementOnePager(
+        requirements, 
+        design, 
+        tasks, 
+        roiInputs
+      );
+      
+      // Perform consistency validation
+      let validationResult: ConsistencyValidationResult | undefined;
+      try {
+        const parsedRequirements = this.parseRequirementsFromString(requirements);
+        const parsedDesign = this.parseDesignFromString(design);
+        
+        const validator = new PMDocumentConsistencyValidator();
+        validationResult = validator.validateManagementOnePagerConsistency(
+          onePager, 
+          parsedRequirements, 
+          parsedDesign
+        );
+        
+        this.logInfo('Management one-pager consistency validation completed', {
+          sessionId,
+          isValid: validationResult.isValid,
+          errorsCount: validationResult.errors.length,
+          warningsCount: validationResult.warnings.length
+        });
+        
+        // Log validation issues if any
+        if (validationResult.errors.length > 0) {
+          this.logWarning('Management one-pager validation errors found', {
+            sessionId,
+            errors: validationResult.errors.map(e => ({ type: e.type, severity: e.severity, message: e.message }))
+          });
+        }
+        
+        if (validationResult.warnings.length > 0) {
+          this.logInfo('Management one-pager validation warnings found', {
+            sessionId,
+            warnings: validationResult.warnings.map(w => ({ type: w.type, message: w.message }))
+          });
+        }
+      } catch (validationError) {
+        this.logWarning('Management one-pager consistency validation failed', {
+          sessionId,
+          error: validationError instanceof Error ? validationError.message : 'Unknown validation error'
+        });
+      }
+      
+      const markdown = this.formatManagementOnePager(onePager);
+      
+      const executionTime = Date.now() - startTime;
+      this.logInfo('Management one-pager generation completed', { 
+        sessionId, 
+        executionTime,
+        markdownLength: markdown.length,
+        validationPassed: validationResult?.isValid
+      });
+      
+      return { 
+        one_pager_markdown: markdown,
+        validation_result: validationResult
+      };
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.logError('Management one-pager generation failed', error, { sessionId, executionTime });
+      throw new Error(`Management one-pager generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Generate Amazon-style PR-FAQ document
+   */
+  async generatePRFAQ(
+    requirements: string, 
+    design: string, 
+    targetDate?: string
+  ): Promise<{ press_release_markdown: string; faq_markdown: string; launch_checklist_markdown: string; validation_result?: ConsistencyValidationResult }> {
+    const sessionId = this.generateSessionId();
+    const startTime = Date.now();
+    
+    try {
+      this.logInfo('Starting PR-FAQ generation', { 
+        sessionId, 
+        requirementsLength: requirements.length,
+        designLength: design.length,
+        targetDate
+      });
+      
+      const prfaq = await this.pmDocumentGenerator.generatePRFAQ(requirements, design, targetDate);
+      
+      // Perform consistency validation
+      let validationResult: ConsistencyValidationResult | undefined;
+      try {
+        const parsedRequirements = this.parseRequirementsFromString(requirements);
+        const parsedDesign = this.parseDesignFromString(design);
+        
+        const validator = new PMDocumentConsistencyValidator();
+        validationResult = validator.validatePRFAQConsistency(
+          prfaq, 
+          parsedRequirements, 
+          parsedDesign
+        );
+        
+        this.logInfo('PR-FAQ consistency validation completed', {
+          sessionId,
+          isValid: validationResult.isValid,
+          errorsCount: validationResult.errors.length,
+          warningsCount: validationResult.warnings.length
+        });
+        
+        // Log validation issues if any
+        if (validationResult.errors.length > 0) {
+          this.logWarning('PR-FAQ validation errors found', {
+            sessionId,
+            errors: validationResult.errors.map(e => ({ type: e.type, severity: e.severity, message: e.message }))
+          });
+        }
+        
+        if (validationResult.warnings.length > 0) {
+          this.logInfo('PR-FAQ validation warnings found', {
+            sessionId,
+            warnings: validationResult.warnings.map(w => ({ type: w.type, message: w.message }))
+          });
+        }
+      } catch (validationError) {
+        this.logWarning('PR-FAQ consistency validation failed', {
+          sessionId,
+          error: validationError instanceof Error ? validationError.message : 'Unknown validation error'
+        });
+      }
+      
+      const pressReleaseMarkdown = this.formatPressRelease(prfaq.pressRelease);
+      const faqMarkdown = this.formatFAQ(prfaq.faq);
+      const launchChecklistMarkdown = this.formatLaunchChecklist(prfaq.launchChecklist);
+      
+      const executionTime = Date.now() - startTime;
+      this.logInfo('PR-FAQ generation completed', { 
+        sessionId, 
+        executionTime,
+        pressReleaseLength: pressReleaseMarkdown.length,
+        faqCount: prfaq.faq.length,
+        checklistItems: prfaq.launchChecklist.length,
+        validationPassed: validationResult?.isValid
+      });
+      
+      return { 
+        press_release_markdown: pressReleaseMarkdown,
+        faq_markdown: faqMarkdown,
+        launch_checklist_markdown: launchChecklistMarkdown,
+        validation_result: validationResult
+      };
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.logError('PR-FAQ generation failed', error, { sessionId, executionTime });
+      throw new Error(`PR-FAQ generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Generate structured requirements with MoSCoW prioritization
+   */
+  async generateRequirements(
+    rawIntent: string, 
+    context?: { roadmap_theme?: string; budget?: number; quotas?: { maxVibes?: number; maxSpecs?: number }; deadlines?: string }
+  ) {
+    const sessionId = this.generateSessionId();
+    const startTime = Date.now();
+    
+    try {
+      this.logInfo('Starting requirements generation', { 
+        sessionId, 
+        intentLength: rawIntent.length,
+        hasContext: !!context
+      });
+      
+      const requirements = await this.pmDocumentGenerator.generateRequirements(rawIntent, context);
+      
+      const executionTime = Date.now() - startTime;
+      this.logInfo('Requirements generation completed', { 
+        sessionId, 
+        executionTime,
+        functionalRequirementsCount: requirements.functionalRequirements.length,
+        mustHaveCount: requirements.priority.must.length,
+        rightTimeDecision: requirements.rightTimeVerdict.decision
+      });
+      
+      return requirements;
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.logError('Requirements generation failed', error, { sessionId, executionTime });
+      throw new Error(`Requirements generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Generate design options with Impact vs Effort analysis
+   */
+  async generateDesignOptions(requirements: string) {
+    const sessionId = this.generateSessionId();
+    const startTime = Date.now();
+    
+    try {
+      this.logInfo('Starting design options generation', { 
+        sessionId, 
+        requirementsLength: requirements.length
+      });
+      
+      const designOptions = await this.pmDocumentGenerator.generateDesignOptions(requirements);
+      
+      const executionTime = Date.now() - startTime;
+      this.logInfo('Design options generation completed', { 
+        sessionId, 
+        executionTime,
+        optionsCount: 3,
+        matrixQuadrants: Object.keys(designOptions.impactEffortMatrix).length
+      });
+      
+      return designOptions;
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.logError('Design options generation failed', error, { sessionId, executionTime });
+      throw new Error(`Design options generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Generate phased task plan with guardrails
+   */
+  async generateTaskPlan(
+    design: string, 
+    limits?: { max_vibes?: number; max_specs?: number; budget_usd?: number }
+  ): Promise<{ task_plan: TaskPlan; validation_result?: ConsistencyValidationResult }> {
+    const sessionId = this.generateSessionId();
+    const startTime = Date.now();
+    
+    try {
+      this.logInfo('Starting task plan generation', { 
+        sessionId, 
+        designLength: design.length,
+        hasLimits: !!limits
+      });
+      
+      // Convert MCP format to TaskLimits format
+      const taskLimits = limits ? {
+        maxVibes: limits.max_vibes,
+        maxSpecs: limits.max_specs,
+        budgetUSD: limits.budget_usd
+      } : undefined;
+      
+      const taskPlan = await this.pmDocumentGenerator.generateTaskPlan(design, taskLimits);
+      
+      // Perform consistency validation
+      let validationResult: ConsistencyValidationResult | undefined;
+      try {
+        const parsedDesign = this.parseDesignFromString(design);
+        
+        const validator = new PMDocumentConsistencyValidator();
+        validationResult = validator.validateTaskPlanConsistency(
+          taskPlan, 
+          parsedDesign
+        );
+        
+        this.logInfo('Task plan consistency validation completed', {
+          sessionId,
+          isValid: validationResult.isValid,
+          errorsCount: validationResult.errors.length,
+          warningsCount: validationResult.warnings.length
+        });
+        
+        // Log validation issues if any
+        if (validationResult.errors.length > 0) {
+          this.logWarning('Task plan validation errors found', {
+            sessionId,
+            errors: validationResult.errors.map(e => ({ type: e.type, severity: e.severity, message: e.message }))
+          });
+        }
+        
+        if (validationResult.warnings.length > 0) {
+          this.logInfo('Task plan validation warnings found', {
+            sessionId,
+            warnings: validationResult.warnings.map(w => ({ type: w.type, message: w.message }))
+          });
+        }
+      } catch (validationError) {
+        this.logWarning('Task plan consistency validation failed', {
+          sessionId,
+          error: validationError instanceof Error ? validationError.message : 'Unknown validation error'
+        });
+      }
+      
+      const executionTime = Date.now() - startTime;
+      this.logInfo('Task plan generation completed', { 
+        sessionId, 
+        executionTime,
+        immediateWinsCount: taskPlan.immediateWins.length,
+        shortTermCount: taskPlan.shortTerm.length,
+        longTermCount: taskPlan.longTerm.length,
+        validationPassed: validationResult?.isValid
+      });
+      
+      return { 
+        task_plan: taskPlan,
+        validation_result: validationResult
+      };
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.logError('Task plan generation failed', error, { sessionId, executionTime });
+      throw new Error(`Task plan generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Format management one-pager as markdown
+   */
+  private formatManagementOnePager(onePager: any): string {
+    return `# Management One-Pager
+
+## Answer
+${onePager.answer}
+
+## Because
+${onePager.because.map((reason: string) => `- ${reason}`).join('\n')}
+
+## What (Scope Today)
+${onePager.whatScopeToday.map((item: string) => `- ${item}`).join('\n')}
+
+## Risks & Mitigations
+${onePager.risksAndMitigations.map((rm: any) => `- **Risk:** ${rm.risk}\n  **Mitigation:** ${rm.mitigation}`).join('\n')}
+
+## Options
+- **Conservative:** ${onePager.options.conservative.summary}
+- **Balanced ✅:** ${onePager.options.balanced.summary}
+- **Bold (ZBD):** ${onePager.options.bold.summary}
+
+## ROI Snapshot
+| Option        | Effort | Impact | Est. Cost | Timing |
+|---------------|--------|--------|-----------|--------|
+| Conservative  | ${onePager.roiSnapshot.options.conservative.effort} | ${onePager.roiSnapshot.options.conservative.impact} | ${onePager.roiSnapshot.options.conservative.estimatedCost} | ${onePager.roiSnapshot.options.conservative.timing} |
+| Balanced ✅   | ${onePager.roiSnapshot.options.balanced.effort} | ${onePager.roiSnapshot.options.balanced.impact} | ${onePager.roiSnapshot.options.balanced.estimatedCost} | ${onePager.roiSnapshot.options.balanced.timing} |
+| Bold (ZBD)    | ${onePager.roiSnapshot.options.bold.effort} | ${onePager.roiSnapshot.options.bold.impact} | ${onePager.roiSnapshot.options.bold.estimatedCost} | ${onePager.roiSnapshot.options.bold.timing} |
+
+## Right-Time Recommendation
+${onePager.rightTimeRecommendation}`;
+  }
+
+  /**
+   * Format press release as markdown
+   */
+  private formatPressRelease(pr: any): string {
+    return `**${pr.date}**
+
+# ${pr.headline}
+
+## ${pr.subHeadline}
+
+${pr.body}`;
+  }
+
+  /**
+   * Format FAQ as markdown
+   */
+  private formatFAQ(faq: any[]): string {
+    return faq.map((item, index) => `**Q${index + 1}: ${item.question}**\n\n${item.answer}`).join('\n\n');
+  }
+
+  /**
+   * Format launch checklist as markdown
+   */
+  private formatLaunchChecklist(checklist: any[]): string {
+    return checklist.map(item => `- [ ] ${item.task} (Owner: ${item.owner}, Due: ${item.dueDate})`).join('\n');
+  }
+
+  /**
+   * Validate cross-document consistency for PM documents
+   */
+  private validatePMDocumentConsistency(pmDocuments: PipelineResult['pmDocuments']): {
+    isValid: boolean;
+    issues: string[];
+    warnings: string[];
+  } {
+    const issues: string[] = [];
+    const warnings: string[] = [];
+
+    if (!pmDocuments) {
+      return { isValid: true, issues, warnings };
+    }
+
+    // Validate requirements → design options consistency
+    if (pmDocuments.requirements && pmDocuments.designOptions) {
+      const consistencyCheck = this.validateRequirementsDesignConsistency(
+        pmDocuments.requirements,
+        pmDocuments.designOptions
+      );
+      issues.push(...consistencyCheck.issues);
+      warnings.push(...consistencyCheck.warnings);
+    }
+
+    // Validate design options → task plan consistency
+    if (pmDocuments.designOptions && pmDocuments.taskPlan) {
+      const consistencyCheck = this.validateDesignTaskConsistency(
+        pmDocuments.designOptions,
+        pmDocuments.taskPlan
+      );
+      issues.push(...consistencyCheck.issues);
+      warnings.push(...consistencyCheck.warnings);
+    }
+
+    // Validate management one-pager consistency with other documents
+    if (pmDocuments.managementOnePager) {
+      const consistencyCheck = this.validateManagementOnePagerConsistency(
+        pmDocuments.managementOnePager,
+        pmDocuments.requirements,
+        pmDocuments.designOptions
+      );
+      issues.push(...consistencyCheck.issues);
+      warnings.push(...consistencyCheck.warnings);
+    }
+
+    // Validate PR-FAQ consistency with other documents
+    if (pmDocuments.prfaq) {
+      const consistencyCheck = this.validatePRFAQConsistency(
+        pmDocuments.prfaq,
+        pmDocuments.requirements,
+        pmDocuments.designOptions
+      );
+      issues.push(...consistencyCheck.issues);
+      warnings.push(...consistencyCheck.warnings);
+    }
+
+    // Cross-validate management one-pager and PR-FAQ
+    if (pmDocuments.managementOnePager && pmDocuments.prfaq) {
+      const consistencyCheck = this.validateManagementOnePagerPRFAQConsistency(
+        pmDocuments.managementOnePager,
+        pmDocuments.prfaq
+      );
+      issues.push(...consistencyCheck.issues);
+      warnings.push(...consistencyCheck.warnings);
+    }
+
+    return {
+      isValid: issues.length === 0,
+      issues,
+      warnings
+    };
+  }
+
+  /**
+   * Validate consistency between requirements and design options
+   */
+  private validateRequirementsDesignConsistency(
+    requirements: any,
+    designOptions: any
+  ): { issues: string[]; warnings: string[] } {
+    const issues: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      // Check if business goal is reflected in problem framing
+      if (requirements.businessGoal && designOptions.problemFraming) {
+        const businessGoalKeywords = this.extractKeywords(requirements.businessGoal);
+        const problemFramingKeywords = this.extractKeywords(designOptions.problemFraming);
+        
+        const overlap = businessGoalKeywords.filter(keyword => 
+          problemFramingKeywords.some(pfKeyword => 
+            pfKeyword.toLowerCase().includes(keyword.toLowerCase()) ||
+            keyword.toLowerCase().includes(pfKeyword.toLowerCase())
+          )
+        );
+
+        if (overlap.length === 0) {
+          warnings.push('Business goal and problem framing may not be well aligned');
+        }
+      }
+
+      // Check if functional requirements are addressed in design options
+      if (requirements.functionalRequirements && designOptions.options) {
+        const functionalReqKeywords = requirements.functionalRequirements
+          .flatMap((req: string) => this.extractKeywords(req));
+        
+        const designOptionsText = JSON.stringify(designOptions.options);
+        const designKeywords = this.extractKeywords(designOptionsText);
+        
+        const coverage = functionalReqKeywords.filter((keyword: string) =>
+          designKeywords.some(dKeyword =>
+            dKeyword.toLowerCase().includes(keyword.toLowerCase()) ||
+            keyword.toLowerCase().includes(dKeyword.toLowerCase())
+          )
+        );
+
+        if (coverage.length < functionalReqKeywords.length * 0.5) {
+          warnings.push('Design options may not adequately address all functional requirements');
+        }
+      }
+
+      // Check MoSCoW priorities alignment with design option impact/effort
+      if (requirements.priority && designOptions.options) {
+        const mustHaveCount = requirements.priority.must?.length || 0;
+        const shouldHaveCount = requirements.priority.should?.length || 0;
+        
+        if (mustHaveCount > 5 && designOptions.options.conservative?.effort === 'High') {
+          warnings.push('High number of must-have requirements may not align with high-effort conservative option');
+        }
+        
+        if (mustHaveCount === 0 && shouldHaveCount === 0) {
+          issues.push('No prioritized requirements found to validate against design options');
+        }
+      }
+
+    } catch (error) {
+      warnings.push('Error during requirements-design consistency validation');
+    }
+
+    return { issues, warnings };
+  }
+
+  /**
+   * Validate consistency between design options and task plan
+   */
+  private validateDesignTaskConsistency(
+    designOptions: any,
+    taskPlan: any
+  ): { issues: string[]; warnings: string[] } {
+    const issues: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      // Check if recommended design option aligns with task complexity
+      const balancedOption = designOptions.options?.balanced;
+      if (balancedOption && taskPlan.shortTerm) {
+        const shortTermTaskCount = taskPlan.shortTerm.length;
+        const longTermTaskCount = taskPlan.longTerm?.length || 0;
+        
+        if (balancedOption.effort === 'Low' && (shortTermTaskCount + longTermTaskCount) > 8) {
+          warnings.push('Low-effort balanced option may not align with high number of tasks');
+        }
+        
+        if (balancedOption.effort === 'High' && (shortTermTaskCount + longTermTaskCount) < 4) {
+          warnings.push('High-effort balanced option may not align with low number of tasks');
+        }
+      }
+
+      // Check if high-impact design options have corresponding high-impact tasks
+      if (designOptions.options && taskPlan.immediateWins) {
+        const highImpactOptions = Object.values(designOptions.options)
+          .filter((option: any) => option.impact === 'High');
+        
+        const highImpactTasks = taskPlan.immediateWins
+          .filter((task: any) => task.impact === 'High');
+        
+        if (highImpactOptions.length > 0 && highImpactTasks.length === 0) {
+          warnings.push('High-impact design options should have corresponding high-impact immediate win tasks');
+        }
+      }
+
+      // Validate guardrails check aligns with design constraints
+      if (taskPlan.guardrailsCheck && designOptions.options) {
+        const guardrailsLimits = taskPlan.guardrailsCheck.limits;
+        const boldOption = designOptions.options.bold;
+        
+        if (guardrailsLimits?.budgetUSD && boldOption?.effort === 'High') {
+          // This is expected alignment, no warning needed
+        } else if (!guardrailsLimits?.budgetUSD && boldOption?.effort === 'High') {
+          warnings.push('High-effort bold option should have corresponding budget guardrails');
+        }
+      }
+
+    } catch (error) {
+      warnings.push('Error during design-task consistency validation');
+    }
+
+    return { issues, warnings };
+  }
+
+  /**
+   * Validate management one-pager consistency with requirements and design
+   */
+  private validateManagementOnePagerConsistency(
+    managementOnePager: string,
+    requirements?: any,
+    designOptions?: any
+  ): { issues: string[]; warnings: string[] } {
+    const issues: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      // Check if one-pager contains key elements
+      if (!managementOnePager.includes('## Answer')) {
+        issues.push('Management one-pager missing Answer section');
+      }
+      
+      if (!managementOnePager.includes('## Because')) {
+        issues.push('Management one-pager missing Because section');
+      }
+      
+      if (!managementOnePager.includes('## ROI Snapshot')) {
+        issues.push('Management one-pager missing ROI Snapshot section');
+      }
+
+      // Check if business goal is reflected in the answer
+      if (requirements?.businessGoal) {
+        const businessGoalKeywords = this.extractKeywords(requirements.businessGoal);
+        const answerSection = this.extractSection(managementOnePager, '## Answer');
+        
+        if (answerSection) {
+          const answerKeywords = this.extractKeywords(answerSection);
+          const overlap = businessGoalKeywords.filter(keyword =>
+            answerKeywords.some(aKeyword =>
+              aKeyword.toLowerCase().includes(keyword.toLowerCase())
+            )
+          );
+          
+          if (overlap.length === 0) {
+            warnings.push('Management one-pager answer may not reflect business goal');
+          }
+        }
+      }
+
+      // Check if design options are reflected in the options section
+      if (designOptions?.options) {
+        const optionsSection = this.extractSection(managementOnePager, '## Options');
+        if (optionsSection) {
+          if (!optionsSection.includes('Conservative') || 
+              !optionsSection.includes('Balanced') || 
+              !optionsSection.includes('Bold')) {
+            warnings.push('Management one-pager options section may not include all design alternatives');
+          }
+        }
+      }
+
+      // Validate length constraint (should be under 120 lines equivalent)
+      const lineCount = managementOnePager.split('\n').length;
+      if (lineCount > 120) {
+        warnings.push(`Management one-pager is ${lineCount} lines, should be under 120 for one-page format`);
+      }
+
+    } catch (error) {
+      warnings.push('Error during management one-pager consistency validation');
+    }
+
+    return { issues, warnings };
+  }
+
+  /**
+   * Validate PR-FAQ consistency with requirements and design
+   */
+  private validatePRFAQConsistency(
+    prfaq: { pressRelease: string; faq: string; launchChecklist: string },
+    requirements?: any,
+    designOptions?: any
+  ): { issues: string[]; warnings: string[] } {
+    const issues: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      // Validate press release structure
+      if (!prfaq.pressRelease.includes('**') || !prfaq.pressRelease.includes('#')) {
+        issues.push('Press release missing proper date and headline formatting');
+      }
+
+      // Check press release length (should be under 250 words)
+      const pressReleaseWordCount = prfaq.pressRelease.split(/\s+/).length;
+      if (pressReleaseWordCount > 250) {
+        warnings.push(`Press release is ${pressReleaseWordCount} words, should be under 250`);
+      }
+
+      // Validate FAQ structure (should have required questions)
+      const requiredQuestions = [
+        'Who is the customer',
+        'What problem are we solving',
+        'Why now',
+        'What is the smallest lovable version',
+        'How will we measure success',
+        'What are the top 3 risks',
+        'What is not included',
+        'How does this compare to alternatives',
+        'What\'s the estimated cost',
+        'What are the next 2 releases'
+      ];
+
+      const faqQuestionCount = (prfaq.faq.match(/\*\*Q\d+:/g) || []).length;
+      if (faqQuestionCount < 10) {
+        warnings.push(`FAQ has ${faqQuestionCount} questions, should have at least 10 required questions`);
+      }
+
+      // Check if business goal is reflected in press release
+      if (requirements?.businessGoal) {
+        const businessGoalKeywords = this.extractKeywords(requirements.businessGoal);
+        const pressReleaseKeywords = this.extractKeywords(prfaq.pressRelease);
+        
+        const overlap = businessGoalKeywords.filter(keyword =>
+          pressReleaseKeywords.some(prKeyword =>
+            prKeyword.toLowerCase().includes(keyword.toLowerCase())
+          )
+        );
+        
+        if (overlap.length === 0) {
+          warnings.push('Press release may not reflect business goal');
+        }
+      }
+
+      // Validate launch checklist has proper structure
+      if (!prfaq.launchChecklist.includes('- [ ]')) {
+        issues.push('Launch checklist missing proper checkbox format');
+      }
+
+    } catch (error) {
+      warnings.push('Error during PR-FAQ consistency validation');
+    }
+
+    return { issues, warnings };
+  }
+
+  /**
+   * Validate consistency between management one-pager and PR-FAQ
+   */
+  private validateManagementOnePagerPRFAQConsistency(
+    managementOnePager: string,
+    prfaq: { pressRelease: string; faq: string; launchChecklist: string }
+  ): { issues: string[]; warnings: string[] } {
+    const issues: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      // Extract key information from both documents
+      const onePagerKeywords = this.extractKeywords(managementOnePager);
+      const prfaqKeywords = this.extractKeywords(prfaq.pressRelease + ' ' + prfaq.faq);
+      
+      // Check for reasonable overlap in key concepts
+      const overlap = onePagerKeywords.filter(keyword =>
+        prfaqKeywords.some(prKeyword =>
+          prKeyword.toLowerCase().includes(keyword.toLowerCase()) ||
+          keyword.toLowerCase().includes(prKeyword.toLowerCase())
+        )
+      );
+
+      if (overlap.length < Math.min(onePagerKeywords.length, prfaqKeywords.length) * 0.3) {
+        warnings.push('Management one-pager and PR-FAQ may not be well aligned in key concepts');
+      }
+
+      // Check if timing recommendations are consistent
+      const rightTimeSection = this.extractSection(managementOnePager, '## Right-Time Recommendation');
+      if (rightTimeSection && prfaq.pressRelease) {
+        const onePagerHasUrgency = rightTimeSection.toLowerCase().includes('now') || 
+                                   rightTimeSection.toLowerCase().includes('immediate');
+        const prfaqHasUrgency = prfaq.pressRelease.toLowerCase().includes('now') ||
+                               prfaq.pressRelease.toLowerCase().includes('immediate');
+        
+        if (onePagerHasUrgency !== prfaqHasUrgency) {
+          warnings.push('Timing urgency may not be consistent between management one-pager and PR-FAQ');
+        }
+      }
+
+      // Check if risk assessments are aligned
+      const risksSection = this.extractSection(managementOnePager, '## Risks & Mitigations');
+      if (risksSection && prfaq.faq.includes('risks')) {
+        const onePagerRiskCount = (risksSection.match(/\*\*Risk:\*\*/g) || []).length;
+        const faqMentionsRisks = prfaq.faq.toLowerCase().includes('risk');
+        
+        if (onePagerRiskCount > 0 && !faqMentionsRisks) {
+          warnings.push('Management one-pager identifies risks but PR-FAQ may not address them adequately');
+        }
+      }
+
+    } catch (error) {
+      warnings.push('Error during management one-pager and PR-FAQ cross-validation');
+    }
+
+    return { issues, warnings };
+  }
+
+  /**
+   * Extract keywords from text for consistency checking
+   */
+  private extractKeywords(text: string): string[] {
+    if (!text) return [];
+    
+    // Remove common words and extract meaningful terms
+    const commonWords = new Set([
+      'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+      'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did',
+      'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall',
+      'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they',
+      'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their'
+    ]);
+
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s]/g, ' ')
+      .split(/\s+/)
+      .filter(word => word.length > 2 && !commonWords.has(word))
+      .filter((word, index, arr) => arr.indexOf(word) === index) // Remove duplicates
+      .slice(0, 20); // Limit to top 20 keywords
+  }
+
+  /**
+   * Extract a specific section from markdown text
+   */
+  private extractSection(text: string, sectionHeader: string): string | null {
+    const lines = text.split('\n');
+    const startIndex = lines.findIndex(line => line.trim() === sectionHeader);
+    
+    if (startIndex === -1) return null;
+    
+    const endIndex = lines.findIndex((line, index) => 
+      index > startIndex && line.startsWith('##')
+    );
+    
+    const sectionLines = endIndex === -1 
+      ? lines.slice(startIndex + 1)
+      : lines.slice(startIndex + 1, endIndex);
+    
+    return sectionLines.join('\n').trim();
+  }
+
+  /**
    * Warm up cache with common operations
    */
   async warmupCache(commonIntents: string[]): Promise<void> {
@@ -935,5 +2002,141 @@ export class AIAgentPipeline {
     );
     
     this.logInfo('Cache warmup completed', { cacheSize: this.cache.getStats().size });
+  }
+
+  /**
+   * Parse requirements from string format (handles both JSON and markdown)
+   */
+  private parseRequirementsFromString(requirements: string): PMRequirements | undefined {
+    try {
+      // Try parsing as JSON first
+      const parsed = JSON.parse(requirements);
+      if (parsed.businessGoal && parsed.userNeeds && parsed.functionalRequirements) {
+        return parsed as PMRequirements;
+      }
+    } catch {
+      // If JSON parsing fails, try to extract from markdown format
+      try {
+        return this.extractRequirementsFromMarkdown(requirements);
+      } catch {
+        // If both fail, return undefined
+        return undefined;
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Parse design options from string format (handles both JSON and markdown)
+   */
+  private parseDesignFromString(design: string): DesignOptions | undefined {
+    try {
+      // Try parsing as JSON first
+      const parsed = JSON.parse(design);
+      if (parsed.options && parsed.impactEffortMatrix) {
+        return parsed as DesignOptions;
+      }
+    } catch {
+      // If JSON parsing fails, try to extract from markdown format
+      try {
+        return this.extractDesignFromMarkdown(design);
+      } catch {
+        // If both fail, return undefined
+        return undefined;
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Extract requirements from markdown format
+   */
+  private extractRequirementsFromMarkdown(markdown: string): PMRequirements | undefined {
+    try {
+      // Simple extraction - in a real implementation, this would be more sophisticated
+      const businessGoalMatch = markdown.match(/## Business Goal\s*\n(.*?)(?=\n##|\n$)/s);
+      const businessGoal = businessGoalMatch ? businessGoalMatch[1].trim() : 'Extracted from markdown';
+
+      // Extract functional requirements
+      const functionalReqMatch = markdown.match(/## Functional Requirements\s*\n(.*?)(?=\n##|\n$)/s);
+      const functionalRequirements = functionalReqMatch 
+        ? functionalReqMatch[1].split('\n').filter(line => line.trim().startsWith('-')).map(line => line.replace(/^-\s*/, ''))
+        : [];
+
+      // Create a basic structure
+      return {
+        businessGoal,
+        userNeeds: {
+          jobs: ['Extracted from markdown'],
+          pains: ['Extracted from markdown'],
+          gains: ['Extracted from markdown']
+        },
+        functionalRequirements,
+        constraintsRisks: [],
+        priority: {
+          must: [],
+          should: [],
+          could: [],
+          wont: []
+        },
+        rightTimeVerdict: {
+          decision: 'do_now',
+          reasoning: 'Extracted from markdown'
+        }
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
+   * Extract design options from markdown format
+   */
+  private extractDesignFromMarkdown(markdown: string): DesignOptions | undefined {
+    try {
+      // Simple extraction - in a real implementation, this would be more sophisticated
+      const problemFramingMatch = markdown.match(/## Problem Framing\s*\n(.*?)(?=\n##|\n$)/s);
+      const problemFraming = problemFramingMatch ? problemFramingMatch[1].trim() : 'Extracted from markdown';
+
+      // Create a basic structure
+      return {
+        problemFraming,
+        options: {
+          conservative: {
+            name: 'Conservative',
+            summary: 'Extracted from markdown',
+            keyTradeoffs: [],
+            impact: 'Medium',
+            effort: 'Low',
+            majorRisks: []
+          },
+          balanced: {
+            name: 'Balanced',
+            summary: 'Extracted from markdown',
+            keyTradeoffs: [],
+            impact: 'High',
+            effort: 'Medium',
+            majorRisks: []
+          },
+          bold: {
+            name: 'Bold',
+            summary: 'Extracted from markdown',
+            keyTradeoffs: [],
+            impact: 'High',
+            effort: 'High',
+            majorRisks: []
+          }
+        },
+        impactEffortMatrix: {
+          highImpactLowEffort: [],
+          highImpactHighEffort: [],
+          lowImpactLowEffort: [],
+          lowImpactHighEffort: []
+        },
+        rightTimeRecommendation: 'Extracted from markdown'
+      };
+    } catch {
+      return undefined;
+    }
   }
 }

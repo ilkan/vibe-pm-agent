@@ -1,6 +1,8 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  forceExit: true,
+  detectOpenHandles: true,
   roots: ['<rootDir>/src/tests'],
   testMatch: [
     '**/tests/**/*.test.ts',

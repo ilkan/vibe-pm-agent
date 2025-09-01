@@ -21,7 +21,7 @@ The PM Agent Intent Optimizer is designed as an MCP Server that provides intelli
 1. **Clone and build the project:**
    ```bash
    git clone <repository-url>
-   cd pm-agent-intent-optimizer
+   cd vibe-pm-agent
    npm install
    npm run build
    ```
@@ -84,9 +84,9 @@ Add this server to your MCP client configuration (e.g., in Kiro):
 ```json
 {
   "mcpServers": {
-    "pm-agent-intent-optimizer": {
+    "vibe-pm-agent": {
       "command": "node",
-      "args": ["path/to/pm-agent-intent-optimizer/bin/mcp-server.js"],
+      "args": ["path/to/vibe-pm-agent/bin/mcp-server.js"],
       "env": {}
     }
   }
@@ -97,10 +97,10 @@ Add this server to your MCP client configuration (e.g., in Kiro):
 ```json
 {
   "mcpServers": {
-    "pm-agent-intent-optimizer": {
+    "vibe-pm-agent": {
       "command": "node",
       "args": [
-        "path/to/pm-agent-intent-optimizer/bin/mcp-server.js",
+        "path/to/vibe-pm-agent/bin/mcp-server.js",
         "--log-level", "info",
         "--health-check"
       ],
@@ -118,9 +118,9 @@ If you publish this as a Python package:
 ```json
 {
   "mcpServers": {
-    "pm-agent-intent-optimizer": {
+    "vibe-pm-agent": {
       "command": "uvx",
-      "args": ["pm-agent-intent-optimizer@latest"],
+      "args": ["vibe-pm-agent@latest"],
       "env": {}
     }
   }
@@ -131,7 +131,51 @@ If you publish this as a Python package:
 
 The server exposes the following tools through the Model Context Protocol:
 
-### 1. `optimize_intent`
+| Tool | Purpose | Use Case |
+|------|---------|----------|
+| `validate_idea_quick` | Fast PASS/FAIL validation with 3 options | Idea screening, brainstorming |
+| `optimize_intent` | Full optimization with ROI analysis | Technical implementation |
+| `generate_requirements` | Structured requirements with MoSCoW | Problem definition |
+| `generate_design_options` | Conservative/Balanced/Bold alternatives | Solution exploration |
+| `generate_task_plan` | Phased implementation roadmap | Project planning |
+| `generate_management_onepager` | Executive summary with Pyramid Principle | Leadership approval |
+| `generate_pr_faq` | Amazon-style product communication | Launch planning |
+| `analyze_workflow` | Existing process optimization | Efficiency improvement |
+| `generate_roi_analysis` | Multi-scenario cost comparison | Investment decisions |
+| `get_consulting_summary` | Professional analysis report | Stakeholder communication |
+
+### Quick Validation Tool
+
+#### `validate_idea_quick`
+**Description**: Fast unit-test-like validation that provides PASS/FAIL verdict with 3 structured options for next steps.
+
+**Input Schema**:
+```json
+{
+  "idea": "string (required, 5-2000 chars) - Raw idea or intent to validate",
+  "context": {
+    "urgency": "string (optional) - low|medium|high",
+    "budget_range": "string (optional) - small|medium|large", 
+    "team_size": "number (optional, 1-100) - Size of team working on this"
+  }
+}
+```
+
+**Example Usage**:
+```json
+{
+  "idea": "Create an automated system to generate daily reports from our database and email them to stakeholders",
+  "context": {
+    "urgency": "medium",
+    "budget_range": "small",
+    "team_size": 3
+  }
+}
+```
+
+### Core Optimization Tools
+
+#### `optimize_intent`
 **Description**: Main tool that takes raw developer intent and returns optimized Kiro spec with consulting analysis.
 
 **Input Schema**:
@@ -140,57 +184,37 @@ The server exposes the following tools through the Model Context Protocol:
   "intent": "string (required) - Raw developer intent in natural language",
   "parameters": {
     "expectedUserVolume": "number (optional) - Expected number of users",
-    "costConstraints": "number (optional) - Budget constraints",
+    "costConstraints": "object (optional) - Budget constraints",
     "performanceSensitivity": "string (optional) - low|medium|high"
   }
 }
 ```
 
-**Example Usage**:
-```json
-{
-  "intent": "I want to create a system that analyzes user feedback and generates reports",
-  "parameters": {
-    "expectedUserVolume": 1000,
-    "costConstraints": 500,
-    "performanceSensitivity": "medium"
-  }
-}
-```
-
-### 2. `analyze_workflow`
+#### `analyze_workflow`
 **Description**: Analyzes existing workflow definitions for optimization opportunities.
 
-**Input Schema**:
-```json
-{
-  "workflow": "object (required) - Existing workflow definition",
-  "techniques": "array (optional) - Specific consulting techniques to apply"
-}
-```
-
-### 3. `generate_roi_analysis`
+#### `generate_roi_analysis`
 **Description**: Generates comprehensive ROI analysis comparing different optimization approaches.
 
-**Input Schema**:
-```json
-{
-  "workflow": "object (required) - Original workflow",
-  "optimizedWorkflow": "object (optional) - Optimized version",
-  "zeroBasedSolution": "object (optional) - Zero-based redesign"
-}
-```
-
-### 4. `get_consulting_summary`
+#### `get_consulting_summary`
 **Description**: Provides detailed consulting-style summary using Pyramid Principle.
 
-**Input Schema**:
-```json
-{
-  "analysis": "object (required) - Analysis results",
-  "techniques": "array (optional) - Techniques used in analysis"
-}
-```
+### PM Workflow Tools
+
+#### `generate_requirements`
+**Description**: Creates PM-grade requirements with Business Goal extraction, MoSCoW prioritization, and Go/No-Go timing decision.
+
+#### `generate_design_options`
+**Description**: Translates approved requirements into Conservative/Balanced/Bold design options with Impact vs Effort analysis.
+
+#### `generate_task_plan`
+**Description**: Creates phased implementation plan with Guardrails Check, Immediate Wins, Short-Term, and Long-Term tasks.
+
+#### `generate_management_onepager`
+**Description**: Creates executive-ready management one-pager using Pyramid Principle with answer-first clarity and timing rationale.
+
+#### `generate_pr_faq`
+**Description**: Generates Amazon-style PR-FAQ document with future-dated press release and comprehensive FAQ.
 
 ## Configuration File Format
 
@@ -234,6 +258,34 @@ Response format:
   "version": "1.0.0"
 }
 ```
+
+## Documentation
+
+Comprehensive guides and best practices:
+
+- **[MCP Tools Documentation](docs/mcp-tools-documentation.md)**: Complete tool reference with input/output examples
+- **[PM Workflow Guide](docs/pm-workflow-guide.md)**: Step-by-step workflow patterns for product management
+- **[Quick Validation Guide](docs/quick-validation-guide.md)**: Best practices for fast idea validation
+- **[PM Document Best Practices](docs/pm-document-best-practices.md)**: Quality standards and guidelines for executive communication
+
+### Workflow Patterns
+
+#### Quick Validation Workflow
+1. **Validate Idea** → Get PASS/FAIL + 3 options (A/B/C)
+2. **Select Option** → Choose based on constraints and risk tolerance
+3. **Deep Analysis** → Use full PM workflow tools if needed
+
+#### Full PM Workflow
+1. **Requirements** → Structure problem with MoSCoW prioritization
+2. **Design Options** → Explore Conservative/Balanced/Bold alternatives
+3. **Task Planning** → Create phased implementation with guardrails
+4. **Communication** → Generate one-pager and PR-FAQ for stakeholders
+
+#### Technical Optimization
+1. **Intent Analysis** → Parse requirements and identify opportunities
+2. **Workflow Analysis** → Apply consulting techniques for efficiency
+3. **ROI Validation** → Compare naive vs optimized vs zero-based approaches
+4. **Implementation** → Generate optimized Kiro specifications
 
 ## Development
 
@@ -338,7 +390,7 @@ MIT License - see LICENSE file for details.
 5. Ensure all tests pass: `npm test`
 6. Submit a pull request
 
-This project follows the Kiro spec-driven development methodology. See the `.kiro/specs/pm-agent-intent-optimizer/` directory for detailed requirements, design, and implementation tasks.
+This project follows the Kiro spec-driven development methodology. See the `.kiro/specs/vibe-pm-agent/` directory for detailed requirements, design, and implementation tasks.
 
 ## Support
 

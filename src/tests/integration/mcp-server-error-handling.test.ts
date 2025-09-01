@@ -36,6 +36,20 @@ describe('MCP Server Error Handling Integration', () => {
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
     
+    // Create mock pipeline with proper Jest mock functions
+    mockPipeline = {
+      processIntent: jest.fn(),
+      analyzeWorkflow: jest.fn(),
+      generateROIAnalysis: jest.fn(),
+      generateConsultingSummary: jest.fn(),
+      generateManagementOnePager: jest.fn(),
+      generatePRFAQ: jest.fn(),
+      generateRequirements: jest.fn(),
+      generateDesignOptions: jest.fn(),
+      generateTaskPlan: jest.fn(),
+      validateIdeaQuick: jest.fn()
+    };
+    
     // Initialize server with logging enabled
     const options: MCPServerOptions = {
       enableLogging: true,
@@ -43,7 +57,8 @@ describe('MCP Server Error Handling Integration', () => {
     };
     
     server = new PMAgentMCPServer(options);
-    mockPipeline = (server as any).pipeline;
+    // Replace the pipeline with our mock
+    (server as any).pipeline = mockPipeline;
     
     // Set debug logging for comprehensive test coverage
     MCPLogger.setLogLevel(LogLevel.DEBUG);
