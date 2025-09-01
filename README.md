@@ -1,4 +1,4 @@
-# PM Agent Intent Optimizer
+# Vibe PM Agent
 
 An AI-powered MCP (Model Context Protocol) server that transforms raw developer intent expressed in natural language into structured, efficient Kiro specifications using consulting-grade business analysis techniques.
 
