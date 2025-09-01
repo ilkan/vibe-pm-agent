@@ -774,7 +774,7 @@ describe('MCP Server Integration Tests', () => {
       const result = await server.handleAnalyzeWorkflow(args, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].json.message).toContain('Invalid workflow structure');
+      expect(result.content[0].json.message).toContain('Validation failed: workflow is required with valid id and steps array');
     });
 
     it('should handle resource exhaustion scenarios', async () => {

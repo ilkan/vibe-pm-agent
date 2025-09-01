@@ -39,25 +39,43 @@ class MockMCPClient {
   }
 
   async callTool(name: string, args: any): Promise<any> {
+    const startTime = Date.now();
     const context: MCPToolContext = {
       toolName: name,
       sessionId: `client-session-${Date.now()}`,
-      timestamp: Date.now(),
+      timestamp: startTime,
       requestId: `client-req-${this.requestId++}`,
       traceId: `client-trace-${Date.now()}`
     };
 
-    switch (name) {
-      case 'optimize_intent':
-        return await this.server.handleOptimizeIntent(args as OptimizeIntentArgs, context);
-      case 'analyze_workflow':
-        return await this.server.handleAnalyzeWorkflow(args as AnalyzeWorkflowArgs, context);
-      case 'generate_roi_analysis':
-        return await this.server.handleGenerateROI(args as GenerateROIArgs, context);
-      case 'get_consulting_summary':
-        return await this.server.handleConsultingSummary(args as ConsultingSummaryArgs, context);
-      default:
-        throw new Error(`Unknown tool: ${name}`);
+    try {
+      let result: any;
+      switch (name) {
+        case 'optimize_intent':
+          result = await this.server.handleOptimizeIntent(args as OptimizeIntentArgs, context);
+          break;
+        case 'analyze_workflow':
+          result = await this.server.handleAnalyzeWorkflow(args as AnalyzeWorkflowArgs, context);
+          break;
+        case 'generate_roi_analysis':
+          result = await this.server.handleGenerateROI(args as GenerateROIArgs, context);
+          break;
+        case 'get_consulting_summary':
+          result = await this.server.handleConsultingSummary(args as ConsultingSummaryArgs, context);
+          break;
+        default:
+          throw new Error(`Unknown tool: ${name}`);
+      }
+
+      // Update metrics for successful calls
+      const responseTime = Date.now() - startTime;
+      (this.server as any).updateMetricsForTesting(responseTime, false);
+      return result;
+    } catch (error) {
+      // Update metrics for failed calls
+      const responseTime = Date.now() - startTime;
+      (this.server as any).updateMetricsForTesting(responseTime, true);
+      throw error;
     }
   }
 }
@@ -86,13 +104,19 @@ describe('MCP Client Simulation Tests', () => {
     it('should support MCP tool discovery', async () => {
       const toolsResponse = await client.listTools();
 
-      expect(toolsResponse.tools).toHaveLength(4);
+      expect(toolsResponse.tools).toHaveLength(10);
       
       const toolNames = toolsResponse.tools.map((tool: any) => tool.name);
       expect(toolNames).toContain('optimize_intent');
       expect(toolNames).toContain('analyze_workflow');
       expect(toolNames).toContain('generate_roi_analysis');
       expect(toolNames).toContain('get_consulting_summary');
+      expect(toolNames).toContain('generate_management_onepager');
+      expect(toolNames).toContain('generate_pr_faq');
+      expect(toolNames).toContain('generate_requirements');
+      expect(toolNames).toContain('generate_design_options');
+      expect(toolNames).toContain('generate_task_plan');
+      expect(toolNames).toContain('validate_idea_quick');
 
       // Verify each tool has required MCP fields
       toolsResponse.tools.forEach((tool: any) => {
@@ -422,7 +446,7 @@ describe('MCP Client Simulation Tests', () => {
       const result = await client.callTool('optimize_intent', malformedArgs);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].json.message).toContain('Cannot process null arguments');
+      expect(result.content[0].json.message).toContain('Validation failed: intent is required and must be a string');
     });
   });
 

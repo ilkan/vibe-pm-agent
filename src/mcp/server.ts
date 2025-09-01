@@ -244,6 +244,11 @@ export class PMAgentMCPServer {
    */
   async handleOptimizeIntent(args: OptimizeIntentArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || typeof args.intent !== 'string') {
+        throw new Error('Validation failed: intent is required and must be a string');
+      }
+
       MCPLogger.debug('Processing intent optimization', context, { 
         intentLength: args.intent.length,
         hasParameters: !!args.parameters 
@@ -291,6 +296,11 @@ export class PMAgentMCPServer {
    */
   async handleAnalyzeWorkflow(args: AnalyzeWorkflowArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || !args.workflow || !args.workflow.id || !Array.isArray(args.workflow.steps)) {
+        throw new Error('Validation failed: workflow is required with valid id and steps array');
+      }
+
       MCPLogger.debug('Analyzing workflow', context, { 
         workflowId: args.workflow.id,
         stepCount: args.workflow.steps.length,
@@ -331,6 +341,11 @@ export class PMAgentMCPServer {
    */
   async handleGenerateROI(args: GenerateROIArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || !args.workflow || !args.workflow.id) {
+        throw new Error('Validation failed: workflow is required with valid id');
+      }
+
       MCPLogger.debug('Generating ROI analysis', context, { 
         workflowId: args.workflow.id,
         hasOptimized: !!args.optimizedWorkflow,
@@ -375,6 +390,11 @@ export class PMAgentMCPServer {
    */
   async handleConsultingSummary(args: ConsultingSummaryArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || !args.analysis) {
+        throw new Error('Validation failed: analysis is required');
+      }
+
       MCPLogger.debug('Generating consulting summary', context, { 
         techniquesUsed: args.analysis.techniquesUsed?.length || 0,
         requestedTechniques: args.techniques?.length || 0,
@@ -415,6 +435,11 @@ export class PMAgentMCPServer {
    */
   async handleGenerateManagementOnePager(args: ManagementOnePagerArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || typeof args.requirements !== 'string' || typeof args.design !== 'string') {
+        throw new Error('Validation failed: requirements and design are required strings');
+      }
+
       MCPLogger.debug('Generating management one-pager', context, { 
         requirementsLength: args.requirements.length,
         designLength: args.design.length,
@@ -454,6 +479,11 @@ export class PMAgentMCPServer {
    */
   async handleGeneratePRFAQ(args: PRFAQArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || typeof args.requirements !== 'string' || typeof args.design !== 'string') {
+        throw new Error('Validation failed: requirements and design are required strings');
+      }
+
       MCPLogger.debug('Generating PR-FAQ', context, { 
         requirementsLength: args.requirements.length,
         designLength: args.design.length,
@@ -493,6 +523,11 @@ export class PMAgentMCPServer {
    */
   async handleGenerateRequirements(args: RequirementsArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || typeof args.raw_intent !== 'string') {
+        throw new Error('Validation failed: raw_intent is required and must be a string');
+      }
+
       MCPLogger.debug('Generating requirements', context, { 
         intentLength: args.raw_intent.length,
         hasContext: !!args.context,
@@ -527,6 +562,11 @@ export class PMAgentMCPServer {
    */
   async handleGenerateDesignOptions(args: DesignOptionsArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || typeof args.requirements !== 'string') {
+        throw new Error('Validation failed: requirements is required and must be a string');
+      }
+
       MCPLogger.debug('Generating design options', context, { 
         requirementsLength: args.requirements.length
       });
@@ -558,6 +598,11 @@ export class PMAgentMCPServer {
    */
   async handleGenerateTaskPlan(args: TaskPlanArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || typeof args.design !== 'string') {
+        throw new Error('Validation failed: design is required and must be a string');
+      }
+
       MCPLogger.debug('Generating task plan', context, { 
         designLength: args.design.length,
         hasLimits: !!args.limits,
@@ -592,6 +637,11 @@ export class PMAgentMCPServer {
    */
   async handleValidateIdeaQuick(args: ValidateIdeaQuickArgs, context: MCPToolContext): Promise<MCPToolResult> {
     try {
+      // Validate required arguments
+      if (!args || typeof args.idea !== 'string') {
+        throw new Error('Validation failed: idea is required and must be a string');
+      }
+
       MCPLogger.debug('Starting quick idea validation', context, { 
         ideaLength: args.idea.length,
         hasContext: !!args.context,
@@ -730,6 +780,13 @@ export class PMAgentMCPServer {
       totalRequests: this.requestCount,
       errorRate: this.requestCount > 0 ? (this.errorCount / this.requestCount) * 100 : 0
     };
+  }
+
+  /**
+   * Public method to update metrics for testing purposes
+   */
+  public updateMetricsForTesting(responseTime: number, isError: boolean = false): void {
+    this.updateMetrics(responseTime, isError);
   }
 
   /**

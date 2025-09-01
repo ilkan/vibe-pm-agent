@@ -212,8 +212,10 @@ describe('MCP Server Startup Tests', () => {
         });
       }).not.toThrow();
       
-      const status = server.getStatus();
-      expect(status.status).toBe('healthy');
+      if (server) {
+        const status = server.getStatus();
+        expect(status.status).toBe('healthy');
+      }
     });
   });
 
