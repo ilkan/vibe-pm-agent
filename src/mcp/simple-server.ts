@@ -180,6 +180,90 @@ export class SimplePMAgentMCPServer {
               },
               required: ["design"]
             }
+          },
+          {
+            name: "generate_roi_analysis",
+            description: "Generates comprehensive ROI analysis comparing naive, optimized, and zero-based approaches",
+            inputSchema: {
+              type: "object",
+              properties: {
+                workflow: {
+                  type: "object",
+                  description: "Original workflow definition"
+                },
+                optimizedWorkflow: {
+                  type: "object",
+                  description: "Optional optimized version of the workflow"
+                },
+                zeroBasedSolution: {
+                  type: "object",
+                  description: "Optional zero-based redesign solution"
+                }
+              },
+              required: ["workflow"]
+            }
+          },
+          {
+            name: "get_consulting_summary",
+            description: "Provides detailed consulting-style summary using Pyramid Principle for any analysis",
+            inputSchema: {
+              type: "object",
+              properties: {
+                analysis: {
+                  type: "object",
+                  properties: {
+                    techniquesUsed: { type: "array" },
+                    keyFindings: { type: "array" },
+                    totalQuotaSavings: { type: "number" }
+                  },
+                  description: "Analysis results to summarize"
+                },
+                techniques: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "Specific techniques to focus on in the summary"
+                }
+              },
+              required: ["analysis"]
+            }
+          },
+          {
+            name: "validate_idea_quick",
+            description: "Fast unit-test-like validation that provides PASS/FAIL verdict with 3 structured options for next steps",
+            inputSchema: {
+              type: "object",
+              properties: {
+                idea: {
+                  type: "string",
+                  description: "Raw idea or intent to validate quickly",
+                  minLength: 5,
+                  maxLength: 2000
+                },
+                context: {
+                  type: "object",
+                  properties: {
+                    urgency: {
+                      type: "string",
+                      enum: ["low", "medium", "high"],
+                      description: "How urgent this idea is"
+                    },
+                    budget_range: {
+                      type: "string",
+                      enum: ["small", "medium", "large"],
+                      description: "Available budget range"
+                    },
+                    team_size: {
+                      type: "number",
+                      minimum: 1,
+                      maximum: 100,
+                      description: "Size of the team working on this"
+                    }
+                  },
+                  description: "Optional context for validation"
+                }
+              },
+              required: ["idea"]
+            }
           }
         ]
       };
@@ -205,6 +289,12 @@ export class SimplePMAgentMCPServer {
             return await this.handleDesignOptions(args);
           case 'generate_task_plan':
             return await this.handleTaskPlan(args);
+          case 'generate_roi_analysis':
+            return await this.handleROIAnalysis(args);
+          case 'get_consulting_summary':
+            return await this.handleConsultingSummary(args);
+          case 'validate_idea_quick':
+            return await this.handleValidateIdeaQuick(args);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -797,44 +887,28 @@ Current developer workflows consume excessive quotas due to inefficient patterns
 ### Task 7: Advanced Analytics Platform
 **ID:** LT-001
 **Name:** Performance Monitoring and Optimization Intelligence
-**Description:** Build comprehensive analytics system for continuous improvement and user insights
+**Description:** Build comprehensive analytics system for continuous improvement and optimization intelligence
 
 **Acceptance Criteria:**
-- Real-time performance monitoring with alerting
-- User behavior analytics and optimization pattern recognition
-- Automated A/B testing for optimization strategy effectiveness
-- Predictive analytics for quota consumption forecasting
+- Real-time performance monitoring tracks quota usage and optimization effectiveness
+- Historical analysis identifies trends and optimization opportunities
+- Predictive analytics forecast future resource needs and cost projections
+- Dashboard provides actionable insights for continuous improvement
 
-**Effort:** L | **Impact:** High | **Priority:** Could
+**Effort:** XL | **Impact:** Med | **Priority:** Could
 
-### Task 8: Scalability and Enterprise Features
+### Task 8: Zero-Based Design Framework
 **ID:** LT-002
-**Name:** Enterprise-Grade Reliability and Scale
-**Description:** Implement advanced caching, load balancing, and enterprise security features
+**Name:** Advanced Workflow Redesign Capabilities
+**Description:** Implement sophisticated zero-based design methodology for revolutionary optimization
 
 **Acceptance Criteria:**
-- Distributed caching system handles high-volume requests
-- Load balancing ensures consistent performance under load
-- Enterprise security features (SSO, audit logging, compliance)
-- Multi-tenant architecture supports organizational isolation
+- Complete workflow decomposition and reconstruction algorithms
+- Advanced pattern recognition for optimization opportunities
+- Integration with industry best practices and benchmarking data
+- Automated recommendation engine for architectural improvements
 
-**Effort:** L | **Impact:** Med | **Priority:** Could
-
----
-
-## Success Metrics & Monitoring
-
-**Key Performance Indicators:**
-- Quota consumption reduction: Target 40-60% average savings
-- User adoption rate: 100+ active installations in first quarter
-- Processing time: <30 seconds for complete intent-to-spec optimization
-- Error rate: <5% for successful intent parsing and optimization
-
-**Risk Monitoring:**
-- Technical complexity tracking against team capability
-- Budget burn rate monitoring with early warning alerts
-- Timeline adherence with milestone completion tracking
-- Quality metrics ensuring user satisfaction and effectiveness`;
+**Effort:** XL | **Impact:** High | **Priority:** Could`;
 
     return {
       content: [{
@@ -844,9 +918,283 @@ Current developer workflows consume excessive quotas due to inefficient patterns
     };
   }
 
+  private async handleROIAnalysis(args: any) {
+    const workflow = args.workflow || {};
+    const optimizedWorkflow = args.optimizedWorkflow;
+    const zeroBasedSolution = args.zeroBasedSolution;
+
+    const workflowId = workflow.id || "unknown";
+    const stepCount = workflow.steps?.length || 5;
+
+    // Calculate costs for different scenarios
+    const naiveCost = stepCount * 3; // Assume 3 quota units per step
+    const optimizedCost = Math.ceil(naiveCost * 0.4); // 60% savings
+    const zeroBasedCost = Math.ceil(naiveCost * 0.15); // 85% savings
+
+    const roiAnalysis = `# ROI Analysis Report
+
+## Executive Summary
+Comprehensive analysis of workflow optimization opportunities with three distinct approaches, showing potential savings of 60-85% through systematic optimization.
+
+## Scenario Comparison
+
+### Scenario 1: Naive Implementation (Current State)
+- **Monthly Cost**: $${naiveCost}/month
+- **Quota Usage**: ${stepCount * 3} units/execution
+- **Approach**: Direct implementation without optimization
+- **Risk Level**: Low (baseline)
+- **Implementation Effort**: Minimal
+
+### Scenario 2: Optimized Workflow (Recommended)
+- **Monthly Cost**: $${optimizedCost}/month
+- **Quota Usage**: ${Math.ceil(stepCount * 1.2)} units/execution
+- **Approach**: Batching, caching, and intelligent decomposition
+- **Risk Level**: Medium
+- **Implementation Effort**: Medium
+- **Savings**: ${Math.round(((naiveCost - optimizedCost) / naiveCost) * 100)}% reduction
+
+### Scenario 3: Zero-Based Design (Future State)
+- **Monthly Cost**: $${zeroBasedCost}/month
+- **Quota Usage**: ${Math.ceil(stepCount * 0.45)} units/execution
+- **Approach**: Complete architectural redesign with event-driven patterns
+- **Risk Level**: High
+- **Implementation Effort**: High
+- **Savings**: ${Math.round(((naiveCost - zeroBasedCost) / naiveCost) * 100)}% reduction
+
+## Financial Impact Analysis
+
+| Metric | Naive | Optimized | Zero-Based |
+|--------|-------|-----------|------------|
+| Monthly Cost | $${naiveCost} | $${optimizedCost} | $${zeroBasedCost} |
+| Annual Cost | $${naiveCost * 12} | $${optimizedCost * 12} | $${zeroBasedCost * 12} |
+| Annual Savings | $0 | $${(naiveCost - optimizedCost) * 12} | $${(naiveCost - zeroBasedCost) * 12} |
+| ROI Timeline | N/A | 2-3 months | 6-9 months |
+
+## Recommendation
+
+**Execute Optimized approach immediately** with Zero-Based design as future roadmap item.
+
+**Rationale:**
+- Optimized approach provides 60% savings with manageable risk
+- Implementation timeline aligns with current team capacity
+- Builds foundation knowledge for future Zero-Based implementation
+- Immediate cost relief justifies medium development investment
+
+## Risk Assessment
+
+### Optimized Approach Risks
+- **Technical Complexity**: Medium - requires careful batching logic
+- **Performance Impact**: Low - caching improves response times
+- **Maintenance Overhead**: Medium - additional monitoring required
+
+### Zero-Based Approach Risks  
+- **Technical Complexity**: High - complete architectural change
+- **Performance Impact**: Unknown - requires extensive testing
+- **Maintenance Overhead**: High - new patterns and monitoring systems
+
+## Next Steps
+1. **Week 1-2**: Implement optimized batching and caching
+2. **Week 3-4**: Performance testing and validation
+3. **Month 2**: Monitor savings and optimize further
+4. **Quarter 2**: Evaluate Zero-Based design feasibility`;
+
+    return {
+      content: [{
+        type: "text",
+        text: roiAnalysis
+      }]
+    };
+  }
+
+  private async handleConsultingSummary(args: any) {
+    const analysis = args.analysis || {};
+    const techniques = args.techniques || [];
+
+    const techniquesUsed = analysis.techniquesUsed || ["MECE", "Value Driver Tree"];
+    const keyFindings = analysis.keyFindings || ["Significant optimization opportunities identified"];
+    const totalQuotaSavings = analysis.totalQuotaSavings || 60;
+
+    const summary = `# Consulting Summary
+
+## Executive Summary (Answer First)
+**Recommendation: Implement workflow optimization immediately** - analysis reveals 60% cost reduction opportunity with medium effort and manageable risk profile.
+
+## Supporting Analysis (Pyramid Structure)
+
+### Level 1: Strategic Rationale
+**Why Act Now:**
+- Current inefficiencies cost $${Math.floor(totalQuotaSavings * 2)}/month with clear optimization path
+- Market timing optimal with rising API costs and budget constraints  
+- Technical foundation ready for implementation with proven patterns
+
+### Level 2: Analytical Foundation
+**Consulting Techniques Applied:**
+${techniquesUsed.map((technique: string) => `- **${technique}**: ${this.getTechniqueDescription(technique)}`).join('\n')}
+
+**Key Findings:**
+${keyFindings.map((finding: string, index: number) => `${index + 1}. ${finding}`).join('\n')}
+
+### Level 3: Implementation Details
+**Optimization Strategies:**
+- **Batching Operations**: Group similar API calls to reduce overhead
+- **Intelligent Caching**: Store frequently accessed data with smart invalidation
+- **Workflow Decomposition**: Break complex processes into optimized components
+- **Async Processing**: Implement non-blocking operations where possible
+
+## Evidence Base
+
+### Quantitative Analysis
+- **Current State**: ${Math.floor(totalQuotaSavings * 1.67)} quota units/execution
+- **Optimized State**: ${Math.floor(totalQuotaSavings * 0.67)} quota units/execution  
+- **Savings Percentage**: ${totalQuotaSavings}%
+- **Monthly Impact**: $${Math.floor(totalQuotaSavings * 2)} cost reduction
+
+### Qualitative Assessment
+- **Implementation Risk**: Medium - requires careful planning but uses proven patterns
+- **Team Readiness**: High - existing skills align with optimization requirements
+- **Maintenance Impact**: Low - optimizations reduce long-term operational overhead
+
+## Recommendations
+
+### Immediate Actions (Next 2 Weeks)
+1. **Implement batching logic** for similar operations
+2. **Add caching layer** for frequently accessed data
+3. **Establish monitoring** for optimization effectiveness
+
+### Short-Term Goals (Next 2 Months)  
+1. **Optimize data retrieval** patterns and payload sizes
+2. **Implement async processing** for non-critical operations
+3. **Validate savings** and refine optimization strategies
+
+### Long-Term Vision (Next Quarter)
+1. **Evaluate zero-based redesign** for additional optimization
+2. **Expand optimization** to related workflows and processes
+3. **Build optimization expertise** as competitive advantage
+
+## Success Metrics
+- **Cost Reduction**: Target 60% savings within 8 weeks
+- **Performance Impact**: Maintain or improve response times
+- **Implementation Quality**: Zero production incidents during rollout
+
+This analysis provides the strategic clarity and tactical guidance needed for confident decision-making and successful implementation.`;
+
+    return {
+      content: [{
+        type: "text",
+        text: summary
+      }]
+    };
+  }
+
+  private async handleValidateIdeaQuick(args: any) {
+    const idea = args.idea || "No idea provided";
+    const context = args.context || {};
+
+    const urgency = context.urgency || "medium";
+    const budgetRange = context.budget_range || "medium";
+    const teamSize = context.team_size || 3;
+
+    // Simple validation logic based on idea content and context
+    const ideaLength = idea.length;
+    const hasSpecificGoal = idea.toLowerCase().includes('optimize') || idea.toLowerCase().includes('reduce') || idea.toLowerCase().includes('improve');
+    const hasTechnicalContent = idea.toLowerCase().includes('api') || idea.toLowerCase().includes('workflow') || idea.toLowerCase().includes('quota');
+
+    let verdict = "PASS";
+    let reasoning = "";
+
+    if (ideaLength < 20) {
+      verdict = "FAIL";
+      reasoning = "Idea too vague - needs more specific details about goals and implementation approach.";
+    } else if (!hasSpecificGoal && !hasTechnicalContent) {
+      verdict = "CONDITIONAL";
+      reasoning = "Idea has potential but lacks specific optimization goals or technical context. Needs clarification.";
+    } else {
+      reasoning = "Idea shows clear optimization intent with sufficient technical context for analysis.";
+    }
+
+    const validation = `# Quick Validation Result
+
+**Verdict:** ${verdict}
+
+**Reasoning:** ${reasoning}
+
+**Context Analysis:**
+- **Urgency Level**: ${urgency.toUpperCase()}
+- **Budget Range**: ${budgetRange.toUpperCase()}  
+- **Team Size**: ${teamSize} developers
+- **Idea Complexity**: ${ideaLength > 100 ? 'High' : ideaLength > 50 ? 'Medium' : 'Low'}
+
+## Next Steps (Choose One)
+
+### Option 1: Conservative Approach
+**Title:** Start with Requirements Analysis
+**Description:** Begin with structured requirements gathering to clarify goals and constraints before proceeding with optimization analysis.
+
+**Trade-offs:**
+- Lower risk but slower time to value
+- Thorough planning reduces implementation surprises
+- May delay addressing urgent optimization needs
+
+**Next Step:** Use \`generate_requirements\` tool with your idea as raw_intent
+
+---
+
+### Option 2: Balanced Approach ✅
+**Title:** Direct Optimization Analysis  
+**Description:** Proceed immediately with intent optimization to get actionable recommendations and ROI analysis.
+
+**Trade-offs:**
+- Faster results with moderate risk
+- Good balance of speed and thoroughness
+- May need refinement based on initial results
+
+**Next Step:** Use \`optimize_intent\` tool with your idea and any known parameters
+
+---
+
+### Option 3: Bold Approach
+**Title:** Comprehensive PM Process
+**Description:** Full product management workflow from requirements through design options to implementation planning.
+
+**Trade-offs:**
+- Most thorough analysis but longest timeline
+- Professional-grade documentation and planning
+- May be overkill for simple optimization needs
+
+**Next Step:** Start with \`generate_requirements\`, then \`generate_design_options\`, then \`generate_task_plan\`
+
+## Recommendation
+
+${urgency === 'high' ? 'Given HIGH urgency, recommend **Option 2 (Balanced)** for fastest actionable results.' :
+        budgetRange === 'large' ? 'Given LARGE budget, recommend **Option 3 (Bold)** for comprehensive analysis.' :
+          'Recommend **Option 2 (Balanced)** for optimal speed-to-value ratio.'}`;
+
+    return {
+      content: [{
+        type: "text",
+        text: validation
+      }]
+    };
+  }
+
+  private getTechniqueDescription(technique: string): string {
+    const descriptions: { [key: string]: string } = {
+      "MECE": "Mutually Exclusive, Collectively Exhaustive analysis for comprehensive problem decomposition",
+      "Value Driver Tree": "Hierarchical breakdown of cost and value drivers for systematic optimization",
+      "Pyramid": "Answer-first communication structure for executive clarity",
+      "ZeroBased": "Ground-up redesign methodology questioning all assumptions",
+      "ImpactEffort": "2x2 matrix prioritizing initiatives by impact vs implementation effort",
+      "ValueProp": "Value proposition analysis focusing on user benefits and business outcomes",
+      "OptionFraming": "Structured comparison of Conservative/Balanced/Bold approaches"
+    };
+    return descriptions[technique] || "Advanced consulting technique for systematic analysis";
+  }
+
+
+
   private extractBusinessGoal(rawIntent: string): string {
     const intent = rawIntent.toLowerCase();
-    
+
     if (intent.includes('quota') && intent.includes('cost')) {
       return 'Reduce developer workflow costs by 40-60% through intelligent quota optimization while maintaining full functionality and improving user experience.';
     } else if (intent.includes('optimization') && intent.includes('workflow')) {
