@@ -14,4 +14,4 @@ export * from './document-reference-linker';
 export * from './steering-file-manager';
 export * from './steering-file-utilities';
 export * from './steering-user-interaction';
-export * from './steering-file-preview';
+export { SteeringFilePreview as SteeringFilePreviewComponent } from './steering-file-preview';

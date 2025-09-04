@@ -1,18 +1,28 @@
 # Product Overview
 
-The PM Agent Intent-to-Spec Optimizer is an AI-powered system that transforms raw developer intent expressed in natural language into structured, efficient Kiro specifications. 
+The Vibe PM Agent provides the missing "PM Mode" for Kiro, completing the development trinity by answering "WHY to build" questions with professional consulting-grade business analysis.
 
 ## Core Purpose
-- Minimize vibe/spec quota consumption while preserving functionality
-- Apply business analysis techniques to optimize workflows
-- Help developers create cost-effective automation workflows
+- Complete Kiro's development modes with strategic PM Mode (WHY to build)
+- Provide business justification and strategic analysis for technical decisions
+- Generate executive-ready communications and stakeholder alignment materials
+- Ensure features are built for the right business reasons at the right time
 
 ## Key Features
-- Natural language intent parsing and analysis
-- Business analysis using fishbone methodology
-- Workflow optimization through batching, caching, and decomposition
-- Quota consumption forecasting and cost savings analysis
-- Generation of optimized Kiro-ready specifications
+- Business opportunity analysis with market validation and strategic fit assessment
+- ROI analysis with multi-scenario financial projections and risk assessment
+- Strategic alignment evaluation against company OKRs, mission, and priorities
+- Executive communication generation (one-pagers, PR-FAQs, board presentations)
+- Market timing validation and right-time recommendations
+- Resource optimization analysis for development efficiency
+
+## Perfect Kiro Integration
+- **PM Mode** (vibe-pm-agent): WHY to build - business justification and strategy
+- **Spec Mode** (Kiro native): WHAT to build - requirements and specifications  
+- **Vibe Mode** (Kiro native): HOW to build - implementation and code generation
 
 ## Target Users
-Developers who want to create efficient Kiro workflows without excessive quota consumption or manual optimization effort.
+- **Product Managers**: Professional PM artifacts and strategic analysis
+- **Engineering Leaders**: Business justification for technical decisions
+- **Executives**: Investment analysis and strategic alignment assessment
+- **Development Teams**: Strategic context that enhances Spec and Vibe mode effectiveness
