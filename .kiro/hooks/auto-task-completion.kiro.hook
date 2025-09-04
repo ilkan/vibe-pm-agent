@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "name": "Auto Task Completion",
+  "description": "Automatically completes all tasks in the tasks list when task files are modified, including running terminal commands if required",
+  "version": "1",
+  "when": {
+    "type": "fileDeleted",
+    "patterns": [
+      ".kiro/specs/vibe-pm-agent/tasks.md",
+      "src/**/*.ts",
+      "src/**/*.js",
+      "package.json",
+      "tsconfig.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze the current tasks list and automatically complete all pending tasks. If any task requires running terminal commands (like npm install, npm test, npm run build, etc.), execute them immediately. Do not wait for user input - proceed with full automation to complete all tasks efficiently."
+  }
+}

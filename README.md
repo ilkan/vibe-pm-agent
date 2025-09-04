@@ -337,6 +337,13 @@ Comprehensive guides and best practices for maximizing PM Agent effectiveness:
 - **[Quick Validation Guide](docs/quick-validation-guide.md)**: Master the `validate_idea_quick` tool for fast, accurate idea screening
 - **[PM Document Best Practices](docs/pm-document-best-practices.md)**: Quality standards for executive communication and stakeholder alignment
 
+### 🎯 Steering File Integration
+- **[Steering File Documentation](docs/README.md)**: Complete guide to automatic steering file generation from PM agent outputs
+- **[Integration Guide](docs/steering-file-integration-guide.md)**: How PM documents become persistent Kiro guidance
+- **[Examples & Templates](docs/steering-file-examples.md)**: Concrete examples of generated steering files for all document types
+- **[Best Practices](docs/steering-file-best-practices.md)**: Organization strategies, naming conventions, and team collaboration patterns
+- **[MCP Tool Reference](docs/mcp-steering-tool-reference.md)**: API reference for steering file parameters and configuration
+
 ### 🎯 Quick Start Paths
 
 #### For Developers

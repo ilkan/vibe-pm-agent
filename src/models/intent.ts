@@ -49,6 +49,7 @@ export interface OptionalParams {
       budget?: number;
       deadlines?: string;
     };
+    steeringOptions?: import('./mcp').SteeringFileOptions;
   };
 }
 

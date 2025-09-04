@@ -47,6 +47,12 @@ export interface MCPToolResult {
     quotaUsed?: number;
     cacheHit?: boolean;
     warnings?: string[];
+    steeringFileCreated?: boolean;
+    steeringFiles?: Array<{
+      filename: string;
+      action: string;
+      fullPath?: string;
+    }>;
   };
 }
 
@@ -176,12 +182,14 @@ export interface ManagementOnePagerArgs {
     cost_balanced?: number;
     cost_bold?: number;
   };
+  steering_options?: SteeringFileOptions;
 }
 
 export interface PRFAQArgs {
   requirements: string;
   design: string;
   target_date?: string;
+  steering_options?: SteeringFileOptions;
 }
 
 export interface RequirementsArgs {
@@ -195,10 +203,12 @@ export interface RequirementsArgs {
     };
     deadlines?: string;
   };
+  steering_options?: SteeringFileOptions;
 }
 
 export interface DesignOptionsArgs {
   requirements: string;
+  steering_options?: SteeringFileOptions;
 }
 
 export interface TaskPlanArgs {
@@ -208,6 +218,7 @@ export interface TaskPlanArgs {
     max_specs?: number;
     budget_usd?: number;
   };
+  steering_options?: SteeringFileOptions;
 }
 
 export interface ValidateIdeaQuickArgs {
@@ -278,6 +289,24 @@ export interface LogEntry {
   };
   metadata?: Record<string, any>;
   duration?: number;
+}
+
+/**
+ * Steering file creation options for MCP tools
+ */
+export interface SteeringFileOptions {
+  /** Whether to create steering files from the generated documents */
+  create_steering_files?: boolean;
+  /** Feature name for organizing steering files */
+  feature_name?: string;
+  /** Custom filename prefix for steering files */
+  filename_prefix?: string;
+  /** Inclusion rule for the steering files */
+  inclusion_rule?: 'always' | 'fileMatch' | 'manual';
+  /** File match pattern when inclusion_rule is 'fileMatch' */
+  file_match_pattern?: string;
+  /** Whether to overwrite existing steering files */
+  overwrite_existing?: boolean;
 }
 
 /**
