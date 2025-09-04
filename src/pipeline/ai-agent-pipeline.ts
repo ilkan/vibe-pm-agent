@@ -17,6 +17,7 @@ import {
   DesignOptions, 
   TaskPlan 
 } from '../components/pm-document-generator';
+import { SteeringService, SteeringCreationResult } from '../components/steering-service';
 import { 
   OptionalParams, 
   KiroSpec, 
@@ -47,6 +48,7 @@ import {
   ParallelOperationFactory,
   PerformanceMetrics
 } from './performance-optimizer';
+import { SteeringFileOptions } from '../models/mcp';
 
 export interface PipelineResult {
   success: boolean;
@@ -64,6 +66,11 @@ export interface PipelineResult {
     requirements?: any; // PMRequirements object
     designOptions?: any; // DesignOptions object
     taskPlan?: any; // TaskPlan object
+  };
+  steeringFiles?: {
+    created: boolean;
+    results: SteeringCreationResult[];
+    summary: string;
   };
   error?: ProcessingError;
   metadata?: {
@@ -88,6 +95,7 @@ export class AIAgentPipeline {
   private specGenerator: SpecGenerator;
   private pmDocumentGenerator: PMDocumentGenerator;
   private quickValidator: QuickValidator;
+  private steeringService: SteeringService;
   
   // Performance optimization components
   private cache: PipelineCache;
@@ -103,6 +111,7 @@ export class AIAgentPipeline {
     this.specGenerator = new SpecGenerator();
     this.pmDocumentGenerator = new PMDocumentGenerator();
     this.quickValidator = new QuickValidator();
+    this.steeringService = new SteeringService();
     
     // Initialize performance optimization components
     this.cache = new PipelineCache({
@@ -288,6 +297,23 @@ export class AIAgentPipeline {
           documentsGenerated: Object.keys(pmDocuments || {}).length 
         });
       }
+
+      // Stage 8: Optional Steering File Creation
+      let steeringFiles: PipelineResult['steeringFiles'] = undefined;
+      if (pmDocuments && params?.generatePMDocuments?.steeringOptions?.create_steering_files) {
+        this.logInfo('Stage 8: Creating steering files from PM documents', { sessionId, stage: 'steering_files' });
+        const steeringResult = await this.createSteeringFilesFromDocuments(
+          pmDocuments,
+          params.generatePMDocuments.steeringOptions,
+          sessionId
+        );
+        steeringFiles = steeringResult;
+        this.logInfo('Steering file creation completed', { 
+          sessionId, 
+          filesCreated: steeringResult.created ? steeringResult.results.length : 0,
+          summary: steeringResult.summary
+        });
+      }
       
       const executionTime = Date.now() - startTime;
       
@@ -321,6 +347,7 @@ export class AIAgentPipeline {
         roiAnalysis,
         efficiencySummary,
         pmDocuments,
+        steeringFiles,
         metadata: {
           executionTime,
           sessionId,
@@ -2138,5 +2165,312 @@ ${pr.body}`;
     } catch {
       return undefined;
     }
+  }
+
+  /**
+   * Create steering files from generated PM documents
+   * This method orchestrates the creation of steering files from various document types
+   */
+  async createSteeringFilesFromDocuments(
+    pmDocuments: PipelineResult['pmDocuments'],
+    steeringOptions?: SteeringFileOptions,
+    sessionId?: string
+  ): Promise<{ created: boolean; results: SteeringCreationResult[]; summary: string }> {
+    if (!pmDocuments || !steeringOptions?.create_steering_files) {
+      return {
+        created: false,
+        results: [],
+        summary: 'Steering file creation not requested or no documents available'
+      };
+    }
+
+    const startTime = Date.now();
+    const results: SteeringCreationResult[] = [];
+    let totalCreated = 0;
+
+    try {
+      this.logInfo('Starting steering file creation from PM documents', { 
+        sessionId, 
+        documentsAvailable: Object.keys(pmDocuments).length,
+        featureName: steeringOptions.feature_name 
+      });
+
+      // Create steering files for each available document type
+      if (pmDocuments.requirements) {
+        try {
+          const requirementsContent = typeof pmDocuments.requirements === 'string' 
+            ? pmDocuments.requirements 
+            : this.formatRequirementsAsMarkdown(pmDocuments.requirements);
+          
+          const result = await this.steeringService.createFromRequirements(requirementsContent, steeringOptions);
+          results.push(result);
+          if (result.created) totalCreated++;
+        } catch (error) {
+          this.logError('Failed to create requirements steering file', error, { sessionId });
+          results.push({
+            created: false,
+            results: [],
+            message: `Failed to create requirements steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            warnings: [error instanceof Error ? error.message : 'Unknown error'],
+            userInteractionRequired: false
+          });
+        }
+      }
+
+      if (pmDocuments.designOptions) {
+        try {
+          const designContent = typeof pmDocuments.designOptions === 'string' 
+            ? pmDocuments.designOptions 
+            : this.formatDesignOptionsAsMarkdown(pmDocuments.designOptions);
+          
+          const result = await this.steeringService.createFromDesignOptions(designContent, steeringOptions);
+          results.push(result);
+          if (result.created) totalCreated++;
+        } catch (error) {
+          this.logError('Failed to create design steering file', error, { sessionId });
+          results.push({
+            created: false,
+            results: [],
+            message: `Failed to create design steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            warnings: [error instanceof Error ? error.message : 'Unknown error'],
+            userInteractionRequired: false
+          });
+        }
+      }
+
+      if (pmDocuments.managementOnePager) {
+        try {
+          const result = await this.steeringService.createFromOnePager(pmDocuments.managementOnePager, steeringOptions);
+          results.push(result);
+          if (result.created) totalCreated++;
+        } catch (error) {
+          this.logError('Failed to create one-pager steering file', error, { sessionId });
+          results.push({
+            created: false,
+            results: [],
+            message: `Failed to create one-pager steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            warnings: [error instanceof Error ? error.message : 'Unknown error'],
+            userInteractionRequired: false
+          });
+        }
+      }
+
+      if (pmDocuments.prfaq) {
+        try {
+          const prfaqContent = typeof pmDocuments.prfaq === 'string' 
+            ? pmDocuments.prfaq 
+            : this.formatPRFAQAsMarkdown(pmDocuments.prfaq);
+          
+          const result = await this.steeringService.createFromPRFAQ(prfaqContent, steeringOptions);
+          results.push(result);
+          if (result.created) totalCreated++;
+        } catch (error) {
+          this.logError('Failed to create PR-FAQ steering file', error, { sessionId });
+          results.push({
+            created: false,
+            results: [],
+            message: `Failed to create PR-FAQ steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            warnings: [error instanceof Error ? error.message : 'Unknown error'],
+            userInteractionRequired: false
+          });
+        }
+      }
+
+      if (pmDocuments.taskPlan) {
+        try {
+          const taskContent = typeof pmDocuments.taskPlan === 'string' 
+            ? pmDocuments.taskPlan 
+            : this.formatTaskPlanAsMarkdown(pmDocuments.taskPlan);
+          
+          const result = await this.steeringService.createFromTaskPlan(taskContent, steeringOptions);
+          results.push(result);
+          if (result.created) totalCreated++;
+        } catch (error) {
+          this.logError('Failed to create task plan steering file', error, { sessionId });
+          results.push({
+            created: false,
+            results: [],
+            message: `Failed to create task plan steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            warnings: [error instanceof Error ? error.message : 'Unknown error'],
+            userInteractionRequired: false
+          });
+        }
+      }
+
+      const executionTime = Date.now() - startTime;
+      const summary = totalCreated > 0 
+        ? `Successfully created ${totalCreated} steering file(s) from PM documents`
+        : 'No steering files were created';
+
+      this.logInfo('Steering file creation completed', { 
+        sessionId, 
+        executionTime, 
+        totalCreated, 
+        totalAttempted: results.length 
+      });
+
+      return {
+        created: totalCreated > 0,
+        results,
+        summary
+      };
+
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.logError('Steering file creation process failed', error, { sessionId, executionTime });
+      
+      return {
+        created: false,
+        results: results.length > 0 ? results : [{
+          created: false,
+          results: [],
+          message: `Steering file creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          warnings: [],
+          userInteractionRequired: false
+        }],
+        summary: 'Steering file creation process failed'
+      };
+    }
+  }
+
+  /**
+   * Prompt user for steering file creation preferences during document generation
+   * This method would integrate with user interaction systems in a real implementation
+   */
+  async promptForSteeringFilePreferences(
+    documentTypes: string[],
+    featureName?: string,
+    sessionId?: string
+  ): Promise<SteeringFileOptions | undefined> {
+    // In a real implementation, this would integrate with the user interface
+    // For now, we'll return default preferences based on the document types
+    
+    this.logInfo('Generating default steering file preferences', { 
+      sessionId, 
+      documentTypes, 
+      featureName 
+    });
+
+    if (documentTypes.length === 0) {
+      return undefined;
+    }
+
+    // Default preferences - in practice, this would be user-configurable
+    return {
+      create_steering_files: true,
+      feature_name: featureName || 'unnamed-feature',
+      inclusion_rule: 'fileMatch',
+      overwrite_existing: false
+    };
+  }
+
+  // Helper methods for formatting different document types as markdown
+
+  private formatRequirementsAsMarkdown(requirements: any): string {
+    if (typeof requirements === 'string') {
+      return requirements;
+    }
+
+    // Format PMRequirements object as markdown
+    let markdown = '# Requirements Document\n\n';
+    
+    if (requirements.businessGoal) {
+      markdown += `## Business Goal\n\n${requirements.businessGoal}\n\n`;
+    }
+    
+    if (requirements.requirements && Array.isArray(requirements.requirements)) {
+      markdown += '## Requirements\n\n';
+      requirements.requirements.forEach((req: any, index: number) => {
+        markdown += `### ${index + 1}. ${req.title || 'Requirement'}\n\n`;
+        if (req.userStory) {
+          markdown += `**User Story:** ${req.userStory}\n\n`;
+        }
+        if (req.acceptanceCriteria && Array.isArray(req.acceptanceCriteria)) {
+          markdown += '**Acceptance Criteria:**\n\n';
+          req.acceptanceCriteria.forEach((criteria: string, i: number) => {
+            markdown += `${i + 1}. ${criteria}\n`;
+          });
+          markdown += '\n';
+        }
+      });
+    }
+
+    return markdown;
+  }
+
+  private formatDesignOptionsAsMarkdown(design: any): string {
+    if (typeof design === 'string') {
+      return design;
+    }
+
+    let markdown = '# Design Options\n\n';
+    
+    if (design.problemFraming) {
+      markdown += `## Problem Framing\n\n${design.problemFraming}\n\n`;
+    }
+    
+    if (design.options) {
+      markdown += '## Design Options\n\n';
+      Object.entries(design.options).forEach(([key, option]: [string, any]) => {
+        markdown += `### ${option.name || key}\n\n`;
+        markdown += `${option.summary || 'No summary available'}\n\n`;
+        markdown += `**Impact:** ${option.impact || 'Not specified'}\n\n`;
+        markdown += `**Effort:** ${option.effort || 'Not specified'}\n\n`;
+      });
+    }
+
+    return markdown;
+  }
+
+  private formatPRFAQAsMarkdown(prfaq: any): string {
+    if (typeof prfaq === 'string') {
+      return prfaq;
+    }
+
+    let markdown = '# Press Release and FAQ\n\n';
+    
+    if (prfaq.pressRelease) {
+      markdown += '## Press Release\n\n';
+      markdown += `${prfaq.pressRelease}\n\n`;
+    }
+    
+    if (prfaq.faq) {
+      markdown += '## Frequently Asked Questions\n\n';
+      markdown += `${prfaq.faq}\n\n`;
+    }
+    
+    if (prfaq.launchChecklist) {
+      markdown += '## Launch Checklist\n\n';
+      markdown += `${prfaq.launchChecklist}\n\n`;
+    }
+
+    return markdown;
+  }
+
+  private formatTaskPlanAsMarkdown(taskPlan: any): string {
+    if (typeof taskPlan === 'string') {
+      return taskPlan;
+    }
+
+    let markdown = '# Implementation Plan\n\n';
+    
+    if (taskPlan.phases && Array.isArray(taskPlan.phases)) {
+      taskPlan.phases.forEach((phase: any, index: number) => {
+        markdown += `## Phase ${index + 1}: ${phase.name || 'Unnamed Phase'}\n\n`;
+        if (phase.tasks && Array.isArray(phase.tasks)) {
+          phase.tasks.forEach((task: any, taskIndex: number) => {
+            markdown += `- [ ] ${taskIndex + 1}. ${task.description || task.title || 'Unnamed task'}\n`;
+          });
+          markdown += '\n';
+        }
+      });
+    } else if (taskPlan.tasks && Array.isArray(taskPlan.tasks)) {
+      markdown += '## Tasks\n\n';
+      taskPlan.tasks.forEach((task: any, index: number) => {
+        markdown += `- [ ] ${index + 1}. ${task.description || task.title || 'Unnamed task'}\n`;
+      });
+    }
+
+    return markdown;
   }
 }

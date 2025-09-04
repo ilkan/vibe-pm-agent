@@ -164,6 +164,37 @@ export const TOOL_SCHEMAS = {
           cost_bold: { type: "number" }
         },
         description: "Optional ROI cost inputs for different scenarios"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { 
+            type: "boolean", 
+            description: "Whether to create steering files from generated documents" 
+          },
+          feature_name: { 
+            type: "string", 
+            description: "Feature name for organizing steering files" 
+          },
+          filename_prefix: { 
+            type: "string", 
+            description: "Custom filename prefix for steering files" 
+          },
+          inclusion_rule: { 
+            type: "string", 
+            enum: ["always", "fileMatch", "manual"],
+            description: "How the steering file should be included in context" 
+          },
+          file_match_pattern: { 
+            type: "string", 
+            description: "File match pattern when inclusion_rule is 'fileMatch'" 
+          },
+          overwrite_existing: { 
+            type: "boolean", 
+            description: "Whether to overwrite existing steering files" 
+          }
+        },
+        description: "Optional steering file creation options"
       }
     },
     required: ["requirements", "design"]
@@ -183,6 +214,37 @@ export const TOOL_SCHEMAS = {
       target_date: {
         type: "string",
         description: "Target launch date (YYYY-MM-DD format, optional, defaults to 3 months from now)"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { 
+            type: "boolean", 
+            description: "Whether to create steering files from generated documents" 
+          },
+          feature_name: { 
+            type: "string", 
+            description: "Feature name for organizing steering files" 
+          },
+          filename_prefix: { 
+            type: "string", 
+            description: "Custom filename prefix for steering files" 
+          },
+          inclusion_rule: { 
+            type: "string", 
+            enum: ["always", "fileMatch", "manual"],
+            description: "How the steering file should be included in context" 
+          },
+          file_match_pattern: { 
+            type: "string", 
+            description: "File match pattern when inclusion_rule is 'fileMatch'" 
+          },
+          overwrite_existing: { 
+            type: "boolean", 
+            description: "Whether to overwrite existing steering files" 
+          }
+        },
+        description: "Optional steering file creation options"
       }
     },
     required: ["requirements", "design"]
@@ -210,6 +272,37 @@ export const TOOL_SCHEMAS = {
           deadlines: { type: "string" }
         },
         description: "Optional context for requirements generation"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { 
+            type: "boolean", 
+            description: "Whether to create steering files from generated documents" 
+          },
+          feature_name: { 
+            type: "string", 
+            description: "Feature name for organizing steering files" 
+          },
+          filename_prefix: { 
+            type: "string", 
+            description: "Custom filename prefix for steering files" 
+          },
+          inclusion_rule: { 
+            type: "string", 
+            enum: ["always", "fileMatch", "manual"],
+            description: "How the steering file should be included in context" 
+          },
+          file_match_pattern: { 
+            type: "string", 
+            description: "File match pattern when inclusion_rule is 'fileMatch'" 
+          },
+          overwrite_existing: { 
+            type: "boolean", 
+            description: "Whether to overwrite existing steering files" 
+          }
+        },
+        description: "Optional steering file creation options"
       }
     },
     required: ["raw_intent"]
@@ -221,6 +314,37 @@ export const TOOL_SCHEMAS = {
       requirements: {
         type: "string",
         description: "Approved requirements document content"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { 
+            type: "boolean", 
+            description: "Whether to create steering files from generated documents" 
+          },
+          feature_name: { 
+            type: "string", 
+            description: "Feature name for organizing steering files" 
+          },
+          filename_prefix: { 
+            type: "string", 
+            description: "Custom filename prefix for steering files" 
+          },
+          inclusion_rule: { 
+            type: "string", 
+            enum: ["always", "fileMatch", "manual"],
+            description: "How the steering file should be included in context" 
+          },
+          file_match_pattern: { 
+            type: "string", 
+            description: "File match pattern when inclusion_rule is 'fileMatch'" 
+          },
+          overwrite_existing: { 
+            type: "boolean", 
+            description: "Whether to overwrite existing steering files" 
+          }
+        },
+        description: "Optional steering file creation options"
       }
     },
     required: ["requirements"]
@@ -241,6 +365,37 @@ export const TOOL_SCHEMAS = {
           budget_usd: { type: "number" }
         },
         description: "Optional project limits for guardrails check"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { 
+            type: "boolean", 
+            description: "Whether to create steering files from generated documents" 
+          },
+          feature_name: { 
+            type: "string", 
+            description: "Feature name for organizing steering files" 
+          },
+          filename_prefix: { 
+            type: "string", 
+            description: "Custom filename prefix for steering files" 
+          },
+          inclusion_rule: { 
+            type: "string", 
+            enum: ["always", "fileMatch", "manual"],
+            description: "How the steering file should be included in context" 
+          },
+          file_match_pattern: { 
+            type: "string", 
+            description: "File match pattern when inclusion_rule is 'fileMatch'" 
+          },
+          overwrite_existing: { 
+            type: "boolean", 
+            description: "Whether to overwrite existing steering files" 
+          }
+        },
+        description: "Optional steering file creation options"
       }
     },
     required: ["design"]
@@ -316,31 +471,31 @@ export const MCP_SERVER_CONFIG: MCPServerConfig = {
     },
     {
       name: "generate_management_onepager",
-      description: "Creates executive-ready management one-pager using Pyramid Principle with answer-first clarity and timing rationale",
+      description: "Creates executive-ready management one-pager using Pyramid Principle with answer-first clarity and timing rationale. Optionally creates steering files for future development guidance.",
       inputSchema: TOOL_SCHEMAS.generateManagementOnePager,
       handler: async () => { throw new Error("Handler not implemented"); }
     },
     {
       name: "generate_pr_faq",
-      description: "Generates Amazon-style PR-FAQ document with future-dated press release and comprehensive FAQ",
+      description: "Generates Amazon-style PR-FAQ document with future-dated press release and comprehensive FAQ. Optionally creates steering files for product clarity guidance.",
       inputSchema: TOOL_SCHEMAS.generatePRFAQ,
       handler: async () => { throw new Error("Handler not implemented"); }
     },
     {
       name: "generate_requirements",
-      description: "Creates PM-grade requirements with Business Goal extraction, MoSCoW prioritization, and Go/No-Go timing decision",
+      description: "Creates PM-grade requirements with Business Goal extraction, MoSCoW prioritization, and Go/No-Go timing decision. Optionally creates steering files for requirements guidance.",
       inputSchema: TOOL_SCHEMAS.generateRequirements,
       handler: async () => { throw new Error("Handler not implemented"); }
     },
     {
       name: "generate_design_options",
-      description: "Translates approved requirements into Conservative/Balanced/Bold design options with Impact vs Effort analysis",
+      description: "Translates approved requirements into Conservative/Balanced/Bold design options with Impact vs Effort analysis. Optionally creates steering files for design guidance.",
       inputSchema: TOOL_SCHEMAS.generateDesignOptions,
       handler: async () => { throw new Error("Handler not implemented"); }
     },
     {
       name: "generate_task_plan",
-      description: "Creates phased implementation plan with Guardrails Check, Immediate Wins, Short-Term, and Long-Term tasks",
+      description: "Creates phased implementation plan with Guardrails Check, Immediate Wins, Short-Term, and Long-Term tasks. Optionally creates steering files for implementation guidance.",
       inputSchema: TOOL_SCHEMAS.generateTaskPlan,
       handler: async () => { throw new Error("Handler not implemented"); }
     },

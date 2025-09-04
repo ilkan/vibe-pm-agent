@@ -257,7 +257,7 @@ Spend 2-3 weeks researching AI moderation approaches and building proof of conce
 
 ### 6. generate_management_onepager
 
-**Description**: Creates executive-ready management one-pager using Pyramid Principle with answer-first clarity and timing rationale.
+**Description**: Creates executive-ready management one-pager using Pyramid Principle with answer-first clarity and timing rationale. Optionally creates steering files for executive guidance.
 
 **Input Schema**:
 ```json
@@ -283,6 +283,17 @@ Spend 2-3 weeks researching AI moderation approaches and building proof of conce
         "cost_balanced": {"type": "number"},
         "cost_bold": {"type": "number"}
       }
+    },
+    "steering_options": {
+      "type": "object",
+      "properties": {
+        "create_steering_files": {"type": "boolean"},
+        "feature_name": {"type": "string"},
+        "inclusion_rule": {"type": "string", "enum": ["always", "fileMatch", "manual"]},
+        "file_match_pattern": {"type": "string"},
+        "overwrite_existing": {"type": "boolean"}
+      },
+      "description": "Optional steering file creation options"
     }
   },
   "required": ["requirements", "design"]
@@ -333,7 +344,7 @@ Launch Balanced approach now because market window is open and technical foundat
 
 ### 7. generate_pr_faq
 
-**Description**: Generates Amazon-style PR-FAQ document with future-dated press release and comprehensive FAQ.
+**Description**: Generates Amazon-style PR-FAQ document with future-dated press release and comprehensive FAQ. Optionally creates steering files for product clarity guidance.
 
 **Input Schema**:
 ```json
@@ -351,6 +362,17 @@ Launch Balanced approach now because market window is open and technical foundat
     "target_date": {
       "type": "string",
       "description": "Target launch date (YYYY-MM-DD format, optional)"
+    },
+    "steering_options": {
+      "type": "object",
+      "properties": {
+        "create_steering_files": {"type": "boolean"},
+        "feature_name": {"type": "string"},
+        "inclusion_rule": {"type": "string", "enum": ["always", "fileMatch", "manual"]},
+        "file_match_pattern": {"type": "string"},
+        "overwrite_existing": {"type": "boolean"}
+      },
+      "description": "Optional steering file creation options"
     }
   },
   "required": ["requirements", "design"]
@@ -359,7 +381,7 @@ Launch Balanced approach now because market window is open and technical foundat
 
 ### 8. generate_requirements
 
-**Description**: Creates PM-grade requirements with Business Goal extraction, MoSCoW prioritization, and Go/No-Go timing decision.
+**Description**: Creates PM-grade requirements with Business Goal extraction, MoSCoW prioritization, and Go/No-Go timing decision. Optionally creates steering files for requirements guidance.
 
 **Input Schema**:
 ```json
@@ -378,6 +400,17 @@ Launch Balanced approach now because market window is open and technical foundat
         "quotas": {"type": "object"},
         "deadlines": {"type": "string"}
       }
+    },
+    "steering_options": {
+      "type": "object",
+      "properties": {
+        "create_steering_files": {"type": "boolean"},
+        "feature_name": {"type": "string"},
+        "inclusion_rule": {"type": "string", "enum": ["always", "fileMatch", "manual"]},
+        "file_match_pattern": {"type": "string"},
+        "overwrite_existing": {"type": "boolean"}
+      },
+      "description": "Optional steering file creation options"
     }
   },
   "required": ["raw_intent"]
@@ -386,7 +419,7 @@ Launch Balanced approach now because market window is open and technical foundat
 
 ### 9. generate_design_options
 
-**Description**: Translates approved requirements into Conservative/Balanced/Bold design options with Impact vs Effort analysis.
+**Description**: Translates approved requirements into Conservative/Balanced/Bold design options with Impact vs Effort analysis. Optionally creates steering files for design guidance.
 
 **Input Schema**:
 ```json
@@ -396,6 +429,17 @@ Launch Balanced approach now because market window is open and technical foundat
     "requirements": {
       "type": "string",
       "description": "Approved requirements document content"
+    },
+    "steering_options": {
+      "type": "object",
+      "properties": {
+        "create_steering_files": {"type": "boolean"},
+        "feature_name": {"type": "string"},
+        "inclusion_rule": {"type": "string", "enum": ["always", "fileMatch", "manual"]},
+        "file_match_pattern": {"type": "string"},
+        "overwrite_existing": {"type": "boolean"}
+      },
+      "description": "Optional steering file creation options"
     }
   },
   "required": ["requirements"]
@@ -404,7 +448,7 @@ Launch Balanced approach now because market window is open and technical foundat
 
 ### 10. generate_task_plan
 
-**Description**: Creates phased implementation plan with Guardrails Check, Immediate Wins, Short-Term, and Long-Term tasks.
+**Description**: Creates phased implementation plan with Guardrails Check, Immediate Wins, Short-Term, and Long-Term tasks. Optionally creates steering files for implementation guidance.
 
 **Input Schema**:
 ```json
@@ -422,6 +466,17 @@ Launch Balanced approach now because market window is open and technical foundat
         "max_specs": {"type": "number"},
         "budget_usd": {"type": "number"}
       }
+    },
+    "steering_options": {
+      "type": "object",
+      "properties": {
+        "create_steering_files": {"type": "boolean"},
+        "feature_name": {"type": "string"},
+        "inclusion_rule": {"type": "string", "enum": ["always", "fileMatch", "manual"]},
+        "file_match_pattern": {"type": "string"},
+        "overwrite_existing": {"type": "boolean"}
+      },
+      "description": "Optional steering file creation options"
     }
   },
   "required": ["design"]
@@ -520,6 +575,52 @@ All tools implement comprehensive error handling:
 3. Use debug logging to troubleshoot issues
 4. Check server health endpoint if tools are consistently failing
 
+## Steering File Integration
+
+### Overview
+PM document generation tools (generate_requirements, generate_design_options, generate_management_onepager, generate_pr_faq, generate_task_plan) can automatically create Kiro steering files from their outputs. This creates a self-improving development environment where PM agent expertise becomes persistent guidance.
+
+### Basic Usage
+Add `steering_options` to any PM document generation tool:
+
+```json
+{
+  "raw_intent": "Build user authentication system",
+  "steering_options": {
+    "create_steering_files": true,
+    "feature_name": "user-auth",
+    "inclusion_rule": "fileMatch",
+    "file_match_pattern": "auth*|user*|login*"
+  }
+}
+```
+
+### Inclusion Rules
+- **always**: Steering file always included in context
+- **fileMatch**: Included only when matching files are open
+- **manual**: Included only when explicitly referenced with `#filename`
+
+### Response with Steering Files
+When steering files are created, responses include additional metadata:
+
+```json
+{
+  "content": [...],
+  "metadata": {
+    "steeringFileCreated": true,
+    "steeringFiles": [
+      {
+        "filename": "requirements-user-auth.md",
+        "action": "created",
+        "fullPath": ".kiro/steering/requirements-user-auth.md"
+      }
+    ]
+  }
+}
+```
+
+For detailed steering file documentation, see [Steering File MCP Integration](./steering-file-mcp-integration.md).
+
 ## Performance Considerations
 
 ### Response Times
@@ -529,6 +630,7 @@ All tools implement comprehensive error handling:
 - **generate_roi_analysis**: 1-2 seconds (calculations)
 - **get_consulting_summary**: 1-2 seconds (formatting)
 - **PM document tools**: 1-3 seconds each (document generation)
+- **Steering file creation**: +100-300ms per file
 
 ### Quota Usage
 Each tool call consumes server resources:
