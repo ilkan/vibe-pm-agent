@@ -38,32 +38,24 @@ Kiro has **Spec Mode** (WHAT to build) and **Vibe Mode** (HOW to build), but lac
 ```
 
 ### 🧠 Key Capabilities
-- **Quick Validation**: 30-second PASS/FAIL with 3 strategic options
-- **Business Analysis**: ROI, market timing, strategic alignment
-- **Executive Communication**: One-pagers, PR-FAQs, board presentations
+- **Market Timing Validation**: Fast right-time analysis for feature decisions
+- **Business Case Generation**: ROI analysis with risk assessment and strategic alignment
+- **Stakeholder Communication**: Executive one-pagers, PR-FAQs, board presentations
 - **Kiro Steering Integration**: PM analysis becomes persistent development context
 
 ## 🛠 MCP Tools
 
-**10 professional PM tools** accessible via MCP protocol:
+**6 strategic PM tools** focused on "WHY to build" analysis:
 
-### Quick Decision
-- `validate_idea_quick` - Fast PASS/FAIL + 3 strategic options
-- `optimize_intent` - Full business analysis + technical recommendations
+### Business Analysis
+- `analyze_business_opportunity` - Market opportunity and timing analysis
+- `generate_business_case` - Comprehensive ROI and risk assessment
+- `assess_strategic_alignment` - Company strategy and OKR alignment
 
-### PM Workflow  
-- `generate_requirements` - Business goals + MoSCoW prioritization
-- `generate_design_options` - Conservative/Balanced/Bold alternatives
-- `generate_task_plan` - Phased roadmap with guardrails
-
-### Executive Communication
-- `generate_management_onepager` - Executive summary with ROI
-- `generate_pr_faq` - Amazon-style launch communication
-
-### Analysis
-- `analyze_workflow` - Process optimization with consulting techniques
-- `generate_roi_analysis` - Multi-scenario cost comparison
-- `get_consulting_summary` - Professional analysis report
+### Decision Support
+- `validate_market_timing` - Fast right-time validation
+- `optimize_resource_allocation` - Development efficiency recommendations
+- `create_stakeholder_communication` - Executive one-pagers and PR-FAQs
 
 ## 🚀 Getting Started
 
@@ -89,8 +81,8 @@ npm install && npm run build
 
 ### Quick Test
 ```bash
-# Validate an idea in 30 seconds
-echo '{"tool": "validate_idea_quick", "input": {"idea": "Build real-time analytics dashboard"}}' | node bin/mcp-server.js
+# Validate market timing in 30 seconds
+echo '{"tool": "validate_market_timing", "input": {"feature_idea": "Build real-time analytics dashboard"}}' | node bin/mcp-server.js
 ```
 
 ## 📊 Example Analysis
@@ -130,10 +122,10 @@ echo '{"tool": "validate_idea_quick", "input": {"idea": "Build real-time analyti
 
 ## 📚 Documentation
 
-- **[PM Workflow Guide](docs/pm-workflow-guide.md)**: Complete workflows from validation to executive communication
-- **[Quick Validation Guide](docs/quick-validation-guide.md)**: Master fast idea screening
+- **[Kiro Mode Integration](docs/kiro-mode-integration-design.md)**: How PM Mode integrates with Kiro's Spec and Vibe modes
 - **[Steering Integration Guide](docs/steering-file-integration-guide.md)**: How PM analysis becomes persistent Kiro guidance
-- **[MCP Tools Reference](docs/mcp-tools-documentation.md)**: Complete API reference
+- **[MCP Tools Reference](docs/mcp-tools-documentation.md)**: Complete API reference for all 6 PM tools
+- **[V2 Migration Guide](docs/v2-migration-guide.md)**: Upgrading to the focused PM Mode approach
 
 ## 🤝 Contributing
 
