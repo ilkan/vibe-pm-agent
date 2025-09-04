@@ -1,79 +1,80 @@
-# 🚀 Vibe PM Agent: The Unit Tester for Spec Mode
+# 🚀 Vibe PM Agent: Strategic PM Mode for Kiro
 
-> **"Like having a McKinsey consultant in your IDE"** - Transforms raw developer ideas into optimized, cost-effective implementations using professional consulting techniques.
+> **"Like having a McKinsey consultant in your IDE"** - Provides the missing "WHY to build" dimension that complements Kiro's native Spec Mode (WHAT) and Vibe Mode (HOW).
 
 [![MCP Integration](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.io)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
 [![Consulting Grade](https://img.shields.io/badge/Analysis-Consulting%20Grade-gold)](https://github.com/yourusername/vibe-pm-agent)
-[![ROI Focused](https://img.shields.io/badge/ROI-40--90%25%20Savings-green)](https://github.com/yourusername/vibe-pm-agent)
+[![Kiro Integration](https://img.shields.io/badge/Kiro-PM%20Mode-purple)](https://kiro.ai)
 
-**The PM Agent ensures AI teams build the right feature at the right time.** It validates intent with consulting frameworks, forecasts ROI, and produces artifacts (specs, one-pagers, PR-FAQ) that align devs, PMs, and execs before costly build cycles.
+**The PM Agent completes Kiro's development trinity** by providing strategic business analysis and justification that feeds into Kiro's native Spec Mode (requirements) and Vibe Mode (implementation).
 
 ## 🎯 The Problem We Solve
 
-**Developers lack systematic approaches to optimize workflows and justify technical decisions** because they don't have access to professional business analysis frameworks. They build first, optimize later (if ever), leading to:
+**Kiro has powerful Spec Mode (WHAT to build) and Vibe Mode (HOW to build), but lacks PM Mode (WHY to build).** This creates a gap where teams jump into requirements and implementation without strategic business justification:
 
-- 💸 **Potentially inefficient patterns** without systematic analysis of alternatives
-- ⏰ **Hours spent** on manual optimization that professional frameworks could streamline  
-- 🎲 **Guesswork** instead of structured decision-making on architecture choices
-- 📊 **No professional analysis** to justify technical decisions to stakeholders
+- 💸 **Features built without business case** - No ROI analysis or strategic alignment
+- ⏰ **Missing market timing analysis** - Build at wrong time, miss opportunities  
+- 🎲 **No stakeholder alignment** - Technical teams and executives speak different languages
+- 📊 **Lack of professional PM artifacts** - No one-pagers, business cases, or strategic communications
 
-## 💡 Our Solution: AI-Powered Consulting Arsenal
+## 💡 Our Solution: PM Mode for Kiro
 
-**Vibe PM Agent** is the world's first AI system that applies **7 professional consulting techniques** to automatically optimize developer workflows and generate executive-ready documentation.
+**Vibe PM Agent** completes Kiro's development trinity by providing the missing **PM Mode** that answers "WHY to build" questions with professional consulting-grade analysis.
 
-### 🧠 Consulting Techniques Arsenal
-- **MECE Framework**: Break down quota drivers into mutually exclusive categories
-- **Pyramid Principle**: Structure recommendations with answer-first clarity
-- **Value Driver Tree**: Decompose costs into measurable optimization opportunities  
-- **Zero-Based Design**: Propose radical "from scratch" efficient approaches
-- **Impact vs Effort Matrix**: Prioritize optimizations by ROI potential
-- **Value Proposition Canvas**: Link user needs to optimized solutions
-- **Option Framing**: Generate Conservative/Balanced/Bold alternatives
+### 🎯 Perfect Integration with Kiro Modes
 
-### 🎯 Key Innovation: The Missing Third Dimension
+| Mode | Purpose | Responsibility | Tools |
+|------|---------|----------------|-------|
+| **PM Mode** | WHY to build | vibe-pm-agent MCP | Business analysis, strategy, ROI |
+| **Spec Mode** | WHAT to build | Kiro native | Requirements, specifications |
+| **Vibe Mode** | HOW to build | Kiro native | Implementation, code generation |
 
-**Product Management has three isomorphic dimensions:**
-- **Spec Mode**: Answers "WHAT to build" - structured requirements and specifications
-- **Vibe Mode**: Answers "HOW to build" - implementation patterns and code generation  
-- **PM Mode**: Answers "WHY to build" - business justification and strategic decisions
-
-**Vibe PM Agent fills the missing third dimension:**
+### 🔄 Seamless Workflow Integration
 
 ```typescript
-// Complete Product Development Cycle
-Spec Mode: "Build user authentication system" → Structured requirements
-Vibe Mode: "Implement OAuth with JWT tokens" → Generated code and tests
-PM Mode: "Why build auth now vs later?" → Business analysis and ROI justification
+// Complete Kiro Development Cycle
+1. PM Mode: "Why build user authentication now?" 
+   → Business case, market timing, strategic alignment
 
-// Vibe PM Agent bridges all three:
-validate_idea_quick("Add social login to increase conversion") 
-→ WHY: Business case with 3 strategic options
-→ WHAT: Structured requirements with MoSCoW prioritization  
-→ HOW: Optimized implementation approach with technical recommendations
+2. Spec Mode: "What authentication features to build?"
+   → Requirements, specifications (with PM context from steering files)
+
+3. Vibe Mode: "How to implement OAuth with JWT?"
+   → Code generation, patterns (with Spec requirements)
+
+// Perfect complementary functionality - no conflicts!
 ```
 
-### 🔄 Self-Improving System with Kiro Agent Steering
+### 🧠 Professional Consulting Techniques
+- **Business Opportunity Analysis**: Market validation and strategic fit assessment
+- **ROI Analysis**: Multi-scenario financial projections and cost-benefit analysis
+- **Strategic Alignment**: Company OKR and mission alignment evaluation
+- **Market Timing**: Right-time analysis based on market signals
+- **Stakeholder Communication**: Executive one-pagers, PR-FAQs, board presentations
+- **Resource Optimization**: Development efficiency and allocation recommendations
 
-**Every PM analysis becomes persistent institutional knowledge** through deep integration with Kiro's Agent Steering system:
+### 🔄 Automatic Kiro Steering Integration
 
-#### 🧠 **Automatic Knowledge Capture**
-- **Requirements Analysis** → Steering files that guide future feature development
-- **Design Options** → Architectural guidance patterns for similar problems
-- **Executive One-Pagers** → Templates and frameworks for stakeholder communication
-- **ROI Analyses** → Benchmarks and cost models for future investment decisions
+**Every PM analysis becomes persistent strategic context** through seamless integration with Kiro's Agent Steering system:
 
-#### 🔄 **Continuous Learning Loop**
+#### 🧠 **Strategic Context Capture**
+- **Business Cases** → Steering files that provide strategic context for Spec Mode
+- **Market Analysis** → Strategic timing and opportunity context for development decisions
+- **Executive Communications** → Stakeholder alignment context for project planning
+- **ROI Analyses** → Investment justification context for technical decisions
+
+#### 🔄 **Integrated Development Flow**
 ```typescript
-// Self-Improving Development Cycle
-PM Analysis → Steering Files → Future Development Guidance → Better Decisions → Enhanced Analysis
+// Kiro Development Cycle with PM Context
+PM Mode Analysis → Steering Files → Spec Mode (with business context) → Vibe Mode (with requirements)
 ```
 
-#### 📚 **Institutional Knowledge Building**
-- **Cross-Reference Integration**: Steering files automatically link related specs and documents
-- **Pattern Recognition**: System learns from successful analysis patterns
-- **Team Alignment**: Shared knowledge base ensures consistent decision-making
-- **Compound Intelligence**: Each analysis improves the quality of future recommendations
+#### 📚 **Strategic Knowledge Building**
+- **Business Context**: PM steering files provide strategic context when working on related features
+- **Decision History**: Track business justifications and strategic decisions over time
+- **Team Alignment**: Shared strategic understanding across development and business teams
+- **Compound Intelligence**: Strategic context improves both technical and business decisions
 
 ## � Valkue for Different Roles
 
@@ -273,25 +274,24 @@ Output:
 - ✅ PR-FAQ for stakeholder alignment
 - ✅ Phased task plan with guardrails
 
-## 🛠️ Complete MCP Toolkit
+## 🛠️ PM-Focused MCP Toolkit
 
-### Quick Decision Tools
-- `validate_idea_quick` → Fast PASS/FAIL with 3 options (like unit tests for ideas)
-- `optimize_intent` → Full optimization with consulting analysis + ROI
+### Strategic Analysis Tools
+- `analyze_business_opportunity` → Market opportunity analysis and strategic fit assessment
+- `generate_business_case` → Comprehensive ROI analysis with financial projections
+- `assess_strategic_alignment` → Company strategy, OKR, and mission alignment evaluation
 
-### PM Workflow Tools  
-- `generate_requirements` → Structured requirements with MoSCoW prioritization
-- `generate_design_options` → Conservative/Balanced/Bold alternatives with Impact vs Effort analysis
-- `generate_task_plan` → Phased implementation with guardrails and immediate wins
+### Executive Communication Tools
+- `create_stakeholder_communication` → Executive one-pagers, PR-FAQs, board presentations
+- `validate_market_timing` → Market timing analysis and right-time recommendations
 
-### Executive Communication
-- `generate_management_onepager` → Pyramid Principle one-pager with decision rationale
-- `generate_pr_faq` → Amazon-style PR-FAQ for launch alignment
+### Resource & Optimization Tools
+- `optimize_resource_allocation` → Development efficiency and resource optimization analysis
 
-### Analysis & Optimization
-- `analyze_workflow` → Existing process optimization with consulting techniques
-- `generate_roi_analysis` → Multi-scenario cost comparison
-- `get_consulting_summary` → Professional analysis report
+**Perfect Complement to Kiro Native Modes:**
+- ✅ **No conflicts** with Spec Mode (requirements) or Vibe Mode (implementation)
+- ✅ **Pure PM focus** on "WHY to build" questions
+- ✅ **Strategic context** that enhances Kiro's native capabilities
 
 ## 🚀 Getting Started
 
@@ -464,74 +464,61 @@ If you publish this as a Python package:
 }
 ```
 
-## Available MCP Tools
+## Available PM Mode Tools
 
-The PM Agent exposes 10 professional-grade tools through the Model Context Protocol:
+The PM Agent exposes 6 strategic PM tools that complement Kiro's native Spec and Vibe modes:
 
-### 🚀 Quick Decision Tools
-
-| Tool | Purpose | Input | Output | Use Case |
-|------|---------|-------|--------|----------|
-| `validate_idea_quick` | Fast PASS/FAIL validation | Raw idea + context | Verdict + 3 options (A/B/C) | Idea screening, brainstorming sessions |
-| `optimize_intent` | Full optimization analysis | Developer intent | Optimized spec + ROI analysis | Technical implementation planning |
-
-### 📋 PM Workflow Tools
+### 🎯 Strategic Analysis Tools
 
 | Tool | Purpose | Input | Output | Use Case |
 |------|---------|-------|--------|----------|
-| `generate_requirements` | Structured requirements | Raw intent + context | Business goals + MoSCoW + Go/No-Go | Problem definition, stakeholder alignment |
-| `generate_design_options` | Solution alternatives | Requirements document | 3 options + Impact vs Effort matrix | Solution exploration, architecture decisions |
-| `generate_task_plan` | Implementation roadmap | Design document | Phased tasks + guardrails | Sprint planning, resource allocation |
+| `analyze_business_opportunity` | Market opportunity analysis | Feature idea + market context | Business justification + strategic fit | Investment decisions, market validation |
+| `generate_business_case` | ROI and financial analysis | Opportunity analysis + financial inputs | Business case + ROI projections | Budget approval, investment planning |
+| `assess_strategic_alignment` | Strategy alignment evaluation | Feature concept + company context | Alignment score + strategic impact | Strategic planning, OKR alignment |
 
-### 📊 Executive Communication
-
-| Tool | Purpose | Input | Output | Use Case |
-|------|---------|-------|--------|----------|
-| `generate_management_onepager` | Executive summary | Requirements + design | Pyramid Principle one-pager | Leadership approval, budget requests |
-| `generate_pr_faq` | Product communication | Requirements + design | Amazon-style PR-FAQ | Launch planning, stakeholder alignment |
-
-### 🔍 Analysis & Optimization
+### 📊 Executive Communication Tools
 
 | Tool | Purpose | Input | Output | Use Case |
 |------|---------|-------|--------|----------|
-| `analyze_workflow` | Process optimization | Existing workflow | Consulting analysis + recommendations | Efficiency improvement, cost reduction |
-| `generate_roi_analysis` | Investment comparison | Workflow scenarios | Multi-scenario cost analysis | Investment decisions, budget planning |
-| `get_consulting_summary` | Professional report | Analysis results | Structured consulting summary | Stakeholder communication, documentation |
+| `create_stakeholder_communication` | Executive artifacts | Business case + audience + type | One-pagers, PR-FAQs, presentations | Leadership communication, launch planning |
+| `validate_market_timing` | Market timing analysis | Feature idea + market signals | Timing assessment + recommendations | Launch timing, market entry decisions |
 
-### Tool Usage Examples
+### 🔧 Resource Optimization Tools
 
-#### Quick Validation Workflow
+| Tool | Purpose | Input | Output | Use Case |
+|------|---------|-------|--------|----------|
+| `optimize_resource_allocation` | Development efficiency | Current workflow + constraints | Optimization recommendations + roadmap | Resource planning, efficiency improvement |
+
+### Integrated Kiro Workflow Examples
+
+#### Strategic Analysis Workflow (PM Mode)
 ```bash
-# 1. Validate idea quickly
-validate_idea_quick: "Build automated API optimization system"
-→ PASS + 3 structured options (Conservative/Balanced/Bold)
+# 1. Analyze business opportunity
+analyze_business_opportunity: "AI-powered code optimization feature"
+→ Market analysis + strategic fit + business justification
 
-# 2. Choose option and proceed
-optimize_intent: "Build automated API optimization with batching and caching"
-→ Optimized spec + structured analysis with professional recommendations
+# 2. Generate business case
+generate_business_case: [opportunity analysis + financial inputs]
+→ ROI projections + investment analysis + risk assessment
+
+# 3. Create executive communication
+create_stakeholder_communication: [business case + "executive_onepager" + "executives"]
+→ Executive one-pager with strategic recommendations
 ```
 
-#### Full PM Workflow  
+#### Complete Kiro Development Flow
 ```bash
-# 1. Structure the problem
-generate_requirements: "Reduce API costs through intelligent optimization"
-→ Business goals + MoSCoW prioritization + Go/No-Go decision
+# Phase 1: PM Mode (Strategic Analysis)
+PM Mode: analyze_business_opportunity + generate_business_case
+→ Creates steering files with strategic context
 
-# 2. Explore solutions
-generate_design_options: [requirements document]
-→ Conservative/Balanced/Bold alternatives + Impact vs Effort matrix
+# Phase 2: Spec Mode (Requirements with Business Context)
+Kiro Spec Mode: Create requirements and specifications
+→ Steering files automatically provide business context
 
-# 3. Plan implementation
-generate_task_plan: [design document]
-→ Phased roadmap with guardrails + immediate wins
-
-# 4. Communicate to executives
-generate_management_onepager: [requirements + design + tasks]
-→ Executive one-pager with Pyramid Principle structure
-
-# 5. Align stakeholders for launch
-generate_pr_faq: [requirements + design]
-→ Amazon-style PR-FAQ with customer value proposition
+# Phase 3: Vibe Mode (Implementation with Requirements Context)  
+Kiro Vibe Mode: Generate implementation code and patterns
+→ Spec requirements guide implementation decisions
 ```
 
 For complete tool schemas and detailed examples, see [MCP Tools Documentation](docs/mcp-tools-documentation.md).
@@ -589,14 +576,13 @@ Comprehensive guides and best practices for maximizing PM Agent effectiveness:
 - **[Quick Validation Guide](docs/quick-validation-guide.md)**: Master the `validate_idea_quick` tool for fast, accurate idea screening
 - **[PM Document Best Practices](docs/pm-document-best-practices.md)**: Quality standards for executive communication and stakeholder alignment
 
-### 🎯 Kiro Agent Steering Integration (Self-Improving System)
-- **[Steering File Documentation](docs/README.md)**: Complete guide to automatic steering file generation from PM agent outputs
-- **[Integration Guide](docs/steering-file-integration-guide.md)**: How PM documents become persistent Kiro Agent guidance
-- **[Examples & Templates](docs/steering-file-examples.md)**: Concrete examples of generated steering files for all document types
-- **[Best Practices](docs/steering-file-best-practices.md)**: Organization strategies, naming conventions, and team collaboration patterns
-- **[MCP Tool Reference](docs/mcp-steering-tool-reference.md)**: API reference for steering file parameters and configuration
+### 🎯 Kiro Agent Steering Integration
+- **[Steering Integration Usage Guide](docs/steering-integration-usage-guide.md)**: Complete guide to automatic steering file generation from PM Mode tools
+- **[Kiro Mode Integration Design](docs/kiro-mode-integration-design.md)**: How PM Mode complements Spec Mode and Vibe Mode without conflicts
+- **[Steering File Examples](docs/steering-file-examples.md)**: Concrete examples of generated steering files for business analysis
+- **[Integration Best Practices](docs/steering-integration-best-practices.md)**: Organization strategies and team collaboration patterns
 
-**Key Innovation**: Every PM analysis automatically becomes institutional knowledge through Kiro's Agent Steering system, creating a compound learning effect where each analysis improves future development guidance.
+**Key Innovation**: Every PM analysis automatically becomes strategic context through Kiro's Agent Steering system, providing business justification and strategic alignment for future development decisions.
 
 ### 🎯 Quick Start Paths
 
@@ -784,9 +770,11 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 🏆 Why This Matters
 
-**Vibe PM Agent completes the missing dimension of product management** - where development tools address WHAT (spec mode) and HOW (vibe mode), but never WHY (business justification).
+**Vibe PM Agent completes Kiro's development trinity** by providing the missing PM Mode that answers "WHY to build" questions with professional consulting-grade analysis.
 
-We've built the **first system that unifies the PM trinity** - WHY/WHAT/HOW in a single workflow with self-improving Kiro Agent Steering integration. This isn't just a tool; it's a **paradigm completion** that makes every technical decision strategically informed.
+We've built the **perfect complement to Kiro's native capabilities** - PM Mode (WHY) + Spec Mode (WHAT) + Vibe Mode (HOW) in a seamless integrated workflow. This isn't just another tool; it's the **missing strategic dimension** that ensures every technical decision is grounded in solid business justification and strategic alignment.
+
+**The result**: Development teams that build the right features at the right time with executive alignment and clear business value. strategically informed.
 
 ### The Complete Innovation Stack:
 

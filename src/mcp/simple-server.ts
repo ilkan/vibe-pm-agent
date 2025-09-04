@@ -1,4 +1,5 @@
-// Simple MCP Server for testing with Claude Desktop
+// PM-Focused MCP Server - Answers "WHY to build" questions
+// Complements Kiro's Spec Mode (WHAT) and Vibe Mode (HOW)
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -6,18 +7,22 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+import { SteeringService } from '../components/steering-service';
+import { DocumentType } from '../models/steering';
 
 /**
- * Simple PM Agent MCP Server for testing
+ * PM-Focused MCP Server that answers "WHY to build" questions
+ * Designed to complement Kiro's native Spec Mode (WHAT) and Vibe Mode (HOW)
  */
 export class SimplePMAgentMCPServer {
   private server: Server;
+  private steeringService: SteeringService;
 
   constructor() {
     this.server = new Server(
       {
         name: "vibe-pm-agent",
-        version: "1.0.0",
+        version: "2.0.0",
       },
       {
         capabilities: {
@@ -26,243 +31,199 @@ export class SimplePMAgentMCPServer {
       }
     );
 
+    this.steeringService = new SteeringService({
+      enabled: true,
+      defaultOptions: {
+        autoSave: true,
+        promptForConfirmation: false,
+        includeReferences: true,
+        namingStrategy: 'feature-based',
+        overwriteExisting: false
+      }
+    });
+
     this.setupHandlers();
   }
 
   private setupHandlers(): void {
-    // List available tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
+          // PURE PM MODE TOOLS - Focus on "WHY to build"
           {
-            name: "optimize_intent",
-            description: "Takes raw developer intent and returns an optimized Kiro spec with ROI analysis",
-            inputSchema: {
-              type: "object",
-              properties: {
-                intent: {
-                  type: "string",
-                  description: "Raw developer intent in natural language"
-                }
-              },
-              required: ["intent"]
-            }
-          },
-          {
-            name: "analyze_workflow",
-            description: "Analyzes an existing workflow for optimization opportunities",
-            inputSchema: {
-              type: "object",
-              properties: {
-                workflow: {
-                  type: "object",
-                  description: "Workflow definition to analyze"
-                }
-              },
-              required: ["workflow"]
-            }
-          },
-          {
-            name: "generate_management_onepager",
-            description: "Creates an executive one-pager with Pyramid Principle, options, and ROI analysis",
-            inputSchema: {
-              type: "object",
-              properties: {
-                requirements: {
-                  type: "string",
-                  description: "Requirements analysis output"
-                },
-                design: {
-                  type: "string",
-                  description: "Design options and recommendations"
-                },
-                tasks: {
-                  type: "string",
-                  description: "Task breakdown and phased plan"
-                },
-                roi_inputs: {
-                  type: "object",
-                  properties: {
-                    cost_naive: { type: "number" },
-                    cost_balanced: { type: "number" },
-                    cost_bold: { type: "number" }
-                  }
-                }
-              },
-              required: ["requirements", "design"]
-            }
-          },
-          {
-            name: "generate_pr_faq",
-            description: "Creates Amazon-style Press Release and FAQ for product clarity",
-            inputSchema: {
-              type: "object",
-              properties: {
-                requirements: {
-                  type: "string",
-                  description: "Requirements analysis output"
-                },
-                design: {
-                  type: "string",
-                  description: "Design options and recommendations"
-                },
-                target_date: {
-                  type: "string",
-                  description: "Target launch date (YYYY-MM-DD format)"
-                }
-              },
-              required: ["requirements", "design"]
-            }
-          },
-          {
-            name: "generate_requirements",
-            description: "Creates PM-grade requirements with Business Goal extraction, MoSCoW prioritization, and Go/No-Go timing decision",
-            inputSchema: {
-              type: "object",
-              properties: {
-                raw_intent: {
-                  type: "string",
-                  description: "Raw developer intent in natural language"
-                },
-                context: {
-                  type: "object",
-                  properties: {
-                    roadmap_theme: { type: "string" },
-                    budget: { type: "number" },
-                    quotas: {
-                      type: "object",
-                      properties: {
-                        maxVibes: { type: "number" },
-                        maxSpecs: { type: "number" }
-                      }
-                    },
-                    deadlines: { type: "string" }
-                  },
-                  description: "Optional context for requirements generation"
-                }
-              },
-              required: ["raw_intent"]
-            }
-          },
-          {
-            name: "generate_design_options",
-            description: "Translates approved requirements into Conservative/Balanced/Bold design options with Impact vs Effort analysis",
-            inputSchema: {
-              type: "object",
-              properties: {
-                requirements: {
-                  type: "string",
-                  description: "Approved requirements document content"
-                }
-              },
-              required: ["requirements"]
-            }
-          },
-          {
-            name: "generate_task_plan",
-            description: "Creates phased implementation plan with Guardrails Check, Immediate Wins, Short-Term, and Long-Term tasks",
-            inputSchema: {
-              type: "object",
-              properties: {
-                design: {
-                  type: "string",
-                  description: "Approved design document content"
-                },
-                limits: {
-                  type: "object",
-                  properties: {
-                    max_vibes: { type: "number" },
-                    max_specs: { type: "number" },
-                    budget_usd: { type: "number" }
-                  },
-                  description: "Optional project limits for guardrails check"
-                }
-              },
-              required: ["design"]
-            }
-          },
-          {
-            name: "generate_roi_analysis",
-            description: "Generates comprehensive ROI analysis comparing naive, optimized, and zero-based approaches",
-            inputSchema: {
-              type: "object",
-              properties: {
-                workflow: {
-                  type: "object",
-                  description: "Original workflow definition"
-                },
-                optimizedWorkflow: {
-                  type: "object",
-                  description: "Optional optimized version of the workflow"
-                },
-                zeroBasedSolution: {
-                  type: "object",
-                  description: "Optional zero-based redesign solution"
-                }
-              },
-              required: ["workflow"]
-            }
-          },
-          {
-            name: "get_consulting_summary",
-            description: "Provides detailed consulting-style summary using Pyramid Principle for any analysis",
-            inputSchema: {
-              type: "object",
-              properties: {
-                analysis: {
-                  type: "object",
-                  properties: {
-                    techniquesUsed: { type: "array" },
-                    keyFindings: { type: "array" },
-                    totalQuotaSavings: { type: "number" }
-                  },
-                  description: "Analysis results to summarize"
-                },
-                techniques: {
-                  type: "array",
-                  items: { type: "string" },
-                  description: "Specific techniques to focus on in the summary"
-                }
-              },
-              required: ["analysis"]
-            }
-          },
-          {
-            name: "validate_idea_quick",
-            description: "Fast unit-test-like validation that provides PASS/FAIL verdict with 3 structured options for next steps",
+            name: "analyze_business_opportunity",
+            description: "Analyzes market opportunity, timing, and business justification for a feature idea",
             inputSchema: {
               type: "object",
               properties: {
                 idea: {
                   type: "string",
-                  description: "Raw idea or intent to validate quickly",
-                  minLength: 5,
-                  maxLength: 2000
+                  description: "Raw feature idea or business need"
                 },
-                context: {
+                market_context: {
                   type: "object",
                   properties: {
-                    urgency: {
-                      type: "string",
-                      enum: ["low", "medium", "high"],
-                      description: "How urgent this idea is"
-                    },
-                    budget_range: {
-                      type: "string",
-                      enum: ["small", "medium", "large"],
-                      description: "Available budget range"
-                    },
-                    team_size: {
-                      type: "number",
-                      minimum: 1,
-                      maximum: 100,
-                      description: "Size of the team working on this"
-                    }
+                    industry: { type: "string" },
+                    competition: { type: "string" },
+                    budget_range: { type: "string", enum: ["small", "medium", "large"] },
+                    timeline: { type: "string" }
                   },
-                  description: "Optional context for validation"
+                  description: "Market and business context"
+                },
+                steering_options: {
+                  type: "object",
+                  properties: {
+                    create_steering_files: { type: "boolean", default: true },
+                    feature_name: { type: "string" },
+                    inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"], default: "manual" }
+                  }
                 }
               },
               required: ["idea"]
+            }
+          },
+          {
+            name: "generate_business_case",
+            description: "Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment",
+            inputSchema: {
+              type: "object",
+              properties: {
+                opportunity_analysis: {
+                  type: "string",
+                  description: "Business opportunity analysis from analyze_business_opportunity"
+                },
+                financial_inputs: {
+                  type: "object",
+                  properties: {
+                    development_cost: { type: "number" },
+                    operational_cost: { type: "number" },
+                    expected_revenue: { type: "number" },
+                    time_to_market: { type: "number" }
+                  }
+                },
+                steering_options: {
+                  type: "object",
+                  properties: {
+                    create_steering_files: { type: "boolean", default: true },
+                    feature_name: { type: "string" },
+                    inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"], default: "manual" }
+                  }
+                }
+              },
+              required: ["opportunity_analysis"]
+            }
+          },
+          {
+            name: "create_stakeholder_communication",
+            description: "Generates executive one-pagers, PR-FAQs, and stakeholder presentations",
+            inputSchema: {
+              type: "object",
+              properties: {
+                business_case: {
+                  type: "string",
+                  description: "Business case analysis"
+                },
+                communication_type: {
+                  type: "string",
+                  enum: ["executive_onepager", "pr_faq", "board_presentation", "team_announcement"],
+                  description: "Type of communication to generate"
+                },
+                audience: {
+                  type: "string",
+                  enum: ["executives", "board", "engineering_team", "customers", "investors"],
+                  description: "Target audience for the communication"
+                },
+                steering_options: {
+                  type: "object",
+                  properties: {
+                    create_steering_files: { type: "boolean", default: true },
+                    feature_name: { type: "string" },
+                    inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"], default: "manual" }
+                  }
+                }
+              },
+              required: ["business_case", "communication_type", "audience"]
+            }
+          },
+          {
+            name: "assess_strategic_alignment",
+            description: "Evaluates how a feature aligns with company strategy, OKRs, and long-term vision",
+            inputSchema: {
+              type: "object",
+              properties: {
+                feature_concept: {
+                  type: "string",
+                  description: "Feature concept or business case"
+                },
+                company_context: {
+                  type: "object",
+                  properties: {
+                    mission: { type: "string" },
+                    current_okrs: { type: "array", items: { type: "string" } },
+                    strategic_priorities: { type: "array", items: { type: "string" } },
+                    competitive_position: { type: "string" }
+                  }
+                },
+                steering_options: {
+                  type: "object",
+                  properties: {
+                    create_steering_files: { type: "boolean", default: true },
+                    feature_name: { type: "string" },
+                    inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"], default: "manual" }
+                  }
+                }
+              },
+              required: ["feature_concept"]
+            }
+          },
+          {
+            name: "optimize_resource_allocation",
+            description: "Analyzes resource requirements and provides optimization recommendations for development efficiency",
+            inputSchema: {
+              type: "object",
+              properties: {
+                current_workflow: {
+                  type: "object",
+                  description: "Current development workflow or process"
+                },
+                resource_constraints: {
+                  type: "object",
+                  properties: {
+                    team_size: { type: "number" },
+                    budget: { type: "number" },
+                    timeline: { type: "string" },
+                    technical_debt: { type: "string" }
+                  }
+                },
+                optimization_goals: {
+                  type: "array",
+                  items: { type: "string", enum: ["cost_reduction", "speed_improvement", "quality_increase", "risk_mitigation"] }
+                }
+              },
+              required: ["current_workflow"]
+            }
+          },
+          {
+            name: "validate_market_timing",
+            description: "Fast validation of whether now is the right time to build a feature based on market conditions",
+            inputSchema: {
+              type: "object",
+              properties: {
+                feature_idea: {
+                  type: "string",
+                  description: "Feature idea to validate timing for"
+                },
+                market_signals: {
+                  type: "object",
+                  properties: {
+                    customer_demand: { type: "string", enum: ["low", "medium", "high"] },
+                    competitive_pressure: { type: "string", enum: ["low", "medium", "high"] },
+                    technical_readiness: { type: "string", enum: ["low", "medium", "high"] },
+                    resource_availability: { type: "string", enum: ["low", "medium", "high"] }
+                  }
+                }
+              },
+              required: ["feature_idea"]
             }
           }
         ]
@@ -275,26 +236,18 @@ export class SimplePMAgentMCPServer {
 
       try {
         switch (name) {
-          case 'optimize_intent':
-            return await this.handleOptimizeIntent(args);
-          case 'analyze_workflow':
-            return await this.handleAnalyzeWorkflow(args);
-          case 'generate_management_onepager':
-            return await this.handleManagementOnePager(args);
-          case 'generate_pr_faq':
-            return await this.handlePRFAQ(args);
-          case 'generate_requirements':
-            return await this.handleRequirements(args);
-          case 'generate_design_options':
-            return await this.handleDesignOptions(args);
-          case 'generate_task_plan':
-            return await this.handleTaskPlan(args);
-          case 'generate_roi_analysis':
-            return await this.handleROIAnalysis(args);
-          case 'get_consulting_summary':
-            return await this.handleConsultingSummary(args);
-          case 'validate_idea_quick':
-            return await this.handleValidateIdeaQuick(args);
+          case 'analyze_business_opportunity':
+            return await this.handleBusinessOpportunityAnalysis(args);
+          case 'generate_business_case':
+            return await this.handleBusinessCaseGeneration(args);
+          case 'create_stakeholder_communication':
+            return await this.handleStakeholderCommunication(args);
+          case 'assess_strategic_alignment':
+            return await this.handleStrategicAlignment(args);
+          case 'optimize_resource_allocation':
+            return await this.handleResourceOptimization(args);
+          case 'validate_market_timing':
+            return await this.handleMarketTimingValidation(args);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -310,864 +263,340 @@ export class SimplePMAgentMCPServer {
     });
   }
 
-  private async handleOptimizeIntent(args: any) {
-    const intent = args.intent || "No intent provided";
+  // PM MODE HANDLERS - Focus on "WHY to build"
 
-    // Simple mock optimization
-    const analysis = `
-# PM Agent Analysis: Intent Optimization
+  private async handleBusinessOpportunityAnalysis(args: any) {
+    const idea = args.idea || "No idea provided";
+    const marketContext = args.market_context || {};
+    const steeringOptions = args.steering_options || {};
 
-## Original Intent
-${intent}
-
-## Consulting Analysis Applied
-- **MECE Framework**: Categorized quota drivers into 3 main areas
-- **Value Driver Tree**: Identified key cost optimization opportunities
-- **Option Framing**: Generated Conservative, Balanced, and Bold approaches
-
-## Optimization Results
-
-### Conservative Approach (Recommended)
-- **Strategy**: Batch similar operations, add basic caching
-- **Quota Savings**: 40-50%
-- **Implementation Effort**: Low
-- **Risk Level**: Low
-
-### Balanced Approach
-- **Strategy**: Advanced batching, intelligent caching, spec decomposition
-- **Quota Savings**: 60-70%
-- **Implementation Effort**: Medium
-- **Risk Level**: Medium
-
-### Bold Approach (Zero-Based Design)
-- **Strategy**: Complete workflow redesign with event-driven architecture
-- **Quota Savings**: 80-90%
-- **Implementation Effort**: High
-- **Risk Level**: High
-
-## ROI Analysis
-- **Current Estimated Cost**: $20/month (naive implementation)
-- **Optimized Cost**: $8/month (Conservative approach)
-- **Savings**: $12/month (60% reduction)
-
-## Recommended Next Steps
-1. Implement Conservative approach first
-2. Monitor performance and cost savings
-3. Consider Balanced approach after validation
-4. Evaluate Bold approach for high-volume scenarios
-
-## Generated Kiro Spec
-\`\`\`yaml
-name: optimized-workflow
-description: Optimized implementation with batching and caching
-requirements:
-  - Batch operations to reduce API calls
-  - Implement caching layer for repeated queries
-  - Use scheduled specs instead of real-time processing
-tasks:
-  - Implement batching logic
-  - Add caching mechanism
-  - Create scheduled execution workflow
-\`\`\`
-`;
-
-    return {
-      content: [{
-        type: "text",
-        text: analysis
-      }]
-    };
-  }
-
-  private async handleAnalyzeWorkflow(args: any) {
-    const workflow = args.workflow || {};
-    const workflowId = workflow.id || "unknown";
-    const stepCount = workflow.steps?.length || 0;
-
-    const analysis = `
-# Workflow Analysis Report
-
-## Workflow Overview
-- **ID**: ${workflowId}
-- **Steps**: ${stepCount}
-- **Complexity**: ${stepCount > 5 ? 'High' : stepCount > 2 ? 'Medium' : 'Low'}
-
-## Consulting Techniques Applied
-
-### MECE Analysis
-**Quota Driver Categories:**
-1. **Data Retrieval Operations**: ${Math.floor(stepCount * 0.4)} steps
-2. **Processing Operations**: ${Math.floor(stepCount * 0.4)} steps  
-3. **Output Operations**: ${Math.floor(stepCount * 0.2)} steps
-
-### Impact vs Effort Matrix
-**High Impact, Low Effort:**
-- Implement result caching
-- Batch similar API calls
-
-**High Impact, Medium Effort:**
-- Optimize data retrieval patterns
-- Implement async processing
-
-**Medium Impact, Low Effort:**
-- Add request deduplication
-- Optimize payload sizes
-
-## Optimization Recommendations
-
-### Priority 1 (Immediate)
-- **Add caching layer**: 30-40% quota reduction
-- **Batch operations**: 20-30% quota reduction
-
-### Priority 2 (Short-term)
-- **Async processing**: 15-25% quota reduction
-- **Data optimization**: 10-20% quota reduction
-
-### Priority 3 (Long-term)
-- **Workflow redesign**: 40-60% quota reduction
-- **Event-driven architecture**: 50-70% quota reduction
-
-## Estimated Savings
-- **Current Cost**: $${stepCount * 2}/execution
-- **Optimized Cost**: $${Math.ceil(stepCount * 0.6)}/execution
-- **Savings**: ${Math.floor(40)}% reduction
-
-## Implementation Roadmap
-1. Week 1: Implement caching
-2. Week 2: Add batching logic
-3. Week 3: Optimize data retrieval
-4. Week 4: Performance testing and validation
-`;
-
-    return {
-      content: [{
-        type: "text",
-        text: analysis
-      }]
-    };
-  }
-
-  private async handleManagementOnePager(args: any) {
-    const requirements = args.requirements || "No requirements provided";
-    const design = args.design || "No design provided";
-    const tasks = args.tasks || "";
-    const roiInputs = args.roi_inputs || {};
-
-    // Extract key information from inputs
-    const costNaive = roiInputs.cost_naive || 100;
-    const costBalanced = roiInputs.cost_balanced || 40;
-    const costBold = roiInputs.cost_bold || 15;
-
-    const onePager = `# Management One-Pager
-
-## Answer
-**Proceed with Balanced approach now; defer Bold approach 1 quarter**
-
-## Because
-• **Right-time opportunity**: Current inefficiencies costing $${costNaive}/month with clear optimization path
-• **Proven ROI**: 60% cost reduction achievable with medium effort and low risk
-• **Strategic alignment**: Builds foundation for future zero-based redesign when scale demands it
-
-## What (Scope Today)
-• Implement batching and caching optimizations
-• Add intelligent workflow decomposition
-• Create monitoring and performance tracking
-• Establish baseline metrics for future optimization
-
-## Risks & Mitigations
-• **Implementation complexity**: Mitigate with phased rollout and comprehensive testing
-• **Performance regression**: Mitigate with A/B testing and rollback procedures  
-• **Team capacity**: Mitigate with clear task prioritization and external support if needed
-
-## Options
-• **Conservative**: Low-risk caching only - safe but limited impact
-• **Balanced ✅**: Comprehensive optimization - optimal risk/reward balance
-• **Bold (Zero-Based)**: Complete redesign - high impact but premature timing
-
-## ROI Snapshot
-
-| Option        | Effort | Impact | Est. Cost | Timing |
-|---------------|--------|--------|-----------|--------|
-| Conservative  | Low    | Med    | $${Math.floor(costNaive * 0.7)}/mo   | Now    |
-| Balanced ✅   | Med    | High   | $${costBalanced}/mo   | Now    |
-| Bold (ZBD)    | High   | VeryH  | $${costBold}/mo   | Later  |
-
-## Right-Time Recommendation
-
-**Execute Balanced approach immediately.** Current pain point ($${costNaive}/month waste) justifies medium investment for 60% savings. Bold approach requires architectural maturity we'll gain through Balanced implementation. Timing aligns with team capacity and strategic roadmap priorities.
-
-**Next milestone**: Validate Balanced approach success metrics in 6 weeks, then evaluate Bold approach feasibility for Q2 planning.`;
-
-    return {
-      content: [{
-        type: "text",
-        text: onePager
-      }]
-    };
-  }
-
-  private async handlePRFAQ(args: any) {
-    const requirements = args.requirements || "No requirements provided";
-    const design = args.design || "No design provided";
-    const targetDate = args.target_date || "2025-12-01";
-
-    const prFaq = `# Press Release & FAQ
-
-## Press Release (${targetDate})
-
-### Headline
-**PM Agent Intent Optimizer Launches: AI-Powered Workflow Optimization Reduces Development Costs by 60%**
-
-### Sub-headline
-Revolutionary consulting-grade analysis transforms raw developer ideas into optimized, cost-effective implementations using proven business frameworks.
-
-### Body
-**Problem**: Developers waste significant time and budget on inefficient workflows, lacking the business analysis expertise to optimize quota usage and implementation strategies.
-
-**Solution**: PM Agent Intent Optimizer applies McKinsey-style consulting techniques (MECE, Value Driver Trees, Zero-Based Design) to automatically analyze developer intent and generate optimized specifications with clear ROI analysis.
-
-**Why Now**: With rising API costs and quota limitations, teams need systematic optimization. Our AI agent provides instant access to senior consultant-level analysis that typically costs $300/hour.
-
-**Customer Quote**: *"Instead of guessing at optimization strategies, we now get professional-grade analysis in seconds. The 60% cost savings paid for itself in the first month."* - Senior Developer, Tech Startup
-
-**Availability**: Available immediately as MCP server integration for Claude Desktop, Kiro, and other AI development environments.
-
----
-
-## FAQ
-
-**Q1: Who is the customer?**
-A1: Software developers, technical leads, and engineering teams who want to optimize workflow costs and implementation efficiency without hiring expensive consultants.
-
-**Q2: What problem are we solving now?**
-A2: Developers lack business analysis skills to optimize quota usage, leading to 2-5x higher costs than necessary. They build inefficient workflows because they don't know proven optimization frameworks.
-
-**Q3: Why now (and why not later)?**
-A3: API costs are rising 20-30% annually while team budgets remain flat. Early adopters gain competitive advantage through systematic cost optimization. Waiting means continued waste.
-
-**Q4: What is the smallest lovable version (SLV) we'll ship first?**
-A4: Four core MCP tools: intent optimization, workflow analysis, ROI comparison, and consulting summaries. Covers 80% of optimization use cases.
-
-**Q5: How will we measure success (3 metrics)?**
-A5: 
-• **Cost Reduction**: Average 40-70% quota savings per optimized workflow
-• **Adoption**: 100+ active MCP server installations in first quarter  
-• **Time Savings**: 90% reduction in optimization analysis time (hours to minutes)
-
-**Q6: What are the top 3 risks & mitigations?**
-A6:
-• **Complexity**: Mitigate with simple text-based outputs and clear examples
-• **Accuracy**: Mitigate with proven consulting frameworks and validation testing
-• **Adoption**: Mitigate with seamless MCP integration and comprehensive documentation
-
-**Q7: What is not included (Won't for now)?**
-A7: Custom consulting techniques, industry-specific optimizations, real-time monitoring, or direct code generation. Focus remains on analysis and recommendations.
-
-**Q8: How does this compare to alternatives?**
-A8: Manual analysis takes hours and requires expensive consultants. Generic optimization tools lack business context. We provide consultant-grade analysis instantly at fraction of the cost.
-
-**Q9: What's the estimated cost / quota footprint?**
-A9: Minimal - analysis uses 1-3 quota units per optimization, typically saving 10-50x that amount in the resulting optimized workflow.
-
-**Q10: What are the next 2 releases after v1?**
-A10: 
-• **v2**: Industry-specific optimization templates and advanced ROI modeling
-• **v3**: Integration with project management tools and automated monitoring
-
----
-
-## Launch Checklist
-
-### Scope & Ownership
-- [ ] **Scope freeze**: 4 core MCP tools with text-based outputs
-- [ ] **Technical owner**: Lead developer for MCP server implementation  
-- [ ] **Product owner**: PM for requirements and user experience
-- [ ] **QA owner**: Test lead for validation and integration testing
-
-### Timeline & Dependencies  
-- [ ] **Week 1**: Core MCP server implementation and basic tool handlers
-- [ ] **Week 2**: Consulting framework integration and response formatting
-- [ ] **Week 3**: Integration testing with Claude Desktop and Kiro
-- [ ] **Week 4**: Documentation, examples, and launch preparation
-- [ ] **Dependencies**: MCP SDK, TypeScript build pipeline, test framework
-
-### Communications Plan
-- [ ] **Developer community**: GitHub release with examples and integration guide
-- [ ] **Kiro users**: In-app announcement and tutorial content
-- [ ] **Technical blogs**: Case studies showing before/after optimization results
-- [ ] **Social proof**: Customer testimonials and ROI case studies`;
-
-    return {
-      content: [{
-        type: "text",
-        text: prFaq
-      }]
-    };
-  }
-
-  private async handleRequirements(args: any) {
-    const rawIntent = args.raw_intent || "No intent provided";
-    const context = args.context || {};
-
-    const requirements = `# Requirements Analysis
-
-## Business Goal (WHY)
-${this.extractBusinessGoal(rawIntent)}
-
-## User Needs Analysis
-**Jobs to be Done:**
-- Optimize workflow efficiency and reduce costs
-- Automate manual processes and improve productivity
-- Generate professional-quality analysis and documentation
-
-**Pain Points:**
-- High quota consumption and budget overruns
-- Manual optimization processes that are time-consuming
-- Lack of expertise in workflow optimization techniques
-
-**Gain Creators:**
-- Significant cost savings through intelligent optimization
-- Professional-grade analysis and recommendations
-- Automated processes that scale with business needs
-
-## Functional Requirements (WHAT)
-1. Parse natural language intent and extract structured requirements
-2. Apply consulting techniques for comprehensive analysis
-3. Generate optimized workflows with clear ROI projections
-4. Provide PM-grade documentation and recommendations
-5. Support MCP integration for seamless AI agent interaction
-
-## Constraints & Risks
-- Technical complexity of multi-stage AI pipeline implementation
-- Accuracy requirements for optimization recommendations
-- Integration challenges with existing Kiro workflows
-- Performance requirements for real-time analysis
-
-## MoSCoW Prioritization
-
-### Must Have
-- **Intent parsing functionality**: Core capability without which the system cannot function
-- **Basic optimization strategies**: Essential for delivering value to users
-- **ROI analysis generation**: Critical for user decision-making and value demonstration
-
-### Should Have
-- **Advanced consulting techniques**: Important for comprehensive analysis quality
-- **PM document generation**: Valuable for stakeholder communication
-- **Performance monitoring**: Important for system reliability and optimization
-
-### Could Have
-- **Real-time collaboration features**: Nice to have but not essential for MVP
-- **Advanced caching strategies**: Helpful for performance but not critical initially
-- **Custom consulting technique creation**: Advanced feature for power users
-
-### Won't Have (for now)
-- **Multi-language support**: Out of scope for initial release
-- **Advanced visualization features**: Focus on core functionality first
-- **Third-party integrations**: Concentrate on MCP integration initially
-
-## Right-Time Verdict
-**Decision: DO NOW**
-
-**Reasoning:** Market opportunity is optimal with rising API costs and team budget constraints. Technical foundation is ready with proven MCP integration patterns. Early implementation provides competitive advantage and immediate cost savings for users.
-
-${context.roadmapTheme ? `**Roadmap Alignment:** Fits perfectly with ${context.roadmapTheme} theme` : ''}
-${context.budget ? `**Budget Consideration:** ${context.budget} budget supports development and deployment` : ''}
-${context.deadlines ? `**Timeline:** ${context.deadlines} provides clear delivery target` : ''}`;
-
-    return {
-      content: [{
-        type: "text",
-        text: requirements
-      }]
-    };
-  }
-
-  private async handleDesignOptions(args: any) {
-    const requirements = args.requirements || "No requirements provided";
-
-    const designOptions = `# Design Options Analysis
-
-## Problem Framing
-Current developer workflows consume excessive quotas due to inefficient patterns and lack of optimization expertise. **Now is the right time** to address this because:
-- API costs are rising 20-30% annually while team budgets remain flat
-- Market demand for optimization tools is high with limited competition
-- Technical foundation (MCP integration) is mature and proven
-- Early adopters gain significant competitive advantage
-
-## Design Alternatives
-
-### Conservative Approach
-**Summary:** Basic intent parsing with manual optimization recommendations and simple ROI reporting
-
-**Key Trade-offs:**
-- Lower implementation risk but limited impact on user workflows
-- Faster time to market but may not differentiate from existing tools
-- Minimal resource requirements but limited scalability potential
-
-**Impact:** Medium | **Effort:** Low | **Major Risks:** May not meet user expectations for comprehensive optimization
-
-### Balanced Approach ✅ (Recommended)
-**Summary:** Automated workflow optimization with consulting analysis and comprehensive PM document generation
-
-**Key Trade-offs:**
-- Good balance of features and implementation complexity
-- Moderate development timeline with high user value delivery
-- Reasonable resource requirements with strong ROI potential
-
-**Impact:** High | **Effort:** Medium | **Major Risks:** Moderate technical complexity requiring skilled development team
-
-### Bold Approach (Zero-Based Design)
-**Summary:** Full AI-powered consulting platform with advanced techniques and real-time optimization
-
-**Key Trade-offs:**
-- Maximum impact and market differentiation but highest implementation risk
-- Longer development timeline but revolutionary user experience
-- Significant resource investment but potential for market leadership
-
-**Impact:** High | **Effort:** High | **Major Risks:** High technical complexity, longer time to market, resource constraints
-
-## Impact vs Effort Matrix
-
-### High Impact, Low Effort
-- Basic caching and batching optimizations
-- Simple MCP tool integration
-
-### High Impact, Medium Effort ✅
-- **Balanced Approach**: Comprehensive optimization with PM documents
-- Advanced consulting technique integration
-- ROI analysis and forecasting capabilities
-
-### High Impact, High Effort
-- **Bold Approach**: Zero-based design with real-time optimization
-- Advanced AI-powered analysis platform
-- Custom consulting technique framework
-
-### Low Impact, Low Effort
-- Basic documentation generation
-- Simple workflow analysis tools
-
-## Right-Time Recommendation
-
-**Execute Balanced approach immediately.** Market conditions are optimal with clear user pain points and technical readiness. The Balanced approach provides the best risk-adjusted return while building foundation for future Bold approach implementation.
-
-**Timing Rationale:**
-- Current quota waste justifies medium investment for 40-60% savings potential
-- Technical team capacity aligns with Balanced approach requirements  
-- Market window exists before competitors enter with similar solutions
-- Bold approach can be evaluated after Balanced approach success validation`;
-
-    return {
-      content: [{
-        type: "text",
-        text: designOptions
-      }]
-    };
-  }
-
-  private async handleTaskPlan(args: any) {
-    const design = args.design || "No design provided";
-    const limits = args.limits || {};
-
-    const taskPlan = `# Phased Task Plan
-
-## Task 0: Guardrails Check ⚠️
-**ID:** GUARD-001
-**Name:** Project Limits Validation
-**Description:** Validate that project scope and resource requirements stay within acceptable limits before proceeding
-
-**Acceptance Criteria:**
-- Estimated quota usage < 80% of maximum limits (${limits.max_vibes || 1000} vibes, ${limits.max_specs || 50} specs)
-- Budget projection stays within ${limits.budget_usd ? '$' + limits.budget_usd.toLocaleString() : '$100,000'} allocation
-- Technical complexity assessment confirms team capability
-- Timeline feasibility validated against resource availability
-
-**Effort:** S | **Impact:** High | **Priority:** Must
-
-**Guardrails Limits:**
-- Max Vibes: ${limits.max_vibes || 1000}
-- Max Specs: ${limits.max_specs || 50}  
-- Budget: ${limits.budget_usd ? '$' + limits.budget_usd.toLocaleString() : '$100,000'}
-
-**Check Criteria:**
-- [ ] Resource allocation confirmed and documented
-- [ ] Technical dependencies identified and resolved
-- [ ] Risk mitigation strategies defined and approved
-- [ ] Success metrics and monitoring plan established
-
----
-
-## Immediate Wins (1-3 tasks, 1-2 weeks)
-
-### Task 1: Core Infrastructure Setup
-**ID:** IMM-001
-**Name:** Project Foundation and MCP Server Framework
-**Description:** Establish basic project structure, MCP server integration, and core component interfaces
-
-**Acceptance Criteria:**
-- Project directory structure created with proper organization
-- MCP server framework integrated and functional
-- Core TypeScript interfaces defined for all major components
-- Basic testing framework configured and operational
-
-**Effort:** S | **Impact:** Med | **Priority:** Must
-
-### Task 2: Intent Parsing MVP
-**ID:** IMM-002  
-**Name:** Basic Natural Language Intent Processing
-**Description:** Implement core intent parsing functionality to extract structured requirements from developer input
-
-**Acceptance Criteria:**
-- Intent parser can extract business objectives from natural language
-- Technical requirements identification working for common patterns
-- Basic validation and error handling implemented
-- Unit tests covering core parsing scenarios
-
-**Effort:** M | **Impact:** High | **Priority:** Must
-
-### Task 3: Simple Optimization Engine
-**ID:** IMM-003
-**Name:** Basic Workflow Optimization Strategies
-**Description:** Implement fundamental optimization techniques (batching, caching) for immediate value delivery
-
-**Acceptance Criteria:**
-- Batching optimization identifies and groups similar operations
-- Basic caching layer reduces redundant processing
-- Optimization recommendations generated with clear explanations
-- Integration tests validate optimization effectiveness
-
-**Effort:** M | **Impact:** High | **Priority:** Must
-
----
-
-## Short-Term Goals (3-6 tasks, 3-8 weeks)
-
-### Task 4: Consulting Techniques Integration
-**ID:** ST-001
-**Name:** Business Analysis Framework Implementation
-**Description:** Integrate 2-3 core consulting techniques (MECE, Value Driver Tree, Impact vs Effort Matrix)
-
-**Acceptance Criteria:**
-- MECE framework categorizes quota drivers effectively
-- Value Driver Tree decomposes cost structures accurately
-- Impact vs Effort Matrix prioritizes optimization opportunities
-- Technique selection algorithm chooses appropriate methods
-
-**Effort:** L | **Impact:** High | **Priority:** Should
-
-### Task 5: ROI Analysis Engine
-**ID:** ST-002
-**Name:** Comprehensive Quota Forecasting and ROI Calculation
-**Description:** Build sophisticated forecasting system with multiple optimization scenarios
-
-**Acceptance Criteria:**
-- Naive, optimized, and zero-based consumption estimates generated
-- ROI tables compare Conservative/Balanced/Bold approaches
-- Percentage savings and dollar impact calculations accurate
-- Confidence intervals and risk assessments included
-
-**Effort:** M | **Impact:** High | **Priority:** Should
-
-### Task 6: PM Document Generation
-**ID:** ST-003
-**Name:** Executive-Ready Document Creation System
-**Description:** Implement management one-pagers, PR-FAQs, and structured requirements generation
-
-**Acceptance Criteria:**
-- Management one-pagers follow Pyramid Principle structure
-- PR-FAQs include future-dated press releases and comprehensive FAQs
-- Requirements use MoSCoW prioritization with timing decisions
-- All documents maintain professional quality and consistency
-
-**Effort:** L | **Impact:** Med | **Priority:** Should
-
----
-
-## Long-Term Vision (2-4 tasks, 2-3 months)
-
-### Task 7: Advanced Analytics Platform
-**ID:** LT-001
-**Name:** Performance Monitoring and Optimization Intelligence
-**Description:** Build comprehensive analytics system for continuous improvement and optimization intelligence
-
-**Acceptance Criteria:**
-- Real-time performance monitoring tracks quota usage and optimization effectiveness
-- Historical analysis identifies trends and optimization opportunities
-- Predictive analytics forecast future resource needs and cost projections
-- Dashboard provides actionable insights for continuous improvement
-
-**Effort:** XL | **Impact:** Med | **Priority:** Could
-
-### Task 8: Zero-Based Design Framework
-**ID:** LT-002
-**Name:** Advanced Workflow Redesign Capabilities
-**Description:** Implement sophisticated zero-based design methodology for revolutionary optimization
-
-**Acceptance Criteria:**
-- Complete workflow decomposition and reconstruction algorithms
-- Advanced pattern recognition for optimization opportunities
-- Integration with industry best practices and benchmarking data
-- Automated recommendation engine for architectural improvements
-
-**Effort:** XL | **Impact:** High | **Priority:** Could`;
-
-    return {
-      content: [{
-        type: "text",
-        text: taskPlan
-      }]
-    };
-  }
-
-  private async handleROIAnalysis(args: any) {
-    const workflow = args.workflow || {};
-    const optimizedWorkflow = args.optimizedWorkflow;
-    const zeroBasedSolution = args.zeroBasedSolution;
-
-    const workflowId = workflow.id || "unknown";
-    const stepCount = workflow.steps?.length || 5;
-
-    // Calculate costs for different scenarios
-    const naiveCost = stepCount * 3; // Assume 3 quota units per step
-    const optimizedCost = Math.ceil(naiveCost * 0.4); // 60% savings
-    const zeroBasedCost = Math.ceil(naiveCost * 0.15); // 85% savings
-
-    const roiAnalysis = `# ROI Analysis Report
+    const analysis = `# Business Opportunity Analysis
 
 ## Executive Summary
-Comprehensive analysis of workflow optimization opportunities with three distinct approaches, showing potential savings of 60-85% through systematic optimization.
+**Opportunity:** ${this.extractOpportunityStatement(idea)}
+**Market Timing:** ${this.assessMarketTiming(marketContext)}
+**Strategic Fit:** ${this.evaluateStrategicFit(idea, marketContext)}
 
-## Scenario Comparison
+## Market Analysis
 
-### Scenario 1: Naive Implementation (Current State)
-- **Monthly Cost**: $${naiveCost}/month
-- **Quota Usage**: ${stepCount * 3} units/execution
-- **Approach**: Direct implementation without optimization
-- **Risk Level**: Low (baseline)
-- **Implementation Effort**: Minimal
+### Problem Validation
+${this.analyzeProblemSpace(idea)}
 
-### Scenario 2: Optimized Workflow (Recommended)
-- **Monthly Cost**: $${optimizedCost}/month
-- **Quota Usage**: ${Math.ceil(stepCount * 1.2)} units/execution
-- **Approach**: Batching, caching, and intelligent decomposition
-- **Risk Level**: Medium
-- **Implementation Effort**: Medium
-- **Savings**: ${Math.round(((naiveCost - optimizedCost) / naiveCost) * 100)}% reduction
+### Market Size & Opportunity
+- **Total Addressable Market (TAM):** ${this.estimateMarketSize(idea, marketContext)}
+- **Serviceable Addressable Market (SAM):** ${this.estimateServiceableMarket(idea, marketContext)}
+- **Competitive Landscape:** ${this.analyzeCompetition(marketContext)}
 
-### Scenario 3: Zero-Based Design (Future State)
-- **Monthly Cost**: $${zeroBasedCost}/month
-- **Quota Usage**: ${Math.ceil(stepCount * 0.45)} units/execution
-- **Approach**: Complete architectural redesign with event-driven patterns
-- **Risk Level**: High
-- **Implementation Effort**: High
-- **Savings**: ${Math.round(((naiveCost - zeroBasedCost) / naiveCost) * 100)}% reduction
+### Customer Segments
+${this.identifyCustomerSegments(idea)}
 
-## Financial Impact Analysis
+## Business Justification
 
-| Metric | Naive | Optimized | Zero-Based |
-|--------|-------|-----------|------------|
-| Monthly Cost | $${naiveCost} | $${optimizedCost} | $${zeroBasedCost} |
-| Annual Cost | $${naiveCost * 12} | $${optimizedCost * 12} | $${zeroBasedCost * 12} |
-| Annual Savings | $0 | $${(naiveCost - optimizedCost) * 12} | $${(naiveCost - zeroBasedCost) * 12} |
-| ROI Timeline | N/A | 2-3 months | 6-9 months |
+### Why Now?
+${this.justifyTiming(idea, marketContext)}
+
+### Strategic Value
+- **Revenue Impact:** ${this.assessRevenueImpact(idea, marketContext)}
+- **Cost Savings:** ${this.assessCostSavings(idea, marketContext)}
+- **Strategic Positioning:** ${this.assessStrategicValue(idea, marketContext)}
+
+### Risk Assessment
+${this.assessBusinessRisks(idea, marketContext)}
 
 ## Recommendation
+**Decision:** ${this.makeGoNoGoRecommendation(idea, marketContext)}
 
-**Execute Optimized approach immediately** with Zero-Based design as future roadmap item.
-
-**Rationale:**
-- Optimized approach provides 60% savings with manageable risk
-- Implementation timeline aligns with current team capacity
-- Builds foundation knowledge for future Zero-Based implementation
-- Immediate cost relief justifies medium development investment
-
-## Risk Assessment
-
-### Optimized Approach Risks
-- **Technical Complexity**: Medium - requires careful batching logic
-- **Performance Impact**: Low - caching improves response times
-- **Maintenance Overhead**: Medium - additional monitoring required
-
-### Zero-Based Approach Risks  
-- **Technical Complexity**: High - complete architectural change
-- **Performance Impact**: Unknown - requires extensive testing
-- **Maintenance Overhead**: High - new patterns and monitoring systems
+**Rationale:** ${this.provideRecommendationRationale(idea, marketContext)}
 
 ## Next Steps
-1. **Week 1-2**: Implement optimized batching and caching
-2. **Week 3-4**: Performance testing and validation
-3. **Month 2**: Monitor savings and optimize further
-4. **Quarter 2**: Evaluate Zero-Based design feasibility`;
+1. Validate assumptions through customer research
+2. Develop detailed business case with financial projections
+3. Assess technical feasibility and resource requirements
+4. Create stakeholder communication materials`;
 
-    return {
-      content: [{
-        type: "text",
-        text: roiAnalysis
-      }]
-    };
-  }
-
-  private async handleConsultingSummary(args: any) {
-    const analysis = args.analysis || {};
-    const techniques = args.techniques || [];
-
-    const techniquesUsed = analysis.techniquesUsed || ["MECE", "Value Driver Tree"];
-    const keyFindings = analysis.keyFindings || ["Significant optimization opportunities identified"];
-    const totalQuotaSavings = analysis.totalQuotaSavings || 60;
-
-    const summary = `# Consulting Summary
-
-## Executive Summary (Answer First)
-**Recommendation: Implement workflow optimization immediately** - analysis reveals 60% cost reduction opportunity with medium effort and manageable risk profile.
-
-## Supporting Analysis (Pyramid Structure)
-
-### Level 1: Strategic Rationale
-**Why Act Now:**
-- Current inefficiencies cost $${Math.floor(totalQuotaSavings * 2)}/month with clear optimization path
-- Market timing optimal with rising API costs and budget constraints  
-- Technical foundation ready for implementation with proven patterns
-
-### Level 2: Analytical Foundation
-**Consulting Techniques Applied:**
-${techniquesUsed.map((technique: string) => `- **${technique}**: ${this.getTechniqueDescription(technique)}`).join('\n')}
-
-**Key Findings:**
-${keyFindings.map((finding: string, index: number) => `${index + 1}. ${finding}`).join('\n')}
-
-### Level 3: Implementation Details
-**Optimization Strategies:**
-- **Batching Operations**: Group similar API calls to reduce overhead
-- **Intelligent Caching**: Store frequently accessed data with smart invalidation
-- **Workflow Decomposition**: Break complex processes into optimized components
-- **Async Processing**: Implement non-blocking operations where possible
-
-## Evidence Base
-
-### Quantitative Analysis
-- **Current State**: ${Math.floor(totalQuotaSavings * 1.67)} quota units/execution
-- **Optimized State**: ${Math.floor(totalQuotaSavings * 0.67)} quota units/execution  
-- **Savings Percentage**: ${totalQuotaSavings}%
-- **Monthly Impact**: $${Math.floor(totalQuotaSavings * 2)} cost reduction
-
-### Qualitative Assessment
-- **Implementation Risk**: Medium - requires careful planning but uses proven patterns
-- **Team Readiness**: High - existing skills align with optimization requirements
-- **Maintenance Impact**: Low - optimizations reduce long-term operational overhead
-
-## Recommendations
-
-### Immediate Actions (Next 2 Weeks)
-1. **Implement batching logic** for similar operations
-2. **Add caching layer** for frequently accessed data
-3. **Establish monitoring** for optimization effectiveness
-
-### Short-Term Goals (Next 2 Months)  
-1. **Optimize data retrieval** patterns and payload sizes
-2. **Implement async processing** for non-critical operations
-3. **Validate savings** and refine optimization strategies
-
-### Long-Term Vision (Next Quarter)
-1. **Evaluate zero-based redesign** for additional optimization
-2. **Expand optimization** to related workflows and processes
-3. **Build optimization expertise** as competitive advantage
-
-## Success Metrics
-- **Cost Reduction**: Target 60% savings within 8 weeks
-- **Performance Impact**: Maintain or improve response times
-- **Implementation Quality**: Zero production incidents during rollout
-
-This analysis provides the strategic clarity and tactical guidance needed for confident decision-making and successful implementation.`;
-
-    return {
-      content: [{
-        type: "text",
-        text: summary
-      }]
-    };
-  }
-
-  private async handleValidateIdeaQuick(args: any) {
-    const idea = args.idea || "No idea provided";
-    const context = args.context || {};
-
-    const urgency = context.urgency || "medium";
-    const budgetRange = context.budget_range || "medium";
-    const teamSize = context.team_size || 3;
-
-    // Simple validation logic based on idea content and context
-    const ideaLength = idea.length;
-    const hasSpecificGoal = idea.toLowerCase().includes('optimize') || idea.toLowerCase().includes('reduce') || idea.toLowerCase().includes('improve');
-    const hasTechnicalContent = idea.toLowerCase().includes('api') || idea.toLowerCase().includes('workflow') || idea.toLowerCase().includes('quota');
-
-    let verdict = "PASS";
-    let reasoning = "";
-
-    if (ideaLength < 20) {
-      verdict = "FAIL";
-      reasoning = "Idea too vague - needs more specific details about goals and implementation approach.";
-    } else if (!hasSpecificGoal && !hasTechnicalContent) {
-      verdict = "CONDITIONAL";
-      reasoning = "Idea has potential but lacks specific optimization goals or technical context. Needs clarification.";
-    } else {
-      reasoning = "Idea shows clear optimization intent with sufficient technical context for analysis.";
+    // Create steering file if requested
+    let steeringResult = null;
+    if (steeringOptions.create_steering_files !== false) {
+      try {
+        // Use ONEPAGER type for business analysis documents
+        steeringResult = await this.steeringService.createFromOnePager(analysis, steeringOptions);
+      } catch (error) {
+        console.warn('Failed to create steering file:', error);
+      }
     }
 
-    const validation = `# Quick Validation Result
+    const response = {
+      content: [{
+        type: "text",
+        text: analysis
+      }]
+    };
 
-**Verdict:** ${verdict}
+    if (steeringResult?.created) {
+      response.content.push({
+        type: "text",
+        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis business analysis is now available as AI context for strategic decisions.`
+      });
+    }
 
-**Reasoning:** ${reasoning}
+    return response;
+  }
 
-**Context Analysis:**
-- **Urgency Level**: ${urgency.toUpperCase()}
-- **Budget Range**: ${budgetRange.toUpperCase()}  
-- **Team Size**: ${teamSize} developers
-- **Idea Complexity**: ${ideaLength > 100 ? 'High' : ideaLength > 50 ? 'Medium' : 'Low'}
+  private async handleBusinessCaseGeneration(args: any) {
+    const opportunityAnalysis = args.opportunity_analysis || "No analysis provided";
+    const financialInputs = args.financial_inputs || {};
+    const steeringOptions = args.steering_options || {};
 
-## Next Steps (Choose One)
+    const businessCase = `# Business Case
 
-### Option 1: Conservative Approach
-**Title:** Start with Requirements Analysis
-**Description:** Begin with structured requirements gathering to clarify goals and constraints before proceeding with optimization analysis.
+## Investment Summary
+**Total Investment:** $${(financialInputs.development_cost || 100000).toLocaleString()}
+**Expected ROI:** ${this.calculateROI(financialInputs)}%
+**Payback Period:** ${this.calculatePaybackPeriod(financialInputs)} months
+**NPV (3 years):** $${this.calculateNPV(financialInputs).toLocaleString()}
 
-**Trade-offs:**
-- Lower risk but slower time to value
-- Thorough planning reduces implementation surprises
-- May delay addressing urgent optimization needs
+## Financial Projections
 
-**Next Step:** Use \`generate_requirements\` tool with your idea as raw_intent
+### Development Costs
+- **Initial Development:** $${(financialInputs.development_cost || 100000).toLocaleString()}
+- **Ongoing Operations:** $${(financialInputs.operational_cost || 20000).toLocaleString()}/year
+- **Time to Market:** ${financialInputs.time_to_market || 6} months
 
----
+### Revenue Projections
+- **Year 1:** $${(financialInputs.expected_revenue || 200000).toLocaleString()}
+- **Year 2:** $${((financialInputs.expected_revenue || 200000) * 1.5).toLocaleString()}
+- **Year 3:** $${((financialInputs.expected_revenue || 200000) * 2.2).toLocaleString()}
 
-### Option 2: Balanced Approach ✅
-**Title:** Direct Optimization Analysis  
-**Description:** Proceed immediately with intent optimization to get actionable recommendations and ROI analysis.
+## Risk Analysis
 
-**Trade-offs:**
-- Faster results with moderate risk
-- Good balance of speed and thoroughness
-- May need refinement based on initial results
+### Financial Risks
+${this.analyzeFinancialRisks(financialInputs)}
 
-**Next Step:** Use \`optimize_intent\` tool with your idea and any known parameters
+### Market Risks
+${this.analyzeMarketRisks(opportunityAnalysis)}
 
----
+### Technical Risks
+${this.analyzeTechnicalRisks(opportunityAnalysis)}
 
-### Option 3: Bold Approach
-**Title:** Comprehensive PM Process
-**Description:** Full product management workflow from requirements through design options to implementation planning.
+## Success Metrics
+${this.defineSuccessMetrics(financialInputs)}
 
-**Trade-offs:**
-- Most thorough analysis but longest timeline
-- Professional-grade documentation and planning
-- May be overkill for simple optimization needs
+## Resource Requirements
+${this.defineResourceRequirements(financialInputs)}
 
-**Next Step:** Start with \`generate_requirements\`, then \`generate_design_options\`, then \`generate_task_plan\`
+## Implementation Phases
+${this.defineImplementationPhases(financialInputs)}
 
 ## Recommendation
+**Proceed with development** based on strong financial projections and strategic alignment.
 
-${urgency === 'high' ? 'Given HIGH urgency, recommend **Option 2 (Balanced)** for fastest actionable results.' :
-        budgetRange === 'large' ? 'Given LARGE budget, recommend **Option 3 (Bold)** for comprehensive analysis.' :
-          'Recommend **Option 2 (Balanced)** for optimal speed-to-value ratio.'}`;
+**Key Success Factors:**
+1. Maintain development timeline to capture market opportunity
+2. Focus on core value proposition to minimize scope creep
+3. Establish clear success metrics and monitoring systems
+4. Plan for iterative improvement based on user feedback`;
+
+    // Create steering file if requested
+    let steeringResult = null;
+    if (steeringOptions.create_steering_files !== false) {
+      try {
+        steeringResult = await this.steeringService.createFromOnePager(businessCase, steeringOptions);
+      } catch (error) {
+        console.warn('Failed to create steering file:', error);
+      }
+    }
+
+    const response = {
+      content: [{
+        type: "text",
+        text: businessCase
+      }]
+    };
+
+    if (steeringResult?.created) {
+      response.content.push({
+        type: "text",
+        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis business case is now available as AI context for project decisions.`
+      });
+    }
+
+    return response;
+  }
+
+  private async handleStakeholderCommunication(args: any) {
+    const businessCase = args.business_case || "No business case provided";
+    const communicationType = args.communication_type || "executive_onepager";
+    const audience = args.audience || "executives";
+    const steeringOptions = args.steering_options || {};
+
+    let communication = "";
+
+    switch (communicationType) {
+      case "executive_onepager":
+        communication = this.generateExecutiveOnePager(businessCase, audience);
+        break;
+      case "pr_faq":
+        communication = this.generatePRFAQ(businessCase, audience);
+        break;
+      case "board_presentation":
+        communication = this.generateBoardPresentation(businessCase, audience);
+        break;
+      case "team_announcement":
+        communication = this.generateTeamAnnouncement(businessCase, audience);
+        break;
+      default:
+        communication = this.generateExecutiveOnePager(businessCase, audience);
+    }
+
+    // Create steering file if requested
+    let steeringResult = null;
+    if (steeringOptions.create_steering_files !== false) {
+      try {
+        if (communicationType === "pr_faq") {
+          steeringResult = await this.steeringService.createFromPRFAQ(communication, steeringOptions);
+        } else {
+          steeringResult = await this.steeringService.createFromOnePager(communication, steeringOptions);
+        }
+      } catch (error) {
+        console.warn('Failed to create steering file:', error);
+      }
+    }
+
+    const response = {
+      content: [{
+        type: "text",
+        text: communication
+      }]
+    };
+
+    if (steeringResult?.created) {
+      response.content.push({
+        type: "text",
+        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis ${communicationType} is now available as AI context for stakeholder communications.`
+      });
+    }
+
+    return response;
+  }
+
+  private async handleStrategicAlignment(args: any) {
+    const featureConcept = args.feature_concept || "No concept provided";
+    const companyContext = args.company_context || {};
+    const steeringOptions = args.steering_options || {};
+
+    const alignment = `# Strategic Alignment Assessment
+
+## Alignment Score: ${this.calculateAlignmentScore(featureConcept, companyContext)}/10
+
+## Mission Alignment
+**Company Mission:** ${companyContext.mission || "Not provided"}
+**Feature Alignment:** ${this.assessMissionAlignment(featureConcept, companyContext)}
+
+## OKR Impact Analysis
+${this.analyzeOKRImpact(featureConcept, companyContext)}
+
+## Strategic Priority Mapping
+${this.mapStrategicPriorities(featureConcept, companyContext)}
+
+## Competitive Positioning
+${this.assessCompetitiveImpact(featureConcept, companyContext)}
+
+## Long-term Vision Contribution
+${this.assessVisionContribution(featureConcept, companyContext)}
+
+## Resource Allocation Justification
+${this.justifyResourceAllocation(featureConcept, companyContext)}
+
+## Recommendation
+${this.makeStrategicRecommendation(featureConcept, companyContext)}`;
+
+    // Create steering file if requested
+    let steeringResult = null;
+    if (steeringOptions.create_steering_files !== false) {
+      try {
+        steeringResult = await this.steeringService.createFromOnePager(alignment, steeringOptions);
+      } catch (error) {
+        console.warn('Failed to create steering file:', error);
+      }
+    }
+
+    const response = {
+      content: [{
+        type: "text",
+        text: alignment
+      }]
+    };
+
+    if (steeringResult?.created) {
+      response.content.push({
+        type: "text",
+        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis strategic alignment assessment is now available as AI context.`
+      });
+    }
+
+    return response;
+  }
+
+  private async handleResourceOptimization(args: any) {
+    const currentWorkflow = args.current_workflow || {};
+    const resourceConstraints = args.resource_constraints || {};
+    const optimizationGoals = args.optimization_goals || ["cost_reduction"];
+
+    const optimization = `# Resource Optimization Analysis
+
+## Current State Assessment
+**Team Size:** ${resourceConstraints.team_size || "Not specified"}
+**Budget:** $${(resourceConstraints.budget || 0).toLocaleString()}
+**Timeline:** ${resourceConstraints.timeline || "Not specified"}
+**Technical Debt Level:** ${resourceConstraints.technical_debt || "Unknown"}
+
+## Optimization Opportunities
+${this.identifyOptimizationOpportunities(currentWorkflow, resourceConstraints, optimizationGoals)}
+
+## Recommended Optimizations
+${this.recommendOptimizations(currentWorkflow, resourceConstraints, optimizationGoals)}
+
+## Impact Analysis
+${this.analyzeOptimizationImpact(currentWorkflow, resourceConstraints, optimizationGoals)}
+
+## Implementation Roadmap
+${this.createOptimizationRoadmap(currentWorkflow, resourceConstraints, optimizationGoals)}
+
+## Success Metrics
+${this.defineOptimizationMetrics(optimizationGoals)}`;
+
+    return {
+      content: [{
+        type: "text",
+        text: optimization
+      }]
+    };
+  }
+
+  private async handleMarketTimingValidation(args: any) {
+    const featureIdea = args.feature_idea || "No idea provided";
+    const marketSignals = args.market_signals || {};
+
+    const validation = `# Market Timing Validation
+
+## Feature Concept
+${featureIdea}
+
+## Market Signal Analysis
+${this.analyzeMarketSignals(marketSignals)}
+
+## Timing Assessment
+**Overall Timing Score:** ${this.calculateTimingScore(marketSignals)}/10
+**Recommendation:** ${this.makeTimingRecommendation(marketSignals)}
+
+## Key Factors
+${this.identifyKeyTimingFactors(marketSignals)}
+
+## Risk Mitigation
+${this.identifyTimingRisks(marketSignals)}
+
+## Action Plan
+${this.createTimingActionPlan(featureIdea, marketSignals)}`;
 
     return {
       content: [{
@@ -1177,42 +606,453 @@ ${urgency === 'high' ? 'Given HIGH urgency, recommend **Option 2 (Balanced)** fo
     };
   }
 
-  private getTechniqueDescription(technique: string): string {
-    const descriptions: { [key: string]: string } = {
-      "MECE": "Mutually Exclusive, Collectively Exhaustive analysis for comprehensive problem decomposition",
-      "Value Driver Tree": "Hierarchical breakdown of cost and value drivers for systematic optimization",
-      "Pyramid": "Answer-first communication structure for executive clarity",
-      "ZeroBased": "Ground-up redesign methodology questioning all assumptions",
-      "ImpactEffort": "2x2 matrix prioritizing initiatives by impact vs implementation effort",
-      "ValueProp": "Value proposition analysis focusing on user benefits and business outcomes",
-      "OptionFraming": "Structured comparison of Conservative/Balanced/Bold approaches"
-    };
-    return descriptions[technique] || "Advanced consulting technique for systematic analysis";
+  // Helper methods for business analysis
+  private extractOpportunityStatement(idea: string): string {
+    return `Transform ${idea.toLowerCase()} into a strategic competitive advantage through systematic optimization and intelligent automation.`;
   }
 
+  private assessMarketTiming(context: any): string {
+    return context.timeline ? `Optimal timing based on ${context.timeline} market window` : "Market timing requires further analysis";
+  }
 
+  private evaluateStrategicFit(idea: string, context: any): string {
+    return context.industry ? `Strong alignment with ${context.industry} industry trends` : "Strategic fit assessment pending industry context";
+  }
 
-  private extractBusinessGoal(rawIntent: string): string {
-    const intent = rawIntent.toLowerCase();
+  private analyzeProblemSpace(idea: string): string {
+    return `The core problem addressed by "${idea}" represents a significant market opportunity with clear customer pain points and measurable business impact.`;
+  }
 
-    if (intent.includes('quota') && intent.includes('cost')) {
-      return 'Reduce developer workflow costs by 40-60% through intelligent quota optimization while maintaining full functionality and improving user experience.';
-    } else if (intent.includes('optimization') && intent.includes('workflow')) {
-      return 'Transform inefficient manual workflows into optimized automated processes that deliver better results with less effort and resource consumption.';
-    } else if (intent.includes('intent') && intent.includes('spec')) {
-      return 'Enable developers to create sophisticated Kiro specifications from natural language intent without requiring deep optimization expertise.';
-    } else {
-      return 'Deliver measurable value through intelligent automation that reduces complexity while improving outcomes and user satisfaction.';
+  private estimateMarketSize(idea: string, context: any): string {
+    const budgetMultiplier = context.budget_range === "large" ? 10 : context.budget_range === "medium" ? 5 : 2;
+    return `$${(budgetMultiplier * 10).toLocaleString()}M estimated market opportunity`;
+  }
+
+  private estimateServiceableMarket(idea: string, context: any): string {
+    const budgetMultiplier = context.budget_range === "large" ? 10 : context.budget_range === "medium" ? 5 : 2;
+    return `$${(budgetMultiplier * 2).toLocaleString()}M serviceable market within 3 years`;
+  }
+
+  private analyzeCompetition(context: any): string {
+    return context.competition ? `Competitive analysis: ${context.competition}` : "Limited direct competition identified, representing first-mover advantage opportunity";
+  }
+
+  private identifyCustomerSegments(idea: string): string {
+    return "Primary segments include enterprise customers seeking efficiency improvements and SMBs requiring cost-effective automation solutions.";
+  }
+
+  private justifyTiming(idea: string, context: any): string {
+    return "Market conditions are optimal with increasing demand for automation, rising operational costs, and technological readiness converging to create ideal implementation window.";
+  }
+
+  private assessRevenueImpact(idea: string, context: any): string {
+    return "Projected 15-25% revenue increase through improved efficiency and new market opportunities.";
+  }
+
+  private assessCostSavings(idea: string, context: any): string {
+    return "Estimated 30-40% operational cost reduction through automation and process optimization.";
+  }
+
+  private assessStrategicValue(idea: string, context: any): string {
+    return "High strategic value through market differentiation, customer retention improvement, and competitive moat creation.";
+  }
+
+  private assessBusinessRisks(idea: string, context: any): string {
+    return `**Key Risks:**
+- Market adoption slower than projected (Medium risk)
+- Technical implementation complexity (Low risk)
+- Competitive response (Medium risk)
+- Resource allocation challenges (Low risk)`;
+  }
+
+  private makeGoNoGoRecommendation(idea: string, context: any): string {
+    return "**GO** - Proceed with development based on strong market opportunity and strategic alignment.";
+  }
+
+  private provideRecommendationRationale(idea: string, context: any): string {
+    return "Market timing is optimal, technical feasibility is confirmed, and strategic value significantly outweighs implementation risks.";
+  }
+
+  // Financial calculation helpers
+  private calculateROI(inputs: any): number {
+    const revenue = inputs.expected_revenue || 200000;
+    const cost = inputs.development_cost || 100000;
+    return Math.round(((revenue - cost) / cost) * 100);
+  }
+
+  private calculatePaybackPeriod(inputs: any): number {
+    const cost = inputs.development_cost || 100000;
+    const monthlyRevenue = (inputs.expected_revenue || 200000) / 12;
+    return Math.round(cost / monthlyRevenue);
+  }
+
+  private calculateNPV(inputs: any): number {
+    const cost = inputs.development_cost || 100000;
+    const annualRevenue = inputs.expected_revenue || 200000;
+    const discountRate = 0.1;
+    
+    let npv = -cost;
+    for (let year = 1; year <= 3; year++) {
+      const revenue = annualRevenue * Math.pow(1.2, year - 1);
+      npv += revenue / Math.pow(1 + discountRate, year);
+    }
+    
+    return Math.round(npv);
+  }
+
+  private analyzeFinancialRisks(inputs: any): string {
+    return "Financial risks are manageable with conservative revenue projections and phased investment approach.";
+  }
+
+  private analyzeMarketRisks(analysis: string): string {
+    return "Market risks mitigated through validated customer demand and differentiated value proposition.";
+  }
+
+  private analyzeTechnicalRisks(analysis: string): string {
+    return "Technical risks are low given proven technology stack and experienced development team.";
+  }
+
+  private defineSuccessMetrics(inputs: any): string {
+    return `**Key Metrics:**
+- Revenue target: $${(inputs.expected_revenue || 200000).toLocaleString()} in Year 1
+- Customer acquisition: 100+ customers in first 6 months
+- User engagement: 80%+ monthly active usage
+- Cost efficiency: 30%+ operational cost reduction`;
+  }
+
+  private defineResourceRequirements(inputs: any): string {
+    return `**Resource Needs:**
+- Development team: 3-5 engineers for ${inputs.time_to_market || 6} months
+- Budget allocation: $${(inputs.development_cost || 100000).toLocaleString()}
+- Infrastructure: Cloud-based scalable architecture
+- Support: Customer success and technical support teams`;
+  }
+
+  private defineImplementationPhases(inputs: any): string {
+    return `**Phase 1 (Months 1-2):** Core functionality development
+**Phase 2 (Months 3-4):** Integration and testing
+**Phase 3 (Months 5-6):** Launch preparation and go-to-market
+**Phase 4 (Months 7+):** Optimization and scaling`;
+  }
+
+  // Communication generation methods
+  private generateExecutiveOnePager(businessCase: string, audience: string): string {
+    return `# Executive One-Pager
+
+## The Ask
+**Approve development investment** for strategic feature that delivers measurable business value and competitive advantage.
+
+## Why Now
+Market opportunity window is optimal with validated customer demand, technical readiness, and strategic alignment converging to create ideal implementation timing.
+
+## Investment & Returns
+- **Investment:** Development and operational costs as outlined in business case
+- **Returns:** Projected ROI and revenue impact with conservative assumptions
+- **Timeline:** Phased approach with early value delivery and iterative improvement
+
+## Strategic Value
+- **Market Position:** Strengthens competitive differentiation
+- **Customer Value:** Addresses validated pain points with measurable impact
+- **Business Growth:** Enables new revenue streams and market expansion
+
+## Risk Mitigation
+- **Technical:** Proven technology stack with experienced team
+- **Market:** Validated demand with conservative projections
+- **Financial:** Phased investment with clear success metrics
+
+## Next Steps
+1. Approve business case and resource allocation
+2. Initiate development with Kiro Spec Mode for detailed requirements
+3. Establish success metrics and monitoring systems
+4. Plan go-to-market strategy and customer communication`;
+  }
+
+  private generatePRFAQ(businessCase: string, audience: string): string {
+    return `# Press Release & FAQ
+
+## Press Release
+
+### Headline
+**[Company] Launches Strategic Feature: Delivering Measurable Value Through Innovation**
+
+### Body
+Today we announced the development of a strategic feature that addresses key customer needs while strengthening our competitive position. This initiative represents our commitment to continuous innovation and customer value creation.
+
+**Customer Impact:** Direct benefits through improved efficiency and enhanced capabilities
+**Market Position:** Reinforces leadership in key market segments
+**Strategic Value:** Aligns with long-term vision and growth objectives
+
+## FAQ
+
+**Q: Why is this feature important?**
+A: It addresses validated customer pain points while creating strategic competitive advantages and new revenue opportunities.
+
+**Q: What's the expected timeline?**
+A: Phased development approach with initial value delivery in 6 months and full feature set within 12 months.
+
+**Q: How does this align with company strategy?**
+A: Direct alignment with strategic priorities, OKRs, and long-term vision for market leadership.
+
+**Q: What are the success metrics?**
+A: Clear ROI targets, customer adoption goals, and business impact measurements as defined in the business case.`;
+  }
+
+  private generateBoardPresentation(businessCase: string, audience: string): string {
+    return `# Board Presentation: Strategic Investment Proposal
+
+## Executive Summary
+Strategic feature development opportunity with strong ROI, market validation, and competitive advantage potential.
+
+## Market Opportunity
+- Validated customer demand with clear pain points
+- Significant market size with limited competition
+- Optimal timing based on market conditions
+
+## Financial Projections
+- Conservative revenue projections with strong ROI
+- Phased investment approach minimizing risk
+- Clear path to profitability and growth
+
+## Strategic Alignment
+- Direct support of company mission and vision
+- Advancement of key OKRs and strategic priorities
+- Strengthening of competitive market position
+
+## Risk Assessment
+- Comprehensive risk analysis with mitigation strategies
+- Conservative assumptions and contingency planning
+- Proven team and technology foundation
+
+## Recommendation
+**Approve strategic investment** based on compelling business case, market opportunity, and strategic value creation.`;
+  }
+
+  private generateTeamAnnouncement(businessCase: string, audience: string): string {
+    return `# Team Announcement: New Strategic Initiative
+
+## Exciting News
+We're launching a strategic feature development initiative that will create significant value for our customers and strengthen our market position.
+
+## What This Means
+- **For Customers:** Enhanced capabilities addressing key pain points
+- **For Our Team:** Opportunity to work on high-impact, strategic project
+- **For The Company:** Competitive advantage and revenue growth
+
+## Development Approach
+- **Methodology:** Using Kiro's Spec Mode for requirements and Vibe Mode for implementation
+- **Timeline:** Phased development with regular milestones and feedback loops
+- **Team Structure:** Cross-functional collaboration with clear ownership
+
+## Success Metrics
+Clear goals and measurements to track progress and celebrate achievements together.
+
+## Next Steps
+Development teams will receive detailed specifications through Kiro Spec Mode, with implementation guidance through Vibe Mode.
+
+**Questions?** Reach out to the PM team for additional context and clarification.`;
+  }
+
+  // Strategic alignment helpers
+  private calculateAlignmentScore(concept: string, context: any): number {
+    let score = 5; // Base score
+    if (context.mission) score += 2;
+    if (context.current_okrs?.length > 0) score += 2;
+    if (context.strategic_priorities?.length > 0) score += 1;
+    return Math.min(score, 10);
+  }
+
+  private assessMissionAlignment(concept: string, context: any): string {
+    return context.mission 
+      ? `Strong alignment with mission to ${context.mission}. Feature directly supports core mission objectives.`
+      : "Mission alignment requires further analysis with company mission statement.";
+  }
+
+  private analyzeOKRImpact(concept: string, context: any): string {
+    if (context.current_okrs?.length > 0) {
+      return `**OKR Impact Analysis:**\n${context.current_okrs.map((okr: string, i: number) => 
+        `- **OKR ${i + 1}:** ${okr} - Direct positive impact through feature capabilities`
+      ).join('\n')}`;
+    }
+    return "OKR impact analysis requires current company OKRs for detailed assessment.";
+  }
+
+  private mapStrategicPriorities(concept: string, context: any): string {
+    if (context.strategic_priorities?.length > 0) {
+      return `**Strategic Priority Mapping:**\n${context.strategic_priorities.map((priority: string, i: number) => 
+        `- **Priority ${i + 1}:** ${priority} - Feature supports through enhanced capabilities`
+      ).join('\n')}`;
+    }
+    return "Strategic priority mapping requires current company priorities for detailed analysis.";
+  }
+
+  private assessCompetitiveImpact(concept: string, context: any): string {
+    return context.competitive_position 
+      ? `Current position: ${context.competitive_position}. Feature strengthens competitive advantage through differentiated capabilities.`
+      : "Competitive impact analysis requires current market position context.";
+  }
+
+  private assessVisionContribution(concept: string, context: any): string {
+    return "Feature contributes to long-term vision through strategic capability building and market position strengthening.";
+  }
+
+  private justifyResourceAllocation(concept: string, context: any): string {
+    return "Resource allocation justified by strategic value, market opportunity, and alignment with company priorities.";
+  }
+
+  private makeStrategicRecommendation(concept: string, context: any): string {
+    const score = this.calculateAlignmentScore(concept, context);
+    if (score >= 8) return "**STRONGLY RECOMMEND** - Excellent strategic alignment with high value potential.";
+    if (score >= 6) return "**RECOMMEND** - Good strategic alignment with clear value creation.";
+    if (score >= 4) return "**CONDITIONAL** - Moderate alignment, requires additional strategic context.";
+    return "**REQUIRES ANALYSIS** - Limited strategic context available for comprehensive assessment.";
+  }
+
+  // Optimization analysis helpers
+  private identifyOptimizationOpportunities(workflow: any, constraints: any, goals: string[]): string {
+    return `**Key Opportunities:**
+- Process automation to reduce manual effort
+- Resource allocation optimization for better efficiency
+- Technology stack improvements for performance gains
+- Workflow streamlining to eliminate bottlenecks`;
+  }
+
+  private recommendOptimizations(workflow: any, constraints: any, goals: string[]): string {
+    return goals.map(goal => {
+      switch (goal) {
+        case "cost_reduction": return "- **Cost Reduction:** Automate repetitive tasks, optimize resource usage";
+        case "speed_improvement": return "- **Speed Improvement:** Parallel processing, eliminate bottlenecks";
+        case "quality_increase": return "- **Quality Increase:** Automated testing, code review processes";
+        case "risk_mitigation": return "- **Risk Mitigation:** Backup systems, monitoring, documentation";
+        default: return `- **${goal}:** Optimization strategies tailored to specific goal`;
+      }
+    }).join('\n');
+  }
+
+  private analyzeOptimizationImpact(workflow: any, constraints: any, goals: string[]): string {
+    return `**Expected Impact:**
+- 20-30% efficiency improvement through process optimization
+- 15-25% cost reduction through resource optimization
+- 40-50% faster delivery through workflow improvements
+- Reduced risk through systematic improvements`;
+  }
+
+  private createOptimizationRoadmap(workflow: any, constraints: any, goals: string[]): string {
+    return `**Implementation Phases:**
+- **Phase 1 (Weeks 1-2):** Quick wins and low-hanging fruit
+- **Phase 2 (Weeks 3-6):** Process improvements and automation
+- **Phase 3 (Weeks 7-12):** Advanced optimizations and monitoring
+- **Phase 4 (Ongoing):** Continuous improvement and refinement`;
+  }
+
+  private defineOptimizationMetrics(goals: string[]): string {
+    return `**Success Metrics:**
+- Efficiency: Measure task completion time and resource utilization
+- Quality: Track error rates and customer satisfaction
+- Cost: Monitor budget utilization and cost per outcome
+- Speed: Measure delivery time and cycle time improvements`;
+  }
+
+  // Market timing helpers
+  private analyzeMarketSignals(signals: any): string {
+    return `**Signal Analysis:**
+- **Customer Demand:** ${signals.customer_demand || 'Unknown'} - ${this.interpretSignal(signals.customer_demand)}
+- **Competitive Pressure:** ${signals.competitive_pressure || 'Unknown'} - ${this.interpretCompetitiveSignal(signals.competitive_pressure)}
+- **Technical Readiness:** ${signals.technical_readiness || 'Unknown'} - ${this.interpretTechnicalSignal(signals.technical_readiness)}
+- **Resource Availability:** ${signals.resource_availability || 'Unknown'} - ${this.interpretResourceSignal(signals.resource_availability)}`;
+  }
+
+  private calculateTimingScore(signals: any): number {
+    const signalValues = {
+      'high': 3,
+      'medium': 2,
+      'low': 1
+    };
+    
+    const demand = signalValues[signals.customer_demand as keyof typeof signalValues] || 2;
+    const competitive = signalValues[signals.competitive_pressure as keyof typeof signalValues] || 2;
+    const technical = signalValues[signals.technical_readiness as keyof typeof signalValues] || 2;
+    const resource = signalValues[signals.resource_availability as keyof typeof signalValues] || 2;
+    
+    return Math.round(((demand + competitive + technical + resource) / 12) * 10);
+  }
+
+  private makeTimingRecommendation(signals: any): string {
+    const score = this.calculateTimingScore(signals);
+    if (score >= 8) return "**OPTIMAL TIMING** - All signals indicate ideal market conditions";
+    if (score >= 6) return "**GOOD TIMING** - Favorable conditions with minor considerations";
+    if (score >= 4) return "**MODERATE TIMING** - Mixed signals, proceed with caution";
+    return "**POOR TIMING** - Consider delaying until conditions improve";
+  }
+
+  private identifyKeyTimingFactors(signals: any): string {
+    return `**Critical Factors:**
+- Market readiness and customer demand levels
+- Competitive landscape and pressure dynamics
+- Technical infrastructure and team capabilities
+- Resource availability and organizational capacity`;
+  }
+
+  private identifyTimingRisks(signals: any): string {
+    return `**Timing Risks:**
+- Market conditions may change rapidly
+- Competitive responses could alter landscape
+- Resource constraints may impact delivery
+- Technical challenges could delay launch`;
+  }
+
+  private createTimingActionPlan(idea: string, signals: any): string {
+    return `**Action Plan:**
+1. **Immediate:** Validate market signals through customer research
+2. **Short-term:** Assess competitive landscape and positioning
+3. **Medium-term:** Confirm technical readiness and resource allocation
+4. **Long-term:** Monitor market conditions and adjust timing as needed`;
+  }
+
+  private interpretSignal(level: string): string {
+    switch (level) {
+      case 'high': return 'Strong market pull, immediate opportunity';
+      case 'medium': return 'Moderate interest, good timing potential';
+      case 'low': return 'Limited demand, consider market development';
+      default: return 'Requires market research for validation';
+    }
+  }
+
+  private interpretCompetitiveSignal(level: string): string {
+    switch (level) {
+      case 'high': return 'Urgent need to respond, first-mover advantage critical';
+      case 'medium': return 'Competitive opportunity, differentiation important';
+      case 'low': return 'Market leadership opportunity, set standards';
+      default: return 'Competitive analysis needed';
+    }
+  }
+
+  private interpretTechnicalSignal(level: string): string {
+    switch (level) {
+      case 'high': return 'Technology ready, implementation feasible';
+      case 'medium': return 'Some technical challenges, manageable risk';
+      case 'low': return 'Significant technical hurdles, high risk';
+      default: return 'Technical feasibility assessment required';
+    }
+  }
+
+  private interpretResourceSignal(level: string): string {
+    switch (level) {
+      case 'high': return 'Resources available, can proceed immediately';
+      case 'medium': return 'Limited resources, prioritization needed';
+      case 'low': return 'Resource constraints, consider phased approach';
+      default: return 'Resource planning required';
     }
   }
 
   async start(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    // No console.log - it breaks MCP protocol over stdio
   }
 
   async stop(): Promise<void> {
     await this.server.close();
   }
 }
+
+// Export with both names for compatibility
+export { SimplePMAgentMCPServer as PMFocusedMCPServer };
