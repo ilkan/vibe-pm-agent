@@ -15,7 +15,7 @@ describe('FrontMatterProcessor', () => {
   describe('constructor', () => {
     it('should initialize with default configuration', () => {
       const config = processor.getConfig();
-      expect(config.generatorId).toBe('pm-agent-intent-optimizer');
+      expect(config.generatorId).toBe('vibe-pm-agent');
       expect(config.includeDescription).toBe(true);
       expect(config.timestampFormat).toBe('iso');
     });
@@ -48,7 +48,7 @@ describe('FrontMatterProcessor', () => {
       
       expect(frontMatter.inclusion).toBe('fileMatch');
       expect(frontMatter.fileMatchPattern).toBe('auth*');
-      expect(frontMatter.generatedBy).toBe('pm-agent-intent-optimizer');
+      expect(frontMatter.generatedBy).toBe('vibe-pm-agent');
       expect(frontMatter.featureName).toBe('user-authentication');
       expect(frontMatter.documentType).toBe(DocumentType.REQUIREMENTS);
       expect(frontMatter.generatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/); // ISO format
@@ -173,7 +173,7 @@ describe('FrontMatterProcessor', () => {
       const frontMatter: FrontMatter = {
         inclusion: 'fileMatch',
         fileMatchPattern: 'auth*|user*',
-        generatedBy: 'pm-agent-intent-optimizer',
+        generatedBy: 'vibe-pm-agent',
         generatedAt: '2024-01-01T00:00:00Z',
         featureName: 'user-authentication',
         documentType: DocumentType.REQUIREMENTS,
@@ -186,7 +186,7 @@ describe('FrontMatterProcessor', () => {
       expect(lines[0]).toBe('---');
       expect(lines).toContain('inclusion: fileMatch');
       expect(lines).toContain("fileMatchPattern: 'auth*|user*'");
-      expect(lines).toContain('generatedBy: pm-agent-intent-optimizer');
+      expect(lines).toContain('generatedBy: vibe-pm-agent');
       expect(lines).toContain('generatedAt: 2024-01-01T00:00:00Z');
       expect(lines).toContain('featureName: user-authentication');
       expect(lines).toContain('documentType: requirements');
@@ -198,7 +198,7 @@ describe('FrontMatterProcessor', () => {
     it('should format front-matter without optional fields', () => {
       const frontMatter: FrontMatter = {
         inclusion: 'manual',
-        generatedBy: 'pm-agent-intent-optimizer',
+        generatedBy: 'vibe-pm-agent',
         generatedAt: '2024-01-01T00:00:00Z',
         featureName: 'test-feature',
         documentType: DocumentType.ONEPAGER
@@ -229,7 +229,7 @@ describe('FrontMatterProcessor', () => {
     const validFrontMatter: FrontMatter = {
       inclusion: 'fileMatch',
       fileMatchPattern: 'auth*',
-      generatedBy: 'pm-agent-intent-optimizer',
+      generatedBy: 'vibe-pm-agent',
       generatedAt: '2024-01-01T00:00:00Z',
       featureName: 'user-authentication',
       documentType: DocumentType.REQUIREMENTS

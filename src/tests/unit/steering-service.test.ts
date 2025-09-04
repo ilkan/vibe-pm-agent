@@ -65,7 +65,7 @@ describe('SteeringService', () => {
       filename: 'test-steering-file.md',
       frontMatter: {
         inclusion: 'fileMatch',
-        generatedBy: 'pm-agent-intent-optimizer',
+        generatedBy: 'vibe-pm-agent',
         generatedAt: new Date().toISOString(),
         featureName: 'test-feature',
         documentType: DocumentType.REQUIREMENTS

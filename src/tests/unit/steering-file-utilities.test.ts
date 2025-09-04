@@ -52,7 +52,7 @@ describe('SteeringFileUtilities', () => {
       const mockContent = `---
 inclusion: fileMatch
 fileMatchPattern: 'requirements*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-01-10T10:00:00Z
 featureName: feature-a
 documentType: requirements
@@ -500,7 +500,7 @@ documentType: design
       it('should parse front-matter correctly', () => {
         const frontMatterText = `inclusion: fileMatch
 fileMatchPattern: 'requirements*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-01-10T10:00:00Z
 featureName: test-feature
 documentType: requirements
@@ -511,7 +511,7 @@ description: Test description`;
         expect(result).toMatchObject({
           inclusion: 'fileMatch',
           fileMatchPattern: 'requirements*',
-          generatedBy: 'pm-agent-intent-optimizer',
+          generatedBy: 'vibe-pm-agent',
           generatedAt: '2024-01-10T10:00:00Z',
           featureName: 'test-feature',
           documentType: 'requirements',

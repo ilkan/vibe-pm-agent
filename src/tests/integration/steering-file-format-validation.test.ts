@@ -137,7 +137,7 @@ describe('Steering File Format Validation Tests', () => {
 
         // Validate field values
         expect(['always', 'fileMatch', 'manual']).toContain(frontMatter.inclusion);
-        expect(frontMatter.generatedBy).toBe('pm-agent-intent-optimizer');
+        expect(frontMatter.generatedBy).toBe('vibe-pm-agent');
         expect(frontMatter.featureName).toBe(`validation-${testCase.expectedDocType}`);
         expect(frontMatter.documentType).toBe(testCase.expectedDocType);
 

@@ -77,7 +77,7 @@ await mcp_pm_agent_intent_optimizer_generate_requirements({
 inclusionRule: fileMatch
 fileMatchPattern: 'requirements*|spec*|*requirements*'
 documentType: requirements
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 ```
 
 #### Generated Steering File Structure
@@ -85,7 +85,7 @@ generatedBy: pm-agent-intent-optimizer
 ---
 inclusion: fileMatch
 fileMatchPattern: 'requirements*|spec*|*requirements*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-03-15T10:30:00Z
 featureName: user-authentication
 documentType: requirements
@@ -143,7 +143,7 @@ await mcp_pm_agent_intent_optimizer_generate_design_options({
 inclusionRule: fileMatch
 fileMatchPattern: 'design*|architecture*|*design*'
 documentType: design
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 ```
 
 ### generate_management_onepager
@@ -189,7 +189,7 @@ await mcp_pm_agent_intent_optimizer_generate_management_onepager({
 ```yaml
 inclusionRule: manual
 documentType: onepager
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 ```
 
 ### generate_pr_faq
@@ -234,7 +234,7 @@ await mcp_pm_agent_intent_optimizer_generate_pr_faq({
 inclusionRule: fileMatch
 fileMatchPattern: 'README*|docs/*|*readme*'
 documentType: prfaq
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 ```
 
 ### generate_task_plan
@@ -281,7 +281,7 @@ await mcp_pm_agent_intent_optimizer_generate_task_plan({
 inclusionRule: fileMatch
 fileMatchPattern: 'tasks*|todo*|implementation*'
 documentType: tasks
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 ```
 
 ## Steering File Preview

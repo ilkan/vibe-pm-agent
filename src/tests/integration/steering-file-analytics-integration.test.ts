@@ -57,7 +57,7 @@ describe('Steering File Analytics Integration', () => {
           content: `---
 inclusion: fileMatch
 fileMatchPattern: 'requirements*|spec*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-01-10T10:00:00Z
 featureName: user-authentication
 documentType: requirements
@@ -82,7 +82,7 @@ This document outlines the requirements for user authentication.
           filename: 'design-user-auth.md',
           content: `---
 inclusion: always
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-01-05T10:00:00Z
 featureName: user-authentication
 documentType: design
@@ -102,7 +102,7 @@ OAuth 2.0 with JWT tokens
           filename: 'onepager-payment-system.md',
           content: `---
 inclusion: manual
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2023-12-01T10:00:00Z
 featureName: payment-system
 documentType: onepager
@@ -125,7 +125,7 @@ This file has no front-matter and should be detected as invalid.`,
           content: `---
 inclusion: fileMatch
 fileMatchPattern: 'tasks*|implementation*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-01-12T10:00:00Z
 featureName: user-authentication
 documentType: tasks
@@ -279,7 +279,7 @@ documentType: tasks
           filename: 'recent-tasks.md',
           content: `---
 inclusion: manual
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: ${new Date().toISOString()}
 featureName: recent-feature
 documentType: tasks
@@ -492,7 +492,7 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
     
     return `---
 inclusion: ${inclusion}${fileMatchPattern ? `\nfileMatchPattern: ${fileMatchPattern}` : ''}
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: ${new Date().toISOString()}
 featureName: ${featureName}
 documentType: ${documentType}

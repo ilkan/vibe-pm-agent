@@ -869,7 +869,7 @@ Please add references to related files using the #[[file:path]] syntax.
     return {
       inclusion: safeInclusion,
       fileMatchPattern: originalFrontMatter?.fileMatchPattern,
-      generatedBy: originalFrontMatter?.generatedBy || 'pm-agent-intent-optimizer-fallback',
+      generatedBy: originalFrontMatter?.generatedBy || 'vibe-pm-agent-fallback',
       generatedAt: timestamp,
       featureName: featureName || 'unnamed-feature',
       documentType,

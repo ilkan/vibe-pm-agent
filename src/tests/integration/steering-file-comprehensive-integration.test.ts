@@ -454,7 +454,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       // Validate front-matter structure
       expect(content).toMatch(/^---\n/);
       expect(content).toMatch(/\ninclusion: fileMatch\n/);
-      expect(content).toMatch(/\ngeneratedBy: pm-agent-intent-optimizer\n/);
+      expect(content).toMatch(/\ngeneratedBy: vibe-pm-agent\n/);
       expect(content).toMatch(/\ngeneratedAt: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\n/);
       expect(content).toMatch(/\nfeatureName: compliance-test\n/);
       expect(content).toMatch(/\ndocumentType: requirements\n/);
@@ -524,7 +524,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       const frontMatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
       const frontMatter = yaml.load(frontMatterMatch![1]) as any;
 
-      expect(frontMatter.generatedBy).toBe('pm-agent-intent-optimizer');
+      expect(frontMatter.generatedBy).toBe('vibe-pm-agent');
       expect(frontMatter.featureName).toBe('metadata-test');
       expect(frontMatter.documentType).toBe(DocumentType.REQUIREMENTS);
       

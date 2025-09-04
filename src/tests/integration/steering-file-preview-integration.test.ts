@@ -122,7 +122,7 @@ This feature will improve user experience by providing better navigation.
         filename: existingFilename,
         frontMatter: {
           inclusion: 'fileMatch',
-          generatedBy: 'pm-agent-intent-optimizer',
+          generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'test-feature',
           documentType: DocumentType.REQUIREMENTS
@@ -145,7 +145,7 @@ This feature will improve user experience by providing better navigation.
         filename: 'problematic-file.md',
         frontMatter: {
           inclusion: 'fileMatch', // Missing fileMatchPattern
-          generatedBy: 'pm-agent-intent-optimizer',
+          generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'test-feature',
           documentType: DocumentType.REQUIREMENTS
@@ -180,7 +180,7 @@ This feature will improve user experience by providing better navigation.
           frontMatter: {
             inclusion: 'fileMatch',
             fileMatchPattern: 'test*',
-            generatedBy: 'pm-agent-intent-optimizer',
+            generatedBy: 'vibe-pm-agent',
             generatedAt: new Date().toISOString(),
             featureName: 'batch-test-1',
             documentType: DocumentType.REQUIREMENTS
@@ -192,7 +192,7 @@ This feature will improve user experience by providing better navigation.
           filename: 'batch-file-2.md',
           frontMatter: {
             inclusion: 'manual',
-            generatedBy: 'pm-agent-intent-optimizer',
+            generatedBy: 'vibe-pm-agent',
             generatedAt: new Date().toISOString(),
             featureName: 'batch-test-2',
             documentType: DocumentType.DESIGN
@@ -240,7 +240,7 @@ This feature will improve user experience by providing better navigation.
           filename: 'preview-file-1.md',
           frontMatter: {
             inclusion: 'always', // This should trigger the suggestion
-            generatedBy: 'pm-agent-intent-optimizer',
+            generatedBy: 'vibe-pm-agent',
             generatedAt: new Date().toISOString(),
             featureName: 'preview-test-1',
             documentType: DocumentType.REQUIREMENTS
@@ -252,7 +252,7 @@ This feature will improve user experience by providing better navigation.
           filename: 'preview-file-2.md',
           frontMatter: {
             inclusion: 'fileMatch',
-            generatedBy: 'pm-agent-intent-optimizer',
+            generatedBy: 'vibe-pm-agent',
             generatedAt: new Date().toISOString(),
             featureName: 'preview-test-2',
             documentType: DocumentType.DESIGN
@@ -288,7 +288,7 @@ This feature will improve user experience by providing better navigation.
         filename: '../invalid-path/file.md', // Invalid path
         frontMatter: {
           inclusion: 'fileMatch',
-          generatedBy: 'pm-agent-intent-optimizer',
+          generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'invalid-test',
           documentType: DocumentType.REQUIREMENTS
@@ -301,7 +301,7 @@ This feature will improve user experience by providing better navigation.
         filename: 'valid-file.md',
         frontMatter: {
           inclusion: 'fileMatch',
-          generatedBy: 'pm-agent-intent-optimizer',
+          generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'valid-test',
           documentType: DocumentType.REQUIREMENTS
@@ -407,7 +407,7 @@ This feature will improve user experience by providing better navigation.
         frontMatter: {
           inclusion: 'fileMatch',
           fileMatchPattern: 'large*',
-          generatedBy: 'pm-agent-intent-optimizer',
+          generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'large-feature',
           documentType: DocumentType.REQUIREMENTS
@@ -439,7 +439,7 @@ This feature will improve user experience by providing better navigation.
         frontMatter: {
           inclusion: 'fileMatch',
           fileMatchPattern: `test-${i}*`,
-          generatedBy: 'pm-agent-intent-optimizer',
+          generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: `batch-feature-${i}`,
           documentType: DocumentType.REQUIREMENTS

@@ -63,7 +63,7 @@ This feature implements user authentication with OAuth2 support for secure login
       expect(result.frontMatter.inclusion).toBe('fileMatch');
       expect(result.frontMatter.fileMatchPattern).toBe('auth*|user*');
       expect(result.frontMatter.featureName).toBe('user-authentication');
-      expect(result.frontMatter.generatedBy).toBe('pm-agent-intent-optimizer');
+      expect(result.frontMatter.generatedBy).toBe('vibe-pm-agent');
       expect(result.content).toContain('Requirements Guidance: user-authentication');
       expect(result.content).toContain('OAuth2 support');
       expect(result.content).toContain('EARS (Easy Approach to Requirements Syntax)');
@@ -342,7 +342,7 @@ Each task includes verification steps and automated testing.
       const result = generator.generateFromRequirements('test', mockContext);
 
       expect(result.frontMatter.inclusion).toBeDefined();
-      expect(result.frontMatter.generatedBy).toBe('pm-agent-intent-optimizer');
+      expect(result.frontMatter.generatedBy).toBe('vibe-pm-agent');
       expect(result.frontMatter.generatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
       expect(result.frontMatter.featureName).toBe('user-authentication');
       expect(result.frontMatter.documentType).toBe(DocumentType.REQUIREMENTS);
