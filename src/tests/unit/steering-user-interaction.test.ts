@@ -18,7 +18,7 @@ describe('SteeringUserInteraction', () => {
       frontMatter: {
         inclusion: 'fileMatch',
         fileMatchPattern: 'requirements*|spec*',
-        generatedBy: 'pm-agent-intent-optimizer',
+        generatedBy: 'vibe-pm-agent',
         generatedAt: '2025-09-04T06:29:22.038Z',
         featureName: 'test-feature',
         documentType: DocumentType.REQUIREMENTS,

@@ -45,14 +45,14 @@ describe('Steering File Models', () => {
     it('should create valid front matter with required fields', () => {
       const frontMatter: FrontMatter = {
         inclusion: 'always',
-        generatedBy: 'pm-agent-intent-optimizer',
+        generatedBy: 'vibe-pm-agent',
         generatedAt: '2024-01-01T00:00:00.000Z',
         featureName: 'test-feature',
         documentType: DocumentType.REQUIREMENTS
       };
 
       expect(frontMatter.inclusion).toBe('always');
-      expect(frontMatter.generatedBy).toBe('pm-agent-intent-optimizer');
+      expect(frontMatter.generatedBy).toBe('vibe-pm-agent');
       expect(frontMatter.generatedAt).toBe('2024-01-01T00:00:00.000Z');
       expect(frontMatter.featureName).toBe('test-feature');
       expect(frontMatter.documentType).toBe(DocumentType.REQUIREMENTS);
@@ -62,7 +62,7 @@ describe('Steering File Models', () => {
       const frontMatter: FrontMatter = {
         inclusion: 'fileMatch',
         fileMatchPattern: '*.md',
-        generatedBy: 'pm-agent-intent-optimizer',
+        generatedBy: 'vibe-pm-agent',
         generatedAt: '2024-01-01T00:00:00.000Z',
         featureName: 'test-feature',
         documentType: DocumentType.DESIGN,
@@ -108,7 +108,7 @@ describe('Steering File Models', () => {
     it('should create complete steering file object', () => {
       const frontMatter: FrontMatter = {
         inclusion: 'always',
-        generatedBy: 'pm-agent-intent-optimizer',
+        generatedBy: 'vibe-pm-agent',
         generatedAt: '2024-01-01T00:00:00.000Z',
         featureName: 'test-feature',
         documentType: DocumentType.REQUIREMENTS

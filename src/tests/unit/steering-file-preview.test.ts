@@ -28,7 +28,7 @@ describe('SteeringFilePreview', () => {
     frontMatter: {
       inclusion: 'fileMatch',
       fileMatchPattern: 'requirements*',
-      generatedBy: 'pm-agent-intent-optimizer',
+      generatedBy: 'vibe-pm-agent',
       generatedAt: '2024-01-01T00:00:00.000Z',
       featureName: 'test-feature',
       documentType: DocumentType.REQUIREMENTS,

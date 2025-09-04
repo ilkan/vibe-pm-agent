@@ -183,7 +183,7 @@ fileMatchPattern: 'auth*|user*|login*|security*'
 ```markdown
 ---
 inclusion: always
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-03-15T10:00:00Z
 documentType: standards
 ---
@@ -216,7 +216,7 @@ These standards apply to all development work and should be followed consistentl
 ---
 inclusion: fileMatch
 fileMatchPattern: 'src/api/*|tests/api/*|docs/api/*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-03-15T10:00:00Z
 documentType: implementation
 ---
@@ -248,7 +248,7 @@ This guidance applies when working on API-related code and documentation.
 ```markdown
 ---
 inclusion: manual
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-03-15T10:00:00Z
 documentType: executive
 ---
@@ -590,7 +590,7 @@ Use OAuth 2.0 for user authentication.
 ---
 inclusion: fileMatch
 fileMatchPattern: '{{FEATURE_NAME}}*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: {{TIMESTAMP}}
 featureName: {{FEATURE_NAME}}
 ---

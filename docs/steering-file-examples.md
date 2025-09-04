@@ -26,7 +26,7 @@ User authentication system with OAuth integration and role-based access control.
 ---
 inclusion: fileMatch
 fileMatchPattern: 'auth*|user*|login*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-03-15T10:30:00Z
 featureName: user-authentication
 documentType: requirements
@@ -99,7 +99,7 @@ Full identity management platform with SSO.
 ---
 inclusion: fileMatch
 fileMatchPattern: 'design*|architecture*|auth*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-03-15T10:45:00Z
 featureName: user-authentication
 documentType: design
@@ -193,7 +193,7 @@ Best ROI with manageable risk and timeline.
 ```markdown
 ---
 inclusion: manual
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-03-15T11:00:00Z
 featureName: user-authentication
 documentType: onepager
@@ -301,7 +301,7 @@ A: OAuth provides better security and user experience while reducing password ma
 ---
 inclusion: fileMatch
 fileMatchPattern: 'README*|docs/*|product*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-03-15T11:15:00Z
 featureName: user-authentication
 documentType: prfaq
@@ -450,7 +450,7 @@ A: We maintain 99.9% uptime with automatic failover to backup authentication met
 ---
 inclusion: fileMatch
 fileMatchPattern: 'tasks*|todo*|implementation*|auth*'
-generatedBy: pm-agent-intent-optimizer
+generatedBy: vibe-pm-agent
 generatedAt: 2024-03-15T11:30:00Z
 featureName: user-authentication
 documentType: tasks

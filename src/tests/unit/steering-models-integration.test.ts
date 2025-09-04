@@ -32,7 +32,7 @@ describe('Steering File Models Integration', () => {
       const frontMatter: FrontMatter = {
         inclusion: context.inclusionRule,
         fileMatchPattern: context.fileMatchPattern,
-        generatedBy: 'pm-agent-intent-optimizer',
+        generatedBy: 'vibe-pm-agent',
         generatedAt: new Date().toISOString(),
         featureName: context.featureName,
         documentType: DocumentType.REQUIREMENTS,
@@ -81,7 +81,7 @@ describe('Steering File Models Integration', () => {
         frontMatter: {
           inclusion: 'fileMatch',
           fileMatchPattern: 'auth*',
-          generatedBy: 'pm-agent-intent-optimizer',
+          generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'user-auth',
           documentType: DocumentType.REQUIREMENTS

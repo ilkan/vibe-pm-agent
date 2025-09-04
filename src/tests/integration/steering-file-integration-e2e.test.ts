@@ -330,7 +330,7 @@ describe('Steering File Integration End-to-End Tests', () => {
         // Validate front-matter structure
         expect(content).toMatch(/^---\n/);
         expect(content).toMatch(/\ninclusion: manual\n/);
-        expect(content).toMatch(/\ngeneratedBy: pm-agent-intent-optimizer\n/);
+        expect(content).toMatch(/\ngeneratedBy: vibe-pm-agent\n/);
         expect(content).toMatch(/\ngeneratedAt: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\n/);
         expect(content).toMatch(new RegExp(`\\nfeatureName: format-test-${testCase.type}\\n`));
         expect(content).toMatch(new RegExp(`\\ndocumentType: ${testCase.expectedDocType}\\n`));
