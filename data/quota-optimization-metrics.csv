@@ -1,0 +1,7 @@
+scenario,quota_reduction_percent,implementation_effort,risk_level,estimated_cost_usd,provenance_citation_id
+Conservative,25,Low,Low,5000,1
+Balanced,50,Medium,Medium,12000,1
+Bold,70,High,High,25000,1
+Naive_Baseline,0,None,None,20000,1
+Industry_Average,35,Medium,Medium,15000,2
+Best_Practice,60,High,Medium,18000,2
