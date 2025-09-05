@@ -43,19 +43,27 @@ Kiro has **Spec Mode** (WHAT to build) and **Vibe Mode** (HOW to build), but lac
 - **Stakeholder Communication**: Executive one-pagers, PR-FAQs, board presentations
 - **Kiro Steering Integration**: PM analysis becomes persistent development context
 
-## 🛠 MCP Tools
+## 🛠 MCP Tools with Citation Integration
 
-**6 strategic PM tools** focused on "WHY to build" analysis:
+**12 strategic PM tools** with **authoritative citations** from McKinsey, Gartner, Harvard Business Review, BCG, and other respected sources:
 
-### Business Analysis
-- `analyze_business_opportunity` - Market opportunity and timing analysis
-- `generate_business_case` - Comprehensive ROI and risk assessment
-- `assess_strategic_alignment` - Company strategy and OKR alignment
+### 🆕 New PM Tools (with Citations)
+- `analyze_business_opportunity` - Market opportunity analysis with industry benchmarks
+- `generate_business_case` - ROI analysis with consulting firm validation
+- `assess_strategic_alignment` - Strategy alignment with OKR best practices
+- `validate_market_timing` - Right-time analysis with market research backing
+- `optimize_resource_allocation` - Efficiency optimization with productivity studies
+- `create_stakeholder_communication` - Executive communications with authoritative sources
 
-### Decision Support
-- `validate_market_timing` - Fast right-time validation
-- `optimize_resource_allocation` - Development efficiency recommendations
-- `create_stakeholder_communication` - Executive one-pagers and PR-FAQs
+### 🔧 Enhanced Existing Tools (now with Citations)
+- `generate_management_onepager` - Executive summaries with consulting-grade references
+- `generate_pr_faq` - Product communications with market timing validation
+- `generate_requirements` - Technical requirements with industry best practices
+- `generate_design_options` - Design decisions with strategic framework backing
+- `generate_task_plan` - Implementation plans with productivity research
+- `validate_idea_quick` - Fast validation with market intelligence
+
+### 🎯 **Core Acceptance Criteria**: Every tool includes citations from well-known, accepted resources
 
 ## 🚀 Getting Started
 
@@ -79,10 +87,13 @@ npm install && npm run build
 }
 ```
 
-### Quick Test
+### Quick Test with Citations
 ```bash
-# Validate market timing in 30 seconds
-echo '{"tool": "validate_market_timing", "input": {"feature_idea": "Build real-time analytics dashboard"}}' | node bin/mcp-server.js
+# Validate market timing with authoritative sources
+echo '{"tool": "validate_market_timing", "input": {"feature_idea": "Build real-time analytics dashboard", "citation_options": {"include_citations": true, "minimum_citations": 3}}}' | node bin/mcp-server.js
+
+# Run comprehensive citation demo
+cd demo/ai-customer-support && node test-citations.js
 ```
 
 ## 📊 Performance & ROI Analysis
