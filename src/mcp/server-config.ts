@@ -656,6 +656,318 @@ export const TOOL_SCHEMAS = {
           }
         },
         description: "Optional steering file creation options"
+      },
+      citation_options: {
+        type: "object",
+        properties: {
+          include_citations: {
+            type: "boolean",
+            description: "Whether to include citations and references",
+            default: true
+          },
+          minimum_citations: {
+            type: "number",
+            description: "Minimum number of citations required",
+            minimum: 1,
+            maximum: 20,
+            default: 5
+          },
+          minimum_confidence: {
+            type: "string",
+            enum: ["low", "medium", "high"],
+            description: "Required confidence level for citations",
+            default: "high"
+          },
+          industry_focus: {
+            type: "string",
+            description: "Industry focus for citation relevance"
+          },
+          geographic_scope: {
+            type: "string",
+            description: "Geographic scope for citations",
+            default: "global"
+          },
+          citation_style: {
+            type: "string",
+            enum: ["business", "apa", "inline"],
+            description: "Citation style for formatting",
+            default: "business"
+          },
+          include_bibliography: {
+            type: "boolean",
+            description: "Whether to include bibliography section",
+            default: true
+          },
+          max_citation_age_months: {
+            type: "number",
+            description: "Maximum age of citations in months",
+            minimum: 6,
+            maximum: 60,
+            default: 18
+          }
+        },
+        description: "Optional citation and referencing options"
+      }
+    },
+    required: ["feature_idea"]
+  } as JSONSchema,
+
+  // New PM Agent tools with citation support
+  generateBusinessCase: {
+    type: "object",
+    properties: {
+      opportunity_analysis: {
+        type: "string",
+        description: "Business opportunity analysis from analyze_business_opportunity",
+        minLength: 100
+      },
+      financial_inputs: {
+        type: "object",
+        properties: {
+          development_cost: {
+            type: "number",
+            description: "Estimated development cost in USD",
+            minimum: 0
+          },
+          operational_cost: {
+            type: "number", 
+            description: "Annual operational cost in USD",
+            minimum: 0
+          },
+          expected_revenue: {
+            type: "number",
+            description: "Expected annual revenue in USD",
+            minimum: 0
+          },
+          time_to_market: {
+            type: "number",
+            description: "Time to market in months",
+            minimum: 1,
+            maximum: 60
+          }
+        },
+        description: "Optional financial inputs for ROI analysis"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { type: "boolean" },
+          feature_name: { type: "string" },
+          inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"] }
+        },
+        description: "Optional steering file creation options"
+      },
+      citation_options: {
+        type: "object",
+        properties: {
+          include_citations: { type: "boolean", default: true },
+          minimum_citations: { type: "number", default: 5 },
+          minimum_confidence: { type: "string", enum: ["low", "medium", "high"], default: "high" },
+          citation_style: { type: "string", enum: ["business", "apa", "inline"], default: "business" },
+          include_bibliography: { type: "boolean", default: true }
+        },
+        description: "Citation and referencing options"
+      }
+    },
+    required: ["opportunity_analysis"]
+  } as JSONSchema,
+
+  createStakeholderCommunication: {
+    type: "object",
+    properties: {
+      business_case: {
+        type: "string",
+        description: "Business case analysis",
+        minLength: 100
+      },
+      communication_type: {
+        type: "string",
+        enum: ["executive_onepager", "pr_faq", "board_presentation", "team_announcement"],
+        description: "Type of communication to generate"
+      },
+      audience: {
+        type: "string",
+        enum: ["executives", "board", "engineering_team", "customers", "investors"],
+        description: "Target audience for the communication"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { type: "boolean" },
+          feature_name: { type: "string" },
+          inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"] }
+        },
+        description: "Optional steering file creation options"
+      },
+      citation_options: {
+        type: "object",
+        properties: {
+          include_citations: { type: "boolean", default: true },
+          minimum_citations: { type: "number", default: 3 },
+          minimum_confidence: { type: "string", enum: ["low", "medium", "high"], default: "high" },
+          citation_style: { type: "string", enum: ["business", "apa", "inline"], default: "business" },
+          include_bibliography: { type: "boolean", default: true }
+        },
+        description: "Citation and referencing options"
+      }
+    },
+    required: ["business_case", "communication_type", "audience"]
+  } as JSONSchema,
+
+  assessStrategicAlignment: {
+    type: "object",
+    properties: {
+      feature_concept: {
+        type: "string",
+        description: "Feature concept or business case",
+        minLength: 50
+      },
+      company_context: {
+        type: "object",
+        properties: {
+          mission: {
+            type: "string",
+            description: "Company mission statement"
+          },
+          strategic_priorities: {
+            type: "array",
+            items: { type: "string" },
+            description: "Current strategic priorities"
+          },
+          current_okrs: {
+            type: "array",
+            items: { type: "string" },
+            description: "Current OKRs"
+          },
+          competitive_position: {
+            type: "string",
+            description: "Current competitive position"
+          }
+        },
+        description: "Company context for alignment assessment"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { type: "boolean" },
+          feature_name: { type: "string" },
+          inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"] }
+        },
+        description: "Optional steering file creation options"
+      },
+      citation_options: {
+        type: "object",
+        properties: {
+          include_citations: { type: "boolean", default: true },
+          minimum_citations: { type: "number", default: 4 },
+          minimum_confidence: { type: "string", enum: ["low", "medium", "high"], default: "high" },
+          citation_style: { type: "string", enum: ["business", "apa", "inline"], default: "business" },
+          include_bibliography: { type: "boolean", default: true }
+        },
+        description: "Citation and referencing options"
+      }
+    },
+    required: ["feature_concept"]
+  } as JSONSchema,
+
+  optimizeResourceAllocation: {
+    type: "object",
+    properties: {
+      current_workflow: {
+        type: "object",
+        description: "Current development workflow or process"
+      },
+      resource_constraints: {
+        type: "object",
+        properties: {
+          budget: {
+            type: "number",
+            description: "Available budget in USD",
+            minimum: 0
+          },
+          team_size: {
+            type: "number",
+            description: "Team size",
+            minimum: 1
+          },
+          timeline: {
+            type: "string",
+            description: "Timeline constraints"
+          },
+          technical_debt: {
+            type: "string",
+            description: "Technical debt considerations"
+          }
+        },
+        description: "Resource constraints"
+      },
+      optimization_goals: {
+        type: "array",
+        items: {
+          type: "string",
+          enum: ["cost_reduction", "speed_improvement", "quality_increase", "risk_mitigation"]
+        },
+        description: "Optimization goals"
+      },
+      citation_options: {
+        type: "object",
+        properties: {
+          include_citations: { type: "boolean", default: true },
+          minimum_citations: { type: "number", default: 4 },
+          minimum_confidence: { type: "string", enum: ["low", "medium", "high"], default: "medium" },
+          citation_style: { type: "string", enum: ["business", "apa", "inline"], default: "business" },
+          include_bibliography: { type: "boolean", default: true }
+        },
+        description: "Citation and referencing options"
+      }
+    },
+    required: ["current_workflow"]
+  } as JSONSchema,
+
+  validateMarketTiming: {
+    type: "object",
+    properties: {
+      feature_idea: {
+        type: "string",
+        description: "Feature idea to validate timing for",
+        minLength: 10
+      },
+      market_signals: {
+        type: "object",
+        properties: {
+          customer_demand: {
+            type: "string",
+            enum: ["low", "medium", "high"],
+            description: "Customer demand level"
+          },
+          competitive_pressure: {
+            type: "string",
+            enum: ["low", "medium", "high"],
+            description: "Competitive pressure level"
+          },
+          technical_readiness: {
+            type: "string",
+            enum: ["low", "medium", "high"],
+            description: "Technical readiness level"
+          },
+          resource_availability: {
+            type: "string",
+            enum: ["low", "medium", "high"],
+            description: "Resource availability level"
+          }
+        },
+        description: "Market signals for timing validation"
+      },
+      citation_options: {
+        type: "object",
+        properties: {
+          include_citations: { type: "boolean", default: true },
+          minimum_citations: { type: "number", default: 3 },
+          minimum_confidence: { type: "string", enum: ["low", "medium", "high"], default: "medium" },
+          citation_style: { type: "string", enum: ["business", "apa", "inline"], default: "business" },
+          include_bibliography: { type: "boolean", default: true }
+        },
+        description: "Citation and referencing options"
       }
     },
     required: ["feature_idea"]
@@ -744,8 +1056,38 @@ export const MCP_SERVER_CONFIG: MCPServerConfig = {
     },
     {
       name: "analyze_business_opportunity",
-      description: "Analyzes business opportunity with integrated competitive landscape and market sizing analysis, providing comprehensive strategic assessment with ROI projections and risk evaluation.",
+      description: "Analyzes business opportunity with integrated competitive landscape and market sizing analysis, providing comprehensive strategic assessment with ROI projections and risk evaluation. Includes citations from authoritative sources.",
       inputSchema: TOOL_SCHEMAS.analyzeBusinessOpportunity,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "generate_business_case",
+      description: "Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment based on opportunity analysis. Includes citations from consulting firms and industry reports.",
+      inputSchema: TOOL_SCHEMAS.generateBusinessCase,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "create_stakeholder_communication",
+      description: "Generates executive one-pagers, PR-FAQs, and stakeholder presentations tailored to specific audiences. Includes authoritative citations for credibility.",
+      inputSchema: TOOL_SCHEMAS.createStakeholderCommunication,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "assess_strategic_alignment",
+      description: "Evaluates how a feature aligns with company strategy, OKRs, and long-term vision. Includes citations from strategic planning and alignment best practices.",
+      inputSchema: TOOL_SCHEMAS.assessStrategicAlignment,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "optimize_resource_allocation",
+      description: "Analyzes resource requirements and provides optimization recommendations for development efficiency. Includes citations from productivity and resource optimization studies.",
+      inputSchema: TOOL_SCHEMAS.optimizeResourceAllocation,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "validate_market_timing",
+      description: "Fast validation of whether now is the right time to build a feature based on market conditions. Includes citations from market timing and product launch studies.",
+      inputSchema: TOOL_SCHEMAS.validateMarketTiming,
       handler: async () => { throw new Error("Handler not implemented"); }
     }
   ]

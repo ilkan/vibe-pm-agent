@@ -53,6 +53,13 @@ export interface MCPToolResult {
       action: string;
       fullPath?: string;
     }>;
+    citations?: {
+      total_citations: number;
+      credibility_score: number;
+      recency_score: number;
+      diversity_score: number;
+      bibliography_included: boolean;
+    };
   };
 }
 
@@ -183,6 +190,7 @@ export interface ManagementOnePagerArgs {
     cost_bold?: number;
   };
   steering_options?: SteeringFileOptions;
+  citation_options?: CitationOptions;
 }
 
 export interface PRFAQArgs {
@@ -190,6 +198,7 @@ export interface PRFAQArgs {
   design: string;
   target_date?: string;
   steering_options?: SteeringFileOptions;
+  citation_options?: CitationOptions;
 }
 
 export interface RequirementsArgs {
@@ -204,11 +213,13 @@ export interface RequirementsArgs {
     deadlines?: string;
   };
   steering_options?: SteeringFileOptions;
+  citation_options?: CitationOptions;
 }
 
 export interface DesignOptionsArgs {
   requirements: string;
   steering_options?: SteeringFileOptions;
+  citation_options?: CitationOptions;
 }
 
 export interface TaskPlanArgs {
@@ -219,6 +230,7 @@ export interface TaskPlanArgs {
     budget_usd?: number;
   };
   steering_options?: SteeringFileOptions;
+  citation_options?: CitationOptions;
 }
 
 export interface ValidateIdeaQuickArgs {
@@ -228,6 +240,74 @@ export interface ValidateIdeaQuickArgs {
     budget_range?: 'small' | 'medium' | 'large';
     team_size?: number;
   };
+  citation_options?: CitationOptions;
+}
+
+export interface AnalyzeBusinessOpportunityArgs {
+  idea: string;
+  market_context?: {
+    industry?: string;
+    competition?: string;
+    budget_range?: 'small' | 'medium' | 'large';
+    timeline?: string;
+  };
+  steering_options?: SteeringFileOptions;
+  citation_options?: CitationOptions;
+}
+
+export interface GenerateBusinessCaseArgs {
+  opportunity_analysis: string;
+  financial_inputs?: {
+    development_cost?: number;
+    operational_cost?: number;
+    expected_revenue?: number;
+    time_to_market?: number;
+  };
+  steering_options?: SteeringFileOptions;
+  citation_options?: CitationOptions;
+}
+
+export interface CreateStakeholderCommunicationArgs {
+  business_case: string;
+  communication_type: 'executive_onepager' | 'pr_faq' | 'board_presentation' | 'team_announcement';
+  audience: 'executives' | 'board' | 'engineering_team' | 'customers' | 'investors';
+  steering_options?: SteeringFileOptions;
+  citation_options?: CitationOptions;
+}
+
+export interface AssessStrategicAlignmentArgs {
+  feature_concept: string;
+  company_context?: {
+    mission?: string;
+    strategic_priorities?: string[];
+    current_okrs?: string[];
+    competitive_position?: string;
+  };
+  steering_options?: SteeringFileOptions;
+  citation_options?: CitationOptions;
+}
+
+export interface OptimizeResourceAllocationArgs {
+  current_workflow: any;
+  resource_constraints?: {
+    budget?: number;
+    team_size?: number;
+    timeline?: string;
+    technical_debt?: string;
+  };
+  optimization_goals?: ('cost_reduction' | 'speed_improvement' | 'quality_increase' | 'risk_mitigation')[];
+  citation_options?: CitationOptions;
+}
+
+export interface ValidateMarketTimingArgs {
+  feature_idea: string;
+  market_signals?: {
+    customer_demand?: 'low' | 'medium' | 'high';
+    competitive_pressure?: 'low' | 'medium' | 'high';
+    technical_readiness?: 'low' | 'medium' | 'high';
+    resource_availability?: 'low' | 'medium' | 'high';
+  };
+  citation_options?: CitationOptions;
 }
 
 /**
@@ -289,6 +369,28 @@ export interface LogEntry {
   };
   metadata?: Record<string, any>;
   duration?: number;
+}
+
+/**
+ * Citation options for MCP tools
+ */
+export interface CitationOptions {
+  /** Whether to include citations and references */
+  include_citations?: boolean;
+  /** Minimum number of citations required */
+  minimum_citations?: number;
+  /** Required confidence level for citations */
+  minimum_confidence?: 'low' | 'medium' | 'high';
+  /** Industry focus for citation relevance */
+  industry_focus?: string;
+  /** Geographic scope for citations */
+  geographic_scope?: string;
+  /** Citation style for formatting */
+  citation_style?: 'business' | 'apa' | 'inline';
+  /** Whether to include bibliography section */
+  include_bibliography?: boolean;
+  /** Maximum age of citations in months */
+  max_citation_age_months?: number;
 }
 
 /**
