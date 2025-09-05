@@ -22,6 +22,7 @@
     "mcp:start:minimal": "node bin/mcp-server.js --no-logging --no-metrics",
     "mcp:validate": "node bin/mcp-server.js --help",
     "mcp:test": "npm run test && node bin/mcp-server.js --help",
+    "cleanup:test": "node -e \"const { cleanupAllTestArtifacts } = require('./src/tests/utils/test-cleanup.ts'); (async () => { console.log('🧹 Cleaning up test artifacts...'); const result = await cleanupAllTestArtifacts(); const total = result.filesCleanup.cleaned.length + result.dirsCleanup.cleaned.length; console.log(`✅ Cleaned up ${total} test artifacts`); })();\"",
     "prepublishOnly": "npm run build && npm run test"
   },
   "keywords": [

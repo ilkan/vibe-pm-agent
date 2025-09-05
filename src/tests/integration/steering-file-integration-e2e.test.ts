@@ -20,6 +20,7 @@ import {
   SteeringFileOptions
 } from '../../models/mcp';
 import { DocumentType } from '../../models/steering';
+import { cleanupAfterTest } from '../utils/test-cleanup';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -66,6 +67,9 @@ describe('Steering File Integration End-to-End Tests', () => {
     } catch (error) {
       // Ignore cleanup errors
     }
+    
+    // Clean up any test-generated steering files
+    await cleanupAfterTest();
   });
 
   describe('Complete PM Agent to Steering File Workflow', () => {

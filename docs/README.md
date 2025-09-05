@@ -44,6 +44,30 @@ This documentation covers the steering file integration feature of the PM Agent 
 - Configuration examples for different teams/projects
 - CI/CD and IDE integration patterns
 
+#### [Competitive Analysis & Market Sizing Guide](competitive-analysis-market-sizing-guide.md)
+**Comprehensive guide** for competitive intelligence tools:
+- Complete documentation for analyze_competitor_landscape and calculate_market_sizing
+- Usage examples and integration workflows
+- Best practices for competitive analysis and market sizing
+- Source attribution and data quality guidelines
+- Steering file integration for competitive intelligence
+
+#### [Competitive Analysis Examples](competitive-analysis-examples.md)
+**Real-world examples** and use cases:
+- SaaS platform competitive analysis examples
+- Mobile app market sizing scenarios
+- Enterprise software competitive positioning
+- Fintech and AI/ML product examples
+- Complete workflow examples and integration patterns
+
+#### [PM Workflow Integration Guide](pm-workflow-integration-guide.md)
+**Integration with existing PM processes**:
+- Product discovery and planning phase integration
+- Go-to-market planning with competitive intelligence
+- Team workflow templates and best practices
+- Integration with Jira, Confluence, and other PM tools
+- Metrics and KPIs for competitive intelligence
+
 ### 🚀 Quick Start
 
 1. **Read the [Integration Guide](steering-file-integration-guide.md)** to understand the concepts
@@ -134,6 +158,8 @@ All PM Agent MCP tools support steering file creation:
 - `generate_management_onepager` → Executive steering files
 - `generate_pr_faq` → Product clarity steering files
 - `generate_task_plan` → Implementation steering files
+- `analyze_competitor_landscape` → Competitive intelligence steering files
+- `calculate_market_sizing` → Market opportunity steering files
 
 ### 🔧 Development Tools
 - **Kiro IDE**: Native steering file support with contextual activation

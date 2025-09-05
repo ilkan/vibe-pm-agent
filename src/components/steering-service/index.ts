@@ -350,6 +350,51 @@ export class SteeringService {
   }
 
   /**
+   * Create steering file from competitive analysis document
+   */
+  async createFromCompetitiveAnalysis(
+    competitiveAnalysis: string, 
+    steeringOptions?: SteeringFileOptions
+  ): Promise<SteeringCreationResult> {
+    return this.createSteeringFileWithUserInteraction(
+      competitiveAnalysis,
+      DocumentType.COMPETITIVE_ANALYSIS,
+      steeringOptions,
+      (content, context) => this.generator.generateFromCompetitiveAnalysis(content, context)
+    );
+  }
+
+  /**
+   * Create steering file from market sizing document
+   */
+  async createFromMarketSizing(
+    marketSizing: string, 
+    steeringOptions?: SteeringFileOptions
+  ): Promise<SteeringCreationResult> {
+    return this.createSteeringFileWithUserInteraction(
+      marketSizing,
+      DocumentType.MARKET_SIZING,
+      steeringOptions,
+      (content, context) => this.generator.generateFromMarketSizing(content, context)
+    );
+  }
+
+  /**
+   * Create steering file from business opportunity document
+   */
+  async createFromBusinessOpportunity(
+    businessOpportunity: string, 
+    steeringOptions?: SteeringFileOptions
+  ): Promise<SteeringCreationResult> {
+    return this.createSteeringFileWithUserInteraction(
+      businessOpportunity,
+      DocumentType.ONEPAGER, // Use onepager type for business opportunity
+      steeringOptions,
+      (content, context) => this.generator.generateFromOnePager(content, context)
+    );
+  }
+
+  /**
    * Generate batch preview for multiple steering files
    */
   async generateBatchPreview(

@@ -177,7 +177,9 @@ documentType: {documentType}
         'design', 
         'onepager',
         'prfaq',
-        'tasks'
+        'tasks',
+        'competitive_analysis',
+        'market_sizing'
       ]);
 
       // Test that enum values are strings

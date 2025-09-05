@@ -318,7 +318,7 @@ describe('SteeringFileTemplates', () => {
     it('should return correct statistics', () => {
       const stats = templates.getTemplateStats();
       
-      expect(stats.totalTemplates).toBe(5); // All document types
+      expect(stats.totalTemplates).toBe(7); // All document types
       expect(stats.templatesByType[DocumentType.REQUIREMENTS]).toBe(true);
       expect(stats.templatesByType[DocumentType.DESIGN]).toBe(true);
       expect(stats.templatesByType[DocumentType.ONEPAGER]).toBe(true);
@@ -346,7 +346,7 @@ describe('SteeringFileTemplates', () => {
     it('should return all templates', () => {
       const allTemplates = templates.getAllTemplates();
       
-      expect(allTemplates.size).toBe(5);
+      expect(allTemplates.size).toBe(7);
       expect(allTemplates.has(DocumentType.REQUIREMENTS)).toBe(true);
       expect(allTemplates.has(DocumentType.DESIGN)).toBe(true);
       expect(allTemplates.has(DocumentType.ONEPAGER)).toBe(true);

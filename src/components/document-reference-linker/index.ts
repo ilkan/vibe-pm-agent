@@ -403,8 +403,10 @@ export class DocumentReferenceLinker {
         [DocumentType.REQUIREMENTS]: 1,
         [DocumentType.DESIGN]: 2,
         [DocumentType.TASKS]: 3,
-        [DocumentType.ONEPAGER]: 4,
-        [DocumentType.PRFAQ]: 5
+        [DocumentType.COMPETITIVE_ANALYSIS]: 4,
+        [DocumentType.MARKET_SIZING]: 5,
+        [DocumentType.ONEPAGER]: 6,
+        [DocumentType.PRFAQ]: 7
       };
       
       const priorityA = typeA ? typePriority[typeA] : 999;

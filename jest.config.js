@@ -30,5 +30,6 @@ module.exports = {
     '^@modelcontextprotocol/sdk/server/stdio.js$': '<rootDir>/src/tests/__mocks__/@modelcontextprotocol/sdk/server/stdio.js',
     '^@modelcontextprotocol/sdk/types.js$': '<rootDir>/src/tests/__mocks__/@modelcontextprotocol/sdk/types.js'
   },
-  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts']
+  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
+  globalTeardown: '<rootDir>/src/tests/global-teardown.ts'
 };

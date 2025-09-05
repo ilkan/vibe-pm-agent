@@ -27,6 +27,7 @@ export interface ManagementOnePager {
   };
   roiSnapshot: ROITable;
   rightTimeRecommendation: string; // 2-4 lines
+  competitivePositioning?: CompetitivePositioning; // Enhanced with competitive insights
 }
 
 export interface RiskMitigation {
@@ -64,6 +65,7 @@ export interface PRFAQ {
   };
   faq: FAQItem[]; // exactly the 10 required questions
   launchChecklist: ChecklistItem[];
+  competitiveDifferentiation?: CompetitiveDifferentiation; // Enhanced with competitive insights
 }
 
 export interface FAQItem {
@@ -76,6 +78,41 @@ export interface ChecklistItem {
   owner: string;
   dueDate: string;
   dependencies?: string[];
+}
+
+export interface CompetitivePositioning {
+  marketPosition: string;
+  keyDifferentiators: string[];
+  competitiveAdvantages: string[];
+  marketGaps: string[];
+  strategicRecommendations: string[];
+}
+
+export interface CompetitiveDifferentiation {
+  uniqueValueProposition: string;
+  competitorComparison: CompetitorComparison[];
+  marketDifferentiators: string[];
+  competitiveAdvantages: string[];
+}
+
+export interface CompetitiveVisualization {
+  mermaidDiagram: string;
+  exportData: CompetitiveExportData;
+  visualizationType: 'matrix' | 'positioning' | 'swot';
+}
+
+export interface CompetitiveExportData {
+  format: 'json' | 'csv' | 'markdown';
+  data: any;
+  filename: string;
+  timestamp: string;
+}
+
+export interface CompetitorComparison {
+  competitorName: string;
+  ourAdvantage: string;
+  theirWeakness: string;
+  differentiationStrategy: string;
 }
 
 export interface PMRequirements {
@@ -187,12 +224,15 @@ export interface TaskLimits {
 export class PMDocumentGenerator {
   /**
    * Generate management one-pager with answer-first Pyramid Principle structure
+   * Enhanced with competitive positioning insights
    */
   async generateManagementOnePager(
     requirements: string,
     design: string,
     tasks?: string,
-    roiInputs?: ROIInputs
+    roiInputs?: ROIInputs,
+    competitiveAnalysis?: any,
+    marketSizing?: any
   ): Promise<ManagementOnePager> {
     return PMDocumentErrorRecovery.recoverFromError(
       async () => {
@@ -212,6 +252,11 @@ export class PMDocumentGenerator {
         const options = this.generateThreeOptions(sanitizedRequirements, sanitizedDesign);
         const roiSnapshot = this.generateROISnapshot(options, roiInputs);
         const rightTimeRecommendation = this.generateTimingRecommendation(sanitizedRequirements, sanitizedDesign);
+        
+        // Generate competitive positioning if competitive analysis is available
+        const competitivePositioning = competitiveAnalysis ? 
+          this.generateCompetitivePositioning(competitiveAnalysis, marketSizing) : 
+          undefined;
 
         return {
           answer,
@@ -220,7 +265,8 @@ export class PMDocumentGenerator {
           risksAndMitigations,
           options,
           roiSnapshot,
-          rightTimeRecommendation
+          rightTimeRecommendation,
+          competitivePositioning
         };
       },
       () => PMDocumentFallbackProvider.generateFallbackManagementOnePager(requirements, design),
@@ -234,11 +280,14 @@ export class PMDocumentGenerator {
 
   /**
    * Generate Amazon-style PR-FAQ with future-dated press release
+   * Enhanced with competitive differentiation insights
    */
   async generatePRFAQ(
     requirements: string,
     design: string,
-    targetDate?: string
+    targetDate?: string,
+    competitiveAnalysis?: any,
+    marketSizing?: any
   ): Promise<PRFAQ> {
     return PMDocumentErrorRecovery.recoverFromError(
       async () => {
@@ -251,14 +300,20 @@ export class PMDocumentGenerator {
         
         const launchDate = targetDate || this.getDefaultLaunchDate();
         
-        const pressRelease = this.generatePressRelease(sanitizedRequirements, sanitizedDesign, launchDate);
-        const faq = this.generateFAQ(sanitizedRequirements, sanitizedDesign);
+        const pressRelease = this.generatePressRelease(sanitizedRequirements, sanitizedDesign, launchDate, competitiveAnalysis);
+        const faq = this.generateFAQ(sanitizedRequirements, sanitizedDesign, competitiveAnalysis);
         const launchChecklist = this.generateLaunchChecklist(sanitizedRequirements, sanitizedDesign, launchDate);
+        
+        // Generate competitive differentiation if competitive analysis is available
+        const competitiveDifferentiation = competitiveAnalysis ? 
+          this.generateCompetitiveDifferentiation(competitiveAnalysis, marketSizing) : 
+          undefined;
 
         return {
           pressRelease,
           faq,
-          launchChecklist
+          launchChecklist,
+          competitiveDifferentiation
         };
       },
       () => PMDocumentFallbackProvider.generateFallbackPRFAQ(requirements, design, targetDate),
@@ -387,6 +442,646 @@ export class PMDocumentGenerator {
     // Utility method for Pyramid Principle structuring
     // Implementation details will be added as needed in subtasks
     return content;
+  }
+
+  /**
+   * Generate competitive positioning section for management one-pager
+   */
+  protected generateCompetitivePositioning(competitiveAnalysis: any, marketSizing?: any): CompetitivePositioning {
+    const competitors = competitiveAnalysis.competitiveMatrix?.competitors || [];
+    const strategicRecommendations = competitiveAnalysis.strategicRecommendations || [];
+    const marketGaps = competitiveAnalysis.marketPositioning?.marketGaps || [];
+
+    // Extract market position from competitive analysis
+    const marketPosition = this.extractMarketPosition(competitors, marketSizing);
+    
+    // Identify key differentiators from competitive matrix
+    const keyDifferentiators = this.extractKeyDifferentiators(competitiveAnalysis);
+    
+    // Extract competitive advantages from SWOT analysis
+    const competitiveAdvantages = this.extractCompetitiveAdvantages(competitiveAnalysis);
+    
+    // Format market gaps as opportunities
+    const formattedMarketGaps = marketGaps.map((gap: any) => 
+      typeof gap === 'string' ? gap : gap.description || 'Market opportunity identified'
+    );
+    
+    // Format strategic recommendations
+    const formattedRecommendations = strategicRecommendations.slice(0, 3).map((rec: any) => 
+      typeof rec === 'string' ? rec : rec.title || rec.description || 'Strategic recommendation'
+    );
+
+    return {
+      marketPosition,
+      keyDifferentiators,
+      competitiveAdvantages,
+      marketGaps: formattedMarketGaps,
+      strategicRecommendations: formattedRecommendations
+    };
+  }
+
+  /**
+   * Generate competitive differentiation section for PR-FAQ
+   */
+  protected generateCompetitiveDifferentiation(competitiveAnalysis: any, marketSizing?: any): CompetitiveDifferentiation {
+    const competitors = competitiveAnalysis.competitiveMatrix?.competitors || [];
+    const strategicRecommendations = competitiveAnalysis.strategicRecommendations || [];
+
+    // Generate unique value proposition
+    const uniqueValueProposition = this.generateUniqueValueProposition(competitiveAnalysis, marketSizing);
+    
+    // Create competitor comparisons
+    const competitorComparison = this.generateCompetitorComparisons(competitors);
+    
+    // Extract market differentiators
+    const marketDifferentiators = this.extractMarketDifferentiators(competitiveAnalysis);
+    
+    // Extract competitive advantages
+    const competitiveAdvantages = this.extractCompetitiveAdvantages(competitiveAnalysis);
+
+    return {
+      uniqueValueProposition,
+      competitorComparison,
+      marketDifferentiators,
+      competitiveAdvantages
+    };
+  }
+
+  /**
+   * Extract market position from competitive analysis and market sizing
+   */
+  private extractMarketPosition(competitors: any[], marketSizing?: any): string {
+    if (marketSizing?.som?.value) {
+      const somValue = marketSizing.som.value;
+      const marketSize = somValue > 1000000000 ? 'large' : somValue > 100000000 ? 'medium' : 'small';
+      return `Targeting ${marketSize} market opportunity with differentiated positioning against ${competitors.length} key competitors`;
+    }
+    
+    if (competitors.length === 0) {
+      return 'First-mover advantage in emerging market with limited competition';
+    } else if (competitors.length <= 3) {
+      return 'Competitive market with opportunity for differentiation';
+    } else {
+      return 'Mature market requiring strong differentiation strategy';
+    }
+  }
+
+  /**
+   * Extract key differentiators from competitive analysis
+   */
+  private extractKeyDifferentiators(competitiveAnalysis: any): string[] {
+    const differentiators: string[] = [];
+    
+    // Extract from competitive matrix differentiation opportunities
+    const opportunities = competitiveAnalysis.competitiveMatrix?.differentiationOpportunities || [];
+    differentiators.push(...opportunities.slice(0, 2));
+    
+    // Extract from strategic recommendations
+    const recommendations = competitiveAnalysis.strategicRecommendations || [];
+    recommendations.slice(0, 2).forEach((rec: any) => {
+      if (rec.type === 'differentiation' && rec.title) {
+        differentiators.push(rec.title);
+      }
+    });
+    
+    // Default differentiators if none found
+    if (differentiators.length === 0) {
+      differentiators.push('Superior user experience and functionality');
+      differentiators.push('Competitive pricing with premium features');
+    }
+    
+    return differentiators.slice(0, 3);
+  }
+
+  /**
+   * Extract competitive advantages from analysis
+   */
+  private extractCompetitiveAdvantages(competitiveAnalysis: any): string[] {
+    const advantages: string[] = [];
+    
+    // Extract from market positioning
+    const positioning = competitiveAnalysis.marketPositioning?.recommendedPositioning || [];
+    advantages.push(...positioning.slice(0, 2));
+    
+    // Extract from SWOT analysis strengths
+    const swotAnalysis = competitiveAnalysis.swotAnalysis || [];
+    if (swotAnalysis.length > 0) {
+      const ourStrengths = swotAnalysis[0]?.strengths || [];
+      ourStrengths.slice(0, 2).forEach((strength: any) => {
+        advantages.push(strength.description || strength);
+      });
+    }
+    
+    // Default advantages if none found
+    if (advantages.length === 0) {
+      advantages.push('Technology leadership and innovation');
+      advantages.push('Strong customer focus and support');
+    }
+    
+    return advantages.slice(0, 3);
+  }
+
+  /**
+   * Generate unique value proposition
+   */
+  private generateUniqueValueProposition(competitiveAnalysis: any, marketSizing?: any): string {
+    const differentiators = this.extractKeyDifferentiators(competitiveAnalysis);
+    const advantages = this.extractCompetitiveAdvantages(competitiveAnalysis);
+    
+    if (marketSizing?.som?.value) {
+      const marketValue = (marketSizing.som.value / 1000000).toFixed(0);
+      return `Unique solution addressing ${marketValue}M market opportunity through ${differentiators[0]?.toLowerCase() || 'innovative approach'} and ${advantages[0]?.toLowerCase() || 'superior execution'}`;
+    }
+    
+    return `Differentiated solution combining ${differentiators[0]?.toLowerCase() || 'innovative features'} with ${advantages[0]?.toLowerCase() || 'competitive advantages'} to deliver superior customer value`;
+  }
+
+  /**
+   * Generate competitor comparisons
+   */
+  private generateCompetitorComparisons(competitors: any[]): CompetitorComparison[] {
+    return competitors.slice(0, 3).map((competitor: any) => {
+      const weaknesses = competitor.weaknesses || ['Limited innovation', 'High pricing'];
+      const strengths = competitor.strengths || ['Market presence'];
+      
+      return {
+        competitorName: competitor.name || 'Key Competitor',
+        ourAdvantage: this.generateOurAdvantage(weaknesses[0]),
+        theirWeakness: weaknesses[0] || 'Limited differentiation',
+        differentiationStrategy: this.generateDifferentiationStrategy(weaknesses[0], strengths[0])
+      };
+    });
+  }
+
+  /**
+   * Generate our advantage based on competitor weakness
+   */
+  private generateOurAdvantage(competitorWeakness: string): string {
+    const advantageMap: { [key: string]: string } = {
+      'high pricing': 'Competitive pricing with superior value',
+      'limited features': 'Comprehensive feature set',
+      'poor user experience': 'Intuitive and user-friendly design',
+      'slow innovation': 'Rapid innovation and feature development',
+      'limited support': 'Exceptional customer support and service',
+      'complex implementation': 'Simple and fast implementation',
+      'legacy systems': 'Modern, cloud-native architecture'
+    };
+    
+    const weakness = competitorWeakness?.toLowerCase() || '';
+    for (const [key, advantage] of Object.entries(advantageMap)) {
+      if (weakness.includes(key)) {
+        return advantage;
+      }
+    }
+    
+    return 'Superior technology and customer focus';
+  }
+
+  /**
+   * Generate differentiation strategy
+   */
+  private generateDifferentiationStrategy(weakness: string, strength: string): string {
+    return `Leverage our ${this.generateOurAdvantage(weakness).toLowerCase()} to compete against their ${strength?.toLowerCase() || 'market position'} while addressing their ${weakness?.toLowerCase() || 'limitations'}`;
+  }
+
+  /**
+   * Extract market differentiators
+   */
+  private extractMarketDifferentiators(competitiveAnalysis: any): string[] {
+    const differentiators: string[] = [];
+    
+    // Extract from competitive matrix
+    const opportunities = competitiveAnalysis.competitiveMatrix?.differentiationOpportunities || [];
+    differentiators.push(...opportunities.slice(0, 2));
+    
+    // Extract from market gaps
+    const marketGaps = competitiveAnalysis.marketPositioning?.marketGaps || [];
+    marketGaps.slice(0, 2).forEach((gap: any) => {
+      const description = typeof gap === 'string' ? gap : gap.description;
+      if (description) {
+        differentiators.push(`Address ${description.toLowerCase()}`);
+      }
+    });
+    
+    // Default differentiators
+    if (differentiators.length === 0) {
+      differentiators.push('First-to-market with innovative solution');
+      differentiators.push('Superior customer experience and support');
+    }
+    
+    return differentiators.slice(0, 3);
+  }
+
+  /**
+   * Generate competitive comparison answer for FAQ
+   */
+  private generateCompetitiveComparisonAnswer(competitiveAnalysis?: any): string {
+    if (!competitiveAnalysis) {
+      return 'Unlike manual optimization or basic automation tools, we provide consulting-grade analysis with multiple optimization strategies, comprehensive ROI analysis, and seamless AI agent integration through MCP protocol.';
+    }
+
+    const competitors = competitiveAnalysis.competitiveMatrix?.competitors || [];
+    const advantages = this.extractCompetitiveAdvantages(competitiveAnalysis);
+    const differentiators = this.extractKeyDifferentiators(competitiveAnalysis);
+
+    let answer = 'Our solution stands out from alternatives in several key ways: ';
+
+    // Add competitive advantages
+    if (advantages.length > 0) {
+      answer += `${advantages[0]}, `;
+    }
+
+    // Add key differentiators
+    if (differentiators.length > 0) {
+      answer += `${differentiators[0]?.toLowerCase()}, `;
+    }
+
+    // Add specific competitor comparisons
+    if (competitors.length > 0) {
+      const topCompetitor = competitors[0];
+      const weakness = topCompetitor.weaknesses?.[0] || 'limited capabilities';
+      answer += `and unlike ${topCompetitor.name || 'leading competitors'} which suffers from ${weakness.toLowerCase()}, `;
+    }
+
+    answer += 'we provide consulting-grade analysis with comprehensive ROI insights and seamless AI agent integration.';
+
+    return answer;
+  }
+
+  /**
+   * Generate competitive matrix visualization with Mermaid diagram
+   */
+  generateCompetitiveVisualization(
+    competitiveAnalysis: any,
+    visualizationType: 'matrix' | 'positioning' | 'swot' = 'matrix'
+  ): CompetitiveVisualization {
+    let mermaidDiagram: string;
+    let exportData: CompetitiveExportData;
+
+    switch (visualizationType) {
+      case 'matrix':
+        mermaidDiagram = this.generateCompetitiveMatrixDiagram(competitiveAnalysis);
+        exportData = this.generateCompetitiveMatrixExport(competitiveAnalysis);
+        break;
+      case 'positioning':
+        mermaidDiagram = this.generatePositioningMapDiagram(competitiveAnalysis);
+        exportData = this.generatePositioningExport(competitiveAnalysis);
+        break;
+      case 'swot':
+        mermaidDiagram = this.generateSWOTDiagram(competitiveAnalysis);
+        exportData = this.generateSWOTExport(competitiveAnalysis);
+        break;
+      default:
+        mermaidDiagram = this.generateCompetitiveMatrixDiagram(competitiveAnalysis);
+        exportData = this.generateCompetitiveMatrixExport(competitiveAnalysis);
+    }
+
+    return {
+      mermaidDiagram,
+      exportData,
+      visualizationType
+    };
+  }
+
+  /**
+   * Generate Mermaid diagram for competitive matrix
+   */
+  private generateCompetitiveMatrixDiagram(competitiveAnalysis: any): string {
+    const competitors = competitiveAnalysis.competitiveMatrix?.competitors || [];
+    const criteria = competitiveAnalysis.competitiveMatrix?.evaluationCriteria || [];
+    
+    if (competitors.length === 0) {
+      return `graph TD
+        A[No Competitive Data Available]
+        A --> B[Conduct Market Research]
+        B --> C[Identify Key Competitors]
+        C --> D[Analyze Competitive Positioning]`;
+    }
+
+    let diagram = `graph TD
+    subgraph "Competitive Matrix"
+        CM[Competitive Analysis]`;
+
+    // Add competitors
+    competitors.slice(0, 5).forEach((competitor: any, index: number) => {
+      const compId = `C${index + 1}`;
+      const marketShare = competitor.marketShare || 0;
+      const shareSize = marketShare > 30 ? 'Large' : marketShare > 15 ? 'Medium' : 'Small';
+      
+      diagram += `
+        ${compId}["${competitor.name}<br/>Market Share: ${marketShare}%<br/>Size: ${shareSize}"]`;
+      
+      // Add strengths
+      if (competitor.strengths && competitor.strengths.length > 0) {
+        const strengthId = `S${index + 1}`;
+        diagram += `
+        ${strengthId}["Strengths:<br/>${competitor.strengths.slice(0, 2).join('<br/>')}"]
+        ${compId} --> ${strengthId}`;
+      }
+      
+      // Add weaknesses
+      if (competitor.weaknesses && competitor.weaknesses.length > 0) {
+        const weaknessId = `W${index + 1}`;
+        diagram += `
+        ${weaknessId}["Weaknesses:<br/>${competitor.weaknesses.slice(0, 2).join('<br/>')}"]
+        ${compId} --> ${weaknessId}`;
+      }
+    });
+
+    // Add our solution
+    diagram += `
+        US["Our Solution<br/>Competitive Advantages"]
+        US --> ADV["${this.extractCompetitiveAdvantages(competitiveAnalysis).slice(0, 2).join('<br/>')}"]`;
+
+    diagram += `
+    end`;
+
+    return diagram;
+  }
+
+  /**
+   * Generate Mermaid diagram for market positioning
+   */
+  private generatePositioningMapDiagram(competitiveAnalysis: any): string {
+    const competitors = competitiveAnalysis.competitiveMatrix?.competitors || [];
+    const marketGaps = competitiveAnalysis.marketPositioning?.marketGaps || [];
+
+    let diagram = `graph LR
+    subgraph "Market Positioning Map"
+        subgraph "Price Axis"
+            LP[Low Price] --- HP[High Price]
+        end
+        subgraph "Features Axis"
+            BF[Basic Features] --- AF[Advanced Features]
+        end`;
+
+    // Position competitors
+    competitors.slice(0, 4).forEach((competitor: any, index: number) => {
+      const compId = `COMP${index + 1}`;
+      const pricing = competitor.pricing?.startingPrice || 50;
+      const features = competitor.keyFeatures?.length || 3;
+      
+      const pricePos = pricing > 100 ? 'High' : 'Low';
+      const featurePos = features > 5 ? 'Advanced' : 'Basic';
+      
+      diagram += `
+        ${compId}["${competitor.name}<br/>${pricePos} Price<br/>${featurePos} Features"]`;
+    });
+
+    // Add market gaps as opportunities
+    if (marketGaps.length > 0) {
+      diagram += `
+        GAP1["Market Gap:<br/>${marketGaps[0]?.description || marketGaps[0] || 'Opportunity Identified'}"]
+        GAP1 -.-> OPP["Our Opportunity"]`;
+    }
+
+    diagram += `
+    end`;
+
+    return diagram;
+  }
+
+  /**
+   * Generate Mermaid diagram for SWOT analysis
+   */
+  private generateSWOTDiagram(competitiveAnalysis: any): string {
+    const swotAnalysis = competitiveAnalysis.swotAnalysis?.[0] || {};
+    const strengths = swotAnalysis.strengths?.slice(0, 3) || [];
+    const weaknesses = swotAnalysis.weaknesses?.slice(0, 3) || [];
+    const opportunities = swotAnalysis.opportunities?.slice(0, 3) || [];
+    const threats = swotAnalysis.threats?.slice(0, 3) || [];
+
+    let diagram = `graph TD
+    subgraph "SWOT Analysis"
+        subgraph "Internal Factors"
+            S[Strengths]
+            W[Weaknesses]
+        end
+        subgraph "External Factors"
+            O[Opportunities]
+            T[Threats]
+        end`;
+
+    // Add strengths
+    strengths.forEach((strength: any, index: number) => {
+      const strengthText = typeof strength === 'string' ? strength : strength.description || 'Strength identified';
+      diagram += `
+        S${index + 1}["${strengthText}"]
+        S --> S${index + 1}`;
+    });
+
+    // Add weaknesses
+    weaknesses.forEach((weakness: any, index: number) => {
+      const weaknessText = typeof weakness === 'string' ? weakness : weakness.description || 'Weakness identified';
+      diagram += `
+        W${index + 1}["${weaknessText}"]
+        W --> W${index + 1}`;
+    });
+
+    // Add opportunities
+    opportunities.forEach((opportunity: any, index: number) => {
+      const opportunityText = typeof opportunity === 'string' ? opportunity : opportunity.description || 'Opportunity identified';
+      diagram += `
+        O${index + 1}["${opportunityText}"]
+        O --> O${index + 1}`;
+    });
+
+    // Add threats
+    threats.forEach((threat: any, index: number) => {
+      const threatText = typeof threat === 'string' ? threat : threat.description || 'Threat identified';
+      diagram += `
+        T${index + 1}["${threatText}"]
+        T --> T${index + 1}`;
+    });
+
+    diagram += `
+    end`;
+
+    return diagram;
+  }
+
+  /**
+   * Generate export data for competitive matrix
+   */
+  private generateCompetitiveMatrixExport(competitiveAnalysis: any): CompetitiveExportData {
+    const competitors = competitiveAnalysis?.competitiveMatrix?.competitors || [];
+    const rankings = competitiveAnalysis?.competitiveMatrix?.rankings || [];
+    
+    const exportData = {
+      competitiveMatrix: {
+        competitors: competitors.map((comp: any) => ({
+          name: comp.name,
+          marketShare: comp.marketShare,
+          strengths: comp.strengths,
+          weaknesses: comp.weaknesses,
+          keyFeatures: comp.keyFeatures,
+          pricing: comp.pricing
+        })),
+        rankings: rankings.map((rank: any) => ({
+          competitorName: rank.competitorName,
+          overallScore: rank.overallScore,
+          rank: rank.rank,
+          competitiveAdvantage: rank.competitiveAdvantage
+        })),
+        differentiationOpportunities: competitiveAnalysis?.competitiveMatrix?.differentiationOpportunities || []
+      },
+      generatedAt: new Date().toISOString(),
+      analysisType: 'competitive_matrix'
+    };
+
+    return {
+      format: 'json',
+      data: exportData,
+      filename: `competitive-matrix-${new Date().toISOString().split('T')[0]}.json`,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Generate export data for positioning map
+   */
+  private generatePositioningExport(competitiveAnalysis: any): CompetitiveExportData {
+    const positioning = competitiveAnalysis?.marketPositioning || {};
+    
+    const exportData = {
+      marketPositioning: {
+        positioningMap: positioning.positioningMap || {},
+        competitorPositions: positioning.competitorPositions || [],
+        marketGaps: positioning.marketGaps || [],
+        recommendedPositioning: positioning.recommendedPositioning || []
+      },
+      generatedAt: new Date().toISOString(),
+      analysisType: 'market_positioning'
+    };
+
+    return {
+      format: 'json',
+      data: exportData,
+      filename: `market-positioning-${new Date().toISOString().split('T')[0]}.json`,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Generate export data for SWOT analysis
+   */
+  private generateSWOTExport(competitiveAnalysis: any): CompetitiveExportData {
+    const swotAnalysis = competitiveAnalysis?.swotAnalysis || [];
+    
+    const exportData = {
+      swotAnalysis: swotAnalysis.map((swot: any) => ({
+        competitorName: swot.competitorName,
+        strengths: swot.strengths || [],
+        weaknesses: swot.weaknesses || [],
+        opportunities: swot.opportunities || [],
+        threats: swot.threats || [],
+        strategicImplications: swot.strategicImplications || []
+      })),
+      generatedAt: new Date().toISOString(),
+      analysisType: 'swot_analysis'
+    };
+
+    return {
+      format: 'json',
+      data: exportData,
+      filename: `swot-analysis-${new Date().toISOString().split('T')[0]}.json`,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Export competitive analysis data in multiple formats
+   */
+  exportCompetitiveData(
+    competitiveAnalysis: any,
+    format: 'json' | 'csv' | 'markdown' = 'json'
+  ): CompetitiveExportData {
+    const competitors = competitiveAnalysis?.competitiveMatrix?.competitors || [];
+    
+    switch (format) {
+      case 'csv':
+        return this.generateCSVExport(competitors);
+      case 'markdown':
+        return this.generateMarkdownExport(competitiveAnalysis);
+      default:
+        return this.generateCompetitiveMatrixExport(competitiveAnalysis);
+    }
+  }
+
+  /**
+   * Generate CSV export for competitive data
+   */
+  private generateCSVExport(competitors: any[]): CompetitiveExportData {
+    const headers = ['Name', 'Market Share', 'Strengths', 'Weaknesses', 'Key Features'];
+    const rows = competitors.map(comp => [
+      comp.name || '',
+      comp.marketShare || 0,
+      (comp.strengths || []).join('; '),
+      (comp.weaknesses || []).join('; '),
+      (comp.keyFeatures || []).join('; ')
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    return {
+      format: 'csv',
+      data: csvContent,
+      filename: `competitive-analysis-${new Date().toISOString().split('T')[0]}.csv`,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Generate Markdown export for competitive analysis
+   */
+  private generateMarkdownExport(competitiveAnalysis: any): CompetitiveExportData {
+    const competitors = competitiveAnalysis?.competitiveMatrix?.competitors || [];
+    const strategicRecommendations = competitiveAnalysis?.strategicRecommendations || [];
+    
+    let markdown = `# Competitive Analysis Report
+
+Generated on: ${new Date().toLocaleDateString()}
+
+## Executive Summary
+
+This report provides a comprehensive analysis of the competitive landscape, including competitor profiles, market positioning, and strategic recommendations.
+
+## Competitive Matrix
+
+| Competitor | Market Share | Key Strengths | Key Weaknesses |
+|------------|--------------|---------------|----------------|
+`;
+
+    competitors.forEach((comp: any) => {
+      const strengths = (comp.strengths || []).slice(0, 2).join(', ');
+      const weaknesses = (comp.weaknesses || []).slice(0, 2).join(', ');
+      markdown += `| ${comp.name || 'Unknown'} | ${comp.marketShare || 0}% | ${strengths} | ${weaknesses} |\n`;
+    });
+
+    markdown += `\n## Strategic Recommendations\n\n`;
+    
+    strategicRecommendations.slice(0, 5).forEach((rec: any, index: number) => {
+      const title = typeof rec === 'string' ? rec : rec.title || rec.description || 'Strategic recommendation';
+      markdown += `${index + 1}. ${title}\n`;
+    });
+
+    markdown += `\n## Market Gaps and Opportunities\n\n`;
+    
+    const marketGaps = competitiveAnalysis?.marketPositioning?.marketGaps || [];
+    marketGaps.slice(0, 3).forEach((gap: any, index: number) => {
+      const description = typeof gap === 'string' ? gap : gap.description || 'Market opportunity identified';
+      markdown += `- ${description}\n`;
+    });
+
+    return {
+      format: 'markdown',
+      data: markdown,
+      filename: `competitive-analysis-${new Date().toISOString().split('T')[0]}.md`,
+      timestamp: new Date().toISOString()
+    };
   }
 
 
@@ -819,16 +1514,17 @@ export class PMDocumentGenerator {
 
   /**
    * Generate future-dated press release with headline, sub-headline, and body
+   * Enhanced with competitive positioning
    */
-  protected generatePressRelease(requirements: string, design: string, launchDate: string): {
+  protected generatePressRelease(requirements: string, design: string, launchDate: string, competitiveAnalysis?: any): {
     date: string;
     headline: string;
     subHeadline: string;
     body: string;
   } {
-    const headline = this.generatePressReleaseHeadline(requirements);
-    const subHeadline = this.generatePressReleaseSubHeadline(requirements, design);
-    const body = this.generatePressReleaseBody(requirements, design);
+    const headline = this.generatePressReleaseHeadline(requirements, competitiveAnalysis);
+    const subHeadline = this.generatePressReleaseSubHeadline(requirements, design, competitiveAnalysis);
+    const body = this.generatePressReleaseBody(requirements, design, competitiveAnalysis);
 
     return {
       date: launchDate,
@@ -840,23 +1536,33 @@ export class PMDocumentGenerator {
 
   /**
    * Generate compelling headline for press release
+   * Enhanced with competitive differentiation
    */
-  protected generatePressReleaseHeadline(requirements: string): string {
+  protected generatePressReleaseHeadline(requirements: string, competitiveAnalysis?: any): string {
+    // Extract competitive advantage for headline
+    const competitiveAdvantage = competitiveAnalysis ? 
+      this.extractCompetitiveAdvantages(competitiveAnalysis)[0] : null;
+    
     if (requirements.toLowerCase().includes('quota') && requirements.toLowerCase().includes('optimization')) {
-      return 'Revolutionary AI Agent Reduces Developer Workflow Costs by 60% While Preserving Full Functionality';
+      const advantage = competitiveAdvantage ? ` with ${competitiveAdvantage}` : '';
+      return `Revolutionary AI Agent Reduces Developer Workflow Costs by 60%${advantage}`;
     } else if (requirements.toLowerCase().includes('intent') && requirements.toLowerCase().includes('spec')) {
-      return 'Breakthrough PM Agent Transforms Natural Language Intent into Optimized Kiro Specifications';
+      const advantage = competitiveAdvantage ? ` Through ${competitiveAdvantage}` : '';
+      return `Breakthrough PM Agent Transforms Natural Language Intent${advantage}`;
     } else if (requirements.toLowerCase().includes('consulting') && requirements.toLowerCase().includes('analysis')) {
-      return 'AI-Powered Consulting Platform Delivers Professional-Grade Workflow Analysis in Minutes';
+      const advantage = competitiveAdvantage ? ` Featuring ${competitiveAdvantage}` : '';
+      return `AI-Powered Consulting Platform Delivers Professional-Grade Analysis${advantage}`;
     } else {
-      return 'Next-Generation PM Agent Revolutionizes Developer Workflow Optimization and Cost Management';
+      const advantage = competitiveAdvantage ? ` Leveraging ${competitiveAdvantage}` : '';
+      return `Next-Generation PM Agent Revolutionizes Developer Workflow${advantage}`;
     }
   }
 
   /**
    * Generate sub-headline that explains the key benefit
+   * Enhanced with competitive positioning
    */
-  protected generatePressReleaseSubHeadline(requirements: string, design: string): string {
+  protected generatePressReleaseSubHeadline(requirements: string, design: string, competitiveAnalysis?: any): string {
     if (requirements.toLowerCase().includes('quota') || requirements.toLowerCase().includes('cost')) {
       return 'Advanced AI system applies consulting-grade analysis to minimize quota consumption while maintaining all required functionality';
     } else if (design.toLowerCase().includes('mcp') || design.toLowerCase().includes('integration')) {
@@ -868,8 +1574,9 @@ export class PMDocumentGenerator {
 
   /**
    * Generate press release body with problem, solution, why now, customer quote, and availability
+   * Enhanced with competitive differentiation
    */
-  protected generatePressReleaseBody(requirements: string, design: string): string {
+  protected generatePressReleaseBody(requirements: string, design: string, competitiveAnalysis?: any): string {
     let body = '';
 
     // Problem statement
@@ -909,10 +1616,11 @@ export class PMDocumentGenerator {
 
   /**
    * Generate FAQ with exactly the 10 required questions and structured answers
+   * Enhanced with competitive differentiation
    */
-  protected generateFAQ(requirements: string, design: string): FAQItem[] {
+  protected generateFAQ(requirements: string, design: string, competitiveAnalysis?: any): FAQItem[] {
     const questions = this.generateRequiredFAQQuestions();
-    const answers = this.generateFAQAnswers(requirements, design);
+    const answers = this.generateFAQAnswers(requirements, design, competitiveAnalysis);
 
     return questions.map((question, index) => ({
       question,
@@ -922,8 +1630,9 @@ export class PMDocumentGenerator {
 
   /**
    * Generate answers for the 10 required FAQ questions
+   * Enhanced with competitive insights
    */
-  protected generateFAQAnswers(requirements: string, design: string): string[] {
+  protected generateFAQAnswers(requirements: string, design: string, competitiveAnalysis?: any): string[] {
     return [
       // Who is the customer?
       'Developers, engineering teams, and organizations using Kiro who want to optimize their workflow efficiency and reduce quota consumption while maintaining full functionality.',
@@ -951,7 +1660,7 @@ export class PMDocumentGenerator {
       'Real-time collaboration features, advanced workflow debugging tools, custom consulting technique development, integration with non-Kiro platforms, and enterprise-specific compliance features.',
 
       // How does this compare to alternatives?
-      'Unlike manual optimization or basic automation tools, we provide consulting-grade analysis with multiple optimization strategies, comprehensive ROI analysis, and seamless AI agent integration through MCP protocol.',
+      this.generateCompetitiveComparisonAnswer(competitiveAnalysis),
 
       // What's the estimated cost/quota footprint?
       design.toLowerCase().includes('mcp') || design.toLowerCase().includes('server')

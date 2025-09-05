@@ -25,9 +25,9 @@ describe('Steering File Models', () => {
       expect(DocumentType.TASKS).toBe('tasks');
     });
 
-    it('should have exactly 5 document types', () => {
+    it('should have exactly 7 document types', () => {
       const documentTypes = Object.values(DocumentType);
-      expect(documentTypes).toHaveLength(5);
+      expect(documentTypes).toHaveLength(7);
     });
   });
 
