@@ -1,0 +1,261 @@
+{
+  "project": "vibe-pm-agent",
+  "version": "1.0",
+  "generated": "2025-01-09",
+  "critical_path": ["TASK-001", "TASK-003", "TASK-005", "TASK-007", "TASK-009"],
+  
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "Implement MCP Server Core Infrastructure",
+      "description": "Set up the foundational MCP server with tool registration and protocol handling",
+      "dri": "Senior Backend Engineer",
+      "priority": "P0",
+      "effort_estimate": "5 days",
+      "dependencies": [],
+      "acceptance_criteria": [
+        "MCP server starts successfully and registers all 10 tools",
+        "Tool discovery endpoint returns complete tool schema",
+        "Basic health check and monitoring endpoints functional",
+        "Integration tests pass for MCP protocol compliance"
+      ],
+      "labels": ["critical-path", "infrastructure"],
+      "references": {
+        "spec_sections": ["Architecture & Interfaces"],
+        "citation_ids": ["6"]
+      }
+    },
+    
+    {
+      "id": "TASK-002", 
+      "title": "Build Intent Interpreter Component",
+      "description": "Implement natural language processing for developer intent parsing",
+      "dri": "ML Engineer",
+      "priority": "P0",
+      "effort_estimate": "8 days",
+      "dependencies": ["TASK-001"],
+      "acceptance_criteria": [
+        "Parse unstructured developer intent into structured ParsedIntent objects",
+        "Extract business objectives with 85%+ accuracy on test dataset",
+        "Identify technical requirements and categorize by complexity",
+        "Unit tests achieve 90%+ code coverage"
+      ],
+      "labels": ["ai-ml", "core-component"],
+      "references": {
+        "spec_sections": ["Requirements"],
+        "citation_ids": ["1"]
+      }
+    },
+    
+    {
+      "id": "TASK-003",
+      "title": "Implement Business Analyzer with Consulting Techniques",
+      "description": "Build the core business analysis engine with MECE, Pyramid Principle, and Value Driver Tree",
+      "dri": "Senior Product Engineer", 
+      "priority": "P0",
+      "effort_estimate": "12 days",
+      "dependencies": ["TASK-002"],
+      "acceptance_criteria": [
+        "Select 2-3 most relevant consulting techniques based on intent analysis",
+        "Apply MECE framework to categorize quota drivers with no overlaps",
+        "Generate Value Driver Tree with quantified impact analysis",
+        "Produce Conservative/Balanced/Bold optimization options",
+        "Integration tests validate technique selection accuracy"
+      ],
+      "labels": ["critical-path", "business-logic", "consulting"],
+      "references": {
+        "spec_sections": ["Requirements", "Architecture & Interfaces"],
+        "citation_ids": ["2"]
+      }
+    },
+    
+    {
+      "id": "TASK-004",
+      "title": "Build Workflow Optimizer Engine", 
+      "description": "Implement optimization strategies for quota reduction including batching and caching",
+      "dri": "Performance Engineer",
+      "priority": "P0", 
+      "effort_estimate": "10 days",
+      "dependencies": ["TASK-003"],
+      "acceptance_criteria": [
+        "Identify optimization opportunities with 90%+ accuracy",
+        "Implement batching strategy reducing API calls by 40%+",
+        "Add caching layer with configurable TTL and invalidation",
+        "Break complex workflows into smaller specs automatically",
+        "Performance tests demonstrate target quota reductions"
+      ],
+      "labels": ["optimization", "performance"],
+      "references": {
+        "spec_sections": ["Requirements", "Objectives & KPIs"],
+        "citation_ids": ["1"]
+      }
+    },
+    
+    {
+      "id": "TASK-005",
+      "title": "Implement Quota Forecaster with ROI Analysis",
+      "description": "Build comprehensive quota estimation and multi-scenario ROI analysis",
+      "dri": "Data Engineer",
+      "priority": "P0",
+      "effort_estimate": "7 days", 
+      "dependencies": ["TASK-004"],
+      "acceptance_criteria": [
+        "Generate accurate quota forecasts for naive/optimized/zero-based scenarios",
+        "Calculate ROI tables with percentage savings and dollar amounts",
+        "Provide confidence intervals for all estimates",
+        "Support what-if analysis with parameter variations",
+        "Validation against historical data shows <15% error rate"
+      ],
+      "labels": ["critical-path", "analytics", "roi"],
+      "references": {
+        "spec_sections": ["Objectives & KPIs", "Data & Metrics"],
+        "citation_ids": ["1", "4"]
+      }
+    },
+    
+    {
+      "id": "TASK-006",
+      "title": "Build PM Document Generator",
+      "description": "Implement executive document generation including one-pagers and PR-FAQs",
+      "dri": "Product Engineer",
+      "priority": "P1",
+      "effort_estimate": "9 days",
+      "dependencies": ["TASK-005"],
+      "acceptance_criteria": [
+        "Generate management one-pagers under 120 lines using Pyramid Principle",
+        "Create Amazon-style PR-FAQs with press release and 20 Q&As",
+        "Apply MoSCoW prioritization to requirements generation",
+        "Produce Impact vs Effort matrices for design options",
+        "Document quality tests achieve 85%+ stakeholder approval simulation"
+      ],
+      "labels": ["pm-documents", "executive-communication"],
+      "references": {
+        "spec_sections": ["Users & Scenarios", "Requirements"],
+        "citation_ids": ["3"]
+      }
+    },
+    
+    {
+      "id": "TASK-007",
+      "title": "Implement Quick Validation Tool",
+      "description": "Build fast PASS/FAIL validation with structured next-step options",
+      "dri": "Frontend Engineer",
+      "priority": "P0",
+      "effort_estimate": "4 days",
+      "dependencies": ["TASK-003"],
+      "acceptance_criteria": [
+        "Provide PASS/FAIL verdict in <5 seconds",
+        "Generate exactly 3 structured options (A/B/C) for next steps", 
+        "Suggest specific improvements for failed validations",
+        "Recommend appropriate deep analysis tools for passed validations",
+        "User testing shows 90%+ find options actionable and clear"
+      ],
+      "labels": ["critical-path", "user-experience", "validation"],
+      "references": {
+        "spec_sections": ["Requirements"],
+        "citation_ids": ["5"]
+      }
+    },
+    
+    {
+      "id": "TASK-008",
+      "title": "Build Enhanced Spec Generator",
+      "description": "Create Kiro-compatible spec output with embedded consulting insights",
+      "dri": "Integration Engineer", 
+      "priority": "P1",
+      "effort_estimate": "6 days",
+      "dependencies": ["TASK-006"],
+      "acceptance_criteria": [
+        "Generate valid Kiro spec format with consulting metadata",
+        "Embed ROI analysis and alternative options in spec structure",
+        "Maintain backward compatibility with existing Kiro workflows",
+        "Include optimization recommendations as actionable tasks",
+        "Integration tests validate spec execution in Kiro environment"
+      ],
+      "labels": ["integration", "spec-generation"],
+      "references": {
+        "spec_sections": ["Architecture & Interfaces"],
+        "citation_ids": ["6"]
+      }
+    },
+    
+    {
+      "id": "TASK-009",
+      "title": "Implement Comprehensive Error Handling",
+      "description": "Add robust error handling, validation, and fallback strategies across all components",
+      "dri": "Senior Backend Engineer",
+      "priority": "P0", 
+      "effort_estimate": "5 days",
+      "dependencies": ["TASK-008"],
+      "acceptance_criteria": [
+        "Validate all inputs with clear error messages",
+        "Implement graceful degradation for partial failures",
+        "Add circuit breakers for external API dependencies", 
+        "Provide meaningful error responses via MCP protocol",
+        "Chaos engineering tests demonstrate system resilience"
+      ],
+      "labels": ["critical-path", "reliability", "error-handling"],
+      "references": {
+        "spec_sections": ["Risks & Mitigations"],
+        "citation_ids": ["6"]
+      }
+    },
+    
+    {
+      "id": "TASK-010",
+      "title": "Create Monitoring and Analytics Dashboard",
+      "description": "Build comprehensive monitoring for performance, usage, and quality metrics",
+      "dri": "DevOps Engineer",
+      "priority": "P1",
+      "effort_estimate": "6 days", 
+      "dependencies": ["TASK-009"],
+      "acceptance_criteria": [
+        "Track all KPIs defined in spec (quota reduction, approval rates, response times)",
+        "Monitor MCP tool usage patterns and performance",
+        "Alert on SLA violations and error rate spikes",
+        "Generate weekly quality reports for stakeholder review",
+        "Dashboard accessible to product and engineering teams"
+      ],
+      "labels": ["monitoring", "analytics", "ops"],
+      "references": {
+        "spec_sections": ["Objectives & KPIs", "Data & Metrics"],
+        "citation_ids": ["1", "2", "3"]
+      }
+    }
+  ],
+  
+  "what_if_scenarios": [
+    {
+      "id": "WHATIF-001",
+      "title": "Re-run ROI Analysis with 30% Higher Quota Costs",
+      "description": "Analyze impact if base quota costs increase by 30% due to model pricing changes",
+      "trigger": "Market pricing changes or model updates",
+      "affected_tasks": ["TASK-005"],
+      "estimated_effort": "2 days",
+      "impact_assessment": "Would increase ROI for optimization scenarios, potentially justifying Bold approach for more customers"
+    },
+    
+    {
+      "id": "WHATIF-002", 
+      "title": "Competitive Response Analysis",
+      "description": "Update competitive landscape if major player launches similar AI PM capabilities",
+      "trigger": "Competitive intelligence alerts",
+      "affected_tasks": ["TASK-003", "TASK-006"],
+      "estimated_effort": "3 days", 
+      "impact_assessment": "May require enhanced differentiation through deeper consulting techniques or faster response times"
+    }
+  ],
+  
+  "success_metrics": {
+    "delivery": {
+      "target_completion": "45 days",
+      "critical_path_buffer": "10%",
+      "quality_gates": ["Code review", "Integration testing", "Performance validation"]
+    },
+    "quality": {
+      "code_coverage": "90%+",
+      "performance_sla": "<30 seconds response time",
+      "reliability_target": "99.5% uptime"
+    }
+  }
+}

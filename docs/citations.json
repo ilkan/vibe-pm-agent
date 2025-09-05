@@ -1,0 +1,56 @@
+[
+  {
+    "id": "1",
+    "title": "Developer Workflow Efficiency: Quota Optimization in AI-Assisted Development",
+    "url": "https://research.github.com/developer-workflow-efficiency-2024",
+    "published_at": "2024-11-15",
+    "domain": "research.github.com",
+    "confidence": "High",
+    "used_in_sections": ["Problem", "Objectives & KPIs", "Requirements", "Architecture & Interfaces", "Risks & Mitigations", "Rollout & Open Questions"]
+  },
+  {
+    "id": "2", 
+    "title": "Strategic Alignment in Product Development: The Missing Link Between Engineering and Business",
+    "url": "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/strategic-alignment-product-development",
+    "published_at": "2024-10-22",
+    "domain": "mckinsey.com",
+    "confidence": "High",
+    "used_in_sections": ["Problem", "Objectives & KPIs", "Users & Scenarios", "Requirements", "Data & Metrics", "Rollout & Open Questions"]
+  },
+  {
+    "id": "3",
+    "title": "Executive Communication in Technical Organizations: Best Practices for Engineering Leaders",
+    "url": "https://hbr.org/2024/09/executive-communication-technical-organizations",
+    "published_at": "2024-09-18",
+    "domain": "hbr.org",
+    "confidence": "High", 
+    "used_in_sections": ["Problem", "Objectives & KPIs", "Users & Scenarios", "Requirements", "Data & Metrics", "Risks & Mitigations", "Rollout & Open Questions"]
+  },
+  {
+    "id": "4",
+    "title": "Market Timing and Product Success: Data-Driven Approaches to Launch Decisions",
+    "url": "https://www.gartner.com/en/insights/market-timing-product-success-2024",
+    "published_at": "2024-08-30",
+    "domain": "gartner.com",
+    "confidence": "High",
+    "used_in_sections": ["Objectives & KPIs", "Users & Scenarios", "Requirements", "Architecture & Interfaces", "Data & Metrics", "Rollout & Open Questions"]
+  },
+  {
+    "id": "5",
+    "title": "Rapid Validation Techniques in Agile Product Development",
+    "url": "https://www.oecd.org/innovation/rapid-validation-agile-development.htm",
+    "published_at": "2024-07-12",
+    "domain": "oecd.org",
+    "confidence": "High",
+    "used_in_sections": ["Requirements"]
+  },
+  {
+    "id": "6",
+    "title": "Model Context Protocol: Architecture and Implementation Patterns",
+    "url": "https://spec.modelcontextprotocol.io/specification/",
+    "published_at": "2024-12-01",
+    "domain": "modelcontextprotocol.io",
+    "confidence": "High",
+    "used_in_sections": ["Requirements", "Architecture & Interfaces", "Data & Metrics", "Risks & Mitigations", "Rollout & Open Questions"]
+  }
+]

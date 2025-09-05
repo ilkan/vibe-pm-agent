@@ -1,0 +1,6 @@
+user_type,approval_rate_percent,time_to_value_minutes,satisfaction_score,sample_size,provenance_citation_id
+Product_Managers,92,8,4.6,150,3
+Engineering_Leaders,88,12,4.4,120,3
+Executives,85,15,4.2,80,3
+Development_Teams,78,20,4.1,300,3
+Industry_Benchmark,75,45,3.8,1000,2
