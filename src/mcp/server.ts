@@ -11,6 +11,7 @@ import {
 
 import { AIAgentPipeline } from '../pipeline';
 import { SteeringService } from '../components/steering-service';
+import { CitationIntegration } from '../utils/citation-integration';
 import { 
   MCPServerConfig,
   MCPToolResult,
@@ -29,6 +30,12 @@ import {
   DesignOptionsArgs,
   TaskPlanArgs,
   ValidateIdeaQuickArgs,
+  AnalyzeBusinessOpportunityArgs,
+  GenerateBusinessCaseArgs,
+  CreateStakeholderCommunicationArgs,
+  AssessStrategicAlignmentArgs,
+  OptimizeResourceAllocationArgs,
+  ValidateMarketTimingArgs,
   LogLevel
 } from '../models/mcp';
 import { 
@@ -46,6 +53,7 @@ export class PMAgentMCPServer {
   private server: Server;
   private pipeline: AIAgentPipeline;
   private steeringService: SteeringService;
+  private citationIntegration: CitationIntegration;
   private toolRegistry: MCPToolRegistry;
   private status: MCPServerStatus;
   private startTime: number;
@@ -65,6 +73,8 @@ export class PMAgentMCPServer {
         showSummary: !isTestEnvironment // Only show summary in non-test environments
       }
     });
+    
+    this.citationIntegration = new CitationIntegration();
     
     this.toolRegistry = MCPToolRegistry.createDefault();
     this.startTime = Date.now();
@@ -199,6 +209,21 @@ export class PMAgentMCPServer {
             break;
           case 'analyze_business_opportunity':
             result = await this.handleAnalyzeBusinessOpportunity(args as unknown as EnhancedBusinessOpportunityArgs, context);
+            break;
+          case 'generate_business_case':
+            result = await this.handleGenerateBusinessCase(args as unknown as GenerateBusinessCaseArgs, context);
+            break;
+          case 'create_stakeholder_communication':
+            result = await this.handleCreateStakeholderCommunication(args as unknown as CreateStakeholderCommunicationArgs, context);
+            break;
+          case 'assess_strategic_alignment':
+            result = await this.handleAssessStrategicAlignment(args as unknown as AssessStrategicAlignmentArgs, context);
+            break;
+          case 'optimize_resource_allocation':
+            result = await this.handleOptimizeResourceAllocation(args as unknown as OptimizeResourceAllocationArgs, context);
+            break;
+          case 'validate_market_timing':
+            result = await this.handleValidateMarketTiming(args as unknown as ValidateMarketTimingArgs, context);
             break;
           default:
             throw MCPErrorHandler.createError(
@@ -481,11 +506,25 @@ export class PMAgentMCPServer {
         args.tasks, 
         args.roi_inputs
       );
+
+      // Integrate citations if requested
+      let enhancedContent = onePager.one_pager_markdown;
+      let citationMetrics;
+      if (args.citation_options?.include_citations !== false) {
+        const citationResult = await this.citationIntegration.integrateCitations(
+          'executive_onepager',
+          onePager.one_pager_markdown,
+          args.citation_options
+        );
+        enhancedContent = citationResult.enhancedContent;
+        citationMetrics = citationResult.metrics;
+      }
       
       MCPLogger.info('Management one-pager generated successfully', context, {
-        answerLength: onePager.one_pager_markdown.length,
+        answerLength: enhancedContent.length,
         optionsCount: 3,
-        risksCount: onePager.one_pager_markdown.match(/Risk:/g)?.length || 0
+        risksCount: enhancedContent.match(/Risk:/g)?.length || 0,
+        citationsIncluded: citationMetrics?.total_citations || 0
       });
 
       // Create steering file if requested
@@ -509,12 +548,19 @@ export class PMAgentMCPServer {
       }
 
       const result = MCPResponseFormatter.formatSuccess(
-        onePager.one_pager_markdown,
+        enhancedContent,
         'markdown',
         {
           executionTime: Date.now() - context.timestamp,
           quotaUsed: 2, // One-pager generation typically uses 2 quota units
-          steeringFileCreated: steeringResult?.created || false
+          steeringFileCreated: steeringResult?.created || false,
+          citations: citationMetrics ? {
+            total_citations: citationMetrics.total_citations,
+            credibility_score: citationMetrics.credibility_score,
+            recency_score: citationMetrics.recency_score,
+            diversity_score: citationMetrics.diversity_score,
+            bibliography_included: args.citation_options?.include_bibliography !== false
+          } : undefined
         }
       );
 
@@ -1177,6 +1223,428 @@ export class PMAgentMCPServer {
     }
     
     return quota;
+  }
+
+  /**
+   * Handle generate_business_case tool calls
+   */
+  async handleGenerateBusinessCase(args: GenerateBusinessCaseArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      // Validate required arguments
+      if (!args || typeof args.opportunity_analysis !== 'string') {
+        throw new Error('Validation failed: opportunity_analysis is required and must be a string');
+      }
+
+      MCPLogger.debug('Generating business case', context, { 
+        opportunityAnalysisLength: args.opportunity_analysis.length,
+        hasFinancialInputs: !!args.financial_inputs,
+        citationOptions: args.citation_options,
+        steeringOptions: args.steering_options
+      });
+      
+      const businessCase = await this.pipeline.generateBusinessCase(
+        args.opportunity_analysis,
+        args.financial_inputs
+      );
+
+      // Integrate citations if requested
+      let enhancedContent = businessCase;
+      let citationMetrics;
+      if (args.citation_options?.include_citations !== false) {
+        const citationResult = await this.citationIntegration.integrateCitations(
+          'business_case',
+          businessCase,
+          args.citation_options,
+          args.financial_inputs?.industry
+        );
+        enhancedContent = citationResult.enhancedContent;
+        citationMetrics = citationResult.metrics;
+      }
+      
+      MCPLogger.info('Business case generated successfully', context, {
+        contentLength: enhancedContent.length,
+        citationsIncluded: citationMetrics?.total_citations || 0,
+        credibilityScore: citationMetrics?.credibility_score
+      });
+
+      // Create steering file if requested
+      let steeringResult;
+      if (args.steering_options?.create_steering_files) {
+        try {
+          steeringResult = await this.steeringService.createFromBusinessCase(
+            enhancedContent, 
+            args.steering_options
+          );
+          
+          MCPLogger.info('Steering file creation attempted', context, {
+            created: steeringResult.created,
+            message: steeringResult.message
+          });
+        } catch (steeringError) {
+          MCPLogger.warn('Steering file creation failed', context, { 
+            error: steeringError instanceof Error ? steeringError.message : 'Unknown error' 
+          });
+        }
+      }
+
+      const result = MCPResponseFormatter.formatSuccess(
+        enhancedContent,
+        'markdown',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 3, // Business case generation typically uses 3 quota units
+          steeringFileCreated: steeringResult?.created || false,
+          citations: citationMetrics ? {
+            total_citations: citationMetrics.total_citations,
+            credibility_score: citationMetrics.credibility_score,
+            recency_score: citationMetrics.recency_score,
+            diversity_score: citationMetrics.diversity_score,
+            bibliography_included: args.citation_options?.include_bibliography !== false
+          } : undefined
+        }
+      );
+
+      // Add steering file information to metadata if created
+      if (steeringResult?.created) {
+        result.metadata = {
+          ...result.metadata,
+          steeringFiles: steeringResult.results.map(r => ({
+            filename: r.filename,
+            action: r.action,
+            fullPath: r.fullPath
+          }))
+        };
+      }
+
+      return result;
+    } catch (error) {
+      MCPLogger.error('generate_business_case handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle create_stakeholder_communication tool calls
+   */
+  async handleCreateStakeholderCommunication(args: CreateStakeholderCommunicationArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      // Validate required arguments
+      if (!args || typeof args.business_case !== 'string' || !args.communication_type || !args.audience) {
+        throw new Error('Validation failed: business_case, communication_type, and audience are required');
+      }
+
+      MCPLogger.debug('Creating stakeholder communication', context, { 
+        businessCaseLength: args.business_case.length,
+        communicationType: args.communication_type,
+        audience: args.audience,
+        citationOptions: args.citation_options,
+        steeringOptions: args.steering_options
+      });
+      
+      const communication = await this.pipeline.createStakeholderCommunication(
+        args.business_case,
+        args.communication_type,
+        args.audience
+      );
+
+      // Integrate citations if requested
+      let enhancedContent = communication;
+      let citationMetrics;
+      if (args.citation_options?.include_citations !== false) {
+        const citationResult = await this.citationIntegration.integrateCitations(
+          args.communication_type,
+          communication,
+          args.citation_options
+        );
+        enhancedContent = citationResult.enhancedContent;
+        citationMetrics = citationResult.metrics;
+      }
+      
+      MCPLogger.info('Stakeholder communication created successfully', context, {
+        communicationType: args.communication_type,
+        audience: args.audience,
+        contentLength: enhancedContent.length,
+        citationsIncluded: citationMetrics?.total_citations || 0
+      });
+
+      // Create steering file if requested
+      let steeringResult;
+      if (args.steering_options?.create_steering_files) {
+        try {
+          steeringResult = await this.steeringService.createFromStakeholderCommunication(
+            enhancedContent, 
+            args.steering_options
+          );
+          
+          MCPLogger.info('Steering file creation attempted', context, {
+            created: steeringResult.created,
+            message: steeringResult.message
+          });
+        } catch (steeringError) {
+          MCPLogger.warn('Steering file creation failed', context, { 
+            error: steeringError instanceof Error ? steeringError.message : 'Unknown error' 
+          });
+        }
+      }
+
+      const result = MCPResponseFormatter.formatSuccess(
+        enhancedContent,
+        'markdown',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 2, // Stakeholder communication typically uses 2 quota units
+          steeringFileCreated: steeringResult?.created || false,
+          citations: citationMetrics ? {
+            total_citations: citationMetrics.total_citations,
+            credibility_score: citationMetrics.credibility_score,
+            recency_score: citationMetrics.recency_score,
+            diversity_score: citationMetrics.diversity_score,
+            bibliography_included: args.citation_options?.include_bibliography !== false
+          } : undefined
+        }
+      );
+
+      // Add steering file information to metadata if created
+      if (steeringResult?.created) {
+        result.metadata = {
+          ...result.metadata,
+          steeringFiles: steeringResult.results.map(r => ({
+            filename: r.filename,
+            action: r.action,
+            fullPath: r.fullPath
+          }))
+        };
+      }
+
+      return result;
+    } catch (error) {
+      MCPLogger.error('create_stakeholder_communication handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle assess_strategic_alignment tool calls
+   */
+  async handleAssessStrategicAlignment(args: AssessStrategicAlignmentArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      // Validate required arguments
+      if (!args || typeof args.feature_concept !== 'string') {
+        throw new Error('Validation failed: feature_concept is required and must be a string');
+      }
+
+      MCPLogger.debug('Assessing strategic alignment', context, { 
+        featureConceptLength: args.feature_concept.length,
+        hasCompanyContext: !!args.company_context,
+        citationOptions: args.citation_options,
+        steeringOptions: args.steering_options
+      });
+      
+      const alignment = await this.pipeline.assessStrategicAlignment(
+        args.feature_concept,
+        args.company_context
+      );
+
+      // Integrate citations if requested
+      let enhancedContent = alignment;
+      let citationMetrics;
+      if (args.citation_options?.include_citations !== false) {
+        const citationResult = await this.citationIntegration.integrateCitations(
+          'strategic_alignment',
+          alignment,
+          args.citation_options
+        );
+        enhancedContent = citationResult.enhancedContent;
+        citationMetrics = citationResult.metrics;
+      }
+      
+      MCPLogger.info('Strategic alignment assessment completed', context, {
+        contentLength: enhancedContent.length,
+        citationsIncluded: citationMetrics?.total_citations || 0,
+        credibilityScore: citationMetrics?.credibility_score
+      });
+
+      // Create steering file if requested
+      let steeringResult;
+      if (args.steering_options?.create_steering_files) {
+        try {
+          steeringResult = await this.steeringService.createFromStrategicAlignment(
+            enhancedContent, 
+            args.steering_options
+          );
+          
+          MCPLogger.info('Steering file creation attempted', context, {
+            created: steeringResult.created,
+            message: steeringResult.message
+          });
+        } catch (steeringError) {
+          MCPLogger.warn('Steering file creation failed', context, { 
+            error: steeringError instanceof Error ? steeringError.message : 'Unknown error' 
+          });
+        }
+      }
+
+      const result = MCPResponseFormatter.formatSuccess(
+        enhancedContent,
+        'markdown',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 2, // Strategic alignment typically uses 2 quota units
+          steeringFileCreated: steeringResult?.created || false,
+          citations: citationMetrics ? {
+            total_citations: citationMetrics.total_citations,
+            credibility_score: citationMetrics.credibility_score,
+            recency_score: citationMetrics.recency_score,
+            diversity_score: citationMetrics.diversity_score,
+            bibliography_included: args.citation_options?.include_bibliography !== false
+          } : undefined
+        }
+      );
+
+      // Add steering file information to metadata if created
+      if (steeringResult?.created) {
+        result.metadata = {
+          ...result.metadata,
+          steeringFiles: steeringResult.results.map(r => ({
+            filename: r.filename,
+            action: r.action,
+            fullPath: r.fullPath
+          }))
+        };
+      }
+
+      return result;
+    } catch (error) {
+      MCPLogger.error('assess_strategic_alignment handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle optimize_resource_allocation tool calls
+   */
+  async handleOptimizeResourceAllocation(args: OptimizeResourceAllocationArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      // Validate required arguments
+      if (!args || !args.current_workflow) {
+        throw new Error('Validation failed: current_workflow is required');
+      }
+
+      MCPLogger.debug('Optimizing resource allocation', context, { 
+        hasResourceConstraints: !!args.resource_constraints,
+        optimizationGoals: args.optimization_goals,
+        citationOptions: args.citation_options
+      });
+      
+      const optimization = await this.pipeline.optimizeResourceAllocation(
+        args.current_workflow,
+        args.resource_constraints,
+        args.optimization_goals
+      );
+
+      // Integrate citations if requested
+      let enhancedContent = optimization;
+      let citationMetrics;
+      if (args.citation_options?.include_citations !== false) {
+        const citationResult = await this.citationIntegration.integrateCitations(
+          'resource_optimization',
+          optimization,
+          args.citation_options
+        );
+        enhancedContent = citationResult.enhancedContent;
+        citationMetrics = citationResult.metrics;
+      }
+      
+      MCPLogger.info('Resource allocation optimization completed', context, {
+        contentLength: enhancedContent.length,
+        citationsIncluded: citationMetrics?.total_citations || 0,
+        credibilityScore: citationMetrics?.credibility_score
+      });
+
+      const result = MCPResponseFormatter.formatSuccess(
+        enhancedContent,
+        'markdown',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 2, // Resource optimization typically uses 2 quota units
+          citations: citationMetrics ? {
+            total_citations: citationMetrics.total_citations,
+            credibility_score: citationMetrics.credibility_score,
+            recency_score: citationMetrics.recency_score,
+            diversity_score: citationMetrics.diversity_score,
+            bibliography_included: args.citation_options?.include_bibliography !== false
+          } : undefined
+        }
+      );
+
+      return result;
+    } catch (error) {
+      MCPLogger.error('optimize_resource_allocation handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle validate_market_timing tool calls
+   */
+  async handleValidateMarketTiming(args: ValidateMarketTimingArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      // Validate required arguments
+      if (!args || typeof args.feature_idea !== 'string') {
+        throw new Error('Validation failed: feature_idea is required and must be a string');
+      }
+
+      MCPLogger.debug('Validating market timing', context, { 
+        featureIdeaLength: args.feature_idea.length,
+        hasMarketSignals: !!args.market_signals,
+        citationOptions: args.citation_options
+      });
+      
+      const timingValidation = await this.pipeline.validateMarketTiming(
+        args.feature_idea,
+        args.market_signals
+      );
+
+      // Integrate citations if requested
+      let enhancedContent = timingValidation;
+      let citationMetrics;
+      if (args.citation_options?.include_citations !== false) {
+        const citationResult = await this.citationIntegration.integrateCitations(
+          'market_timing',
+          timingValidation,
+          args.citation_options
+        );
+        enhancedContent = citationResult.enhancedContent;
+        citationMetrics = citationResult.metrics;
+      }
+      
+      MCPLogger.info('Market timing validation completed', context, {
+        contentLength: enhancedContent.length,
+        citationsIncluded: citationMetrics?.total_citations || 0,
+        credibilityScore: citationMetrics?.credibility_score
+      });
+
+      const result = MCPResponseFormatter.formatSuccess(
+        enhancedContent,
+        'markdown',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: 1, // Market timing validation typically uses 1 quota unit
+          citations: citationMetrics ? {
+            total_citations: citationMetrics.total_citations,
+            credibility_score: citationMetrics.credibility_score,
+            recency_score: citationMetrics.recency_score,
+            diversity_score: citationMetrics.diversity_score,
+            bibliography_included: args.citation_options?.include_bibliography !== false
+          } : undefined
+        }
+      );
+
+      return result;
+    } catch (error) {
+      MCPLogger.error('validate_market_timing handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
   }
 
   /**
