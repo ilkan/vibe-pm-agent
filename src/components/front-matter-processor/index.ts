@@ -35,7 +35,9 @@ const DEFAULT_FILE_MATCH_PATTERNS: Record<DocumentType, string> = {
   [DocumentType.DESIGN]: 'design*|architecture*|*design*|*arch*',
   [DocumentType.ONEPAGER]: '', // Manual inclusion by default
   [DocumentType.PRFAQ]: '', // Manual inclusion by default
-  [DocumentType.TASKS]: 'tasks*|todo*|*tasks*|implementation*'
+  [DocumentType.TASKS]: 'tasks*|todo*|*tasks*|implementation*',
+  [DocumentType.COMPETITIVE_ANALYSIS]: 'competitive*|competitor*|market*|analysis*',
+  [DocumentType.MARKET_SIZING]: 'market*|sizing*|tam*|sam*|som*|opportunity*'
 };
 
 /**
@@ -46,7 +48,9 @@ const DEFAULT_INCLUSION_RULES: Record<DocumentType, InclusionRule> = {
   [DocumentType.DESIGN]: 'fileMatch',
   [DocumentType.ONEPAGER]: 'manual',
   [DocumentType.PRFAQ]: 'manual',
-  [DocumentType.TASKS]: 'fileMatch'
+  [DocumentType.TASKS]: 'fileMatch',
+  [DocumentType.COMPETITIVE_ANALYSIS]: 'fileMatch',
+  [DocumentType.MARKET_SIZING]: 'fileMatch'
 };
 
 /**

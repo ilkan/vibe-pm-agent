@@ -12,6 +12,7 @@ import {
   MCPToolContext,
   SteeringFileOptions
 } from '../../models/mcp';
+import { cleanupAfterTest } from '../utils/test-cleanup';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -38,6 +39,9 @@ describe('MCP Steering Integration Tests', () => {
     } catch (error) {
       // Ignore cleanup errors
     }
+    
+    // Clean up any test-generated steering files
+    await cleanupAfterTest();
   });
 
   describe('handleGenerateRequirements with steering options', () => {

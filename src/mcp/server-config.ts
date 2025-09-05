@@ -10,6 +10,11 @@ import {
   ConsultingSummaryArgs,
   ValidateIdeaQuickArgs
 } from '../models/mcp';
+import { 
+  CompetitiveAnalysisArgs, 
+  MarketSizingArgs, 
+  EnhancedBusinessOpportunityArgs 
+} from '../models/competitive';
 
 /**
  * JSON Schema definitions for MCP tool inputs
@@ -434,6 +439,226 @@ export const TOOL_SCHEMAS = {
       }
     },
     required: ["idea"]
+  } as JSONSchema,
+
+  analyzeCompetitorLandscape: {
+    type: "object",
+    properties: {
+      feature_idea: {
+        type: "string",
+        description: "Feature idea or product concept for competitive analysis",
+        minLength: 10,
+        maxLength: 2000
+      },
+      market_context: {
+        type: "object",
+        properties: {
+          industry: { 
+            type: "string",
+            description: "Industry or market sector"
+          },
+          geography: { 
+            type: "array", 
+            items: { type: "string" },
+            description: "Target geographic markets" 
+          },
+          target_segment: { 
+            type: "string",
+            description: "Target customer segment"
+          }
+        },
+        description: "Optional market context for competitive analysis"
+      },
+      analysis_depth: {
+        type: "string",
+        enum: ["quick", "standard", "comprehensive"],
+        description: "Depth of competitive analysis to perform"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { 
+            type: "boolean", 
+            description: "Whether to create steering files from generated documents" 
+          },
+          feature_name: { 
+            type: "string", 
+            description: "Feature name for organizing steering files" 
+          },
+          filename_prefix: { 
+            type: "string", 
+            description: "Custom filename prefix for steering files" 
+          },
+          inclusion_rule: { 
+            type: "string", 
+            enum: ["always", "fileMatch", "manual"],
+            description: "How the steering file should be included in context" 
+          },
+          file_match_pattern: { 
+            type: "string", 
+            description: "File match pattern when inclusion_rule is 'fileMatch'" 
+          },
+          overwrite_existing: { 
+            type: "boolean", 
+            description: "Whether to overwrite existing steering files" 
+          }
+        },
+        description: "Optional steering file creation options"
+      }
+    },
+    required: ["feature_idea"]
+  } as JSONSchema,
+
+  calculateMarketSizing: {
+    type: "object", 
+    properties: {
+      feature_idea: {
+        type: "string",
+        description: "Feature idea or product concept for market sizing analysis",
+        minLength: 10,
+        maxLength: 2000
+      },
+      market_definition: {
+        type: "object",
+        properties: {
+          industry: { 
+            type: "string",
+            description: "Industry or market sector"
+          },
+          geography: { 
+            type: "array",
+            items: { type: "string" },
+            description: "Target geographic markets"
+          },
+          customer_segments: {
+            type: "array",
+            items: { type: "string" },
+            description: "Target customer segments"
+          }
+        },
+        required: ["industry"],
+        description: "Market definition for sizing analysis"
+      },
+      sizing_methods: {
+        type: "array",
+        items: {
+          type: "string",
+          enum: ["top-down", "bottom-up", "value-theory"]
+        },
+        description: "Market sizing methodologies to apply",
+        default: ["top-down", "bottom-up"]
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { 
+            type: "boolean", 
+            description: "Whether to create steering files from generated documents" 
+          },
+          feature_name: { 
+            type: "string", 
+            description: "Feature name for organizing steering files" 
+          },
+          filename_prefix: { 
+            type: "string", 
+            description: "Custom filename prefix for steering files" 
+          },
+          inclusion_rule: { 
+            type: "string", 
+            enum: ["always", "fileMatch", "manual"],
+            description: "How the steering file should be included in context" 
+          },
+          file_match_pattern: { 
+            type: "string", 
+            description: "File match pattern when inclusion_rule is 'fileMatch'" 
+          },
+          overwrite_existing: { 
+            type: "boolean", 
+            description: "Whether to overwrite existing steering files" 
+          }
+        },
+        description: "Optional steering file creation options"
+      }
+    },
+    required: ["feature_idea", "market_definition"]
+  } as JSONSchema,
+
+  analyzeBusinessOpportunity: {
+    type: "object",
+    properties: {
+      feature_idea: {
+        type: "string",
+        description: "Feature idea or business need for opportunity analysis",
+        minLength: 10,
+        maxLength: 2000
+      },
+      market_context: {
+        type: "object",
+        properties: {
+          industry: { 
+            type: "string",
+            description: "Industry or market sector"
+          },
+          geography: { 
+            type: "array", 
+            items: { type: "string" },
+            description: "Target geographic markets" 
+          },
+          target_segment: { 
+            type: "string",
+            description: "Target customer segment"
+          }
+        },
+        description: "Optional market context for business analysis"
+      },
+      include_competitive_analysis: {
+        type: "boolean",
+        description: "Whether to include competitive landscape analysis",
+        default: true
+      },
+      include_market_sizing: {
+        type: "boolean", 
+        description: "Whether to include TAM/SAM/SOM market sizing",
+        default: true
+      },
+      analysis_depth: {
+        type: "string",
+        enum: ["quick", "standard", "comprehensive"],
+        description: "Depth of business opportunity analysis"
+      },
+      steering_options: {
+        type: "object",
+        properties: {
+          create_steering_files: { 
+            type: "boolean", 
+            description: "Whether to create steering files from generated documents" 
+          },
+          feature_name: { 
+            type: "string", 
+            description: "Feature name for organizing steering files" 
+          },
+          filename_prefix: { 
+            type: "string", 
+            description: "Custom filename prefix for steering files" 
+          },
+          inclusion_rule: { 
+            type: "string", 
+            enum: ["always", "fileMatch", "manual"],
+            description: "How the steering file should be included in context" 
+          },
+          file_match_pattern: { 
+            type: "string", 
+            description: "File match pattern when inclusion_rule is 'fileMatch'" 
+          },
+          overwrite_existing: { 
+            type: "boolean", 
+            description: "Whether to overwrite existing steering files" 
+          }
+        },
+        description: "Optional steering file creation options"
+      }
+    },
+    required: ["feature_idea"]
   } as JSONSchema
 };
 
@@ -503,6 +728,24 @@ export const MCP_SERVER_CONFIG: MCPServerConfig = {
       name: "validate_idea_quick",
       description: "Fast unit-test-like validation that provides PASS/FAIL verdict with 3 structured options for next steps. Acts like a unit test for ideas - quick feedback with clear choices.",
       inputSchema: TOOL_SCHEMAS.validateIdeaQuick,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "analyze_competitor_landscape",
+      description: "Generates comprehensive competitor analysis with competitive matrix, SWOT analysis, and strategic recommendations using credible sources like McKinsey, Gartner, and World Economic Forum reports.",
+      inputSchema: TOOL_SCHEMAS.analyzeCompetitorLandscape,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "calculate_market_sizing",
+      description: "Performs TAM/SAM/SOM market sizing analysis using multiple methodologies (top-down, bottom-up, value-theory) with confidence intervals and authoritative source attribution.",
+      inputSchema: TOOL_SCHEMAS.calculateMarketSizing,
+      handler: async () => { throw new Error("Handler not implemented"); }
+    },
+    {
+      name: "analyze_business_opportunity",
+      description: "Analyzes business opportunity with integrated competitive landscape and market sizing analysis, providing comprehensive strategic assessment with ROI projections and risk evaluation.",
+      inputSchema: TOOL_SCHEMAS.analyzeBusinessOpportunity,
       handler: async () => { throw new Error("Handler not implemented"); }
     }
   ]

@@ -737,6 +737,22 @@ ${this.createTimingActionPlan(featureIdea, marketSignals)}`;
 
   // Communication generation methods
   private generateExecutiveOnePager(businessCase: string, audience: string): string {
+    // Extract competitive insights from business case if available
+    const hasCompetitiveAnalysis = businessCase.toLowerCase().includes('competitor') || 
+                                  businessCase.toLowerCase().includes('competitive') ||
+                                  businessCase.toLowerCase().includes('market position');
+
+    let competitiveSection = '';
+    if (hasCompetitiveAnalysis) {
+      competitiveSection = `
+
+## Competitive Positioning
+- **Market Position:** Differentiated solution addressing key market gaps
+- **Competitive Advantage:** Superior technology and customer-focused approach
+- **Market Opportunity:** Significant addressable market with limited direct competition
+- **Strategic Differentiation:** Unique capabilities that competitors cannot easily replicate`;
+    }
+
     return `# Executive One-Pager
 
 ## The Ask
@@ -751,50 +767,66 @@ Market opportunity window is optimal with validated customer demand, technical r
 - **Timeline:** Phased approach with early value delivery and iterative improvement
 
 ## Strategic Value
-- **Market Position:** Strengthens competitive differentiation
+- **Market Position:** Strengthens competitive differentiation and market leadership
 - **Customer Value:** Addresses validated pain points with measurable impact
-- **Business Growth:** Enables new revenue streams and market expansion
+- **Business Growth:** Enables new revenue streams and market expansion${competitiveSection}
 
 ## Risk Mitigation
 - **Technical:** Proven technology stack with experienced team
-- **Market:** Validated demand with conservative projections
+- **Market:** Validated demand with conservative projections and competitive analysis
 - **Financial:** Phased investment with clear success metrics
 
 ## Next Steps
 1. Approve business case and resource allocation
 2. Initiate development with Kiro Spec Mode for detailed requirements
 3. Establish success metrics and monitoring systems
-4. Plan go-to-market strategy and customer communication`;
+4. Plan go-to-market strategy and competitive positioning`;
   }
 
   private generatePRFAQ(businessCase: string, audience: string): string {
+    // Extract competitive insights from business case if available
+    const hasCompetitiveAnalysis = businessCase.toLowerCase().includes('competitor') || 
+                                  businessCase.toLowerCase().includes('competitive') ||
+                                  businessCase.toLowerCase().includes('market position');
+
+    let competitiveFAQ = '';
+    if (hasCompetitiveAnalysis) {
+      competitiveFAQ = `
+
+**Q: How does this compare to competitive alternatives?**
+A: Our solution provides unique competitive advantages through superior technology, customer-focused design, and innovative features that address market gaps competitors have not filled.
+
+**Q: What is our competitive differentiation strategy?**
+A: We differentiate through advanced capabilities, better user experience, and strategic positioning that leverages our core strengths while addressing competitor weaknesses.`;
+    }
+
     return `# Press Release & FAQ
 
 ## Press Release
 
 ### Headline
-**[Company] Launches Strategic Feature: Delivering Measurable Value Through Innovation**
+**[Company] Launches Strategic Feature: Delivering Measurable Value Through Market-Leading Innovation**
 
 ### Body
-Today we announced the development of a strategic feature that addresses key customer needs while strengthening our competitive position. This initiative represents our commitment to continuous innovation and customer value creation.
+Today we announced the development of a strategic feature that addresses key customer needs while strengthening our competitive position in the market. This initiative represents our commitment to continuous innovation and customer value creation through differentiated solutions.
 
 **Customer Impact:** Direct benefits through improved efficiency and enhanced capabilities
-**Market Position:** Reinforces leadership in key market segments
-**Strategic Value:** Aligns with long-term vision and growth objectives
+**Market Position:** Reinforces leadership in key market segments with competitive differentiation
+**Strategic Value:** Aligns with long-term vision and growth objectives while addressing market opportunities
 
 ## FAQ
 
 **Q: Why is this feature important?**
-A: It addresses validated customer pain points while creating strategic competitive advantages and new revenue opportunities.
+A: It addresses validated customer pain points while creating strategic competitive advantages and new revenue opportunities in a growing market.
 
 **Q: What's the expected timeline?**
-A: Phased development approach with initial value delivery in 6 months and full feature set within 12 months.
+A: Phased development approach with initial value delivery in 6 months and full feature set within 12 months, positioning us ahead of competitive alternatives.
 
 **Q: How does this align with company strategy?**
-A: Direct alignment with strategic priorities, OKRs, and long-term vision for market leadership.
+A: Direct alignment with strategic priorities, OKRs, and long-term vision for market leadership and competitive differentiation.
 
 **Q: What are the success metrics?**
-A: Clear ROI targets, customer adoption goals, and business impact measurements as defined in the business case.`;
+A: Clear ROI targets, customer adoption goals, market share objectives, and business impact measurements as defined in the business case.${competitiveFAQ}`;
   }
 
   private generateBoardPresentation(businessCase: string, audience: string): string {

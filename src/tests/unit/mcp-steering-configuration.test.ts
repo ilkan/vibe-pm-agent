@@ -131,7 +131,7 @@ describe('MCP Steering Configuration Tests', () => {
       const registry = MCPToolRegistry.createDefault();
       const tools = registry.getAllTools();
       
-      expect(tools).toHaveLength(10);
+      expect(tools).toHaveLength(13);
       
       const pmDocumentTools = tools.filter(tool => 
         ['generate_requirements', 'generate_design_options', 'generate_management_onepager', 
@@ -347,7 +347,7 @@ describe('MCP Steering Configuration Tests', () => {
         'validate_idea_quick'
       ];
 
-      expect(MCP_SERVER_CONFIG.tools).toHaveLength(expectedTools.length);
+      expect(MCP_SERVER_CONFIG.tools).toHaveLength(13);
       
       const toolNames = MCP_SERVER_CONFIG.tools.map(tool => tool.name);
       expectedTools.forEach(expectedTool => {

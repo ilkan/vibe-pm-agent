@@ -31,6 +31,11 @@ import {
   ValidateIdeaQuickArgs,
   LogLevel
 } from '../models/mcp';
+import { 
+  CompetitiveAnalysisArgs, 
+  MarketSizingArgs, 
+  EnhancedBusinessOpportunityArgs 
+} from '../models/competitive';
 import { MCP_SERVER_CONFIG, MCPToolRegistry } from './server-config';
 import { MCPErrorHandler, MCPResponseFormatter, MCPLogger } from '../utils/mcp-error-handling';
 
@@ -185,6 +190,15 @@ export class PMAgentMCPServer {
             break;
           case 'validate_idea_quick':
             result = await this.handleValidateIdeaQuick(args as unknown as ValidateIdeaQuickArgs, context);
+            break;
+          case 'analyze_competitor_landscape':
+            result = await this.handleAnalyzeCompetitorLandscape(args as unknown as CompetitiveAnalysisArgs, context);
+            break;
+          case 'calculate_market_sizing':
+            result = await this.handleCalculateMarketSizing(args as unknown as MarketSizingArgs, context);
+            break;
+          case 'analyze_business_opportunity':
+            result = await this.handleAnalyzeBusinessOpportunity(args as unknown as EnhancedBusinessOpportunityArgs, context);
             break;
           default:
             throw MCPErrorHandler.createError(
@@ -897,6 +911,272 @@ export class PMAgentMCPServer {
     });
     
     return response;
+  }
+
+  /**
+   * Handle analyze_competitor_landscape tool calls
+   */
+  async handleAnalyzeCompetitorLandscape(args: CompetitiveAnalysisArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      // Validate required arguments
+      if (!args || typeof args.feature_idea !== 'string') {
+        throw new Error('Validation failed: feature_idea is required and must be a string');
+      }
+
+      MCPLogger.debug('Analyzing competitor landscape', context, { 
+        featureIdeaLength: args.feature_idea.length,
+        hasMarketContext: !!args.market_context,
+        analysisDepth: args.analysis_depth,
+        steeringOptions: args.steering_options
+      });
+      
+      const competitorAnalysis = await this.pipeline.analyzeCompetitorLandscape(
+        args.feature_idea,
+        args.market_context,
+        args.analysis_depth || 'standard'
+      );
+      
+      MCPLogger.info('Competitor landscape analysis completed', context, {
+        competitorsFound: competitorAnalysis.competitiveMatrix.competitors.length,
+        confidenceLevel: competitorAnalysis.confidenceLevel,
+        sourcesUsed: competitorAnalysis.sourceAttribution.length,
+        recommendationsCount: competitorAnalysis.strategicRecommendations.length
+      });
+
+      // Create steering file if requested
+      let steeringResult;
+      if (args.steering_options?.create_steering_files) {
+        try {
+          const analysisText = JSON.stringify(competitorAnalysis, null, 2);
+          steeringResult = await this.steeringService.createFromCompetitiveAnalysis(
+            analysisText, 
+            args.steering_options
+          );
+          
+          MCPLogger.info('Steering file creation attempted', context, {
+            created: steeringResult.created,
+            message: steeringResult.message
+          });
+        } catch (steeringError) {
+          MCPLogger.warn('Steering file creation failed', context, { 
+            error: steeringError instanceof Error ? steeringError.message : 'Unknown error' 
+          });
+        }
+      }
+
+      const result = MCPResponseFormatter.formatSuccess(
+        competitorAnalysis,
+        'json',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: (args.analysis_depth || 'standard') === 'comprehensive' ? 4 : (args.analysis_depth || 'standard') === 'standard' ? 3 : 2,
+          steeringFileCreated: steeringResult?.created || false
+        }
+      );
+
+      // Add steering file information to metadata if created
+      if (steeringResult?.created) {
+        result.metadata = {
+          ...result.metadata,
+          steeringFiles: steeringResult.results.map(r => ({
+            filename: r.filename,
+            action: r.action,
+            fullPath: r.fullPath
+          }))
+        };
+      }
+
+      return result;
+    } catch (error) {
+      MCPLogger.error('analyze_competitor_landscape handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle calculate_market_sizing tool calls
+   */
+  async handleCalculateMarketSizing(args: MarketSizingArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      // Validate required arguments
+      if (!args || typeof args.feature_idea !== 'string' || !args.market_definition || !args.market_definition.industry) {
+        throw new Error('Validation failed: feature_idea and market_definition with industry are required');
+      }
+
+      MCPLogger.debug('Calculating market sizing', context, { 
+        featureIdeaLength: args.feature_idea.length,
+        industry: args.market_definition.industry,
+        geographyCount: args.market_definition.geography?.length || 0,
+        customerSegmentsCount: args.market_definition.customer_segments?.length || 0,
+        sizingMethods: args.sizing_methods,
+        steeringOptions: args.steering_options
+      });
+      
+      const marketSizing = await this.pipeline.calculateMarketSizing(
+        args.feature_idea,
+        args.market_definition,
+        args.sizing_methods
+      );
+      
+      MCPLogger.info('Market sizing calculation completed', context, {
+        tamValue: marketSizing.tam.value,
+        samValue: marketSizing.sam.value,
+        somValue: marketSizing.som.value,
+        methodologiesUsed: marketSizing.methodology.length,
+        scenariosGenerated: marketSizing.scenarios.length,
+        sourcesUsed: marketSizing.sourceAttribution.length
+      });
+
+      // Create steering file if requested
+      let steeringResult;
+      if (args.steering_options?.create_steering_files) {
+        try {
+          const marketSizingText = JSON.stringify(marketSizing, null, 2);
+          steeringResult = await this.steeringService.createFromMarketSizing(
+            marketSizingText, 
+            args.steering_options
+          );
+          
+          MCPLogger.info('Steering file creation attempted', context, {
+            created: steeringResult.created,
+            message: steeringResult.message
+          });
+        } catch (steeringError) {
+          MCPLogger.warn('Steering file creation failed', context, { 
+            error: steeringError instanceof Error ? steeringError.message : 'Unknown error' 
+          });
+        }
+      }
+
+      const result = MCPResponseFormatter.formatSuccess(
+        marketSizing,
+        'json',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: args.sizing_methods.length * 2, // Each methodology uses ~2 quota units
+          steeringFileCreated: steeringResult?.created || false
+        }
+      );
+
+      // Add steering file information to metadata if created
+      if (steeringResult?.created) {
+        result.metadata = {
+          ...result.metadata,
+          steeringFiles: steeringResult.results.map(r => ({
+            filename: r.filename,
+            action: r.action,
+            fullPath: r.fullPath
+          }))
+        };
+      }
+
+      return result;
+    } catch (error) {
+      MCPLogger.error('calculate_market_sizing handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Handle analyze_business_opportunity tool calls
+   */
+  async handleAnalyzeBusinessOpportunity(args: EnhancedBusinessOpportunityArgs, context: MCPToolContext): Promise<MCPToolResult> {
+    try {
+      // Validate required arguments
+      if (!args || typeof args.feature_idea !== 'string') {
+        throw new Error('Validation failed: feature_idea is required and must be a string');
+      }
+
+      MCPLogger.debug('Analyzing enhanced business opportunity', context, { 
+        featureIdeaLength: args.feature_idea.length,
+        hasMarketContext: !!args.market_context,
+        includeCompetitive: args.include_competitive_analysis !== false,
+        includeMarketSizing: args.include_market_sizing !== false,
+        analysisDepth: args.analysis_depth,
+        steeringOptions: args.steering_options
+      });
+      
+      const businessOpportunity = await this.pipeline.analyzeEnhancedBusinessOpportunity(
+        args.feature_idea,
+        args.market_context,
+        args.include_competitive_analysis !== false,
+        args.include_market_sizing !== false,
+        args.analysis_depth || 'standard'
+      );
+      
+      MCPLogger.info('Enhanced business opportunity analysis completed', context, {
+        hasCompetitiveAnalysis: !!businessOpportunity.competitiveAnalysis,
+        hasMarketSizing: !!businessOpportunity.marketSizing,
+        strategicFitScore: businessOpportunity.strategicFit?.alignmentScore,
+        opportunityValue: businessOpportunity.marketSizing?.som?.value
+      });
+
+      // Create steering file if requested
+      let steeringResult;
+      if (args.steering_options?.create_steering_files) {
+        try {
+          const opportunityText = JSON.stringify(businessOpportunity, null, 2);
+          steeringResult = await this.steeringService.createFromBusinessOpportunity(
+            opportunityText, 
+            args.steering_options
+          );
+          
+          MCPLogger.info('Steering file creation attempted', context, {
+            created: steeringResult.created,
+            message: steeringResult.message
+          });
+        } catch (steeringError) {
+          MCPLogger.warn('Steering file creation failed', context, { 
+            error: steeringError instanceof Error ? steeringError.message : 'Unknown error' 
+          });
+        }
+      }
+
+      const result = MCPResponseFormatter.formatSuccess(
+        businessOpportunity,
+        'json',
+        {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: this.calculateBusinessOpportunityQuota(args),
+          steeringFileCreated: steeringResult?.created || false
+        }
+      );
+
+      // Add steering file information to metadata if created
+      if (steeringResult?.created) {
+        result.metadata = {
+          ...result.metadata,
+          steeringFiles: steeringResult.results.map(r => ({
+            filename: r.filename,
+            action: r.action,
+            fullPath: r.fullPath
+          }))
+        };
+      }
+
+      return result;
+    } catch (error) {
+      MCPLogger.error('analyze_business_opportunity handler failed', error as Error, context);
+      return MCPErrorHandler.createErrorResponse(error as Error, context);
+    }
+  }
+
+  /**
+   * Calculate quota usage for business opportunity analysis
+   */
+  private calculateBusinessOpportunityQuota(args: EnhancedBusinessOpportunityArgs): number {
+    let quota = 2; // Base business analysis
+    
+    if (args.include_competitive_analysis !== false) {
+      const depth = args.analysis_depth || 'standard';
+      quota += depth === 'comprehensive' ? 4 : depth === 'standard' ? 3 : 2;
+    }
+    
+    if (args.include_market_sizing !== false) {
+      quota += 4; // Default 2 methods * 2 quota each
+    }
+    
+    return quota;
   }
 
   /**

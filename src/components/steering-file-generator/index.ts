@@ -24,6 +24,8 @@ export interface ISteeringFileGenerator {
   generateFromOnePager(onePager: string, context: SteeringContext): SteeringFile;
   generateFromPRFAQ(prfaq: string, context: SteeringContext): SteeringFile;
   generateFromTaskPlan(taskPlan: string, context: SteeringContext): SteeringFile;
+  generateFromCompetitiveAnalysis(competitiveAnalysis: string, context: SteeringContext): SteeringFile;
+  generateFromMarketSizing(marketSizing: string, context: SteeringContext): SteeringFile;
 }
 
 /**
@@ -371,6 +373,353 @@ export class SteeringFileGenerator implements ISteeringFileGenerator {
     }
     
     return insights.length > 0 ? insights.join('\n') : 'Best practices derived from task structure and methodology.';
+  }
+
+  /**
+   * Generate steering file from competitive analysis document
+   */
+  generateFromCompetitiveAnalysis(competitiveAnalysis: string, context: SteeringContext): SteeringFile {
+    const template = this.steeringTemplates.getTemplate(DocumentType.COMPETITIVE_ANALYSIS)!;
+    const frontMatter = this.frontMatterProcessor.generateFrontMatter(DocumentType.COMPETITIVE_ANALYSIS, context);
+    
+    const placeholders = {
+      feature_name: context.featureName,
+      timestamp: frontMatter.generatedAt,
+      competitive_landscape: this.extractCompetitiveLandscape(competitiveAnalysis),
+      market_positioning: this.extractMarketPositioning(competitiveAnalysis),
+      strategic_recommendations: this.extractStrategicRecommendations(competitiveAnalysis),
+      competitive_insights: this.extractCompetitiveInsights(competitiveAnalysis),
+      related_documents: this.templateProcessor.formatFileReferences(
+        this.templateProcessor.generateFileReferences(context.relatedFiles)
+      )
+    };
+
+    const content = this.templateProcessor.processTemplate(template.template, placeholders);
+
+    return {
+      filename: this.generateFilename(context.featureName, DocumentType.COMPETITIVE_ANALYSIS),
+      frontMatter,
+      content,
+      references: this.templateProcessor.generateFileReferences(context.relatedFiles),
+      fullPath: `.kiro/steering/${this.generateFilename(context.featureName, DocumentType.COMPETITIVE_ANALYSIS)}`
+    };
+  }
+
+  /**
+   * Generate steering file from market sizing document
+   */
+  generateFromMarketSizing(marketSizing: string, context: SteeringContext): SteeringFile {
+    const template = this.steeringTemplates.getTemplate(DocumentType.MARKET_SIZING)!;
+    const frontMatter = this.frontMatterProcessor.generateFrontMatter(DocumentType.MARKET_SIZING, context);
+    
+    const placeholders = {
+      feature_name: context.featureName,
+      timestamp: frontMatter.generatedAt,
+      market_opportunity: this.extractMarketOpportunity(marketSizing),
+      tam_sam_som: this.extractTAMSAMSOM(marketSizing),
+      market_assumptions: this.extractMarketAssumptions(marketSizing),
+      sizing_insights: this.extractSizingInsights(marketSizing),
+      related_documents: this.templateProcessor.formatFileReferences(
+        this.templateProcessor.generateFileReferences(context.relatedFiles)
+      )
+    };
+
+    const content = this.templateProcessor.processTemplate(template.template, placeholders);
+
+    return {
+      filename: this.generateFilename(context.featureName, DocumentType.MARKET_SIZING),
+      frontMatter,
+      content,
+      references: this.templateProcessor.generateFileReferences(context.relatedFiles),
+      fullPath: `.kiro/steering/${this.generateFilename(context.featureName, DocumentType.MARKET_SIZING)}`
+    };
+  }
+
+  // Helper methods for competitive analysis extraction
+  private extractCompetitiveLandscape(analysis: string): string {
+    try {
+      const data = JSON.parse(analysis);
+      const insights = [];
+      
+      if (data.competitiveMatrix?.competitors && data.competitiveMatrix.competitors.length > 0) {
+        const competitorNames = data.competitiveMatrix.competitors.map((c: any) => c.name).join(', ');
+        insights.push(`- Key competitors identified: ${competitorNames}`);
+        insights.push(`- Competitive matrix includes ${data.competitiveMatrix.competitors.length} competitors`);
+      }
+      
+      if (data.swotAnalysis && data.swotAnalysis.length > 0) {
+        insights.push(`- SWOT analysis completed for ${data.swotAnalysis.length} competitors`);
+      }
+      
+      if (data.confidenceLevel) {
+        insights.push(`- Analysis confidence level: ${data.confidenceLevel}`);
+      }
+      
+      return insights.length > 0 ? insights.join('\n') : 'Competitive landscape analysis available';
+    } catch (error) {
+      // Fallback to basic string matching if JSON parsing fails
+      const insights = [];
+      if (analysis.includes('competitor') || analysis.includes('competitive')) {
+        insights.push('- Competitive landscape analysis available');
+      }
+      if (analysis.includes('SWOT') || analysis.includes('strengths')) {
+        insights.push('- SWOT analysis provides strategic context');
+      }
+      return insights.length > 0 ? insights.join('\n') : 'Competitive landscape insights derived from analysis.';
+    }
+  }
+
+  private extractMarketPositioning(analysis: string): string {
+    try {
+      const data = JSON.parse(analysis);
+      const insights = [];
+      
+      if (data.marketPositioning?.marketGaps && data.marketPositioning.marketGaps.length > 0) {
+        insights.push(`- Market gaps identified: ${data.marketPositioning.marketGaps.join(', ')}`);
+      }
+      
+      if (data.marketPositioning?.recommendedPositioning && data.marketPositioning.recommendedPositioning.length > 0) {
+        insights.push(`- Positioning recommendations: ${data.marketPositioning.recommendedPositioning.join(', ')}`);
+      }
+      
+      if (data.competitiveMatrix?.differentiationOpportunities && data.competitiveMatrix.differentiationOpportunities.length > 0) {
+        insights.push(`- Differentiation opportunities: ${data.competitiveMatrix.differentiationOpportunities.join(', ')}`);
+      }
+      
+      return insights.length > 0 ? insights.join('\n') : 'Market positioning guidance available';
+    } catch (error) {
+      // Fallback to basic string matching if JSON parsing fails
+      const insights = [];
+      if (analysis.includes('differentiation') || analysis.includes('unique')) {
+        insights.push('- Differentiation opportunities identified');
+      }
+      if (analysis.includes('gap') || analysis.includes('opportunity')) {
+        insights.push('- Market gaps present strategic opportunities');
+      }
+      return insights.length > 0 ? insights.join('\n') : 'Market positioning guidance from competitive analysis.';
+    }
+  }
+
+  private extractStrategicRecommendations(analysis: string): string {
+    try {
+      const data = JSON.parse(analysis);
+      const insights = [];
+      
+      if (data.strategicRecommendations && data.strategicRecommendations.length > 0) {
+        insights.push('**Key Strategic Recommendations:**');
+        data.strategicRecommendations.slice(0, 3).forEach((rec: any, index: number) => {
+          if (typeof rec === 'string') {
+            insights.push(`${index + 1}. ${rec}`);
+          } else if (rec.recommendation) {
+            insights.push(`${index + 1}. ${rec.recommendation}`);
+          }
+        });
+      }
+      
+      if (data.riskAssessment || (data.strategicRecommendations && data.strategicRecommendations.some((r: any) => r.risks))) {
+        insights.push('- Risk assessment and mitigation strategies included');
+      }
+      
+      return insights.length > 0 ? insights.join('\n') : 'Strategic recommendations available';
+    } catch (error) {
+      // Fallback to basic string matching if JSON parsing fails
+      const insights = [];
+      if (analysis.includes('recommendation') || analysis.includes('strategy')) {
+        insights.push('- Strategic recommendations available');
+      }
+      if (analysis.includes('risk') || analysis.includes('threat')) {
+        insights.push('- Risk assessment included in strategy');
+      }
+      return insights.length > 0 ? insights.join('\n') : 'Strategic recommendations derived from competitive analysis.';
+    }
+  }
+
+  private extractCompetitiveInsights(analysis: string): string {
+    try {
+      const data = JSON.parse(analysis);
+      const insights = [];
+      
+      if (data.sourceAttribution && data.sourceAttribution.length > 0) {
+        const sources = data.sourceAttribution.map((s: any) => s.type || s.title).join(', ');
+        insights.push(`- Analysis based on credible sources: ${sources}`);
+      }
+      
+      if (data.dataQuality) {
+        insights.push(`- Data quality: ${data.dataQuality.overallConfidence ? 
+          `${Math.round(data.dataQuality.overallConfidence * 100)}% confidence` : 
+          'Quality indicators available'}`);
+      }
+      
+      if (data.lastUpdated) {
+        const updateDate = new Date(data.lastUpdated).toLocaleDateString();
+        insights.push(`- Analysis last updated: ${updateDate}`);
+      }
+      
+      return insights.length > 0 ? insights.join('\n') : 'Competitive insights with source attribution';
+    } catch (error) {
+      // Fallback to basic string matching if JSON parsing fails
+      const insights = [];
+      if (analysis.includes('source') || analysis.includes('McKinsey') || analysis.includes('Gartner')) {
+        insights.push('- Credible sources validate competitive insights');
+      }
+      if (analysis.includes('confidence') || analysis.includes('quality')) {
+        insights.push('- Data quality indicators provide reliability context');
+      }
+      return insights.length > 0 ? insights.join('\n') : 'Competitive insights with source attribution.';
+    }
+  }
+
+  // Helper methods for market sizing extraction
+  private extractMarketOpportunity(sizing: string): string {
+    try {
+      const data = JSON.parse(sizing);
+      const insights = [];
+      
+      if (data.tam?.value) {
+        const tamValue = data.tam.value >= 1000000000 ? 
+          `$${(data.tam.value / 1000000000).toFixed(1)}B` : 
+          `$${(data.tam.value / 1000000).toFixed(0)}M`;
+        insights.push(`- Total Addressable Market: ${tamValue}`);
+      }
+      
+      if (data.tam?.growthRate || data.sam?.growthRate) {
+        const growthRate = data.tam?.growthRate || data.sam?.growthRate;
+        insights.push(`- Market growth rate: ${(growthRate * 100).toFixed(1)}% annually`);
+      }
+      
+      if (data.scenarios && data.scenarios.length > 0) {
+        insights.push(`- ${data.scenarios.length} market scenarios analyzed`);
+      }
+      
+      return insights.length > 0 ? insights.join('\n') : 'Market opportunity analysis available';
+    } catch (error) {
+      // Fallback to basic string matching if JSON parsing fails
+      const insights = [];
+      if (sizing.includes('TAM') || sizing.includes('Total Addressable Market')) {
+        insights.push('- Market growth projections included');
+      }
+      return insights.length > 0 ? insights.join('\n') : 'Market opportunity insights from sizing analysis.';
+    }
+  }
+
+  private extractTAMSAMSOM(sizing: string): string {
+    try {
+      const data = JSON.parse(sizing);
+      const insights = [];
+      
+      if (data.tam?.value) {
+        const tamValue = data.tam.value >= 1000000000 ? 
+          `$${(data.tam.value / 1000000000).toFixed(1)}B` : 
+          `$${(data.tam.value / 1000000).toFixed(0)}M`;
+        insights.push(`- **TAM**: ${tamValue} (${data.tam.methodology || 'Multiple methodologies'})`);
+      }
+      
+      if (data.sam?.value) {
+        const samValue = data.sam.value >= 1000000000 ? 
+          `$${(data.sam.value / 1000000000).toFixed(1)}B` : 
+          `$${(data.sam.value / 1000000).toFixed(0)}M`;
+        insights.push(`- **SAM**: ${samValue} (${data.sam.methodology || 'Serviceable market'})`);
+      }
+      
+      if (data.som?.value) {
+        const somValue = data.som.value >= 1000000000 ? 
+          `$${(data.som.value / 1000000000).toFixed(1)}B` : 
+          `$${(data.som.value / 1000000).toFixed(0)}M`;
+        insights.push(`- **SOM**: ${somValue} (${data.som.methodology || 'Obtainable market'})`);
+      }
+      
+      return insights.length > 0 ? insights.join('\n') : 'TAM/SAM/SOM analysis available';
+    } catch (error) {
+      // Fallback to basic string matching if JSON parsing fails
+      const insights = [];
+      if (sizing.includes('TAM')) {
+        insights.push('- TAM: Total Addressable Market defined');
+      }
+      if (sizing.includes('SAM')) {
+        insights.push('- SAM: Serviceable Addressable Market calculated');
+      }
+      if (sizing.includes('SOM')) {
+        insights.push('- SOM: Serviceable Obtainable Market estimated');
+      }
+      return insights.length > 0 ? insights.join('\n') : 'TAM/SAM/SOM framework applied for market sizing.';
+    }
+  }
+
+  private extractMarketAssumptions(sizing: string): string {
+    try {
+      const data = JSON.parse(sizing);
+      const insights = [];
+      
+      if (data.assumptions && data.assumptions.length > 0) {
+        insights.push('**Key Market Assumptions:**');
+        data.assumptions.slice(0, 3).forEach((assumption: any, index: number) => {
+          const text = typeof assumption === 'string' ? assumption : assumption.description || assumption.assumption;
+          if (text) {
+            insights.push(`${index + 1}. ${text}`);
+          }
+        });
+      }
+      
+      if (data.methodology && data.methodology.length > 0) {
+        const methods = data.methodology.map((m: any) => m.type || m.name).join(', ');
+        insights.push(`- Methodologies used: ${methods}`);
+      }
+      
+      if (data.confidenceIntervals && data.confidenceIntervals.length > 0) {
+        const avgConfidence = data.confidenceIntervals.reduce((sum: number, ci: any) => sum + (ci.confidenceLevel || 0), 0) / data.confidenceIntervals.length;
+        insights.push(`- Average confidence level: ${Math.round(avgConfidence * 100)}%`);
+      }
+      
+      return insights.length > 0 ? insights.join('\n') : 'Market assumptions and methodology documented';
+    } catch (error) {
+      // Fallback to basic string matching if JSON parsing fails
+      const insights = [];
+      if (sizing.includes('assumption') || sizing.includes('methodology')) {
+        insights.push('- Market sizing assumptions documented');
+      }
+      if (sizing.includes('confidence') || sizing.includes('scenario')) {
+        insights.push('- Multiple scenarios with confidence intervals');
+      }
+      return insights.length > 0 ? insights.join('\n') : 'Market assumptions and methodology documented.';
+    }
+  }
+
+  private extractSizingInsights(sizing: string): string {
+    try {
+      const data = JSON.parse(sizing);
+      const insights = [];
+      
+      if (data.methodology && data.methodology.length > 0) {
+        const methodTypes = data.methodology.map((m: any) => m.type).filter(Boolean);
+        if (methodTypes.length > 0) {
+          insights.push(`- Methodologies applied: ${methodTypes.join(', ')}`);
+        }
+      }
+      
+      if (data.sourceAttribution && data.sourceAttribution.length > 0) {
+        const sources = data.sourceAttribution.map((s: any) => s.type || s.title).join(', ');
+        insights.push(`- Data sources: ${sources}`);
+      }
+      
+      if (data.scenarios && data.scenarios.length > 0) {
+        const scenarioTypes = data.scenarios.map((s: any) => s.name || s.type).filter(Boolean);
+        if (scenarioTypes.length > 0) {
+          insights.push(`- Scenarios analyzed: ${scenarioTypes.join(', ')}`);
+        }
+      }
+      
+      return insights.length > 0 ? insights.join('\n') : 'Market sizing insights with methodological rigor';
+    } catch (error) {
+      // Fallback to basic string matching if JSON parsing fails
+      const insights = [];
+      if (sizing.includes('top-down') || sizing.includes('bottom-up')) {
+        insights.push('- Multiple sizing methodologies applied');
+      }
+      if (sizing.includes('source') || sizing.includes('Gartner') || sizing.includes('McKinsey')) {
+        insights.push('- Authoritative sources validate market data');
+      }
+      return insights.length > 0 ? insights.join('\n') : 'Market sizing insights with methodological rigor.';
+    }
   }
 }
 

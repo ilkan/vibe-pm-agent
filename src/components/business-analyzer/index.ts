@@ -14,7 +14,15 @@ import {
   ValueProposition,
   ThreeOptionAnalysis,
   Optimization,
-  OptionalParams
+  OptionalParams,
+  EnhancedBusinessOpportunity,
+  BusinessOpportunity,
+  StrategicFitAssessment,
+  MarketTimingAnalysis,
+  IntegratedInsight,
+  OverallRecommendation,
+  MarketSizingResult,
+  CompetitorAnalysisResult
 } from '../../models';
 import { validateParsedIntent, validateWorkflow, validateConsultingTechniques, ValidationError } from '../../utils/validation';
 import { ErrorHandler, AnalysisError } from '../../utils/error-handling';
@@ -41,6 +49,27 @@ export interface IBusinessAnalyzer {
   applyValuePropositionCanvas(intent: ParsedIntent, params?: OptionalParams): ValueProposition;
   generateOptionFraming(workflow: Workflow, params?: OptionalParams): ThreeOptionAnalysis;
   analyzeWithTechniques(intent: ParsedIntent, techniques?: string[]): Promise<ConsultingAnalysis>;
+  
+  // Enhanced Business Opportunity Analysis (Task 4.1)
+  analyzeEnhancedBusinessOpportunity(
+    intent: ParsedIntent, 
+    marketSizing?: MarketSizingResult, 
+    competitiveAnalysis?: CompetitorAnalysisResult,
+    params?: OptionalParams
+  ): Promise<EnhancedBusinessOpportunity>;
+  
+  // Strategic Fit Assessment (Task 4.2)
+  assessStrategicFit(
+    intent: ParsedIntent,
+    competitiveAnalysis?: CompetitorAnalysisResult,
+    params?: OptionalParams
+  ): StrategicFitAssessment;
+  
+  analyzeMarketTiming(
+    intent: ParsedIntent,
+    competitiveAnalysis?: CompetitorAnalysisResult,
+    params?: OptionalParams
+  ): MarketTimingAnalysis;
 }
 
 export class BusinessAnalyzer implements IBusinessAnalyzer {
@@ -865,5 +894,960 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     if (complexityScore >= 5) return 'high';
     if (complexityScore >= 3) return 'medium';
     return 'low';
+  }
+
+  // ============================================================================
+  // Enhanced Business Opportunity Analysis (Task 4.1)
+  // ============================================================================
+
+  /**
+   * Analyzes enhanced business opportunity with integrated market sizing and competitive context
+   * Requirements: 3.1, 3.2, 3.3
+   */
+  async analyzeEnhancedBusinessOpportunity(
+    intent: ParsedIntent,
+    marketSizing?: MarketSizingResult,
+    competitiveAnalysis?: CompetitorAnalysisResult,
+    params?: OptionalParams
+  ): Promise<EnhancedBusinessOpportunity> {
+    // Generate base business opportunity analysis
+    const businessOpportunity = await this.generateBusinessOpportunity(intent, params);
+    
+    // Assess strategic fit with competitive positioning
+    const strategicFit = this.assessStrategicFit(intent, competitiveAnalysis, params);
+    
+    // Analyze market timing
+    const marketTiming = this.analyzeMarketTiming(intent, competitiveAnalysis, params);
+    
+    // Generate integrated insights
+    const integratedInsights = this.generateIntegratedInsights(
+      businessOpportunity,
+      marketSizing,
+      competitiveAnalysis,
+      strategicFit,
+      marketTiming
+    );
+    
+    // Generate overall recommendation
+    const overallRecommendation = this.generateOverallRecommendation(
+      businessOpportunity,
+      marketSizing,
+      competitiveAnalysis,
+      strategicFit,
+      marketTiming,
+      integratedInsights
+    );
+
+    return {
+      businessOpportunity,
+      marketSizing,
+      competitiveAnalysis,
+      strategicFit,
+      marketTiming,
+      integratedInsights,
+      overallRecommendation
+    };
+  }
+
+  private async generateBusinessOpportunity(intent: ParsedIntent, params?: OptionalParams): Promise<BusinessOpportunity> {
+    const id = `opportunity-${Date.now()}`;
+    
+    // Extract market validation from intent
+    const marketValidation = {
+      targetMarket: intent.dataSourcesNeeded,
+      marketNeed: intent.businessObjective,
+      customerSegments: this.extractCustomerSegments(intent),
+      competitiveLandscape: intent.potentialRisks.map(risk => risk.description),
+      marketTrends: this.identifyMarketTrends(intent),
+      validationSources: intent.dataSourcesNeeded
+    };
+
+    // Assess strategic alignment
+    const strategyAlignment = {
+      companyMission: 'Enhance development productivity and decision-making',
+      strategicPriorities: ['Developer Experience', 'AI Integration', 'Workflow Optimization'],
+      okrAlignment: this.assessOKRAlignment(intent),
+      competitiveAdvantage: this.identifyCompetitiveAdvantages(intent),
+      alignmentScore: this.calculateAlignmentScore(intent)
+    };
+
+    // Generate financial projections
+    const financialProjections = this.generateFinancialProjections(intent, params);
+
+    // Assess risks
+    const riskAssessment = this.generateRiskAssessment(intent);
+
+    // Create implementation plan
+    const implementationPlan = this.generateImplementationPlan(intent);
+
+    // Define success metrics
+    const successMetrics = this.generateSuccessMetrics(intent);
+
+    return {
+      id,
+      title: `Business Opportunity: ${intent.businessObjective}`,
+      description: `Enhanced business opportunity analysis for ${intent.businessObjective} with integrated market and competitive context`,
+      marketValidation,
+      strategicAlignment: strategyAlignment,
+      financialProjections,
+      riskAssessment,
+      implementationPlan,
+      successMetrics,
+      confidenceLevel: this.calculateConfidenceLevel(intent, params),
+      lastUpdated: new Date().toISOString()
+    };
+  }
+
+  // ============================================================================
+  // Strategic Fit Assessment (Task 4.2)
+  // ============================================================================
+
+  /**
+   * Implements strategic alignment scoring with competitive positioning
+   * Requirements: 3.2, 3.4
+   */
+  assessStrategicFit(
+    intent: ParsedIntent,
+    competitiveAnalysis?: CompetitorAnalysisResult,
+    params?: OptionalParams
+  ): StrategicFitAssessment {
+    // Calculate alignment score based on multiple factors
+    const alignmentScore = this.calculateStrategicAlignmentScore(intent, competitiveAnalysis);
+    
+    // Identify competitive advantages
+    const competitiveAdvantage = this.identifyCompetitiveAdvantages(intent, competitiveAnalysis);
+    
+    // Analyze market gaps
+    const marketGaps = this.analyzeMarketGaps(intent, competitiveAnalysis);
+    
+    // Assess entry barriers
+    const entryBarriers = this.assessEntryBarriers(intent, competitiveAnalysis);
+    
+    // Identify success factors
+    const successFactors = this.identifySuccessFactors(intent, competitiveAnalysis);
+    
+    // Generate strategic recommendations
+    const strategicRecommendations = this.generateStrategicRecommendations(
+      intent,
+      competitiveAnalysis,
+      alignmentScore,
+      marketGaps,
+      entryBarriers
+    );
+    
+    // Perform comprehensive fit analysis
+    const fitAnalysis = this.performFitAnalysis(
+      intent,
+      competitiveAnalysis,
+      alignmentScore,
+      marketGaps,
+      entryBarriers,
+      successFactors
+    );
+
+    return {
+      alignmentScore,
+      competitiveAdvantage,
+      marketGaps,
+      entryBarriers,
+      successFactors,
+      strategicRecommendations,
+      fitAnalysis
+    };
+  }
+
+  /**
+   * Analyzes market timing with competitive context
+   */
+  analyzeMarketTiming(
+    intent: ParsedIntent,
+    competitiveAnalysis?: CompetitorAnalysisResult,
+    params?: OptionalParams
+  ): MarketTimingAnalysis {
+    const marketReadiness = this.assessMarketReadiness(intent);
+    const competitiveTiming = this.assessCompetitiveTiming(competitiveAnalysis);
+    const internalReadiness = this.assessInternalReadiness(intent, params);
+    const externalFactors = this.identifyExternalFactors(intent);
+    
+    const timingScore = this.calculateTimingScore(
+      marketReadiness,
+      competitiveTiming,
+      internalReadiness,
+      externalFactors
+    );
+    
+    const timingRecommendation = this.generateTimingRecommendation(
+      timingScore,
+      marketReadiness,
+      competitiveTiming,
+      internalReadiness,
+      externalFactors
+    );
+
+    return {
+      timingScore,
+      marketReadiness,
+      competitiveTiming,
+      internalReadiness,
+      externalFactors,
+      timingRecommendation
+    };
+  }
+
+  // ============================================================================
+  // Helper Methods for Enhanced Analysis
+  // ============================================================================
+
+  private extractCustomerSegments(intent: ParsedIntent) {
+    return [
+      {
+        name: 'Development Teams',
+        size: 1000000,
+        characteristics: ['Technical', 'Efficiency-focused', 'Tool-savvy'],
+        painPoints: intent.potentialRisks.map(risk => risk.description),
+        willingness_to_pay: 100
+      }
+    ];
+  }
+
+  private identifyMarketTrends(intent: ParsedIntent): string[] {
+    const trends = ['AI-driven development tools', 'Workflow automation', 'Developer productivity focus'];
+    
+    if (intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')) {
+      trends.push('AI integration in development workflows');
+    }
+    
+    if (intent.operationsRequired.some(op => op.type === 'vibe')) {
+      trends.push('Code generation and AI assistance');
+    }
+    
+    return trends;
+  }
+
+  private assessOKRAlignment(intent: ParsedIntent) {
+    return [
+      {
+        objective: 'Improve Developer Productivity',
+        keyResults: ['Reduce development time by 30%', 'Increase code quality scores'],
+        alignmentStrength: 'strong' as const
+      },
+      {
+        objective: 'Enhance AI Integration',
+        keyResults: ['Deploy AI tools across development lifecycle'],
+        alignmentStrength: intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis') ? 'strong' as const : 'moderate' as const
+      }
+    ];
+  }
+
+  private identifyCompetitiveAdvantages(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult): string[] {
+    const advantages = [
+      'Integrated development environment',
+      'AI-powered workflow optimization',
+      'Comprehensive PM toolkit'
+    ];
+
+    if (competitiveAnalysis?.marketPositioning.marketGaps) {
+      competitiveAnalysis.marketPositioning.marketGaps.forEach(gap => {
+        if (gap.size === 'large') {
+          advantages.push(`First-mover advantage in ${gap.description}`);
+        }
+      });
+    }
+
+    return advantages;
+  }
+
+  private calculateAlignmentScore(intent: ParsedIntent): number {
+    let score = 70; // Base alignment score
+    
+    // Boost for AI-related requirements (processing and analysis)
+    if (intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')) {
+      score += 15;
+    }
+    
+    // Boost for workflow optimization focus
+    if (intent.businessObjective.toLowerCase().includes('optimize') || 
+        intent.businessObjective.toLowerCase().includes('efficiency')) {
+      score += 10;
+    }
+    
+    // Penalty for high complexity
+    if (intent.technicalRequirements.length > 5) {
+      score -= 5;
+    }
+    
+    return Math.min(Math.max(score, 0), 100);
+  }
+
+  private generateFinancialProjections(intent: ParsedIntent, params?: OptionalParams) {
+    const baseRevenue = params?.costConstraints?.maxCostDollars || 50000;
+    
+    return [
+      {
+        timeframe: 'Year 1',
+        revenue: baseRevenue * 2,
+        costs: baseRevenue * 0.7,
+        profit: baseRevenue * 1.3,
+        roi: 1.86,
+        assumptions: ['Market adoption rate: 15%', 'Customer retention: 85%']
+      },
+      {
+        timeframe: 'Year 2',
+        revenue: baseRevenue * 4,
+        costs: baseRevenue * 1.2,
+        profit: baseRevenue * 2.8,
+        roi: 2.33,
+        assumptions: ['Market adoption rate: 25%', 'Customer retention: 90%']
+      }
+    ];
+  }
+
+  private generateRiskAssessment(intent: ParsedIntent) {
+    const risks = intent.potentialRisks.map(risk => ({
+      category: 'technical' as const,
+      description: risk.description,
+      probability: risk.severity === 'high' ? 0.7 : risk.severity === 'medium' ? 0.4 : 0.2,
+      impact: risk.severity === 'high' ? 8 : risk.severity === 'medium' ? 5 : 3,
+      riskScore: (risk.severity === 'high' ? 0.7 : risk.severity === 'medium' ? 0.4 : 0.2) * 
+                 (risk.severity === 'high' ? 8 : risk.severity === 'medium' ? 5 : 3)
+    }));
+
+    const mitigationStrategies = risks.map(risk => ({
+      riskCategory: risk.category,
+      strategy: `Implement comprehensive testing and validation for ${risk.description}`,
+      effectiveness: 0.8,
+      cost: 5000
+    }));
+
+    const overallRiskLevel = risks.some(r => r.riskScore > 5) ? 'high' as const :
+                           risks.some(r => r.riskScore > 3) ? 'medium' as const : 'low' as const;
+
+    return {
+      risks,
+      mitigationStrategies,
+      overallRiskLevel
+    };
+  }
+
+  private generateImplementationPlan(intent: ParsedIntent) {
+    return [
+      {
+        phase: 1,
+        name: 'Foundation & Planning',
+        duration: '4 weeks',
+        deliverables: ['Technical architecture', 'Resource allocation', 'Risk mitigation plan'],
+        resources: ['Senior Developer', 'Product Manager', 'UX Designer'],
+        dependencies: ['Stakeholder approval', 'Budget allocation'],
+        milestones: ['Architecture review', 'Team formation', 'Project kickoff']
+      },
+      {
+        phase: 2,
+        name: 'Core Development',
+        duration: '8 weeks',
+        deliverables: ['Core functionality', 'Integration tests', 'Documentation'],
+        resources: ['Development Team', 'QA Engineer', 'Technical Writer'],
+        dependencies: ['Phase 1 completion', 'Development environment setup'],
+        milestones: ['MVP completion', 'Integration testing', 'Performance validation']
+      }
+    ];
+  }
+
+  private generateSuccessMetrics(intent: ParsedIntent) {
+    return [
+      {
+        name: 'User Adoption Rate',
+        type: 'leading' as const,
+        target: 75,
+        unit: 'percentage',
+        measurementFrequency: 'weekly',
+        dataSource: 'Analytics platform'
+      },
+      {
+        name: 'Workflow Efficiency Improvement',
+        type: 'lagging' as const,
+        target: 30,
+        unit: 'percentage',
+        measurementFrequency: 'monthly',
+        dataSource: 'Performance metrics'
+      }
+    ];
+  }
+
+  private calculateConfidenceLevel(intent: ParsedIntent, params?: OptionalParams): 'high' | 'medium' | 'low' {
+    let confidenceScore = 60; // Lower base score
+    
+    // Boost confidence for well-defined requirements
+    if (intent.technicalRequirements.length >= 2) {
+      confidenceScore += 15;
+    }
+    
+    // Boost confidence for clear business objective
+    if (intent.businessObjective.length > 20) {
+      confidenceScore += 10;
+    }
+    
+    // Reduce confidence for high-risk scenarios
+    if (intent.potentialRisks.some(risk => risk.severity === 'high')) {
+      confidenceScore -= 35;
+    }
+    
+    // Reduce confidence for empty requirements
+    if (intent.technicalRequirements.length === 0) {
+      confidenceScore -= 30;
+    }
+    
+    // Reduce confidence for multiple high risks
+    const highRiskCount = intent.potentialRisks.filter(risk => risk.severity === 'high').length;
+    if (highRiskCount > 1) {
+      confidenceScore -= 15;
+    }
+    
+    if (confidenceScore >= 75) return 'high';
+    if (confidenceScore >= 45) return 'medium';
+    return 'low';
+  }
+
+  private calculateStrategicAlignmentScore(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult): number {
+    let score = 60; // Base score
+    
+    // Strategic alignment factors
+    if (intent.businessObjective.toLowerCase().includes('productivity')) score += 20;
+    if (intent.businessObjective.toLowerCase().includes('efficiency')) score += 15;
+    if (intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')) score += 15;
+    
+    // Competitive positioning boost
+    if (competitiveAnalysis?.marketPositioning.marketGaps.some(gap => gap.size === 'large')) {
+      score += 10;
+    }
+    
+    return Math.min(score, 100);
+  }
+
+  private analyzeMarketGaps(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult) {
+    const gaps = [];
+    
+    // AI integration gap
+    if (intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')) {
+      gaps.push({
+        gapType: 'feature' as const,
+        description: 'AI-powered workflow optimization',
+        size: 'large' as const,
+        competitorCoverage: 30,
+        opportunityScore: 85,
+        addressabilityScore: 90,
+        timeToMarket: '6-12 months',
+        resourceRequirements: ['AI expertise', 'Development team', 'Data infrastructure']
+      });
+    }
+    
+    // Workflow automation gap
+    gaps.push({
+      gapType: 'use-case' as const,
+      description: 'Comprehensive PM workflow automation',
+      size: 'medium' as const,
+      competitorCoverage: 45,
+      opportunityScore: 70,
+      addressabilityScore: 80,
+      timeToMarket: '3-6 months',
+      resourceRequirements: ['Product expertise', 'Integration capabilities']
+    });
+    
+    return gaps;
+  }
+
+  private assessEntryBarriers(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult) {
+    return [
+      {
+        type: 'technical' as const,
+        description: 'AI and ML expertise requirements',
+        height: 'medium' as const,
+        overcomability: 75,
+        timeToOvercome: '6-12 months',
+        costToOvercome: 200000,
+        strategicImportance: 85
+      },
+      {
+        type: 'brand' as const,
+        description: 'Developer tool market recognition',
+        height: 'medium' as const,
+        overcomability: 60,
+        timeToOvercome: '12-18 months',
+        costToOvercome: 150000,
+        strategicImportance: 70
+      }
+    ];
+  }
+
+  private identifySuccessFactors(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult) {
+    return [
+      {
+        factor: 'AI Integration Capability',
+        importance: 90,
+        currentCapability: 70,
+        capabilityGap: 20,
+        developmentPlan: ['Hire AI specialists', 'Develop ML models', 'Create training datasets'],
+        timeToAchieve: '6 months',
+        investmentRequired: 150000
+      },
+      {
+        factor: 'Developer Experience Design',
+        importance: 85,
+        currentCapability: 80,
+        capabilityGap: 5,
+        developmentPlan: ['UX research', 'Usability testing', 'Interface optimization'],
+        timeToAchieve: '3 months',
+        investmentRequired: 75000
+      }
+    ];
+  }
+
+  private generateStrategicRecommendations(
+    intent: ParsedIntent,
+    competitiveAnalysis: CompetitorAnalysisResult | undefined,
+    alignmentScore: number,
+    marketGaps: any[],
+    entryBarriers: any[]
+  ) {
+    const recommendations = [];
+    
+    if (alignmentScore > 80 && marketGaps.some(gap => gap.size === 'large')) {
+      recommendations.push({
+        type: 'go' as const,
+        rationale: ['Strong strategic alignment', 'Large market opportunity', 'Competitive advantage potential'],
+        conditions: ['Secure AI expertise', 'Validate market demand'],
+        timeline: '6-12 months',
+        resourceRequirements: ['Development team', 'AI specialists', 'Product managers'],
+        expectedOutcomes: ['Market leadership', 'Revenue growth', 'Competitive differentiation'],
+        riskMitigation: ['Phased rollout', 'Customer validation', 'Competitive monitoring']
+      });
+    } else if (alignmentScore > 60) {
+      recommendations.push({
+        type: 'pivot' as const,
+        rationale: ['Moderate alignment', 'Market opportunity exists', 'Entry barriers manageable'],
+        conditions: ['Refine value proposition', 'Strengthen capabilities'],
+        timeline: '3-6 months preparation',
+        resourceRequirements: ['Strategy team', 'Market research', 'Capability development'],
+        expectedOutcomes: ['Improved market fit', 'Reduced execution risk'],
+        riskMitigation: ['Market validation', 'Capability assessment', 'Competitive analysis']
+      });
+    } else {
+      // For low alignment scores, recommend pivot or delay
+      recommendations.push({
+        type: 'pivot' as const,
+        rationale: ['Low strategic alignment', 'Significant changes needed', 'Market opportunity unclear'],
+        conditions: ['Reassess strategic fit', 'Identify alternative approaches', 'Strengthen value proposition'],
+        timeline: '6-9 months preparation',
+        resourceRequirements: ['Strategy team', 'Market research', 'Product development'],
+        expectedOutcomes: ['Better market alignment', 'Clearer value proposition'],
+        riskMitigation: ['Thorough market validation', 'Stakeholder alignment', 'Iterative approach']
+      });
+    }
+    
+    return recommendations;
+  }
+
+  private performFitAnalysis(
+    intent: ParsedIntent,
+    competitiveAnalysis: CompetitorAnalysisResult | undefined,
+    alignmentScore: number,
+    marketGaps: any[],
+    entryBarriers: any[],
+    successFactors: any[]
+  ) {
+    const marketFit = {
+      score: 75,
+      confidence: 80,
+      factors: [
+        { name: 'Market Size', weight: 30, score: 80, rationale: 'Large developer market' },
+        { name: 'Customer Need', weight: 25, score: 85, rationale: 'Strong productivity focus' },
+        { name: 'Market Timing', weight: 20, score: 70, rationale: 'AI adoption growing' },
+        { name: 'Competition', weight: 25, score: 65, rationale: 'Moderate competitive intensity' }
+      ],
+      recommendation: 'Strong market fit with growth potential'
+    };
+
+    const strategicFit = {
+      score: alignmentScore,
+      confidence: 85,
+      factors: [
+        { name: 'Mission Alignment', weight: 40, score: alignmentScore, rationale: 'Aligns with productivity mission' },
+        { name: 'Capability Fit', weight: 35, score: 70, rationale: 'Good technical capabilities' },
+        { name: 'Resource Availability', weight: 25, score: 75, rationale: 'Adequate resources available' }
+      ],
+      recommendation: alignmentScore > 80 ? 'Excellent strategic fit' : 'Good strategic alignment'
+    };
+
+    const capabilityFit = {
+      score: 72,
+      confidence: 75,
+      factors: successFactors.map(factor => ({
+        name: factor.factor,
+        weight: factor.importance / 100 * 25,
+        score: factor.currentCapability,
+        rationale: `Current capability: ${factor.currentCapability}%`
+      })),
+      recommendation: 'Capabilities adequate with development needed'
+    };
+
+    const timingFit = {
+      score: 78,
+      confidence: 70,
+      factors: [
+        { name: 'Market Readiness', weight: 40, score: 80, rationale: 'Market ready for AI tools' },
+        { name: 'Internal Readiness', weight: 35, score: 75, rationale: 'Good internal capabilities' },
+        { name: 'Competitive Timing', weight: 25, score: 70, rationale: 'Window of opportunity exists' }
+      ],
+      recommendation: 'Good timing for market entry'
+    };
+
+    const overallFit = {
+      score: Math.round((marketFit.score + strategicFit.score + capabilityFit.score + timingFit.score) / 4),
+      confidence: Math.round((marketFit.confidence + strategicFit.confidence + capabilityFit.confidence + timingFit.confidence) / 4),
+      factors: [
+        { name: 'Market Fit', weight: 25, score: marketFit.score, rationale: marketFit.recommendation },
+        { name: 'Strategic Fit', weight: 30, score: strategicFit.score, rationale: strategicFit.recommendation },
+        { name: 'Capability Fit', weight: 25, score: capabilityFit.score, rationale: capabilityFit.recommendation },
+        { name: 'Timing Fit', weight: 20, score: timingFit.score, rationale: timingFit.recommendation }
+      ],
+      recommendation: 'Proceed with strategic opportunity'
+    };
+
+    return {
+      marketFit,
+      strategicFit,
+      capabilityFit,
+      timingFit,
+      overallFit,
+      keyInsights: [
+        'Strong market opportunity in developer productivity space',
+        'AI integration capabilities need strengthening',
+        'Competitive window exists for 12-18 months',
+        'Strategic alignment supports investment decision'
+      ]
+    };
+  }
+
+  private assessMarketReadiness(intent: ParsedIntent) {
+    return {
+      customerDemand: 80,
+      marketMaturity: 'growth' as const,
+      adoptionCurve: 'early-majority' as const,
+      marketSignals: [
+        {
+          type: 'demand' as const,
+          signal: 'Increasing developer productivity focus',
+          strength: 'strong' as const,
+          trend: 'increasing' as const,
+          impact: 85
+        },
+        {
+          type: 'technology' as const,
+          signal: 'AI tool adoption in development',
+          strength: 'strong' as const,
+          trend: 'increasing' as const,
+          impact: 90
+        }
+      ],
+      readinessScore: 82
+    };
+  }
+
+  private assessCompetitiveTiming(competitiveAnalysis?: CompetitorAnalysisResult) {
+    return {
+      competitorMoves: competitiveAnalysis?.competitiveMatrix.competitors.flatMap(comp => 
+        comp.recentMoves.map(move => ({
+          competitor: comp.name,
+          move: move.description,
+          timing: move.date,
+          impact: move.impact === 'high' ? 80 : move.impact === 'medium' ? 50 : 20,
+          responseRequired: move.impact === 'high'
+        }))
+      ) || [],
+      marketWindowSize: 'moderate' as const,
+      firstMoverAdvantage: 70,
+      competitiveResponse: [
+        {
+          scenario: 'Major competitor launches similar feature',
+          probability: 0.6,
+          timeframe: '12-18 months',
+          impact: 70,
+          counterStrategy: ['Accelerate development', 'Enhance differentiation', 'Strengthen partnerships']
+        }
+      ],
+      timingAdvantage: 65
+    };
+  }
+
+  private assessInternalReadiness(intent: ParsedIntent, params?: OptionalParams) {
+    return {
+      capabilityReadiness: 75,
+      resourceAvailability: params?.costConstraints ? 70 : 85,
+      organizationalAlignment: 80,
+      technicalReadiness: intent.technicalRequirements.length > 3 ? 70 : 85,
+      overallReadiness: 77,
+      readinessGaps: [
+        {
+          area: 'AI Expertise',
+          currentState: 'Basic AI knowledge',
+          requiredState: 'Advanced AI/ML capabilities',
+          gapSize: 30,
+          timeToClose: '6 months',
+          effort: 8
+        }
+      ]
+    };
+  }
+
+  private identifyExternalFactors(intent: ParsedIntent) {
+    return [
+      {
+        category: 'technological' as const,
+        factor: 'AI technology advancement',
+        impact: 85,
+        probability: 0.9,
+        timeframe: '12 months',
+        mitigation: ['Stay current with AI developments', 'Build flexible architecture']
+      },
+      {
+        category: 'economic' as const,
+        factor: 'Developer tool market growth',
+        impact: 70,
+        probability: 0.8,
+        timeframe: '24 months',
+        mitigation: ['Monitor market trends', 'Adjust pricing strategy']
+      }
+    ];
+  }
+
+  private calculateTimingScore(marketReadiness: any, competitiveTiming: any, internalReadiness: any, externalFactors: any[]): number {
+    const marketScore = marketReadiness.readinessScore;
+    const competitiveScore = competitiveTiming.timingAdvantage;
+    const internalScore = internalReadiness.overallReadiness;
+    const externalScore = externalFactors.reduce((sum, factor) => sum + factor.impact * factor.probability, 0) / externalFactors.length;
+    
+    return Math.round((marketScore * 0.3 + competitiveScore * 0.25 + internalScore * 0.25 + externalScore * 0.2));
+  }
+
+  private generateTimingRecommendation(
+    timingScore: number,
+    marketReadiness: any,
+    competitiveTiming: any,
+    internalReadiness: any,
+    externalFactors: any[]
+  ) {
+    if (timingScore >= 80) {
+      return {
+        recommendation: 'launch-now' as const,
+        rationale: ['Optimal market conditions', 'Strong competitive position', 'High internal readiness'],
+        optimalTiming: 'Immediate launch recommended',
+        conditions: ['Secure necessary resources', 'Finalize go-to-market strategy'],
+        risks: ['Competitive response', 'Resource constraints'],
+        alternatives: ['Phased launch approach', 'Partnership strategy']
+      };
+    } else if (timingScore >= 65) {
+      return {
+        recommendation: 'launch-soon' as const,
+        rationale: ['Good market conditions', 'Reasonable competitive window', 'Adequate preparation time'],
+        optimalTiming: '3-6 months',
+        conditions: ['Address capability gaps', 'Strengthen market position'],
+        risks: ['Market timing shift', 'Competitive preemption'],
+        alternatives: ['Accelerated timeline', 'Strategic partnerships']
+      };
+    } else {
+      return {
+        recommendation: 'delay' as const,
+        rationale: ['Market not fully ready', 'Internal capabilities need development', 'Competitive risks high'],
+        optimalTiming: '6-12 months',
+        conditions: ['Develop capabilities', 'Monitor market evolution', 'Strengthen competitive position'],
+        risks: ['Missing market window', 'Competitive advantage erosion'],
+        alternatives: ['Pivot strategy', 'Partnership approach', 'Niche market entry']
+      };
+    }
+  }
+
+  private generateIntegratedInsights(
+    businessOpportunity: BusinessOpportunity,
+    marketSizing?: MarketSizingResult,
+    competitiveAnalysis?: CompetitorAnalysisResult,
+    strategicFit?: StrategicFitAssessment,
+    marketTiming?: MarketTimingAnalysis
+  ): IntegratedInsight[] {
+    const insights: IntegratedInsight[] = [];
+
+    // Market-Competitive Insight
+    if (marketSizing && competitiveAnalysis) {
+      insights.push({
+        type: 'market-competitive',
+        insight: `Market opportunity of $${marketSizing.tam.value.toLocaleString()} TAM with ${competitiveAnalysis.competitiveMatrix.competitors.length} major competitors presents significant growth potential`,
+        supportingData: [
+          { source: 'market-sizing', dataPoint: 'TAM', value: marketSizing.tam.value, context: 'Total addressable market size' },
+          { source: 'competitive-analysis', dataPoint: 'Competitor Count', value: competitiveAnalysis.competitiveMatrix.competitors.length, context: 'Number of direct competitors' }
+        ],
+        implications: [
+          'Large market validates opportunity size',
+          'Competitive landscape requires differentiation strategy',
+          'Market share capture potential exists'
+        ],
+        actionItems: [
+          'Develop competitive differentiation strategy',
+          'Focus on underserved market segments',
+          'Monitor competitive moves closely'
+        ],
+        confidence: 85
+      });
+    }
+
+    // Strategic-Timing Insight
+    if (strategicFit && marketTiming) {
+      insights.push({
+        type: 'strategic-timing',
+        insight: `Strategic alignment score of ${strategicFit.alignmentScore}% combined with timing score of ${marketTiming.timingScore}% indicates favorable conditions for investment`,
+        supportingData: [
+          { source: 'strategic-fit', dataPoint: 'Alignment Score', value: strategicFit.alignmentScore, context: 'Strategic alignment percentage' },
+          { source: 'timing-analysis', dataPoint: 'Timing Score', value: marketTiming.timingScore, context: 'Market timing favorability' }
+        ],
+        implications: [
+          'Strong strategic fit supports long-term success',
+          'Market timing favors early entry',
+          'Internal capabilities align with opportunity'
+        ],
+        actionItems: [
+          'Accelerate development timeline',
+          'Secure necessary resources',
+          'Establish market entry strategy'
+        ],
+        confidence: 80
+      });
+    }
+
+    return insights;
+  }
+
+  private generateOverallRecommendation(
+    businessOpportunity: BusinessOpportunity,
+    marketSizing?: MarketSizingResult,
+    competitiveAnalysis?: CompetitorAnalysisResult,
+    strategicFit?: StrategicFitAssessment,
+    marketTiming?: MarketTimingAnalysis,
+    integratedInsights?: IntegratedInsight[]
+  ): OverallRecommendation {
+    // Calculate overall scores
+    const strategicScore = strategicFit?.alignmentScore || 70;
+    const timingScore = marketTiming?.timingScore || 70;
+    const marketScore = marketSizing ? 80 : 70;
+    const competitiveScore = competitiveAnalysis ? 75 : 70;
+    
+    const overallScore = (strategicScore + timingScore + marketScore + competitiveScore) / 4;
+    const confidence = Math.min(90, overallScore);
+
+    let decision: 'strong-go' | 'conditional-go' | 'pivot' | 'delay' | 'no-go';
+    let keyReasons: string[];
+    let conditions: string[];
+
+    if (overallScore >= 80) {
+      decision = 'strong-go';
+      keyReasons = [
+        'Excellent strategic alignment',
+        'Favorable market conditions',
+        'Strong competitive position',
+        'Optimal timing for launch'
+      ];
+      conditions = [
+        'Secure adequate funding',
+        'Assemble experienced team',
+        'Establish go-to-market strategy'
+      ];
+    } else if (overallScore >= 70) {
+      decision = 'conditional-go';
+      keyReasons = [
+        'Good strategic fit',
+        'Reasonable market opportunity',
+        'Manageable competitive risks',
+        'Acceptable timing window'
+      ];
+      conditions = [
+        'Address identified capability gaps',
+        'Validate market assumptions',
+        'Develop risk mitigation strategies',
+        'Secure stakeholder alignment'
+      ];
+    } else if (overallScore >= 60) {
+      decision = 'pivot';
+      keyReasons = [
+        'Moderate strategic alignment',
+        'Market opportunity exists but limited',
+        'Competitive challenges present',
+        'Timing requires optimization'
+      ];
+      conditions = [
+        'Refine value proposition',
+        'Identify niche market segments',
+        'Strengthen competitive differentiation',
+        'Improve internal capabilities'
+      ];
+    } else {
+      decision = 'delay';
+      keyReasons = [
+        'Strategic alignment needs improvement',
+        'Market conditions not optimal',
+        'High competitive risks',
+        'Internal readiness insufficient'
+      ];
+      conditions = [
+        'Develop core capabilities',
+        'Wait for better market conditions',
+        'Strengthen competitive position',
+        'Reassess strategic priorities'
+      ];
+    }
+
+    const nextSteps = [
+      {
+        step: 'Stakeholder Review',
+        owner: 'Product Manager',
+        timeline: '1 week',
+        dependencies: ['Analysis completion'],
+        deliverables: ['Stakeholder presentation', 'Decision documentation'],
+        successCriteria: ['Stakeholder alignment', 'Clear decision path']
+      },
+      {
+        step: 'Resource Planning',
+        owner: 'Engineering Manager',
+        timeline: '2 weeks',
+        dependencies: ['Stakeholder approval'],
+        deliverables: ['Resource allocation plan', 'Timeline estimate'],
+        successCriteria: ['Resource commitment', 'Realistic timeline']
+      }
+    ];
+
+    const resourceRequirements = [
+      {
+        type: 'human' as const,
+        description: 'Development team',
+        quantity: 5,
+        unit: 'FTE',
+        timeframe: '6 months',
+        criticality: 'critical' as const
+      },
+      {
+        type: 'financial' as const,
+        description: 'Development budget',
+        quantity: 500000,
+        unit: 'USD',
+        timeframe: '12 months',
+        criticality: 'critical' as const
+      }
+    ];
+
+    return {
+      decision,
+      confidence,
+      keyReasons,
+      conditions,
+      nextSteps,
+      timeline: decision === 'strong-go' ? '3-6 months' : decision === 'conditional-go' ? '6-9 months' : '9-12 months',
+      resourceRequirements,
+      successProbability: confidence
+    };
   }
 }

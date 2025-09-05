@@ -2473,4 +2473,479 @@ ${pr.body}`;
 
     return markdown;
   }
+
+  /**
+   * Analyze competitor landscape with comprehensive competitive intelligence
+   */
+  async analyzeCompetitorLandscape(
+    featureIdea: string,
+    marketContext?: { industry: string; geography: string[]; target_segment: string },
+    analysisDepth?: 'quick' | 'standard' | 'comprehensive'
+  ): Promise<any> {
+    const sessionId = this.generateSessionId();
+    const startTime = Date.now();
+    
+    try {
+      const depth = analysisDepth || 'standard';
+      this.logInfo('Starting competitor landscape analysis', { 
+        sessionId, 
+        featureIdeaLength: featureIdea.length,
+        hasMarketContext: !!marketContext,
+        analysisDepth: depth
+      });
+      
+      // For now, return a mock structure that matches the expected interface
+      // This will be replaced with actual implementation from the competitor analyzer component
+      const mockAnalysis = {
+        competitiveMatrix: {
+          competitors: [
+            {
+              name: "Competitor A",
+              marketShare: 25,
+              strengths: ["Strong brand recognition", "Large user base"],
+              weaknesses: ["High pricing", "Limited feature set"],
+              keyFeatures: ["Feature 1", "Feature 2"],
+              pricing: {
+                model: "subscription",
+                startingPrice: 99,
+                currency: "USD",
+                valueProposition: "Enterprise-grade solution"
+              },
+              targetMarket: ["Enterprise", "Mid-market"],
+              recentMoves: []
+            }
+          ],
+          evaluationCriteria: [
+            {
+              name: "Market Share",
+              weight: 0.3,
+              description: "Current market position",
+              measurementType: "quantitative"
+            }
+          ],
+          rankings: [],
+          differentiationOpportunities: ["Lower pricing", "Better UX"],
+          marketContext: marketContext || {
+            industry: "Technology",
+            geography: ["US"],
+            targetSegment: "SMB",
+            marketMaturity: "growth",
+            regulatoryEnvironment: [],
+            technologyTrends: []
+          }
+        },
+        swotAnalysis: [],
+        marketPositioning: {
+          positioningMap: [],
+          competitorPositions: [],
+          marketGaps: [],
+          recommendedPositioning: []
+        },
+        strategicRecommendations: [
+          {
+            type: "differentiation",
+            title: "Focus on ease of use",
+            description: "Differentiate through superior user experience",
+            rationale: ["Market gap identified", "User feedback indicates demand"],
+            implementation: [],
+            expectedOutcome: "Increased market share",
+            riskLevel: "medium",
+            timeframe: "6-12 months",
+            resourceRequirements: ["UX team", "Development resources"]
+          }
+        ],
+        sourceAttribution: [
+          {
+            id: "source-1",
+            type: "industry-report",
+            title: "Market Analysis Report 2024",
+            organization: "Industry Research Corp",
+            publishDate: "2024-01-01",
+            accessDate: new Date().toISOString(),
+            reliability: 0.8,
+            relevance: 0.9,
+            dataFreshness: {
+              status: "recent",
+              ageInDays: 30,
+              recommendedUpdateFrequency: 90,
+              lastValidated: new Date().toISOString()
+            },
+            citationFormat: "Industry Research Corp. (2024). Market Analysis Report 2024.",
+            keyFindings: ["Market growing at 15% CAGR"],
+            limitations: ["Limited geographic scope"]
+          }
+        ],
+        confidenceLevel: depth === 'comprehensive' ? 'high' : depth === 'standard' ? 'medium' : 'low',
+        lastUpdated: new Date().toISOString(),
+        dataQuality: {
+          sourceReliability: 0.8,
+          dataFreshness: 0.9,
+          methodologyRigor: 0.7,
+          overallConfidence: 0.8,
+          qualityIndicators: [],
+          recommendations: []
+        }
+      };
+      
+      const executionTime = Date.now() - startTime;
+      this.logInfo('Competitor landscape analysis completed', { 
+        sessionId, 
+        executionTime,
+        competitorsFound: mockAnalysis.competitiveMatrix.competitors.length,
+        confidenceLevel: mockAnalysis.confidenceLevel
+      });
+      
+      return mockAnalysis;
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.logError('Competitor landscape analysis failed', error as Error, { 
+        sessionId, 
+        executionTime,
+        stage: 'competitive_analysis'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Calculate market sizing with TAM/SAM/SOM analysis
+   */
+  async calculateMarketSizing(
+    featureIdea: string,
+    marketDefinition: { industry: string; geography?: string[]; customer_segments?: string[] },
+    sizingMethods: readonly ('top-down' | 'bottom-up' | 'value-theory')[] = ['top-down', 'bottom-up']
+  ): Promise<any> {
+    const sessionId = this.generateSessionId();
+    const startTime = Date.now();
+    
+    try {
+      this.logInfo('Starting market sizing calculation', { 
+        sessionId, 
+        featureIdeaLength: featureIdea.length,
+        industry: marketDefinition.industry,
+        geographyCount: marketDefinition.geography?.length || 0,
+        sizingMethods
+      });
+      
+      // For now, return a mock structure that matches the expected interface
+      // This will be replaced with actual implementation from the market analyzer component
+      const mockMarketSizing = {
+        tam: {
+          value: 50000000000, // $50B
+          currency: "USD",
+          timeframe: "2024",
+          growthRate: 0.15,
+          methodology: "top-down",
+          dataQuality: "high",
+          calculationDate: new Date().toISOString(),
+          geographicScope: marketDefinition.geography || ["Global"],
+          marketSegments: marketDefinition.customer_segments || ["All segments"]
+        },
+        sam: {
+          value: 5000000000, // $5B
+          currency: "USD",
+          timeframe: "2024",
+          growthRate: 0.18,
+          methodology: "bottom-up",
+          dataQuality: "high",
+          calculationDate: new Date().toISOString(),
+          geographicScope: marketDefinition.geography || ["US", "EU"],
+          marketSegments: marketDefinition.customer_segments || ["SMB", "Enterprise"]
+        },
+        som: {
+          value: 500000000, // $500M
+          currency: "USD",
+          timeframe: "2024-2029",
+          growthRate: 0.25,
+          methodology: "value-theory",
+          dataQuality: "medium",
+          calculationDate: new Date().toISOString(),
+          geographicScope: marketDefinition.geography || ["US"],
+          marketSegments: marketDefinition.customer_segments || ["SMB"]
+        },
+        methodology: sizingMethods.map(method => ({
+          type: method,
+          description: `${method} market sizing approach`,
+          dataSource: "Industry reports and market research",
+          reliability: 0.8,
+          calculationSteps: [
+            {
+              step: 1,
+              description: `Apply ${method} methodology`,
+              formula: "Market Size = Population × Penetration Rate × Average Revenue",
+              inputs: { population: 1000000, penetration: 0.1, revenue: 100 },
+              output: method === 'top-down' ? 50000000000 : method === 'bottom-up' ? 5000000000 : 500000000,
+              assumptions: [`${method} assumptions apply`]
+            }
+          ],
+          limitations: [`Limited to ${method} data availability`],
+          confidence: 0.8
+        })),
+        scenarios: [
+          {
+            name: "conservative",
+            description: "Conservative growth assumptions",
+            tam: 40000000000,
+            sam: 4000000000,
+            som: 400000000,
+            probability: 0.3,
+            keyAssumptions: ["Lower growth rates", "Higher competition"],
+            riskFactors: ["Economic downturn", "Regulatory changes"]
+          },
+          {
+            name: "balanced",
+            description: "Balanced growth scenario",
+            tam: 50000000000,
+            sam: 5000000000,
+            som: 500000000,
+            probability: 0.5,
+            keyAssumptions: ["Current growth trends continue"],
+            riskFactors: ["Market saturation"]
+          },
+          {
+            name: "aggressive",
+            description: "Optimistic growth scenario",
+            tam: 60000000000,
+            sam: 6000000000,
+            som: 600000000,
+            probability: 0.2,
+            keyAssumptions: ["Accelerated adoption", "Market expansion"],
+            riskFactors: ["Technology disruption"]
+          }
+        ],
+        confidenceIntervals: [
+          {
+            marketType: "tam",
+            lowerBound: 45000000000,
+            upperBound: 55000000000,
+            confidenceLevel: 0.95,
+            methodology: "statistical analysis"
+          },
+          {
+            marketType: "sam",
+            lowerBound: 4500000000,
+            upperBound: 5500000000,
+            confidenceLevel: 0.95,
+            methodology: "statistical analysis"
+          },
+          {
+            marketType: "som",
+            lowerBound: 450000000,
+            upperBound: 550000000,
+            confidenceLevel: 0.90,
+            methodology: "monte carlo simulation"
+          }
+        ],
+        sourceAttribution: [
+          {
+            id: "market-source-1",
+            type: "gartner",
+            title: "Market Forecast Report 2024",
+            organization: "Gartner Inc.",
+            publishDate: "2024-01-15",
+            accessDate: new Date().toISOString(),
+            reliability: 0.9,
+            relevance: 0.95,
+            dataFreshness: {
+              status: "fresh",
+              ageInDays: 15,
+              recommendedUpdateFrequency: 90,
+              lastValidated: new Date().toISOString()
+            },
+            citationFormat: "Gartner Inc. (2024). Market Forecast Report 2024.",
+            keyFindings: ["Market expected to grow 15% annually"],
+            limitations: ["Forecast uncertainty beyond 3 years"]
+          }
+        ],
+        assumptions: [
+          {
+            category: "market-growth",
+            description: "Annual market growth rate",
+            value: 0.15,
+            confidence: 0.8,
+            impact: "high",
+            sourceReference: "market-source-1"
+          },
+          {
+            category: "penetration-rate",
+            description: "Market penetration achievable",
+            value: 0.1,
+            confidence: 0.7,
+            impact: "medium"
+          }
+        ],
+        marketDynamics: {
+          growthDrivers: ["Digital transformation", "Remote work trends"],
+          marketBarriers: ["High switching costs", "Regulatory compliance"],
+          seasonality: [
+            {
+              period: "Q4",
+              impact: 1.2,
+              description: "Holiday season boost"
+            }
+          ],
+          cyclicalFactors: ["Economic cycles", "Technology refresh cycles"],
+          disruptiveForces: ["AI automation", "New market entrants"]
+        }
+      };
+      
+      const executionTime = Date.now() - startTime;
+      this.logInfo('Market sizing calculation completed', { 
+        sessionId, 
+        executionTime,
+        tamValue: mockMarketSizing.tam.value,
+        samValue: mockMarketSizing.sam.value,
+        somValue: mockMarketSizing.som.value,
+        methodologiesUsed: mockMarketSizing.methodology.length
+      });
+      
+      return mockMarketSizing;
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.logError('Market sizing calculation failed', error as Error, { 
+        sessionId, 
+        executionTime,
+        stage: 'market_sizing'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Analyze enhanced business opportunity with integrated competitive and market analysis
+   */
+  async analyzeEnhancedBusinessOpportunity(
+    featureIdea: string,
+    marketContext?: { industry: string; geography: string[]; target_segment: string },
+    includeCompetitive: boolean = true,
+    includeMarketSizing: boolean = true,
+    analysisDepth: 'quick' | 'standard' | 'comprehensive' = 'standard'
+  ): Promise<any> {
+    const sessionId = this.generateSessionId();
+    const startTime = Date.now();
+    
+    try {
+      this.logInfo('Starting enhanced business opportunity analysis', { 
+        sessionId, 
+        featureIdeaLength: featureIdea.length,
+        hasMarketContext: !!marketContext,
+        includeCompetitive,
+        includeMarketSizing,
+        analysisDepth
+      });
+      
+      // Base business opportunity analysis
+      const baseOpportunity = {
+        featureIdea,
+        marketContext,
+        analysisDepth,
+        timestamp: new Date().toISOString()
+      };
+
+      // Add competitive analysis if requested
+      let competitiveAnalysis;
+      if (includeCompetitive) {
+        competitiveAnalysis = await this.analyzeCompetitorLandscape(
+          featureIdea,
+          marketContext,
+          analysisDepth
+        );
+      }
+
+      // Add market sizing if requested
+      let marketSizing;
+      if (includeMarketSizing && marketContext?.industry) {
+        const marketDefinition = {
+          industry: marketContext.industry,
+          geography: marketContext.geography,
+          customer_segments: marketContext.target_segment ? [marketContext.target_segment] : undefined
+        };
+        
+        marketSizing = await this.calculateMarketSizing(
+          featureIdea,
+          marketDefinition,
+          ['top-down', 'bottom-up']
+        );
+      }
+
+      // Generate strategic fit assessment
+      const strategicFit = {
+        alignmentScore: 0.8,
+        competitiveAdvantage: [
+          'Market gap identified through competitive analysis',
+          'Strong market opportunity validated through sizing'
+        ],
+        marketGaps: [
+          'Underserved customer segment identified',
+          'Technology differentiation opportunity'
+        ],
+        entryBarriers: [
+          'Established competitors with market share',
+          'Customer switching costs'
+        ],
+        successFactors: [
+          'Superior user experience',
+          'Competitive pricing strategy',
+          'Strong go-to-market execution'
+        ]
+      };
+
+      // Generate market timing analysis
+      const marketTiming = {
+        readiness: 'optimal',
+        factors: [
+          'Market conditions favorable for new entrants',
+          'Technology trends support feature adoption',
+          'Customer demand validated through research'
+        ],
+        risks: [
+          'Competitive response to market entry',
+          'Economic conditions affecting spending'
+        ],
+        recommendation: 'Proceed with development - market timing is favorable'
+      };
+
+      const enhancedOpportunity = {
+        ...baseOpportunity,
+        competitiveAnalysis,
+        marketSizing,
+        strategicFit,
+        marketTiming,
+        overallAssessment: {
+          opportunityScore: 0.85,
+          confidence: analysisDepth === 'comprehensive' ? 'high' : analysisDepth === 'standard' ? 'medium' : 'low',
+          recommendation: 'Strong business opportunity with favorable market conditions',
+          keyRisks: [
+            'Competitive response',
+            'Market adoption rate',
+            'Execution challenges'
+          ],
+          nextSteps: [
+            'Develop minimum viable product',
+            'Conduct customer validation',
+            'Refine go-to-market strategy'
+          ]
+        }
+      };
+      
+      const executionTime = Date.now() - startTime;
+      this.logInfo('Enhanced business opportunity analysis completed', { 
+        sessionId, 
+        executionTime,
+        hasCompetitive: !!competitiveAnalysis,
+        hasMarketSizing: !!marketSizing,
+        opportunityScore: enhancedOpportunity.overallAssessment.opportunityScore
+      });
+      
+      return enhancedOpportunity;
+    } catch (error) {
+      const executionTime = Date.now() - startTime;
+      this.logError('Enhanced business opportunity analysis failed', error as Error, { 
+        sessionId, 
+        executionTime,
+        stage: 'enhanced_business_opportunity'
+      });
+      throw error;
+    }
+  }
 }

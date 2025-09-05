@@ -13,7 +13,9 @@ export enum DocumentType {
   DESIGN = 'design',
   ONEPAGER = 'onepager',
   PRFAQ = 'prfaq',
-  TASKS = 'tasks'
+  TASKS = 'tasks',
+  COMPETITIVE_ANALYSIS = 'competitive_analysis',
+  MARKET_SIZING = 'market_sizing'
 }
 
 /**
