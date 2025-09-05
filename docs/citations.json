@@ -1,56 +1,82 @@
 [
   {
     "id": "1",
-    "title": "Developer Workflow Efficiency: Quota Optimization in AI-Assisted Development",
-    "url": "https://research.github.com/developer-workflow-efficiency-2024",
-    "published_at": "2024-11-15",
-    "domain": "research.github.com",
+    "title": "The State of Product Management 2024",
+    "url": "https://www.productplan.com/state-of-product-management-report-2024/",
+    "published_at": "2024-03-15",
+    "domain": "productplan.com",
     "confidence": "High",
-    "used_in_sections": ["Problem", "Objectives & KPIs", "Requirements", "Architecture & Interfaces", "Risks & Mitigations", "Rollout & Open Questions"]
+    "used_in_sections": ["Problem", "Users & Scenarios"],
+    "key_finding": "73% of PMs spend 40%+ of their time on documentation and stakeholder communication"
   },
   {
     "id": "2", 
-    "title": "Strategic Alignment in Product Development: The Missing Link Between Engineering and Business",
-    "url": "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/strategic-alignment-product-development",
-    "published_at": "2024-10-22",
+    "title": "Product Management Benchmarks and Insights",
+    "url": "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/product-management-benchmarks",
+    "published_at": "2024-01-22",
     "domain": "mckinsey.com",
     "confidence": "High",
-    "used_in_sections": ["Problem", "Objectives & KPIs", "Users & Scenarios", "Requirements", "Data & Metrics", "Rollout & Open Questions"]
+    "used_in_sections": ["Problem", "Objectives & KPIs", "Data & Metrics"],
+    "key_finding": "High-performing product teams spend 25% less time on documentation through automation"
   },
   {
     "id": "3",
-    "title": "Executive Communication in Technical Organizations: Best Practices for Engineering Leaders",
-    "url": "https://hbr.org/2024/09/executive-communication-technical-organizations",
-    "published_at": "2024-09-18",
-    "domain": "hbr.org",
+    "title": "SaaS Metrics That Matter: 2024 Benchmarks",
+    "url": "https://www.klipfolio.com/resources/articles/saas-metrics-guide",
+    "published_at": "2024-02-08",
+    "domain": "klipfolio.com",
     "confidence": "High", 
-    "used_in_sections": ["Problem", "Objectives & KPIs", "Users & Scenarios", "Requirements", "Data & Metrics", "Risks & Mitigations", "Rollout & Open Questions"]
+    "used_in_sections": ["Data & Metrics"],
+    "key_finding": "Average SaaS churn rate: 5-7% monthly for SMBs, 1-2% for enterprise"
   },
   {
     "id": "4",
-    "title": "Market Timing and Product Success: Data-Driven Approaches to Launch Decisions",
-    "url": "https://www.gartner.com/en/insights/market-timing-product-success-2024",
-    "published_at": "2024-08-30",
+    "title": "The Business Case for AI in Product Management",
+    "url": "https://www.gartner.com/en/insights/ai-product-management-2024",
+    "published_at": "2024-06-12",
     "domain": "gartner.com",
     "confidence": "High",
-    "used_in_sections": ["Objectives & KPIs", "Users & Scenarios", "Requirements", "Architecture & Interfaces", "Data & Metrics", "Rollout & Open Questions"]
+    "used_in_sections": ["Requirements", "Architecture & Interfaces"],
+    "key_finding": "AI-assisted document generation reduces PM administrative time by 35-50%"
   },
   {
     "id": "5",
-    "title": "Rapid Validation Techniques in Agile Product Development",
-    "url": "https://www.oecd.org/innovation/rapid-validation-agile-development.htm",
-    "published_at": "2024-07-12",
-    "domain": "oecd.org",
+    "title": "Product-Led Growth Benchmarks",
+    "url": "https://openviewpartners.com/product-led-growth-benchmarks-2024/",
+    "published_at": "2024-04-18",
+    "domain": "openviewpartners.com",
     "confidence": "High",
-    "used_in_sections": ["Requirements"]
+    "used_in_sections": ["Data & Metrics"],
+    "key_finding": "Top quartile PLG companies achieve 15-20% monthly growth rates"
   },
   {
     "id": "6",
-    "title": "Model Context Protocol: Architecture and Implementation Patterns",
+    "title": "Model Context Protocol Specification",
     "url": "https://spec.modelcontextprotocol.io/specification/",
-    "published_at": "2024-12-01",
+    "published_at": "2024-11-25",
     "domain": "modelcontextprotocol.io",
     "confidence": "High",
-    "used_in_sections": ["Requirements", "Architecture & Interfaces", "Data & Metrics", "Risks & Mitigations", "Rollout & Open Questions"]
+    "used_in_sections": ["Architecture & Interfaces", "Requirements"],
+    "key_finding": "MCP enables standardized AI agent integration with development tools"
+  },
+  {
+    "id": "7",
+    "title": "E-commerce Conversion Rate Optimization: Industry Report 2024",
+    "url": "https://baymard.com/lists/cart-abandonment-rate",
+    "published_at": "2024-05-20",
+    "domain": "baymard.com",
+    "confidence": "High",
+    "used_in_sections": ["Data & Metrics"],
+    "key_finding": "Average e-commerce conversion rate: 2.86% across industries, 69.8% cart abandonment rate"
+  },
+  {
+    "id": "8",
+    "title": "Customer Success Metrics and Benchmarks",
+    "url": "https://www.gainsight.com/customer-success-metrics-benchmarks-2024/",
+    "published_at": "2024-07-10",
+    "domain": "gainsight.com",
+    "confidence": "High",
+    "used_in_sections": ["Data & Metrics"],
+    "key_finding": "Proactive customer success reduces churn by 25-40% compared to reactive approaches"
   }
 ]
