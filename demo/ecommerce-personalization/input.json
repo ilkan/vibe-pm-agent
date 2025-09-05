@@ -1,0 +1,29 @@
+{
+  "scenario": "E-commerce AI Personalization Engine",
+  "context": {
+    "company": "StyleCraft Marketplace",
+    "stage": "Growth-stage e-commerce (200 employees)",
+    "problem": "Conversion rates plateauing, customers overwhelmed by product catalog",
+    "current_state": "Basic category filtering, no personalization, 2.3% conversion rate"
+  },
+  "raw_developer_intent": "Our conversion rates have been stuck at 2.3% for months and customers are complaining about not finding relevant products in our 50K+ item catalog. I want to build an AI-powered personalization engine that shows each customer products they're actually likely to buy based on their browsing history, purchase patterns, and similar customer behavior. Think Amazon's 'customers who bought this also bought' but way smarter. We need real-time recommendations on product pages, personalized homepage sections, and maybe email campaigns. The marketing team is pushing hard for this because our CAC is getting expensive and we need better conversion to make the unit economics work. But I'm worried about the complexity - we've never done ML at scale and I don't want to build a system that becomes a black box nobody can maintain.",
+  "optional_parameters": {
+    "expected_user_volume": 50000,
+    "cost_constraints": 150000,
+    "performance_sensitivity": "high",
+    "timeline_pressure": "moderate",
+    "team_size": 12
+  },
+  "business_context": {
+    "monthly_revenue": 2800000,
+    "monthly_visitors": 180000,
+    "conversion_rate": 0.023,
+    "avg_order_value": 85,
+    "product_catalog_size": 52000,
+    "cac": 45,
+    "ltv": 180,
+    "marketing_team_size": 6,
+    "engineering_team": 12,
+    "upcoming_milestones": ["Holiday season (Q4)", "New product line launch", "International expansion planning"]
+  }
+}

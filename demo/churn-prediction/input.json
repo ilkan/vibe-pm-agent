@@ -1,0 +1,26 @@
+{
+  "scenario": "SaaS Churn Prevention Dashboard",
+  "context": {
+    "company": "CloudFlow Analytics",
+    "stage": "Series A SaaS (50 employees)",
+    "problem": "15% monthly churn rate, customer success team overwhelmed",
+    "current_state": "Manual spreadsheet tracking, reactive support"
+  },
+  "raw_developer_intent": "Our customer success team is drowning in churn. They're tracking everything in spreadsheets and only find out about at-risk customers when they're already canceling. I want to build a real-time churn prediction dashboard that uses our product usage data, support tickets, and billing info to predict which customers are likely to churn in the next 30 days. It should have alerts, automated workflows, and maybe some ML to get smarter over time. The CS team needs this yesterday but I don't want to build something that becomes a maintenance nightmare.",
+  "optional_parameters": {
+    "expected_user_volume": 25,
+    "cost_constraints": 50000,
+    "performance_sensitivity": "high",
+    "timeline_pressure": "urgent",
+    "team_size": 8
+  },
+  "business_context": {
+    "monthly_revenue": 180000,
+    "customer_count": 450,
+    "churn_rate": 0.15,
+    "avg_customer_value": 4800,
+    "cs_team_size": 4,
+    "engineering_team": 8,
+    "upcoming_milestones": ["Series B fundraising in 6 months", "Enterprise customer pilot in Q2"]
+  }
+}
