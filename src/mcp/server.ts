@@ -45,6 +45,12 @@ import {
 } from '../models/competitive';
 import { MCP_SERVER_CONFIG, MCPToolRegistry } from './server-config';
 import { MCPErrorHandler, MCPResponseFormatter, MCPLogger } from '../utils/mcp-error-handling';
+import { 
+  MCP_TOOLS_REGISTRY, 
+  getAvailableToolNames, 
+  getToolMetadata, 
+  isValidToolName 
+} from './tools';
 
 /**
  * PM Agent MCP Server implementation
@@ -121,14 +127,23 @@ export class PMAgentMCPServer {
    * Setup MCP tool handlers
    */
   private setupToolHandlers(): void {
-    // Register tool handlers with the MCP server
+    // Register tool handlers with the MCP server using clean tool implementations
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+      // Combine registry tools with clean tool implementations
+      const registryTools = this.toolRegistry.getAllTools().map(tool => ({
+        name: tool.name,
+        description: tool.description,
+        inputSchema: tool.inputSchema,
+      }));
+
+      const cleanTools = Object.entries(MCP_TOOLS_REGISTRY).map(([name, tool]) => ({
+        name,
+        description: tool.description,
+        inputSchema: tool.schema,
+      }));
+
       return {
-        tools: this.toolRegistry.getAllTools().map(tool => ({
-          name: tool.name,
-          description: tool.description,
-          inputSchema: tool.inputSchema,
-        })),
+        tools: [...registryTools, ...cleanTools],
       };
     });
 
@@ -146,31 +161,39 @@ export class PMAgentMCPServer {
       try {
         MCPLogger.info(`Tool call started: ${name}`, context, { args });
         
-        // Validate tool exists
-        const tool = this.toolRegistry.getTool(name);
-        if (!tool) {
-          throw MCPErrorHandler.createError(
-            MCPErrorCode.TOOL_NOT_FOUND,
-            `Tool '${name}' not found`,
-            context,
-            { availableTools: this.toolRegistry.getToolNames() }
-          );
-        }
-
-        // Validate input
-        const validation = this.toolRegistry.validateToolInput(name, args);
-        if (!validation.valid) {
-          throw MCPErrorHandler.createError(
-            MCPErrorCode.VALIDATION_FAILED,
-            `Invalid input: ${validation.errors?.join(', ')}`,
-            context,
-            { validationErrors: validation.errors, schema: tool.inputSchema }
-          );
-        }
-
         // Execute tool handler
         let result: MCPToolResult;
-        switch (name) {
+        
+        // Check if it's a clean tool implementation first
+        if (isValidToolName(name)) {
+          const toolMeta = getToolMetadata(name);
+          MCPLogger.debug(`Executing clean tool: ${name}`, context);
+          result = await toolMeta.handler(args as any, context);
+        } else {
+          // Fallback to registry tools
+          const tool = this.toolRegistry.getTool(name);
+          if (!tool) {
+            throw MCPErrorHandler.createError(
+              MCPErrorCode.TOOL_NOT_FOUND,
+              `Tool '${name}' not found`,
+              context,
+              { availableTools: [...this.toolRegistry.getToolNames(), ...getAvailableToolNames()] }
+            );
+          }
+
+          // Validate input for registry tools
+          const validation = this.toolRegistry.validateToolInput(name, args);
+          if (!validation.valid) {
+            throw MCPErrorHandler.createError(
+              MCPErrorCode.VALIDATION_FAILED,
+              `Invalid input: ${validation.errors?.join(', ')}`,
+              context,
+              { validationErrors: validation.errors, schema: tool.inputSchema }
+            );
+          }
+
+          // Execute legacy tool handler
+          switch (name) {
           case 'optimize_intent':
             result = await this.handleOptimizeIntent(args as unknown as OptimizeIntentArgs, context);
             break;
@@ -225,12 +248,13 @@ export class PMAgentMCPServer {
           case 'validate_market_timing':
             result = await this.handleValidateMarketTiming(args as unknown as ValidateMarketTimingArgs, context);
             break;
-          default:
-            throw MCPErrorHandler.createError(
-              MCPErrorCode.METHOD_NOT_FOUND,
-              `Tool handler for '${name}' not implemented`,
-              context
-            );
+            default:
+              throw MCPErrorHandler.createError(
+                MCPErrorCode.METHOD_NOT_FOUND,
+                `Tool handler for '${name}' not implemented`,
+                context
+              );
+          }
         }
 
         // Update metrics and log success
@@ -289,6 +313,96 @@ export class PMAgentMCPServer {
         // Could implement reconnection logic here
       }
     };
+  }
+
+  /**
+   * Get server health status
+   */
+  public getHealthStatus(): MCPServerStatus {
+    const uptime = Date.now() - this.startTime;
+    const averageResponseTime = this.responseTimes.length > 0 
+      ? this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length 
+      : 0;
+    const errorRate = this.requestCount > 0 ? (this.errorCount / this.requestCount) * 100 : 0;
+
+    return {
+      ...this.status,
+      uptime,
+      toolsRegistered: this.toolRegistry.getAllTools().length + Object.keys(MCP_TOOLS_REGISTRY).length,
+      performance: {
+        averageResponseTime,
+        totalRequests: this.requestCount,
+        errorRate
+      }
+    };
+  }
+
+  /**
+   * Health check endpoint for monitoring
+   */
+  public async healthCheck(): Promise<{
+    status: string;
+    uptime: number;
+    toolsAvailable: string[];
+    performance: {
+      averageResponseTime: number;
+      totalRequests: number;
+      errorRate: number;
+    };
+    timestamp: string;
+  }> {
+    const health = this.getHealthStatus();
+    const allTools = [...this.toolRegistry.getToolNames(), ...getAvailableToolNames()];
+    
+    return {
+      status: health.status,
+      uptime: health.uptime,
+      toolsAvailable: allTools,
+      performance: health.performance,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Connect the server to a transport
+   */
+  public async connect(transport: any): Promise<void> {
+    try {
+      await this.server.connect(transport);
+      MCPLogger.info('MCP Server connected successfully', undefined, {
+        transport: transport.constructor.name,
+        toolsRegistered: this.getHealthStatus().toolsRegistered
+      });
+    } catch (error) {
+      MCPLogger.error('Failed to connect MCP server', error as Error, undefined);
+      throw error;
+    }
+  }
+
+  /**
+   * Stop the server gracefully
+   */
+  public async stop(): Promise<void> {
+    try {
+      const uptime = Date.now() - this.startTime;
+      await this.server.close();
+      
+      MCPLogger.info('MCP Server stopped', undefined, {
+        uptime,
+        totalRequests: this.requestCount,
+        errorRate: this.requestCount > 0 ? (this.errorCount / this.requestCount) * 100 : 0
+      });
+    } catch (error) {
+      MCPLogger.error('Error stopping MCP server', error as Error, undefined);
+      throw error;
+    }
+  }
+
+  /**
+   * Get server status for monitoring
+   */
+  public getStatus(): MCPServerStatus {
+    return this.getHealthStatus();
   }
 
   /**
@@ -1255,7 +1369,7 @@ export class PMAgentMCPServer {
           'business_case',
           businessCase,
           args.citation_options,
-          args.financial_inputs?.industry
+          'general'
         );
         enhancedContent = citationResult.enhancedContent;
         citationMetrics = citationResult.metrics;
@@ -1673,35 +1787,7 @@ export class PMAgentMCPServer {
     }
   }
 
-  /**
-   * Stop the MCP server
-   */
-  async stop(): Promise<void> {
-    try {
-      // Clean up pipeline resources first
-      if (this.pipeline && typeof (this.pipeline as any).cleanup === 'function') {
-        await (this.pipeline as any).cleanup();
-      }
-      
-      await this.server.close();
-      MCPLogger.info('MCP Server stopped', undefined, {
-        uptime: Date.now() - this.startTime,
-        totalRequests: this.requestCount,
-        errorRate: this.status.performance.errorRate
-      });
-    } catch (error) {
-      MCPLogger.error('Error stopping MCP Server', error as Error);
-      throw error;
-    }
-  }
 
-  /**
-   * Get server status and health information
-   */
-  getStatus(): MCPServerStatus {
-    this.status.uptime = Date.now() - this.startTime;
-    return { ...this.status };
-  }
 
   /**
    * Update performance metrics

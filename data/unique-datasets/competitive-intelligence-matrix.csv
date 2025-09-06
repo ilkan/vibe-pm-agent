@@ -1,0 +1,21 @@
+company_name,industry,market_share_pct,revenue_growth_rate,innovation_index,customer_satisfaction,financial_health,competitive_moat,threat_level,opportunity_score,data_sources,last_updated
+Microsoft,Cloud Computing,23.4,12.8,92.5,4.6,A+,Very Strong,Low,8.7,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Amazon Web Services,Cloud Computing,32.1,16.2,89.7,4.4,A+,Very Strong,Medium,9.1,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Google Cloud,Cloud Computing,8.9,28.4,94.2,4.3,A+,Strong,High,8.9,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Salesforce,CRM,19.8,11.3,85.6,4.5,A,Strong,Low,7.9,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Oracle,Database,14.2,3.7,76.4,3.9,A-,Moderate,Medium,6.8,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+SAP,Enterprise Software,22.1,5.8,78.9,4.1,A,Moderate,Low,7.2,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Adobe,Creative Software,61.3,13.5,84.3,4.7,A+,Very Strong,Low,8.4,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Autodesk,Design Software,35.7,9.2,82.1,4.2,A,Strong,Medium,7.8,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Intuit,Financial Software,67.8,14.1,79.6,4.6,A+,Strong,Low,8.2,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+ServiceNow,IT Service Management,28.4,22.7,86.8,4.4,A+,Strong,Medium,8.6,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Workday,HR Software,15.9,17.3,81.7,4.3,A,Moderate,High,7.9,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Zoom,Video Communications,41.2,8.9,81.9,4.5,A,Moderate,High,7.4,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Slack,Team Collaboration,12.6,15.4,80.2,4.2,B+,Weak,Very High,7.0,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Atlassian,Developer Tools,31.8,19.6,83.4,4.4,A,Strong,Medium,8.1,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+GitHub,Code Repository,73.2,21.3,88.5,4.6,A+,Very Strong,Low,9.0,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+GitLab,DevOps Platform,8.7,34.2,85.9,4.1,B+,Moderate,High,8.3,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Shopify,E-commerce Platform,29.3,26.1,83.7,4.3,A,Strong,Medium,8.1,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Square,Payment Processing,18.4,13.7,77.8,4.2,A-,Moderate,Medium,7.5,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+Stripe,Payment Infrastructure,35.6,38.9,86.4,4.5,A+,Strong,Medium,8.8,"sec_edgar,github_ecosystem,bls_labor",2024-01-15
+PayPal,Digital Payments,52.1,9.8,74.2,4.0,A,Moderate,Medium,7.1,"sec_edgar,github_ecosystem,bls_labor",2024-01-15

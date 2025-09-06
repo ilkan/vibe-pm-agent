@@ -677,6 +677,50 @@ export class SteeringService {
       create_steering_files: true // Always true when we reach this point
     };
   }
+  /**
+   * Create steering file from business case analysis
+   */
+  async createFromBusinessCase(
+    businessCase: string,
+    steeringOptions?: SteeringFileOptions
+  ): Promise<SteeringCreationResult> {
+    return this.createSteeringFileWithUserInteraction(
+      businessCase,
+      DocumentType.ONEPAGER,
+      steeringOptions,
+      (content, context) => this.generator.generateFromOnePager(content, context)
+    );
+  }
+
+  /**
+   * Create steering file from stakeholder communication
+   */
+  async createFromStakeholderCommunication(
+    communication: string,
+    steeringOptions?: SteeringFileOptions
+  ): Promise<SteeringCreationResult> {
+    return this.createSteeringFileWithUserInteraction(
+      communication,
+      DocumentType.ONEPAGER,
+      steeringOptions,
+      (content, context) => this.generator.generateFromOnePager(content, context)
+    );
+  }
+
+  /**
+   * Create steering file from strategic alignment analysis
+   */
+  async createFromStrategicAlignment(
+    alignment: string,
+    steeringOptions?: SteeringFileOptions
+  ): Promise<SteeringCreationResult> {
+    return this.createSteeringFileWithUserInteraction(
+      alignment,
+      DocumentType.REQUIREMENTS,
+      steeringOptions,
+      (content, context) => this.generator.generateFromRequirements(content, context)
+    );
+  }
 }
 
 export default SteeringService;

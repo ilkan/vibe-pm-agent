@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe PM Agent - Demo Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .demo-section {
+            padding: 40px;
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .tool-card {
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 25px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .tool-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .tool-card.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .tool-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .tool-card p {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .tool-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .input-section {
+            margin-top: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .input-group textarea,
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group textarea:focus,
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .results-section {
+            margin-top: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .results-section.show {
+            display: block;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            white-space: pre-wrap;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .error {
+            background: #fff5f5;
+            border-left-color: #e53e3e;
+            color: #c53030;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-healthy { background: #48bb78; }
+        .status-degraded { background: #ed8936; }
+        .status-error { background: #e53e3e; }
+        
+        .examples {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e6f3ff;
+            border-radius: 6px;
+        }
+        
+        .examples h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .example-item {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .example-item:hover {
+            background: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Vibe PM Agent</h1>
+            <p>Transform raw ideas into professional business intelligence with evidence-backed analysis</p>
+            <div style="margin-top: 15px;">
+                <span class="status-indicator status-healthy"></span>
+                <span id="server-status">MCP Server Ready</span>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2 style="margin-bottom: 25px; color: #2c3e50;">🚀 Business Intelligence Tools</h2>
+            
+            <div class="tool-grid">
+                <div class="tool-card" data-tool="analyze_business_opportunity">
+                    <h3>📊 Business Opportunity Analysis</h3>
+                    <p>Comprehensive market validation and strategic fit assessment with competitive intelligence and evidence-backed recommendations.</p>
+                    <span class="tool-badge">Core Tool</span>
+                </div>
+                
+                <div class="tool-card" data-tool="generate_business_case">
+                    <h3>💰 Business Case Generation</h3>
+                    <p>ROI analysis with multi-scenario projections, comparable company data, and risk assessment with mitigation strategies.</p>
+                    <span class="tool-badge">Financial</span>
+                </div>
+                
+                <div class="tool-card" data-tool="create_stakeholder_communication">
+                    <h3>📋 Executive Communications</h3>
+                    <p>Generate executive one-pagers, PR-FAQs, and board presentations with Pyramid Principle structure and citations.</p>
+                    <span class="tool-badge">Executive</span>
+                </div>
+                
+                <div class="tool-card" data-tool="validate_market_timing">
+                    <h3>⏰ Market Timing Validation</h3>
+                    <p>Fast validation of whether now is the right time to build based on market conditions and competitive pressure.</p>
+                    <span class="tool-badge">Quick</span>
+                </div>
+                
+                <div class="tool-card" data-tool="assess_strategic_alignment">
+                    <h3>🎯 Strategic Alignment</h3>
+                    <p>Evaluate how features align with company strategy, OKRs, and long-term vision with competitive positioning.</p>
+                    <span class="tool-badge">Strategy</span>
+                </div>
+                
+                <div class="tool-card" data-tool="optimize_resource_allocation">
+                    <h3>⚡ Resource Optimization</h3>
+                    <p>Analyze resource requirements and provide optimization recommendations for development efficiency.</p>
+                    <span class="tool-badge">Operations</span>
+                </div>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="feature-idea">Feature Idea or Business Question</label>
+                    <textarea id="feature-idea" placeholder="Describe your feature idea, business question, or strategic challenge..."></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="industry">Industry (Optional)</label>
+                    <select id="industry">
+                        <option value="">Select industry...</option>
+                        <option value="saas">SaaS / Software</option>
+                        <option value="ecommerce">E-commerce</option>
+                        <option value="fintech">FinTech</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="education">Education</option>
+                        <option value="manufacturing">Manufacturing</option>
+                        <option value="retail">Retail</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="urgency">Urgency Level</label>
+                    <select id="urgency">
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="runAnalysis()">🚀 Run Analysis</button>
+                    <button class="btn btn-secondary" onclick="clearResults()">🗑️ Clear</button>
+                </div>
+                
+                <div class="examples">
+                    <h4>💡 Example Ideas (Click to use)</h4>
+                    <div class="example-item" onclick="setExample('AI-powered customer support chatbot for SaaS platform to reduce support ticket volume and improve customer satisfaction')">
+                        AI-powered customer support chatbot for SaaS platform
+                    </div>
+                    <div class="example-item" onclick="setExample('Real-time fraud detection system for fintech payments to prevent financial losses and improve security')">
+                        Real-time fraud detection system for fintech payments
+                    </div>
+                    <div class="example-item" onclick="setExample('Personalized product recommendation engine for e-commerce to increase conversion rates and average order value')">
+                        Personalized product recommendation engine for e-commerce
+                    </div>
+                    <div class="example-item" onclick="setExample('Automated code review system for development teams to improve code quality and reduce bugs')">
+                        Automated code review system for development teams
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results-section" id="results-section">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">📈 Analysis Results</h3>
+                <div id="results-content" class="result-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTool = 'analyze_business_opportunity';
+        
+        // Tool selection
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.tool-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                selectedTool = card.dataset.tool;
+            });
+        });
+        
+        // Set default selection
+        document.querySelector('[data-tool="analyze_business_opportunity"]').classList.add('active');
+        
+        function setExample(text) {
+            document.getElementById('feature-idea').value = text;
+        }
+        
+        function clearResults() {
+            document.getElementById('results-section').classList.remove('show');
+            document.getElementById('feature-idea').value = '';
+        }
+        
+        async function runAnalysis() {
+            const featureIdea = document.getElementById('feature-idea').value.trim();
+            const industry = document.getElementById('industry').value;
+            const urgency = document.getElementById('urgency').value;
+            
+            if (!featureIdea) {
+                alert('Please enter a feature idea or business question');
+                return;
+            }
+            
+            const resultsSection = document.getElementById('results-section');
+            const resultsContent = document.getElementById('results-content');
+            
+            resultsSection.classList.add('show');
+            resultsContent.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing with ${selectedTool}...</p>
+                    <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                        Generating evidence-backed business intelligence with citations
+                    </p>
+                </div>
+            `;
+            
+            try {
+                // Simulate MCP tool call (in real implementation, this would call the actual MCP server)
+                const result = await simulateMCPCall(selectedTool, {
+                    feature_idea: featureIdea,
+                    market_context: {
+                        industry: industry || undefined,
+                        urgency: urgency
+                    }
+                });
+                
+                resultsContent.innerHTML = result;
+                resultsContent.classList.remove('error');
+                
+            } catch (error) {
+                resultsContent.innerHTML = `Error: ${error.message}`;
+                resultsContent.classList.add('error');
+            }
+        }
+        
+        // Simulate MCP tool calls for demo purposes
+        async function simulateMCPCall(tool, args) {
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+            
+            const responses = {
+                analyze_business_opportunity: generateBusinessOpportunityResponse(args),
+                generate_business_case: generateBusinessCaseResponse(args),
+                create_stakeholder_communication: generateStakeholderCommResponse(args),
+                validate_market_timing: generateMarketTimingResponse(args),
+                assess_strategic_alignment: generateStrategicAlignmentResponse(args),
+                optimize_resource_allocation: generateResourceOptimizationResponse(args)
+            };
+            
+            return responses[tool] || 'Tool response not implemented in demo';
+        }
+        
+        function generateBusinessOpportunityResponse(args) {
+            return `# 📊 Business Opportunity Analysis
+
+## Executive Summary
+**RECOMMENDATION: PROCEED** with ${args.feature_idea} - Market timing is optimal (Confidence: 87%)
+
+## Market Opportunity
+• **Market Size**: $2.8B addressable market with 19.1% CAGR (2023-2030)
+• **Customer Demand**: High - 73% of organizations report resource constraints in this area
+• **Competitive Gap**: Limited solutions addressing this specific need with evidence-backed approach
+
+## Strategic Fit Assessment
+✅ **High Strategic Value** - Aligns with market trends and customer pain points
+✅ **Technical Feasibility** - Leverages existing capabilities and infrastructure  
+✅ **Resource Alignment** - Fits within current team capacity and budget constraints
+
+## Risk Assessment
+🟡 **Medium Risk** - Standard market and execution risks with clear mitigation strategies
+• Market adoption risk: 25% probability, mitigated by pilot program
+• Technical complexity risk: 15% probability, mitigated by phased approach
+• Competitive response risk: 30% probability, mitigated by first-mover advantage
+
+## Financial Projections
+• **Development Cost**: $150K - $300K (6-12 months)
+• **Expected Revenue**: $500K - $1.2M annually (Year 2)
+• **ROI**: 180% - 320% over 24 months
+• **Break-even**: 8-14 months
+
+## Next Steps
+1. **Immediate**: Conduct customer validation interviews (2 weeks)
+2. **Short-term**: Develop MVP specification and technical architecture (4 weeks)  
+3. **Medium-term**: Begin development with pilot customer program (3 months)
+
+## Citations & Evidence
+[1] ProductPlan State of Product Management 2024
+[2] Gartner Market Analysis: ${args.market_context?.industry || 'Software'} Solutions 2024
+[3] McKinsey Digital Transformation Report 2024
+[4] Industry benchmark data from comparable implementations
+
+*Analysis generated with evidence-backed methodology and professional consulting frameworks*`;
+        }
+        
+        function generateBusinessCaseResponse(args) {
+            return `# 💰 Comprehensive Business Case
+
+## Investment Recommendation
+**APPROVE INVESTMENT** - Strong ROI with manageable risk profile (Confidence: 91%)
+
+## Financial Analysis
+
+### Multi-Scenario Projections
+| Scenario | Investment | Timeline | Revenue (Y2) | ROI | Risk Level |
+|----------|------------|----------|--------------|-----|------------|
+| Conservative | $200K | 12 months | $600K | 200% | Low |
+| Balanced ✅ | $250K | 9 months | $900K | 260% | Medium |
+| Aggressive | $350K | 6 months | $1.3M | 271% | High |
+
+### Cost Breakdown
+• **Development**: 60% ($150K - $210K)
+• **Infrastructure**: 20% ($50K - $70K)  
+• **Marketing/Sales**: 15% ($37K - $52K)
+• **Contingency**: 5% ($12K - $17K)
+
+## Market Validation
+✅ **Customer Interviews**: 15 target customers, 87% expressed strong interest
+✅ **Competitive Analysis**: 3 direct competitors, significant differentiation opportunity
+✅ **Market Timing**: Optimal window based on industry trends and customer readiness
+
+## Risk Assessment & Mitigation
+🟢 **Technical Risk**: Low (15%) - Proven technology stack
+🟡 **Market Risk**: Medium (25%) - Mitigation: Pilot program with 3 customers
+🟡 **Execution Risk**: Medium (20%) - Mitigation: Experienced team, phased approach
+
+## Strategic Benefits
+• **Revenue Growth**: Direct revenue stream with recurring model
+• **Market Position**: First-mover advantage in emerging segment
+• **Customer Retention**: Increased stickiness and reduced churn
+• **Competitive Moat**: Proprietary data and network effects
+
+## Implementation Timeline
+**Phase 1** (Months 1-3): MVP development and pilot program
+**Phase 2** (Months 4-6): Market launch and customer acquisition  
+**Phase 3** (Months 7-12): Scale and optimization
+
+## Success Metrics
+• **Revenue**: $500K ARR by Month 12
+• **Customers**: 50 paying customers by Month 12
+• **Market Share**: 5% of addressable segment by Month 18
+
+*Business case validated with industry benchmarks and comparable company analysis*`;
+        }
+        
+        function generateStakeholderCommResponse(args) {
+            return `# 📋 Executive Communication Package
+
+## Management One-Pager
+
+### DECISION: PROCEED NOW
+**Recommendation**: Launch ${args.feature_idea} in Q2 2025 (Confidence: 89%)
+
+### WHY (3 Core Reasons)
+1. **Market Opportunity**: $2.8B market growing at 19.1% CAGR with limited competition
+2. **Customer Demand**: 73% of target customers report this as top priority need  
+3. **Strategic Timing**: 18-month competitive window before major players enter
+
+### WHAT (Scope & Success Metrics)
+• **MVP Launch**: Q2 2025 with core functionality
+• **Target**: 50 customers, $500K ARR by end of year
+• **Investment**: $250K over 9 months with balanced risk profile
+
+### RISKS & MITIGATIONS
+🟡 **Market Adoption** (25% risk) → Pilot program with 3 anchor customers
+🟡 **Technical Complexity** (15% risk) → Phased development approach
+🟡 **Competitive Response** (30% risk) → First-mover advantage and IP protection
+
+### OPTIONS ANALYSIS
+| Option | Investment | Timeline | ROI | Recommendation |
+|--------|------------|----------|-----|----------------|
+| Conservative | $200K | 12mo | 200% | Safe choice |
+| **Balanced** ✅ | $250K | 9mo | 260% | **RECOMMENDED** |
+| Aggressive | $350K | 6mo | 271% | High risk |
+
+---
+
+## PR-FAQ Preview
+
+### Press Release (Future-dated: July 15, 2025)
+**FOR IMMEDIATE RELEASE**
+
+**Company Announces Revolutionary ${args.feature_idea} That Transforms Customer Experience**
+
+*New solution addresses critical market need with 87% customer satisfaction in pilot program*
+
+**[City, Date]** - Today Company announced the launch of [Solution Name], an innovative platform that [key benefit] for [target market]. The solution addresses the growing need for [problem] that affects 73% of organizations in the industry.
+
+"This represents a fundamental shift in how companies approach [problem area]," said [CEO Name]. "Our pilot customers have seen [quantified benefit], demonstrating the transformative potential of this approach."
+
+The solution is available starting [date] with pricing beginning at [price point].
+
+### Key FAQ Items
+**Q: Who is the target customer?**
+A: Mid-market to enterprise companies in [industry] with [specific characteristics]
+
+**Q: What problem does this solve that wasn't solved before?**  
+A: Existing solutions require [limitation], while our approach enables [differentiation]
+
+**Q: Why launch now?**
+A: Market research shows 18-month window before major competitors enter space
+
+*Complete PR-FAQ and launch checklist available upon request*`;
+        }
+        
+        function generateMarketTimingResponse(args) {
+            return `# ⏰ Market Timing Validation
+
+## TIMING VERDICT: GO NOW ✅
+**Confidence**: 85% - Optimal market window with strong supporting signals
+
+## Market Readiness Signals
+
+### 🟢 POSITIVE INDICATORS
+• **Customer Demand**: High (87% of surveyed customers express urgent need)
+• **Market Maturity**: Sweet spot - problem recognized, solutions immature
+• **Technology Readiness**: Core technologies proven and accessible
+• **Economic Climate**: Favorable for B2B software investments
+
+### 🟡 CAUTION INDICATORS  
+• **Competitive Pressure**: Medium (2-3 players exploring similar solutions)
+• **Regulatory Environment**: Stable but evolving (monitor for changes)
+• **Resource Availability**: Tight talent market for specialized skills
+
+### 🔴 RISK INDICATORS
+• **Market Saturation**: Low risk - early stage market
+• **Economic Headwinds**: Minimal impact on target segment
+
+## Competitive Window Analysis
+**18-Month First-Mover Advantage**
+• Major players (Company A, Company B) in early research phase
+• No dominant solution exists in market
+• Customer switching costs currently low
+
+## Timing Recommendation
+
+### IMMEDIATE ACTION (Next 30 days)
+✅ Begin customer validation interviews
+✅ Secure initial development resources  
+✅ File provisional patents for key innovations
+
+### SHORT-TERM (3-6 months)
+✅ Launch pilot program with anchor customers
+✅ Build MVP with core functionality
+✅ Establish market positioning and messaging
+
+### MEDIUM-TERM (6-12 months)
+✅ Scale customer acquisition
+✅ Expand feature set based on market feedback
+✅ Build competitive moats (data, network effects)
+
+## Risk Mitigation
+**If delayed 6 months**: 40% reduction in first-mover advantage
+**If delayed 12 months**: 70% reduction, face established competition
+**If delayed 18+ months**: Market likely saturated, significantly higher customer acquisition costs
+
+## Market Intelligence Sources
+[1] Industry analyst reports (Gartner, Forrester)
+[2] Customer interview data (n=25)  
+[3] Competitive intelligence monitoring
+[4] Technology trend analysis
+
+*Timing analysis based on real-time market intelligence and proven frameworks*`;
+        }
+        
+        function generateStrategicAlignmentResponse(args) {
+            return `# 🎯 Strategic Alignment Assessment
+
+## ALIGNMENT SCORE: 92/100 ✅
+**Verdict**: STRONG STRATEGIC FIT - Aligns with core objectives and market position
+
+## Company Strategy Alignment
+
+### 🎯 MISSION ALIGNMENT (95/100)
+✅ **Core Mission**: Directly supports company's mission to [mission statement]
+✅ **Value Proposition**: Enhances customer value delivery in key market segment
+✅ **Brand Promise**: Reinforces commitment to innovation and customer success
+
+### 📊 OKR ALIGNMENT (90/100)
+✅ **Revenue Growth**: Contributes $500K+ ARR toward annual revenue target
+✅ **Market Expansion**: Opens new customer segment worth $2.8B TAM
+✅ **Product Innovation**: Advances technology leadership in core competency
+⚠️ **Resource Efficiency**: Requires 15% of engineering capacity (within limits)
+
+### 🏆 STRATEGIC PRIORITIES (88/100)
+✅ **Priority 1 - Customer Success**: Directly improves customer outcomes and satisfaction
+✅ **Priority 2 - Market Leadership**: Establishes first-mover advantage in emerging category  
+✅ **Priority 3 - Profitable Growth**: Strong ROI profile with recurring revenue model
+⚠️ **Priority 4 - Operational Excellence**: May strain operations during initial launch
+
+## Competitive Positioning Impact
+
+### STRENGTHENS POSITION
+• **Differentiation**: Creates unique value proposition vs. competitors
+• **Market Share**: Potential to capture 5-8% of addressable market
+• **Customer Stickiness**: Increases switching costs and reduces churn
+• **Innovation Leadership**: Reinforces reputation as market innovator
+
+### COMPETITIVE ADVANTAGES
+🔥 **First-Mover**: 18-month head start over major competitors
+🔥 **Technology**: Proprietary approach with patent potential
+🔥 **Customer Base**: Existing relationships provide distribution advantage
+🔥 **Data Network**: Creates valuable data moat over time
+
+## Resource Allocation Assessment
+
+### FITS WITHIN CONSTRAINTS ✅
+• **Budget**: $250K investment within annual innovation budget
+• **Team Capacity**: 15% engineering allocation (acceptable level)
+• **Timeline**: 9-month development fits product roadmap
+• **Risk Tolerance**: Medium risk profile aligns with company appetite
+
+### OPPORTUNITY COST ANALYSIS
+**Alternative A**: Incremental feature improvements (Lower impact, safer)
+**Alternative B**: Adjacent market expansion (Higher risk, longer timeline)
+**Alternative C**: Partnership/acquisition (Higher cost, integration complexity)
+
+**Recommendation**: Proceed with proposed initiative over alternatives
+
+## Strategic Risks & Mitigation
+
+🟡 **Resource Dilution** (20% probability)
+→ Mitigation: Dedicated team, clear scope boundaries
+
+🟡 **Strategic Drift** (15% probability)  
+→ Mitigation: Regular strategy reviews, success metrics alignment
+
+🟢 **Market Timing** (10% probability)
+→ Mitigation: Continuous market monitoring, pivot capability
+
+## Long-term Strategic Value
+**Year 1**: Market entry and customer validation
+**Year 2**: Scale and market share capture  
+**Year 3**: Platform expansion and ecosystem development
+**Year 5**: Market leadership position with significant competitive moats
+
+*Strategic assessment based on proven frameworks and industry best practices*`;
+        }
+        
+        function generateResourceOptimizationResponse(args) {
+            return `# ⚡ Resource Optimization Analysis
+
+## OPTIMIZATION SCORE: 78/100 ⚡
+**Verdict**: SIGNIFICANT EFFICIENCY GAINS POSSIBLE - Recommended optimizations identified
+
+## Current Resource Assessment
+
+### 👥 TEAM UTILIZATION
+• **Engineering**: 85% capacity (5% over optimal)
+• **Product**: 70% capacity (opportunity for expansion)  
+• **Design**: 90% capacity (near maximum)
+• **QA**: 60% capacity (underutilized)
+
+### 💰 BUDGET ALLOCATION
+• **Development**: 65% of budget (appropriate)
+• **Infrastructure**: 20% of budget (slightly high)
+• **Tools/Licenses**: 10% of budget (optimizable)
+• **Contingency**: 5% of budget (adequate)
+
+## Optimization Recommendations
+
+### 🚀 HIGH IMPACT OPTIMIZATIONS
+
+**1. Cross-functional Team Formation** (Impact: High, Effort: Medium)
+• Create dedicated feature team with balanced skill mix
+• Reduce handoffs and communication overhead by 30%
+• Estimated time savings: 15-20% faster delivery
+
+**2. Automated Testing Pipeline** (Impact: High, Effort: Medium)  
+• Implement CI/CD with automated testing
+• Reduce QA bottlenecks and improve quality
+• Estimated cost savings: $25K annually in manual testing
+
+**3. Infrastructure Optimization** (Impact: Medium, Effort: Low)
+• Migrate to containerized deployment
+• Reduce infrastructure costs by 25-30%
+• Estimated savings: $15K annually
+
+### ⚡ QUICK WINS (Implement First)
+
+**1. Tool Consolidation** (Impact: Medium, Effort: Low)
+• Audit and consolidate development tools
+• Eliminate redundant licenses and subscriptions
+• Immediate savings: $5K annually
+
+**2. Knowledge Sharing Sessions** (Impact: Medium, Effort: Low)
+• Weekly tech talks and code reviews
+• Reduce knowledge silos and improve code quality
+• Productivity improvement: 10-15%
+
+**3. Agile Process Refinement** (Impact: Medium, Effort: Low)
+• Optimize sprint planning and retrospectives
+• Reduce meeting overhead by 20%
+• Time savings: 4-6 hours per developer per sprint
+
+## Resource Allocation Strategy
+
+### RECOMMENDED TEAM STRUCTURE
+```
+Product Owner (1.0 FTE) - Requirements and stakeholder management
+Tech Lead (1.0 FTE) - Architecture and technical decisions  
+Senior Engineers (2.0 FTE) - Core development
+Junior Engineers (1.0 FTE) - Support development and learning
+Designer (0.5 FTE) - UX/UI design and user research
+QA Engineer (0.5 FTE) - Testing and quality assurance
+DevOps (0.3 FTE) - Infrastructure and deployment
+```
+
+### BUDGET OPTIMIZATION
+| Category | Current | Optimized | Savings |
+|----------|---------|-----------|---------|
+| Development | $162K | $150K | $12K |
+| Infrastructure | $50K | $35K | $15K |
+| Tools/Licenses | $25K | $18K | $7K |
+| **Total** | **$237K** | **$203K** | **$34K** |
+
+## Performance Improvements
+
+### DEVELOPMENT VELOCITY
+• **Current**: 15 story points per sprint
+• **Optimized**: 20-22 story points per sprint (+33-47%)
+• **Time to Market**: 9 months → 6.5-7 months
+
+### QUALITY METRICS
+• **Bug Rate**: Reduce from 2.1 to 1.2 bugs per feature
+• **Customer Satisfaction**: Improve from 7.2 to 8.5+ (NPS)
+• **Technical Debt**: Reduce by 40% through better practices
+
+## Risk Mitigation
+
+🟡 **Team Transition Risk** (25% probability)
+→ Mitigation: Gradual transition, training programs, clear communication
+
+🟡 **Tool Migration Risk** (15% probability)
+→ Mitigation: Pilot programs, rollback plans, vendor support
+
+🟢 **Performance Risk** (10% probability)  
+→ Mitigation: Continuous monitoring, regular retrospectives
+
+## Implementation Timeline
+
+**Phase 1 (Weeks 1-2)**: Quick wins implementation
+**Phase 2 (Weeks 3-6)**: Team restructuring and process optimization
+**Phase 3 (Weeks 7-12)**: Infrastructure and tooling improvements
+**Phase 4 (Ongoing)**: Continuous optimization and monitoring
+
+## Success Metrics
+• **Delivery Speed**: 30% faster feature delivery
+• **Cost Efficiency**: 15% reduction in development costs
+• **Quality**: 40% reduction in post-launch bugs
+• **Team Satisfaction**: Maintain 8.0+ team happiness score
+
+*Optimization analysis based on industry benchmarks and proven methodologies*`;
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set a sample idea to get started
+            document.getElementById('feature-idea').value = 'AI-powered customer support chatbot for SaaS platform to reduce support ticket volume and improve customer satisfaction';
+        });
+    </script>
+</body>
+</html>
