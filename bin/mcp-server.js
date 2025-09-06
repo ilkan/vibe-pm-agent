@@ -1,365 +1,184 @@
 #!/usr/bin/env node
 
 /**
- * PM Agent Intent Optimizer MCP Server
- * Executable entry point for the MCP server with complete functionality
+ * Vibe PM Agent MCP Server Entry Point
  * 
- * Features:
- * - Intent optimization with consulting techniques
- * - Quick idea validation (unit-test-like for ideas)
- * - PM document generation (one-pagers, PR-FAQs, requirements, design options, task plans)
- * - Workflow analysis and ROI forecasting
- * - Comprehensive logging and monitoring
+ * This script starts the MCP server for the Vibe PM Agent.
+ * It provides evidence-backed business intelligence capabilities
+ * through the Model Context Protocol.
  */
 
-const { PMAgentMCPServer } = require('../dist/mcp/server');
-const { MCPLogger } = require('../dist/utils/mcp-error-handling');
-const { LogLevel } = require('../dist/models/mcp');
-
-// Command line argument parsing
-const args = process.argv.slice(2);
-const config = {
-  logLevel: LogLevel.INFO,
-  enableLogging: true,
-  enableMetrics: true,
-  enableHealthCheck: false,
-  enableQuickValidation: true,
-  enablePMDocuments: true,
-  port: null, // MCP uses stdio by default
-  configFile: null,
-  maxConcurrentRequests: 10,
-  requestTimeout: 30000, // 30 seconds
-  enablePerformanceMonitoring: true
-};
+const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
+const { PMAgentMCPServer } = require('../dist/mcp/server.js');
 
 // Parse command line arguments
-for (let i = 0; i < args.length; i++) {
-  const arg = args[i];
-  
-  switch (arg) {
-    case '--log-level':
-    case '-l':
-      const level = args[++i];
-      if (level && Object.values(LogLevel).includes(level)) {
-        config.logLevel = level;
-      } else {
-        console.error(`Invalid log level: ${level}. Valid levels: ${Object.values(LogLevel).join(', ')}`);
-        process.exit(1);
-      }
-      break;
-      
-    case '--no-logging':
-      config.enableLogging = false;
-      break;
-      
-    case '--no-metrics':
-      config.enableMetrics = false;
-      break;
-      
-    case '--health-check':
-    case '-h':
-      config.enableHealthCheck = true;
-      break;
-      
-    case '--no-quick-validation':
-      config.enableQuickValidation = false;
-      break;
-      
-    case '--no-pm-documents':
-      config.enablePMDocuments = false;
-      break;
-      
-    case '--max-concurrent':
-      const maxConcurrent = parseInt(args[++i]);
-      if (maxConcurrent && maxConcurrent > 0) {
-        config.maxConcurrentRequests = maxConcurrent;
-      } else {
-        console.error(`Invalid max concurrent requests: ${args[i]}`);
-        process.exit(1);
-      }
-      break;
-      
-    case '--timeout':
-      const timeout = parseInt(args[++i]);
-      if (timeout && timeout > 0) {
-        config.requestTimeout = timeout * 1000; // Convert to milliseconds
-      } else {
-        console.error(`Invalid timeout: ${args[i]}`);
-        process.exit(1);
-      }
-      break;
-      
-    case '--no-performance-monitoring':
-      config.enablePerformanceMonitoring = false;
-      break;
-      
-    case '--config':
-    case '-c':
-      config.configFile = args[++i];
-      break;
-      
-    case '--help':
-      printHelp();
-      process.exit(0);
-      break;
-      
-    case '--version':
-    case '-v':
-      const packageJson = require('../package.json');
-      console.log(`${packageJson.name} v${packageJson.version}`);
-      process.exit(0);
-      break;
-      
-    default:
-      if (arg.startsWith('-')) {
-        console.error(`Unknown option: ${arg}`);
-        console.error('Use --help for usage information');
-        process.exit(1);
-      }
-      break;
-  }
-}
+const args = process.argv.slice(2);
+const options = {
+  enableLogging: !args.includes('--no-logging'),
+  enableMetrics: !args.includes('--no-metrics'),
+  logLevel: args.includes('--log-level') 
+    ? args[args.indexOf('--log-level') + 1] 
+    : 'info',
+  healthCheck: args.includes('--health-check'),
+  help: args.includes('--help') || args.includes('-h')
+};
 
-// Load configuration from file if specified
-if (config.configFile) {
-  try {
-    const fs = require('fs');
-    const fileConfig = JSON.parse(fs.readFileSync(config.configFile, 'utf8'));
-    Object.assign(config, fileConfig);
-  } catch (error) {
-    console.error(`Failed to load config file ${config.configFile}:`, error.message);
-    process.exit(1);
-  }
-}
+// Show help information
+if (options.help) {
+  console.log(`
+Vibe PM Agent MCP Server v2.0.0
+Evidence-backed business intelligence MCP server
 
-// Initialize logging
-if (config.enableLogging) {
-  MCPLogger.setLogLevel(config.logLevel);
-}
+Usage: vibe-pm-agent [options]
 
-// Global error handlers
-process.on('uncaughtException', (error) => {
-  if (config.enableLogging) {
-    MCPLogger.fatal('Uncaught exception', error);
-  } else {
-    console.error('Uncaught exception:', error);
-  }
-  process.exit(1);
-});
+Options:
+  --help, -h           Show this help message
+  --log-level <level>  Set logging level (debug, info, warn, error)
+  --no-logging         Disable logging output
+  --no-metrics         Disable performance metrics
+  --health-check       Perform health check and exit
 
-process.on('unhandledRejection', (reason, promise) => {
-  if (config.enableLogging) {
-    MCPLogger.error('Unhandled promise rejection', new Error(String(reason)), undefined, { promise });
-  } else {
-    console.error('Unhandled promise rejection:', reason);
-  }
-  process.exit(1);
-});
+MCP Tools Available:
+  - analyze_business_opportunity    Market validation and strategic assessment
+  - generate_business_case         ROI analysis with multi-scenario projections
+  - create_stakeholder_communication  Executive communications generation
+  - assess_strategic_alignment     Company OKR and mission alignment
+  - validate_market_timing         Right-time recommendations
+  - process_executive_query        Automated executive intelligence
+  - generate_management_onepager   Executive one-pager with Pyramid Principle
+  - generate_pr_faq               Amazon-style PR-FAQ document
+  - generate_requirements         PM-grade requirements with MoSCoW prioritization
+  - generate_design_options       Conservative/Balanced/Bold alternatives
+  - generate_task_plan           Phased implementation plan
 
-// Graceful shutdown handling
-let server = null;
-let isShuttingDown = false;
+Examples:
+  vibe-pm-agent                    # Start MCP server
+  vibe-pm-agent --log-level debug  # Start with debug logging
+  vibe-pm-agent --health-check     # Check server health
+  vibe-pm-agent --no-logging       # Start without logging
 
-async function gracefulShutdown(signal) {
-  if (isShuttingDown) {
-    if (config.enableLogging) {
-      MCPLogger.warn('Force shutdown requested');
-    }
-    process.exit(1);
-  }
-  
-  isShuttingDown = true;
-  
-  if (config.enableLogging) {
-    MCPLogger.info(`Received ${signal}, shutting down gracefully...`);
-  } else {
-    console.log(`Received ${signal}, shutting down gracefully...`);
-  }
-  
-  if (server) {
-    try {
-      await server.stop();
-      if (config.enableLogging) {
-        MCPLogger.info('Server stopped successfully');
-      } else {
-        console.log('Server stopped successfully');
-      }
-    } catch (error) {
-      if (config.enableLogging) {
-        MCPLogger.error('Error during server shutdown', error);
-      } else {
-        console.error('Error during server shutdown:', error);
-      }
+For Kiro integration, add this server to your MCP configuration:
+{
+  "mcpServers": {
+    "vibe-pm-agent": {
+      "command": "vibe-pm-agent",
+      "args": [],
+      "env": {}
     }
   }
-  
+}
+
+Documentation: https://github.com/your-username/vibe-pm-agent
+Issues: https://github.com/your-username/vibe-pm-agent/issues
+`);
   process.exit(0);
 }
 
-// Register signal handlers
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-process.on('SIGHUP', () => gracefulShutdown('SIGHUP'));
-
-// Health check endpoint (if enabled)
-if (config.enableHealthCheck) {
-  const http = require('http');
-  const healthServer = http.createServer((req, res) => {
-    if (req.url === '/health' && req.method === 'GET') {
-      const status = server ? server.getStatus() : { status: 'starting' };
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        ...status,
-        timestamp: new Date().toISOString(),
-        version: require('../package.json').version
-      }));
-    } else {
-      res.writeHead(404);
-      res.end('Not Found');
-    }
-  });
-  
-  const healthPort = process.env.HEALTH_PORT || 3001;
-  healthServer.listen(healthPort, () => {
-    if (config.enableLogging) {
-      MCPLogger.info(`Health check endpoint available at http://localhost:${healthPort}/health`);
-    }
-  });
-}
-
-// Start the MCP server
-async function startServer() {
+async function main() {
   try {
-    if (config.enableLogging) {
-      MCPLogger.info('Starting PM Agent Intent Optimizer MCP Server...', undefined, config);
-    } else {
-      console.log('Starting PM Agent Intent Optimizer MCP Server...');
+    // Create MCP server instance
+    const server = new PMAgentMCPServer(options);
+    
+    // Perform health check if requested
+    if (options.healthCheck) {
+      const health = await server.healthCheck();
+      console.log('Health Check Results:');
+      console.log(JSON.stringify(health, null, 2));
+      
+      if (health.status === 'healthy') {
+        console.log('✅ Server is healthy and ready');
+        process.exit(0);
+      } else {
+        console.log('❌ Server health check failed');
+        process.exit(1);
+      }
     }
     
-    // Create server instance with complete configuration
-    server = new PMAgentMCPServer({
-      enableLogging: config.enableLogging,
-      enableMetrics: config.enableMetrics,
-      logLevel: config.logLevel,
-      enableQuickValidation: config.enableQuickValidation,
-      enablePMDocuments: config.enablePMDocuments,
-      maxConcurrentRequests: config.maxConcurrentRequests,
-      requestTimeout: config.requestTimeout,
-      enablePerformanceMonitoring: config.enablePerformanceMonitoring
+    // Create stdio transport for MCP communication
+    const transport = new StdioServerTransport();
+    
+    // Connect server to transport
+    await server.connect(transport);
+    
+    if (options.enableLogging) {
+      console.error('🚀 Vibe PM Agent MCP Server started successfully');
+      console.error('📊 Evidence-backed business intelligence ready');
+      console.error('🔗 Connected via stdio transport');
+      
+      // Log available tools
+      const health = await server.healthCheck();
+      console.error(`🛠️  ${health.toolsAvailable.length} tools available: ${health.toolsAvailable.join(', ')}`);
+    }
+    
+    // Handle graceful shutdown
+    process.on('SIGINT', async () => {
+      if (options.enableLogging) {
+        console.error('🛑 Shutting down MCP server...');
+      }
+      
+      try {
+        await server.stop();
+        if (options.enableLogging) {
+          console.error('✅ Server stopped gracefully');
+        }
+        process.exit(0);
+      } catch (error) {
+        console.error('❌ Error during shutdown:', error.message);
+        process.exit(1);
+      }
     });
     
-    // Start the server
-    await server.start();
-    
-    if (config.enableLogging) {
-      MCPLogger.info('MCP Server is running and ready to accept connections');
-    } else {
-      console.log('MCP Server is running and ready to accept connections');
-    }
-    
-    // Keep the process alive
-    process.stdin.resume();
+    process.on('SIGTERM', async () => {
+      if (options.enableLogging) {
+        console.error('🛑 Received SIGTERM, shutting down...');
+      }
+      
+      try {
+        await server.stop();
+        process.exit(0);
+      } catch (error) {
+        console.error('❌ Error during shutdown:', error.message);
+        process.exit(1);
+      }
+    });
     
   } catch (error) {
-    if (config.enableLogging) {
-      MCPLogger.fatal('Failed to start MCP Server', error);
-    } else {
-      console.error('Failed to start MCP Server:', error);
+    console.error('❌ Failed to start MCP server:', error.message);
+    
+    if (options.enableLogging && error.stack) {
+      console.error('Stack trace:', error.stack);
     }
+    
+    // Provide helpful error messages
+    if (error.message.includes('ENOENT')) {
+      console.error('💡 Make sure you have run "npm run build" first');
+    } else if (error.message.includes('MODULE_NOT_FOUND')) {
+      console.error('💡 Make sure you have run "npm install" first');
+    } else if (error.message.includes('permission')) {
+      console.error('💡 Check file permissions or run with appropriate privileges');
+    }
+    
     process.exit(1);
   }
 }
 
-function printHelp() {
-  const packageJson = require('../package.json');
-  console.log(`
-${packageJson.name} v${packageJson.version}
-${packageJson.description}
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Promise Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
 
-AI-powered MCP server with complete PM workflow capabilities including:
-- Intent optimization with consulting techniques (MECE, Pyramid Principle, etc.)
-- Quick idea validation (unit-test-like validation with PASS/FAIL + 3 options)
-- PM document generation (management one-pagers, PR-FAQs, requirements, design options, task plans)
-- Workflow analysis and ROI forecasting with Conservative/Balanced/Bold scenarios
-- Comprehensive logging and performance monitoring
-
-Usage: mcp-server [options]
-
-Core Options:
-  -l, --log-level <level>       Set logging level (debug, info, warn, error, fatal)
-  --no-logging                  Disable logging
-  --no-metrics                  Disable performance metrics collection
-  -h, --health-check            Enable HTTP health check endpoint on port 3001
-  -c, --config <file>           Load configuration from JSON file
-  -v, --version                 Show version information
-  --help                        Show this help message
-
-Feature Options:
-  --no-quick-validation         Disable quick idea validation tool
-  --no-pm-documents            Disable PM document generation tools
-  --no-performance-monitoring   Disable performance monitoring
-
-Performance Options:
-  --max-concurrent <number>     Maximum concurrent requests (default: 10)
-  --timeout <seconds>           Request timeout in seconds (default: 30)
-
-Environment Variables:
-  HEALTH_PORT                   Port for health check endpoint (default: 3001)
-  LOG_LEVEL                     Default log level if not specified via --log-level
-  MCP_MAX_CONCURRENT           Maximum concurrent requests
-  MCP_TIMEOUT                  Request timeout in seconds
-
-Examples:
-  mcp-server                                    # Start with all features enabled
-  mcp-server --log-level debug                 # Start with debug logging
-  mcp-server --health-check                    # Start with health check endpoint
-  mcp-server --config config.json              # Start with custom configuration
-  mcp-server --no-logging --no-metrics         # Start minimal (no logging/metrics)
-  mcp-server --max-concurrent 5 --timeout 60   # Custom performance settings
-
-Available MCP Tools:
-  1. validate_idea_quick          - Fast PASS/FAIL validation with 3 structured options
-  2. optimize_intent              - Complete intent optimization with consulting analysis
-  3. analyze_workflow             - Workflow analysis using consulting techniques
-  4. generate_roi_analysis        - ROI comparison with Conservative/Balanced/Bold scenarios
-  5. get_consulting_summary       - Professional consulting-style analysis summary
-  6. generate_management_onepager - Executive one-pager with Pyramid Principle structure
-  7. generate_pr_faq              - Amazon-style PR-FAQ documents
-  8. generate_requirements        - PM-grade requirements with MoSCoW prioritization
-  9. generate_design_options      - Design options with Impact vs Effort analysis
-  10. generate_task_plan          - Phased implementation plans with guardrails
-
-MCP Client Configuration:
-  Add this server to your MCP client configuration:
-  {
-    "mcpServers": {
-      "vibe-pm-agent": {
-        "command": "node",
-        "args": ["path/to/bin/mcp-server.js"],
-        "env": {
-          "LOG_LEVEL": "info"
-        }
-      }
-    }
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error.message);
+  if (error.stack) {
+    console.error('Stack trace:', error.stack);
   }
-
-  Or using uvx (recommended):
-  {
-    "mcpServers": {
-      "vibe-pm-agent": {
-        "command": "uvx",
-        "args": ["vibe-pm-agent"],
-        "env": {}
-      }
-    }
-  }
-
-For more information and examples, visit: https://github.com/your-org/vibe-pm-agent
-`);
-}
+  process.exit(1);
+});
 
 // Start the server
-startServer().catch((error) => {
-  console.error('Startup failed:', error);
+main().catch((error) => {
+  console.error('❌ Fatal error:', error.message);
   process.exit(1);
 });

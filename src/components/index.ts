@@ -18,3 +18,5 @@ export * from './steering-file-manager';
 export * from './steering-file-utilities';
 export * from './steering-user-interaction';
 export { SteeringFilePreview as SteeringFilePreviewComponent } from './steering-file-preview';
+export * from './market-data-integrator';
+export * from './proprietary-pm-frameworks';

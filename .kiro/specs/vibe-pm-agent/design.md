@@ -1,91 +1,147 @@
+# Generated-by: Kiro Spec Mode
+# Spec-ID: vibe_pm_agent_v2_hackathon
+# Spec-Hash: sha256:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+# Model: claude-3.5-sonnet
+# Timestamp: 2025-01-09T10:30:00Z
+
 # Design Document
 
 ## Overview
 
-The Vibe PM Agent is designed as an **MCP Server** that functions as an AI agent, providing intelligent consulting-grade analysis through Model Context Protocol tools. The system transforms unstructured developer intent into optimized Kiro specifications using a multi-stage processing pipeline that employs natural language processing, business analysis techniques, and optimization algorithms to minimize quota consumption while preserving functionality.
+The Vibe PM Agent is Kiro's missing "PM Mode" - an **evidence-backed business intelligence MCP Server** that transforms raw feature ideas into comprehensive, credible business cases with professional citations and confidence scoring. The system provides automated executive intelligence capabilities, enabling CEOs to receive comprehensive business analysis within 15 minutes of sending email queries through automation platforms like n8n.
 
-The MCP Server exposes AI agent capabilities through well-defined tools that can be called by other AI systems (like Kiro), enabling seamless integration while maintaining the sophisticated multi-phase analysis pipeline internally.
+**Core Value Proposition:** Transform weeks of PM work into minutes of evidence-backed business intelligence with professional citations, competitive analysis, and confidence scoring that executives and investors trust.
+
+**Integration Architecture:** MCP Server that integrates seamlessly with Kiro, automation platforms (n8n, Zapier), and any AI system supporting Model Context Protocol for flexible deployment and maximum ecosystem compatibility.
 
 ## Architecture
 
-The system is structured as an **MCP Server** with an internal AI agent pipeline:
+The system is structured as an **Evidence-Backed Business Intelligence MCP Server** with automated executive intelligence capabilities:
 
 ```mermaid
 graph TD
-    A[MCP Client - Kiro/AI System] --> B[MCP Server Interface]
-    B --> C[AI Agent Pipeline]
-    
-    subgraph "MCP Tools"
-        D[optimize_intent]
-        E[analyze_workflow] 
-        F[generate_roi_analysis]
-        G[get_consulting_summary]
-        H[generate_management_onepager]
-        I[generate_pr_faq]
-        J[generate_requirements]
-        K[generate_design_options]
-        L[generate_task_plan]
-    end
-    
-    subgraph "Internal AI Agent Pipeline"
-        M[Intent Interpreter]
-        N[Business Analyzer]
-        O[Workflow Optimizer]
-        P[Quota Forecaster]
-        Q[Consulting Summary Generator]
-        R[PM Document Generator]
-        S[Spec Generator]
-    end
-    
+    A[CEO Email] --> B[n8n Automation Platform]
+    C[Kiro/AI Systems] --> D[MCP Server Interface]
     B --> D
-    B --> E
-    B --> F
-    B --> G
-    B --> H
-    B --> I
-    B --> J
-    B --> K
-    B --> L
+    D --> E[Business Intelligence Pipeline]
     
+    subgraph "MCP Tools - Business Intelligence"
+        F[analyze_business_opportunity]
+        G[generate_business_case] 
+        H[create_stakeholder_communication]
+        I[assess_strategic_alignment]
+        J[validate_market_timing]
+        K[optimize_resource_allocation]
+        L[process_executive_query]
+        M[generate_automated_response]
+    end
+    
+    subgraph "Evidence & Citation Engine"
+        N[Market Research Integration]
+        O[Competitive Intelligence]
+        P[Citation Management]
+        Q[Confidence Scoring]
+        R[Source Validation]
+    end
+    
+    subgraph "Business Analysis Pipeline"
+        S[Intent Analysis]
+        T[Market Intelligence]
+        U[Strategic Assessment]
+        V[Financial Modeling]
+        W[Risk Analysis]
+        X[Evidence Compilation]
+        Y[Executive Communication]
+    end
+    
+    D --> F
+    D --> G
+    D --> H
+    D --> I
+    D --> J
+    D --> K
+    D --> L
     D --> M
-    M --> N
-    N --> O
-    O --> P
-    P --> Q
-    Q --> R
-    R --> S
-    S --> T[Enhanced Kiro Spec + ROI Analysis + PM Documents]
+    
+    F --> S
+    S --> T
+    T --> U
+    U --> V
+    V --> W
+    W --> X
+    X --> Y
+    Y --> Z[Comprehensive Business Intelligence with Citations]
+    
+    N --> T
+    O --> T
+    P --> X
+    Q --> X
+    R --> X
 ```
 
 ### MCP Server Interface
 
-**Primary MCP Tools**:
-1. **`validate_idea_quick`**: Fast unit-test-like validation with PASS/FAIL verdict and 3 structured options (NEW - Simple is best!)
-2. **`optimize_intent`**: Main tool that takes raw developer intent and returns optimized Kiro spec with consulting analysis
-3. **`analyze_workflow`**: Analyzes existing workflows for optimization opportunities
-4. **`generate_roi_analysis`**: Creates ROI comparison between different optimization approaches
-5. **`get_consulting_summary`**: Provides detailed consulting-style analysis using selected techniques
-6. **`generate_management_onepager`**: Creates executive-ready one-pager with Pyramid Principle structure
-7. **`generate_pr_faq`**: Generates Amazon-style PR-FAQ documents for product communication
-8. **`generate_requirements`**: Creates PM-grade requirements with MoSCoW prioritization and right-time decisions
-9. **`generate_design_options`**: Produces Conservative/Balanced/Bold design options with Impact vs Effort analysis
-10. **`generate_task_plan`**: Creates phased implementation plans with guardrails and structured task breakdown
+**Business Intelligence MCP Tools**:
+1. **`analyze_business_opportunity`**: Comprehensive market validation and strategic fit assessment with citations and confidence scoring
+2. **`generate_business_case`**: ROI analysis with multi-scenario projections, comparable company data, and evidence validation
+3. **`create_stakeholder_communication`**: Executive one-pagers, PR-FAQs, board presentations with comprehensive citations and confidence scoring
+4. **`assess_strategic_alignment`**: Company OKR and mission alignment analysis with competitive positioning and market intelligence
+5. **`validate_market_timing`**: Right-time recommendations with verified market research, competitive analysis, and trend validation
+6. **`optimize_resource_allocation`**: Development efficiency and team allocation recommendations with industry benchmarks
+7. **`process_executive_query`**: Automated CEO/executive question processing with comprehensive business intelligence and evidence compilation
+8. **`generate_automated_response`**: Professional email formatting with executive summaries and structured business analysis attachments
 
-### Internal AI Agent Components
+**Evidence & Citation Features**:
+- **Comprehensive Citation Management**: All outputs include source URLs, publication dates, and credibility ratings (A/B/C scale)
+- **Confidence Scoring**: Every recommendation includes confidence score (0-100%) based on evidence quality and source reliability
+- **Source Validation**: Automatic verification of market research, competitive data, and financial projections with methodology transparency
+- **Comparable Company Analysis**: Financial projections backed by verified SEC filings, investor reports, and industry benchmarks
 
-1. **Intent Interpreter**: Parses natural language and extracts structured requirements
-2. **Business Analyzer**: Applies 2-3 consulting techniques to analyze workflows
-3. **Workflow Optimizer**: Restructures operations for efficiency
-4. **Quota Forecaster**: Generates comprehensive ROI analysis with multiple scenarios
-5. **Consulting Summary Generator**: Creates professional consulting-style analysis using Pyramid Principle
-6. **PM Document Generator**: Creates management one-pagers, PR-FAQs, requirements, design options, and task plans
-7. **Spec Generator**: Produces final Kiro-compatible specifications with consulting insights
+### Automated Executive Intelligence Workflow
+
+**CEO Email → Business Intelligence Tool → Automated Response (15 minutes)**
+
+```mermaid
+sequenceDiagram
+    participant CEO
+    participant n8n as n8n Automation
+    participant MCP as vibe-pm-agent MCP
+    participant Intel as Business Intelligence Engine
+    participant Email as Email System
+    
+    CEO->>Email: Sends business question via email
+    Email->>n8n: Email triggers n8n workflow
+    n8n->>n8n: Extracts business query from email
+    n8n->>MCP: Calls process_executive_query MCP tool
+    MCP->>Intel: Analyzes query and generates business intelligence
+    Intel->>Intel: Market research & competitive intelligence
+    Intel->>Intel: Financial modeling & risk assessment  
+    Intel->>Intel: Evidence compilation & citation management
+    Intel->>MCP: Returns structured business intelligence
+    MCP->>n8n: Business intelligence with citations & confidence
+    n8n->>n8n: Formats response email with attachments
+    n8n->>Email: Sends professional email response
+    Email->>CEO: Comprehensive business analysis delivered
+    
+    Note over MCP: vibe-pm-agent is a business intelligence tool, not an email server
+    Note over n8n: n8n handles email integration and formatting
+```
+
+### Internal Business Intelligence Components
+
+1. **Intent Analysis Engine**: Detects business question types (market opportunity, competitive threat, investment decision, strategic direction)
+2. **Market Intelligence Aggregator**: Integrates verified industry reports, competitive data, and market research with source validation
+3. **Strategic Assessment Framework**: Applies consulting methodologies (MECE, Pyramid Principle, Impact vs Effort) with evidence backing
+4. **Financial Modeling Engine**: Generates ROI projections using comparable company data and industry benchmarks with confidence intervals
+5. **Risk Analysis System**: Identifies risks using historical data and industry precedents with probability estimates and mitigation strategies
+6. **Evidence Compilation Engine**: Manages comprehensive citations, source credibility ratings, and confidence scoring for all claims
+7. **Executive Communication Generator**: Creates professional business documents with Pyramid Principle structure and evidence validation
 
 ## MCP Server Tool Definitions
 
-### Tool: validate_idea_quick
+### Tool: analyze_business_opportunity
 
-**Description**: Fast unit-test-like validation that provides PASS/FAIL verdict with 3 structured options for next steps. Acts like a unit test for ideas - quick feedback with clear choices.
+**Description**: Comprehensive market validation and strategic fit assessment with evidence-backed analysis, competitive intelligence, and confidence scoring.
 
 **Input Schema**:
 ```json
@@ -94,14 +150,23 @@ graph TD
   "properties": {
     "idea": {
       "type": "string",
-      "description": "Raw idea or intent to validate quickly"
+      "description": "Raw feature idea or business need"
     },
-    "context": {
+    "market_context": {
       "type": "object",
       "properties": {
-        "urgency": {"type": "string", "enum": ["low", "medium", "high"]},
-        "budget_range": {"type": "string", "enum": ["small", "medium", "large"]},
-        "team_size": {"type": "number"}
+        "industry": {"type": "string"},
+        "competition": {"type": "string"},
+        "timeline": {"type": "string"},
+        "budget_range": {"type": "string", "enum": ["small", "medium", "large"]}
+      }
+    },
+    "steering_options": {
+      "type": "object",
+      "properties": {
+        "create_steering_files": {"type": "boolean", "default": true},
+        "feature_name": {"type": "string"},
+        "inclusion_rule": {"type": "string", "enum": ["always", "fileMatch", "manual"], "default": "manual"}
       }
     }
   },
@@ -109,79 +174,109 @@ graph TD
 }
 ```
 
-**Output**: Quick validation result with PASS/FAIL verdict, reasoning, and exactly 3 options (A/B/C) for next steps
+**Output**: Market opportunity analysis with competitive landscape, customer validation, market sizing, strategic fit assessment, comprehensive citations, and confidence scoring
 
-### Tool: optimize_intent
+### Tool: generate_business_case
 
-**Description**: Takes raw developer intent and optional parameters, applies consulting analysis, and returns an optimized Kiro spec with ROI analysis.
+**Description**: Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment using comparable company data and industry benchmarks.
 
 **Input Schema**:
 ```json
 {
   "type": "object",
   "properties": {
-    "intent": {
+    "opportunity_analysis": {
       "type": "string",
-      "description": "Raw developer intent in natural language"
+      "description": "Business opportunity analysis from analyze_business_opportunity"
     },
-    "parameters": {
+    "financial_inputs": {
       "type": "object",
       "properties": {
-        "expectedUserVolume": {"type": "number"},
-        "costConstraints": {"type": "number"},
-        "performanceSensitivity": {"type": "string", "enum": ["low", "medium", "high"]}
+        "development_cost": {"type": "number"},
+        "expected_revenue": {"type": "number"},
+        "operational_cost": {"type": "number"},
+        "time_to_market": {"type": "number"}
+      }
+    },
+    "steering_options": {
+      "type": "object",
+      "properties": {
+        "create_steering_files": {"type": "boolean", "default": true},
+        "feature_name": {"type": "string"},
+        "inclusion_rule": {"type": "string", "enum": ["always", "fileMatch", "manual"], "default": "manual"}
       }
     }
   },
-  "required": ["intent"]
+  "required": ["opportunity_analysis"]
 }
 ```
 
-**Output**: Enhanced Kiro Spec with consulting summary and ROI analysis
+**Output**: Comprehensive business case with multi-scenario ROI analysis, risk assessment with mitigation strategies, comparable company benchmarks, financial projections with confidence intervals, and comprehensive citations
 
-### Tool: analyze_workflow
+### Tool: process_executive_query
 
-**Description**: Analyzes an existing workflow definition for optimization opportunities using consulting techniques.
+**Description**: Automated processing of CEO/executive business questions with comprehensive business intelligence generation and evidence compilation.
 
 **Input Schema**:
 ```json
 {
   "type": "object",
   "properties": {
-    "workflow": {
-      "type": "object",
-      "description": "Existing workflow definition to analyze"
+    "query": {
+      "type": "string",
+      "description": "Executive business question or strategic inquiry"
     },
-    "techniques": {
-      "type": "array",
-      "items": {"type": "string"},
-      "description": "Specific consulting techniques to apply (optional)"
+    "context": {
+      "type": "object",
+      "properties": {
+        "sender": {"type": "string", "description": "Executive name/title"},
+        "urgency": {"type": "string", "enum": ["low", "medium", "high", "urgent"]},
+        "company_context": {"type": "object"},
+        "previous_context": {"type": "string", "description": "Previous conversation context"}
+      }
+    },
+    "response_format": {
+      "type": "object",
+      "properties": {
+        "include_attachments": {"type": "boolean", "default": true},
+        "detail_level": {"type": "string", "enum": ["summary", "detailed", "comprehensive"], "default": "comprehensive"},
+        "confidence_threshold": {"type": "number", "default": 70}
+      }
     }
   },
-  "required": ["workflow"]
+  "required": ["query"]
 }
 ```
 
-**Output**: Consulting analysis with optimization recommendations
+**Output**: Comprehensive business intelligence package with executive summary, detailed analysis, market intelligence, competitive assessment, financial projections, risk analysis, and comprehensive citations with confidence scoring
 
-### Tool: generate_roi_analysis
+### Tool: format_executive_response
 
-**Description**: Generates comprehensive ROI analysis comparing naive, optimized, and zero-based approaches.
+**Description**: Formats comprehensive business intelligence into structured data that automation platforms can use to create professional executive communications.
 
 **Input Schema**:
 ```json
 {
   "type": "object",
   "properties": {
-    "workflow": {"type": "object"},
-    "optimizedWorkflow": {"type": "object"},
-    "zeroBasedSolution": {"type": "object"}
+    "business_intelligence": {
+      "type": "object",
+      "description": "Comprehensive analysis from process_executive_query"
+    },
+    "response_preferences": {
+      "type": "object",
+      "properties": {
+        "format": {"type": "string", "enum": ["email_ready", "structured_data", "both"], "default": "both"},
+        "include_attachments": {"type": "boolean", "default": true},
+        "summary_length": {"type": "string", "enum": ["brief", "standard", "detailed"], "default": "standard"}
+      }
+    }
   },
-  "required": ["workflow"]
+  "required": ["business_intelligence"]
 }
 ```
 
-**Output**: ROI table with Conservative/Balanced/Bold scenarios
+**Output**: Structured response package with formatted executive summary text, attachment content (executive one-pager, detailed business case, market intelligence report, financial projections), and comprehensive citations that automation platforms can use to compose professional emails
 
 ### Tool: get_consulting_summary
 
@@ -344,160 +439,254 @@ graph TD
 
 ## Components and Interfaces
 
-### Intent Interpreter
+### Intent Analysis Engine
 
-**Purpose**: Extract structured information from unstructured developer input
+**Purpose**: Extract structured business intelligence requirements from executive queries and feature ideas
 
 **Key Methods**:
-- `parseIntent(rawText: string, params?: OptionalParams): ParsedIntent`
-- `extractBusinessObjective(intent: ParsedIntent): BusinessObjective`
-- `identifyTechnicalRequirements(intent: ParsedIntent): TechnicalRequirement[]`
+- `analyzeBusinessQuery(query: string, context?: ExecutiveContext): BusinessQuery`
+- `extractMarketOpportunity(query: BusinessQuery): MarketOpportunity`
+- `identifyAnalysisRequirements(query: BusinessQuery): AnalysisRequirement[]`
+- `determineEvidenceNeeds(query: BusinessQuery): EvidenceRequirement[]`
 
 **Data Structures**:
 ```typescript
-interface ParsedIntent {
+interface BusinessQuery {
+  queryType: 'market_opportunity' | 'competitive_threat' | 'investment_decision' | 'strategic_direction';
   businessObjective: string;
-  technicalRequirements: TechnicalRequirement[];
-  dataSourcesNeeded: string[];
-  operationsRequired: Operation[];
-  potentialRisks: Risk[];
+  analysisRequirements: AnalysisRequirement[];
+  evidenceNeeds: EvidenceRequirement[];
+  urgencyLevel: 'low' | 'medium' | 'high' | 'urgent';
+  confidenceThreshold: number;
 }
 
-interface TechnicalRequirement {
-  type: 'data_retrieval' | 'processing' | 'analysis' | 'output';
+interface AnalysisRequirement {
+  type: 'market_research' | 'competitive_analysis' | 'financial_modeling' | 'risk_assessment';
   description: string;
-  complexity: 'low' | 'medium' | 'high';
-  quotaImpact: 'minimal' | 'moderate' | 'significant';
+  priority: 'must_have' | 'should_have' | 'nice_to_have';
+  evidenceLevel: 'basic' | 'comprehensive' | 'exhaustive';
+}
+
+interface EvidenceRequirement {
+  sourceType: 'industry_report' | 'competitive_data' | 'financial_filing' | 'customer_research';
+  credibilityThreshold: 'A' | 'B' | 'C';
+  recencyRequirement: number; // days
+  confidenceImpact: number; // 0-100
 }
 ```
 
-### Business Analyzer
+### Market Intelligence Aggregator
 
-**Purpose**: Apply 2-3 relevant consulting techniques from a comprehensive arsenal to analyze workflows and identify optimization opportunities
+**Purpose**: Integrate verified industry reports, competitive data, and market research with comprehensive source validation and credibility scoring
 
 **Key Methods**:
-- `selectTechniques(intent: ParsedIntent): ConsultingTechnique[]`
-- `applyMECE(workflow: Workflow): MECEAnalysis`
-- `applyValueDriverTree(workflow: Workflow): ValueDriverAnalysis`
-- `applyZeroBasedDesign(intent: ParsedIntent): ZeroBasedSolution`
-- `applyImpactEffortMatrix(optimizations: Optimization[]): PrioritizedOptimizations`
-- `applyValuePropositionCanvas(intent: ParsedIntent): ValueProposition`
-- `generateOptionFraming(workflow: Workflow): ThreeOptionAnalysis`
+- `aggregateMarketData(query: BusinessQuery): MarketIntelligence`
+- `validateCompetitiveIntelligence(competitors: string[]): CompetitiveAnalysis`
+- `assessMarketTiming(opportunity: MarketOpportunity): TimingAnalysis`
+- `benchmarkIndustryMetrics(industry: string): IndustryBenchmarks`
+- `validateSourceCredibility(source: DataSource): CredibilityRating`
+- `generateMarketSizing(opportunity: MarketOpportunity): MarketSizeAnalysis`
 
 **Data Structures**:
 ```typescript
-interface ConsultingTechnique {
-  name: 'MECE' | 'Pyramid' | 'ValueDriverTree' | 'ZeroBased' | 'ImpactEffort' | 'ValueProp' | 'OptionFraming';
-  relevanceScore: number;
-  applicableScenarios: string[];
+interface MarketIntelligence {
+  marketSize: MarketSizeAnalysis;
+  competitiveLandscape: CompetitiveAnalysis;
+  industryTrends: TrendAnalysis[];
+  customerValidation: CustomerInsights;
+  timingFactors: TimingAnalysis;
+  sources: CitationPackage;
+  confidenceScore: number; // 0-100
 }
 
-interface MECEAnalysis {
-  categories: QuotaDriverCategory[];
-  totalCoverage: number;
-  overlaps: string[];
+interface CompetitiveAnalysis {
+  competitors: CompetitorProfile[];
+  marketShare: MarketShareData;
+  competitivePositioning: PositioningMatrix;
+  threatAssessment: ThreatAnalysis[];
+  sources: DataSource[];
+  lastUpdated: Date;
 }
 
-interface QuotaDriverCategory {
+interface CompetitorProfile {
   name: string;
-  drivers: string[];
-  quotaImpact: number;
-  optimizationPotential: number;
+  marketShare: number;
+  revenue: number;
+  strengths: string[];
+  weaknesses: string[];
+  recentMoves: CompetitiveMove[];
+  sources: DataSource[];
 }
 
-interface ValueDriverAnalysis {
-  primaryDrivers: ValueDriver[];
-  secondaryDrivers: ValueDriver[];
-  rootCauses: string[];
+interface DataSource {
+  url: string;
+  title: string;
+  publisher: string;
+  publicationDate: Date;
+  credibilityRating: 'A' | 'B' | 'C';
+  sourceType: 'industry_report' | 'sec_filing' | 'news_article' | 'research_study';
+  accessDate: Date;
+  methodology?: string;
 }
 
-interface ValueDriver {
-  name: string;
-  currentCost: number;
-  optimizedCost: number;
-  savingsPotential: number;
+interface CitationPackage {
+  primarySources: DataSource[];
+  supportingSources: DataSource[];
+  methodologyNotes: string[];
+  confidenceFactors: ConfidenceFactor[];
+  lastValidated: Date;
 }
 
-interface ZeroBasedSolution {
-  radicalApproach: string;
-  assumptionsChallenged: string[];
-  potentialSavings: number;
-  implementationRisk: 'low' | 'medium' | 'high';
-}
-
-interface ThreeOptionAnalysis {
-  conservative: OptimizationOption;
-  balanced: OptimizationOption;
-  bold: OptimizationOption;
-}
-
-interface OptimizationOption {
-  name: string;
-  description: string;
-  quotaSavings: number;
-  implementationEffort: 'low' | 'medium' | 'high';
-  riskLevel: 'low' | 'medium' | 'high';
-  estimatedROI: number;
+interface ConfidenceFactor {
+  factor: string;
+  impact: number; // -100 to +100
+  reasoning: string;
+  sources: DataSource[];
 }
 ```
 
-### Workflow Optimizer
+### Financial Modeling Engine
 
-**Purpose**: Restructure workflows to minimize quota consumption while preserving functionality
-
-**Key Methods**:
-- `identifyOptimizationOpportunities(workflow: Workflow, issues: EfficiencyIssue[]): Optimization[]`
-- `applyBatchingStrategy(operations: Operation[]): BatchedOperation[]`
-- `implementCachingLayer(workflow: Workflow): CachedWorkflow`
-- `breakIntoSpecs(workflow: Workflow): SpecDefinition[]`
-
-**Optimization Strategies**:
-1. **Batching**: Group similar operations to reduce API calls
-2. **Caching**: Store intermediate results to avoid redundant processing
-3. **Spec Decomposition**: Break complex workflows into smaller, reusable specs
-4. **Vibe-to-Spec Conversion**: Replace repetitive vibe calls with structured specs
-
-### Quota Forecaster
-
-**Purpose**: Generate comprehensive ROI analysis with multiple optimization scenarios
+**Purpose**: Generate ROI projections using comparable company data and industry benchmarks with confidence intervals and sensitivity analysis
 
 **Key Methods**:
-- `estimateNaiveConsumption(workflow: Workflow): QuotaForecast`
-- `estimateOptimizedConsumption(optimizedWorkflow: OptimizedWorkflow): QuotaForecast`
-- `estimateZeroBasedConsumption(zeroBasedSolution: ZeroBasedSolution): QuotaForecast`
-- `generateROITable(scenarios: OptimizationScenario[]): ROIAnalysis`
-- `calculateMultiScenarioSavings(forecasts: QuotaForecast[]): ComprehensiveSavings`
+- `generateROIProjections(opportunity: MarketOpportunity, costs: CostInputs): ROIAnalysis`
+- `benchmarkComparableCompanies(industry: string, stage: string): ComparableBenchmarks`
+- `performSensitivityAnalysis(baseCase: FinancialModel): SensitivityResults`
+- `assessInvestmentRisk(projections: ROIAnalysis): RiskAssessment`
+- `validateFinancialAssumptions(model: FinancialModel): AssumptionValidation`
+- `generateScenarioAnalysis(baseCase: FinancialModel): ScenarioComparison`
 
 **Data Structures**:
 ```typescript
-interface QuotaForecast {
-  vibesConsumed: number;
-  specsConsumed: number;
-  estimatedCost: number;
-  confidenceLevel: 'low' | 'medium' | 'high';
-  scenario: 'naive' | 'optimized' | 'zero-based';
-}
-
 interface ROIAnalysis {
-  scenarios: OptimizationScenario[];
-  recommendations: string[];
-  bestOption: string;
-  riskAssessment: string;
+  scenarios: {
+    conservative: FinancialScenario;
+    balanced: FinancialScenario;
+    bold: FinancialScenario;
+  };
+  comparableBenchmarks: ComparableBenchmarks;
+  sensitivityAnalysis: SensitivityResults;
+  riskAssessment: RiskAssessment;
+  recommendedScenario: 'conservative' | 'balanced' | 'bold';
+  confidenceInterval: ConfidenceInterval;
+  sources: CitationPackage;
 }
 
-interface OptimizationScenario {
+interface FinancialScenario {
+  developmentCost: number;
+  operationalCost: number;
+  expectedRevenue: number;
+  timeToMarket: number;
+  roi: number;
+  npv: number;
+  irr: number;
+  paybackPeriod: number;
+  assumptions: FinancialAssumption[];
+}
+
+interface ComparableBenchmarks {
+  companies: ComparableCompany[];
+  industryMetrics: IndustryMetric[];
+  benchmarkSources: DataSource[];
+  validationNotes: string[];
+}
+
+interface ComparableCompany {
   name: string;
-  forecast: QuotaForecast;
-  savingsPercentage: number;
-  implementationEffort: string;
-  riskLevel: string;
+  revenue: number;
+  developmentCosts: number;
+  timeToMarket: number;
+  roi: number;
+  marketContext: string;
+  sources: DataSource[];
 }
 
-interface ComprehensiveSavings {
-  conservativeSavings: number;
-  balancedSavings: number;
-  boldSavings: number;
-  recommendedApproach: string;
+interface SensitivityResults {
+  keyVariables: SensitivityVariable[];
+  worstCase: FinancialScenario;
+  bestCase: FinancialScenario;
+  breakEvenAnalysis: BreakEvenPoint[];
+}
+
+interface RiskAssessment {
+  financialRisks: FinancialRisk[];
+  marketRisks: MarketRisk[];
+  operationalRisks: OperationalRisk[];
+  overallRiskScore: number; // 0-100
+  mitigationStrategies: MitigationStrategy[];
+}
+```
+
+### Evidence Compilation Engine
+
+**Purpose**: Manage comprehensive citations, source credibility ratings, and confidence scoring for all business intelligence claims
+
+**Key Methods**:
+- `compileEvidence(analysis: BusinessAnalysis): EvidencePackage`
+- `validateSourceCredibility(sources: DataSource[]): CredibilityAssessment`
+- `calculateConfidenceScore(evidence: EvidencePackage): ConfidenceScore`
+- `generateCitationDocument(evidence: EvidencePackage): CitationDocument`
+- `performFactChecking(claims: BusinessClaim[]): FactCheckResults`
+- `assessMethodologyTransparency(analysis: BusinessAnalysis): MethodologyAssessment`
+
+**Data Structures**:
+```typescript
+interface EvidencePackage {
+  primaryEvidence: Evidence[];
+  supportingEvidence: Evidence[];
+  contradictoryEvidence: Evidence[];
+  evidenceGaps: EvidenceGap[];
+  overallConfidence: ConfidenceScore;
+  citationDocument: CitationDocument;
+  lastValidated: Date;
+}
+
+interface Evidence {
+  claim: string;
+  sources: DataSource[];
+  evidenceType: 'quantitative' | 'qualitative' | 'anecdotal';
+  strength: 'weak' | 'moderate' | 'strong';
+  recency: number; // days since publication
+  relevance: number; // 0-100
+  credibilityImpact: number; // contribution to overall confidence
+}
+
+interface ConfidenceScore {
+  overall: number; // 0-100
+  breakdown: {
+    sourceQuality: number;
+    dataRecency: number;
+    methodologyTransparency: number;
+    evidenceConsistency: number;
+    sampleSize: number;
+  };
+  confidenceInterval: {
+    lower: number;
+    upper: number;
+    level: number; // e.g., 95 for 95% confidence
+  };
+}
+
+interface CitationDocument {
+  executiveSummary: string;
+  sourcesByCategory: {
+    industryReports: DataSource[];
+    competitiveIntelligence: DataSource[];
+    financialData: DataSource[];
+    customerResearch: DataSource[];
+    academicStudies: DataSource[];
+  };
+  methodologyNotes: MethodologyNote[];
+  limitationsAndCaveats: string[];
+  recommendationsForFurtherResearch: string[];
+}
+
+interface MethodologyNote {
+  category: string;
+  description: string;
+  limitations: string[];
+  confidenceImpact: string;
 }
 ```
 
@@ -681,67 +870,154 @@ interface ROIRow {
 ```typescript
 interface MCPServerConfig {
   name: "vibe-pm-agent";
-  version: "1.0.0";
-  description: "AI agent for optimizing developer intent into efficient Kiro specs using consulting techniques";
-  tools: MCPTool[];
+  version: "2.0.0";
+  description: "Evidence-backed business intelligence MCP server with automated executive intelligence capabilities";
+  tools: BusinessIntelligenceTool[];
+  capabilities: {
+    citationManagement: true;
+    confidenceScoring: true;
+    automatedExecutiveIntelligence: true;
+    realTimeMarketData: true;
+    competitiveIntelligence: true;
+  };
 }
 
-interface MCPTool {
+interface BusinessIntelligenceTool {
   name: string;
   description: string;
   inputSchema: JSONSchema;
-  handler: (args: any) => Promise<MCPToolResult>;
+  outputSchema: JSONSchema;
+  handler: (args: any) => Promise<BusinessIntelligenceResult>;
+  evidenceRequirements: EvidenceRequirement[];
+  confidenceThreshold: number;
 }
 
-interface MCPToolResult {
+interface BusinessIntelligenceResult {
   content: Array<{
-    type: "text" | "resource";
+    type: "text" | "resource" | "attachment";
     text?: string;
     resource?: {
       uri: string;
       mimeType: string;
       text: string;
     };
+    attachment?: {
+      filename: string;
+      mimeType: string;
+      content: string;
+      description: string;
+    };
   }>;
+  evidence: EvidencePackage;
+  confidence: ConfidenceScore;
+  citations: CitationDocument;
   isError?: boolean;
+  executionTime?: number;
 }
 ```
 
-### Tool Handlers
+### Automated Executive Intelligence Integration
 
 ```typescript
-class PMAgentMCPServer {
-  private pipeline: AIAgentPipeline;
+class ExecutiveIntelligenceMCPServer {
+  private businessIntelligencePipeline: BusinessIntelligencePipeline;
+  private evidenceEngine: EvidenceCompilationEngine;
+  private citationManager: CitationManager;
 
-  async handleOptimizeIntent(args: OptimizeIntentArgs): Promise<MCPToolResult> {
+  async handleProcessExecutiveQuery(args: ExecutiveQueryArgs): Promise<BusinessIntelligenceResult> {
+    const startTime = Date.now();
+    
     try {
-      const result = await this.pipeline.processIntent(args.intent, args.parameters);
+      // Analyze executive query intent
+      const queryAnalysis = await this.businessIntelligencePipeline.analyzeExecutiveQuery(
+        args.query, 
+        args.context
+      );
+      
+      // Generate comprehensive business intelligence
+      const businessIntelligence = await this.businessIntelligencePipeline.generateComprehensiveAnalysis(
+        queryAnalysis,
+        args.response_format
+      );
+      
+      // Compile evidence and validate sources
+      const evidencePackage = await this.evidenceEngine.compileEvidence(businessIntelligence);
+      
+      // Generate citations and confidence scoring
+      const citationDocument = await this.citationManager.generateCitationDocument(evidencePackage);
+      const confidenceScore = await this.evidenceEngine.calculateConfidenceScore(evidencePackage);
+      
       return {
         content: [{
           type: "text",
-          text: JSON.stringify(result, null, 2)
-        }]
+          text: businessIntelligence.executiveSummary
+        }, {
+          type: "attachment",
+          attachment: {
+            filename: "business_case_analysis.md",
+            mimeType: "text/markdown",
+            content: businessIntelligence.detailedAnalysis,
+            description: "Comprehensive business case with market intelligence"
+          }
+        }, {
+          type: "attachment", 
+          attachment: {
+            filename: "citations_and_evidence.md",
+            mimeType: "text/markdown",
+            content: citationDocument.formattedDocument,
+            description: "Comprehensive citations with source credibility analysis"
+          }
+        }],
+        evidence: evidencePackage,
+        confidence: confidenceScore,
+        citations: citationDocument,
+        executionTime: Date.now() - startTime
       };
     } catch (error) {
       return {
         content: [{
-          type: "text", 
-          text: `Error: ${error.message}`
+          type: "text",
+          text: `Executive Intelligence Error: ${error.message}`
+        }],
+        isError: true,
+        executionTime: Date.now() - startTime
+      };
+    }
+  }
+
+  async handleFormatExecutiveResponse(args: FormatResponseArgs): Promise<BusinessIntelligenceResult> {
+    try {
+      // Format business intelligence for automation platform use
+      const responsePackage = await this.businessIntelligencePipeline.formatForAutomation(
+        args.business_intelligence,
+        args.response_preferences
+      );
+      
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify({
+            executive_summary: responsePackage.executiveSummary,
+            email_subject: responsePackage.suggestedSubject,
+            key_recommendations: responsePackage.keyRecommendations,
+            attachments: responsePackage.attachmentData
+          }, null, 2)
+        }],
+        evidence: args.business_intelligence.evidence,
+        confidence: args.business_intelligence.confidence,
+        citations: args.business_intelligence.citations
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Response Formatting Error: ${error.message}`
         }],
         isError: true
       };
     }
   }
-
-  async handleAnalyzeWorkflow(args: AnalyzeWorkflowArgs): Promise<MCPToolResult> {
-    const analysis = await this.pipeline.analyzeWorkflow(args.workflow, args.techniques);
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify(analysis, null, 2)
-      }]
-    };
-  }
+}
 
   async handleGenerateROI(args: GenerateROIArgs): Promise<MCPToolResult> {
     const roiAnalysis = await this.pipeline.generateROIAnalysis(args);
@@ -826,17 +1102,111 @@ class PMAgentMCPServer {
 }
 ```
 
-### AI Agent Pipeline Integration
+### n8n Automation Platform Integration
+
+**Executive Intelligence Workflow Architecture:**
 
 ```typescript
-class AIAgentPipeline {
-  private intentInterpreter: IntentInterpreter;
-  private businessAnalyzer: BusinessAnalyzer;
-  private workflowOptimizer: WorkflowOptimizer;
-  private quotaForecaster: QuotaForecaster;
-  private consultingSummaryGenerator: ConsultingSummaryGenerator;
-  private pmDocumentGenerator: PMDocumentGenerator;
-  private specGenerator: SpecGenerator;
+interface N8nExecutiveWorkflow {
+  trigger: EmailTrigger;
+  processing: BusinessIntelligenceProcessing;
+  response: AutomatedEmailResponse;
+}
+
+interface EmailTrigger {
+  emailProvider: 'gmail' | 'outlook' | 'exchange';
+  monitoredAddresses: string[];
+  businessQueryDetection: {
+    keywords: string[];
+    senderWhitelist: string[];
+    urgencyDetection: boolean;
+  };
+}
+
+interface BusinessIntelligenceProcessing {
+  mcpServerEndpoint: string;
+  tools: {
+    processExecutiveQuery: MCPToolCall;
+    generateAutomatedResponse: MCPToolCall;
+  };
+  errorHandling: {
+    retryAttempts: number;
+    fallbackResponse: string;
+    escalationContacts: string[];
+  };
+}
+
+interface AutomatedEmailResponse {
+  responseTemplate: EmailTemplate;
+  attachmentHandling: AttachmentConfig;
+  deliveryOptions: DeliveryConfig;
+}
+```
+
+**Sample n8n Workflow Configuration:**
+
+```json
+{
+  "name": "CEO Executive Intelligence Automation",
+  "nodes": [
+    {
+      "type": "Gmail Trigger",
+      "parameters": {
+        "pollTimes": "every 5 minutes",
+        "filters": {
+          "from": ["ceo@company.com", "board@company.com"],
+          "subject_contains": ["should we", "what about", "analysis needed"]
+        }
+      }
+    },
+    {
+      "type": "Function",
+      "name": "Extract Business Query",
+      "parameters": {
+        "functionCode": "// Extract query intent and urgency\nreturn { query: items[0].json.body, urgency: detectUrgency(items[0].json.subject) };"
+      }
+    },
+    {
+      "type": "HTTP Request", 
+      "name": "Call vibe-pm-agent MCP",
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/mcp/process_executive_query",
+        "body": {
+          "query": "={{$json.query}}",
+          "context": {
+            "sender": "={{$json.from}}",
+            "urgency": "={{$json.urgency}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "Gmail",
+      "name": "Send Executive Response", 
+      "parameters": {
+        "operation": "send",
+        "to": "={{$json.original_sender}}",
+        "subject": "Re: Business Analysis - {{$json.query_summary}}",
+        "body": "={{$json.executive_summary}}",
+        "attachments": "={{$json.business_analysis_attachments}}"
+      }
+    }
+  ]
+}
+```
+
+### Business Intelligence Pipeline Integration
+
+```typescript
+class BusinessIntelligencePipeline {
+  private intentAnalyzer: IntentAnalysisEngine;
+  private marketIntelligence: MarketIntelligenceAggregator;
+  private strategicAssessment: StrategicAssessmentFramework;
+  private financialModeling: FinancialModelingEngine;
+  private riskAnalysis: RiskAnalysisSystem;
+  private evidenceCompilation: EvidenceCompilationEngine;
+  private executiveCommunication: ExecutiveCommunicationGenerator;
 
   async processIntent(intent: string, params?: OptionalParams): Promise<EnhancedKiroSpec> {
     // Full AI agent pipeline execution

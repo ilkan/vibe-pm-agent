@@ -1,0 +1,105 @@
+# Generated-by: Kiro Spec Mode
+# Spec-ID: vibe_pm_agent_v2_hackathon
+# Spec-Hash: sha256:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+# Model: claude-3.5-sonnet
+# Timestamp: 2025-01-09T10:30:00Z
+
+id: vibe_pm_agent_v2_hackathon
+version: "2.0.0"
+name: "Vibe PM Agent - Hackathon Enhanced"
+description: "AI-powered PM Mode for Kiro with spec-driven development, steering integration, and production-ready MCP tools"
+
+inputs:
+  - name: "raw_intent"
+    type: "string"
+    description: "Developer's raw intent in natural language"
+    required: true
+  - name: "context"
+    type: "object"
+    description: "Optional context including budget, timeline, team size"
+    required: false
+  - name: "requirements"
+    type: "string"
+    description: "Requirements document content for PM artifacts"
+    required: false
+  - name: "design"
+    type: "string"
+    description: "Design document content for PM artifacts"
+    required: false
+
+outputs:
+  - name: "business_opportunity_analysis"
+    type: "object"
+    description: "Comprehensive market validation and strategic fit assessment with citations"
+  - name: "business_case"
+    type: "object"
+    description: "ROI analysis with multi-scenario projections and evidence validation"
+  - name: "stakeholder_communications"
+    type: "object"
+    description: "Executive one-pagers, PR-FAQs, board presentations with confidence scoring"
+  - name: "strategic_alignment_assessment"
+    type: "object"
+    description: "Company OKR and mission alignment analysis with competitive positioning"
+  - name: "market_timing_validation"
+    type: "object"
+    description: "Right-time recommendations with market intelligence and competitive analysis"
+  - name: "resource_optimization"
+    type: "object"
+    description: "Development efficiency and team allocation recommendations"
+  - name: "automated_executive_response"
+    type: "object"
+    description: "Comprehensive business intelligence response to executive queries with structured attachments"
+  - name: "executive_email_package"
+    type: "object"
+    description: "Professional email with executive summary and detailed business analysis attachments"
+
+constraints:
+  - "All outputs must include comprehensive citations with source credibility ratings (A/B/C)"
+  - "All quantitative claims must include confidence intervals and methodology transparency"
+  - "All financial projections must reference comparable companies with source documentation"
+  - "All market claims must cite verified industry reports with publication dates"
+  - "All competitive intelligence must reference verifiable sources (SEC filings, public data)"
+  - "All recommendations must include confidence scores (0-100%) based on evidence quality"
+  - "Management one-pagers must be under 120 lines with citations section"
+  - "PR-FAQ documents must include evidence validation and source attribution"
+  - "All outputs must include provenance headers with Spec-ID, Model, Timestamp"
+  - "Task plans must include Guardrails Check as Task 0"
+  - "All acceptance criteria must map to at least one task"
+  - "Steering rules must govern tone, safety (strip PII), units, estimate bands"
+  - "MCP tools must have JSDoc documentation and health endpoints"
+
+acceptance_criteria:
+  - id: "AC001"
+    description: "WHEN generating business cases THEN system SHALL include comprehensive citations with source credibility ratings and confidence scores"
+    mapped_tasks: ["T001", "T002", "T003"]
+  - id: "AC002"
+    description: "WHEN making quantitative claims THEN system SHALL provide confidence intervals, sample sizes, and methodology transparency"
+    mapped_tasks: ["T004", "T005"]
+  - id: "AC003"
+    description: "WHEN referencing market data THEN system SHALL cite original sources with report titles, dates, and credibility ratings"
+    mapped_tasks: ["T006", "T007"]
+  - id: "AC004"
+    description: "WHEN providing financial projections THEN system SHALL reference comparable companies with source documentation"
+    mapped_tasks: ["T008", "T009"]
+  - id: "AC005"
+    description: "WHEN making recommendations THEN system SHALL include overall confidence score based on evidence quality"
+    mapped_tasks: ["T010", "T011"]
+  - id: "AC006"
+    description: "WHEN exposing MCP tools THEN system SHALL provide health endpoint and tool schema documentation"
+    mapped_tasks: ["T012", "T013"]
+  - id: "AC007"
+    description: "WHEN generating artifacts THEN system SHALL achieve >80% test coverage with CI validation"
+    mapped_tasks: ["T014", "T015"]
+  - id: "AC008"
+    description: "WHEN benchmarking performance THEN system SHALL provide p50/p95 latencies for all tools"
+    mapped_tasks: ["T016", "T017"]
+
+quality_bar:
+  - "P0 Kiro AI IDE Features: 100/100 target score"
+  - "P0 Technical Complexity: 95-100 target score"
+  - "P1 Innovation & Creativity: 95-100 target score"
+  - "Test coverage >80% with artifacts uploaded"
+  - "CI green with coverage and performance badges"
+  - "Judge Fast-Path: 5-minute validation with one-liners"
+  - "Production readiness: health checks, logging, env hygiene"
+  - "Security and contribution docs for open-source trust"

@@ -1,0 +1,245 @@
+{
+  "timestamp": "2025-09-06T12:05:08.864Z",
+  "summary": {
+    "total_tools": 12,
+    "benchmarked_tools": 12,
+    "avg_p50": 803.59,
+    "avg_p95": 1029.11
+  },
+  "results": {
+    "analyze_business_opportunity": {
+      "tool": "analyze_business_opportunity",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 882.18,
+        "max": 1390.88,
+        "avg": 1035.64,
+        "p50": 981.31,
+        "p95": 1320.2
+      },
+      "raw_data": [
+        882.1770420000003,
+        886.3443749999999,
+        981.3066660000001,
+        1037.4740839999995,
+        1390.880333
+      ]
+    },
+    "generate_business_case": {
+      "tool": "generate_business_case",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 1013.3,
+        "max": 1667.97,
+        "avg": 1379.64,
+        "p50": 1348.5,
+        "p95": 1648.14
+      },
+      "raw_data": [
+        1013.2977919999994,
+        1299.5944170000002,
+        1348.4968749999998,
+        1568.8282500000005,
+        1667.9662499999995
+      ]
+    },
+    "create_stakeholder_communication": {
+      "tool": "create_stakeholder_communication",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 766.25,
+        "max": 1554.15,
+        "avg": 1139.17,
+        "p50": 989.27,
+        "p95": 1526.18
+      },
+      "raw_data": [
+        766.2489580000001,
+        971.9126249999972,
+        989.2696660000001,
+        1414.276084000001,
+        1554.1523750000015
+      ]
+    },
+    "assess_strategic_alignment": {
+      "tool": "assess_strategic_alignment",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 675.28,
+        "max": 1466.98,
+        "avg": 1056.34,
+        "p50": 1103.2,
+        "p95": 1395.63
+      },
+      "raw_data": [
+        675.2800410000018,
+        925.979292,
+        1103.1988330000022,
+        1110.2542500000018,
+        1466.9793329999993
+      ]
+    },
+    "validate_market_timing": {
+      "tool": "validate_market_timing",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 452.26,
+        "max": 935.24,
+        "avg": 722.47,
+        "p50": 680.29,
+        "p95": 926.86
+      },
+      "raw_data": [
+        452.2627500000017,
+        651.2070419999982,
+        680.2924579999999,
+        893.3335829999996,
+        935.2379580000015
+      ]
+    },
+    "optimize_resource_allocation": {
+      "tool": "optimize_resource_allocation",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 521.17,
+        "max": 1175.28,
+        "avg": 1014.01,
+        "p50": 1144.59,
+        "p95": 1171.18
+      },
+      "raw_data": [
+        521.1697500000009,
+        1074.2205840000024,
+        1144.588499999998,
+        1154.768500000002,
+        1175.2823750000025
+      ]
+    },
+    "generate_management_onepager": {
+      "tool": "generate_management_onepager",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 529.3,
+        "max": 901.33,
+        "avg": 653.34,
+        "p50": 610.24,
+        "p95": 852.38
+      },
+      "raw_data": [
+        529.3035830000008,
+        569.2667919999949,
+        610.2434579999972,
+        656.5772090000028,
+        901.3254579999993
+      ]
+    },
+    "generate_pr_faq": {
+      "tool": "generate_pr_faq",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 697.22,
+        "max": 1380.39,
+        "avg": 1087.71,
+        "p50": 1094.44,
+        "p95": 1356.58
+      },
+      "raw_data": [
+        697.2183749999967,
+        1005.1657919999998,
+        1094.444875000001,
+        1261.3292499999952,
+        1380.393624999997
+      ]
+    },
+    "generate_requirements": {
+      "tool": "generate_requirements",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 259.32,
+        "max": 469.28,
+        "avg": 354.23,
+        "p50": 330.25,
+        "p95": 462.85
+      },
+      "raw_data": [
+        259.3179170000003,
+        275.1739170000001,
+        330.25170799999614,
+        437.1402089999974,
+        469.2833329999994
+      ]
+    },
+    "generate_design_options": {
+      "tool": "generate_design_options",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 337.35,
+        "max": 668.26,
+        "avg": 472.84,
+        "p50": 456.93,
+        "p95": 628.26
+      },
+      "raw_data": [
+        337.34708300000057,
+        433.37533400000393,
+        456.9292090000017,
+        468.2627500000017,
+        668.2614580000009
+      ]
+    },
+    "generate_task_plan": {
+      "tool": "generate_task_plan",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 442.59,
+        "max": 940.32,
+        "avg": 751.13,
+        "p50": 799.16,
+        "p95": 920.71
+      },
+      "raw_data": [
+        442.5862500000003,
+        731.3530410000021,
+        799.1567920000016,
+        842.2325830000045,
+        940.3237079999963
+      ]
+    },
+    "validate_idea_quick": {
+      "tool": "validate_idea_quick",
+      "runs": 5,
+      "failed_runs": 0,
+      "latencies": {
+        "min": 76.17,
+        "max": 143.37,
+        "avg": 108.57,
+        "p50": 104.94,
+        "p95": 140.33
+      },
+      "raw_data": [
+        76.17470899999898,
+        90.21983300000284,
+        104.94195900000341,
+        128.16383399999904,
+        143.3670420000053
+      ]
+    }
+  },
+  "metadata": {
+    "runs_per_tool": 5,
+    "node_version": "v23.6.1",
+    "platform": "darwin",
+    "arch": "arm64"
+  }
+}

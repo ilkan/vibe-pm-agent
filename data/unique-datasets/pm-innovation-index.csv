@@ -1,0 +1,21 @@
+company_name,industry,innovation_score,patent_velocity,github_activity,funding_momentum,talent_acquisition,market_disruption_potential,data_sources,confidence_score
+Microsoft,Technology,92.5,145,8750,2.1,4.2,8.7,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",94
+Google,Technology,94.2,189,12400,1.8,4.8,9.1,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",96
+Amazon,E-commerce,89.7,167,9200,2.3,4.1,8.9,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",93
+Apple,Technology,91.3,134,3200,1.9,4.5,8.8,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",95
+Meta,Social Media,87.4,98,7800,2.7,3.9,7.8,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",89
+Tesla,Automotive,88.9,156,4500,3.2,4.3,9.2,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",91
+Netflix,Entertainment,82.1,45,2100,1.4,3.7,7.2,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",87
+Salesforce,SaaS,85.6,78,5600,2.0,4.0,7.9,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",90
+Nvidia,Semiconductors,96.8,201,6700,2.8,4.9,9.5,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",97
+Adobe,Software,84.3,89,4200,1.7,3.8,7.6,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",88
+Shopify,E-commerce,83.7,67,8900,2.5,3.6,8.1,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",86
+Zoom,Communications,81.9,34,3400,1.6,3.5,7.4,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",85
+Slack,Productivity,80.2,28,5200,1.3,3.4,7.0,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",83
+Stripe,Fintech,86.4,52,7100,2.9,4.1,8.3,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",89
+Airbnb,Travel,79.8,41,2800,1.8,3.3,7.5,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",82
+Uber,Transportation,78.5,63,4600,2.1,3.2,7.8,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",81
+Spotify,Music,77.9,29,3700,1.5,3.1,6.9,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",80
+Palantir,Data Analytics,85.1,74,1900,2.4,4.0,8.2,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",87
+Snowflake,Data Cloud,87.2,56,2600,3.1,4.2,8.5,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",90
+Databricks,Analytics,86.8,61,3100,2.8,4.1,8.4,"sec_edgar,uspto_patents,github_ecosystem,bls_labor",89

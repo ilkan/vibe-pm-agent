@@ -107,3 +107,15 @@ demo.ts
 
 # Hackathon-specific files
 .kiro/steering/Hackathon Rules.md
+
+# Video documentation and recording materials
+docs/VIDEO_DOCUMENTATION.md
+docs/VIDEO_SCRIPT_OUTLINE.md
+docs/VIDEO_TEST_SCENARIOS.md
+docs/DEMO_SETUP_GUIDE.md
+video-recording/
+demo/video-scenarios/
+*.mp4
+*.mov
+*.avi
+*.mkv

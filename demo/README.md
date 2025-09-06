@@ -4,7 +4,17 @@ Real-world scenarios showing PM Mode in action - from raw developer intent to ex
 
 ## 🎯 Demo Scenarios
 
-### 🆕 **AI Customer Support Platform** (`ai-customer-support/`) ⭐ **NEW**
+### 🆕 **AI Code Review Assistant** (`ai-code-review-assistant/`) ⭐ **LATEST**
+**Context**: Development team building AI-powered code review assistant for security and performance
+**Demonstrates**: **Complete PM workflow with 6 new tools** - Business opportunity → Business case → Executive communication
+**Features**: Professional PM documents with McKinsey, Gartner, BCG citations, 300% ROI analysis, market timing validation
+```bash
+cd demo/ai-code-review-assistant
+node run-complete-workflow.js   # Full PM workflow demonstration
+./show-analysis.sh             # View business analysis results
+```
+
+### 🆕 **AI Customer Support Platform** (`ai-customer-support/`) 
 **Context**: SaaS company building AI-powered customer support automation
 **Demonstrates**: **Citation integration across all PM tools** with McKinsey, Gartner, BCG, HBR sources
 **Features**: 6 professional documents, 25+ authoritative citations, executive-ready quality
@@ -33,7 +43,15 @@ node test-enhanced-tools.js     # Test enhanced existing tools
 
 ## 🚀 How to Run Demos
 
-### 🎯 **Citation Integration Demo** (Recommended)
+### 🎯 **Complete PM Workflow Demo** (Recommended)
+```bash
+cd demo/ai-code-review-assistant
+node run-complete-workflow.js   # Full PM workflow with 6 new tools
+./show-analysis.sh             # View business analysis
+```
+**Generates**: Business opportunity analysis → Business case with 300% ROI → Executive one-pager → Market timing validation
+
+### 🎯 **Citation Integration Demo** 
 ```bash
 cd demo/ai-customer-support
 node test-citations.js          # New PM tools with citations

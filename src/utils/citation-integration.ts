@@ -68,7 +68,7 @@ export class CitationIntegration {
                 start: new Date(Date.now() - citationOptions.max_citation_age_months * 30 * 24 * 60 * 60 * 1000).toISOString(),
                 end: new Date().toISOString()
             },
-            minimum_confidence: citationOptions.minimum_confidence,
+            minimum_confidence: citationOptions.minimum_confidence as any,
             language: 'english'
         };
 
@@ -83,7 +83,7 @@ export class CitationIntegration {
 
         // Generate bibliography
         const bibliography = citationOptions.include_bibliography
-            ? this.citationService.generateBibliography(selectedCitations, citationOptions.citation_style)
+            ? this.citationService.generateBibliography(selectedCitations, citationOptions.citation_style as 'business' | 'apa')
             : '';
 
         // Calculate metrics
