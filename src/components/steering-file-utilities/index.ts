@@ -1,23 +1,23 @@
 /**
  * Steering File Management Utilities
- * 
+ *
  * Provides utility methods for listing, organizing, cleaning up, and analyzing
  * existing steering files to maintain an efficient steering file system.
  */
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { 
-  SteeringFile, 
-  FrontMatter, 
+import {
+  SteeringFile,
+  FrontMatter,
   DocumentType,
   SteeringFileStats,
-  InclusionRule 
+  InclusionRule,
 } from '../../models/steering';
 import {
   SteeringLogger,
   SteeringOperationWrapper,
-  FileSystemError
+  FileSystemError,
 } from '../../utils/steering-error-handling';
 
 /**
@@ -125,7 +125,7 @@ const DEFAULT_CONFIG: SteeringUtilitiesConfig = {
   steeringDirectory: '.kiro/steering',
   backupDirectory: '.kiro/steering/.backups',
   defaultMaxAgeDays: 90,
-  defaultMaxUnusedDays: 30
+  defaultMaxUnusedDays: 30,
 };
 
 /**
@@ -142,49 +142,44 @@ export class SteeringFileUtilities {
    * List all steering files with detailed information
    */
   async listSteeringFiles(): Promise<SteeringFileInfo[]> {
-    SteeringLogger.info('Listing all steering files', { 
-      directory: this.config.steeringDirectory 
+    SteeringLogger.info('Listing all steering files', {
+      directory: this.config.steeringDirectory,
     });
 
-    return SteeringOperationWrapper.executeWithErrorHandling(
-      async () => {
-        const files: SteeringFileInfo[] = [];
-        
-        try {
-          await fs.access(this.config.steeringDirectory);
-        } catch {
-          SteeringLogger.warn('Steering directory does not exist', {
-            directory: this.config.steeringDirectory
-          });
-          return files;
-        }
+    return SteeringOperationWrapper.executeWithErrorHandling(async () => {
+      const files: SteeringFileInfo[] = [];
 
-        const entries = await fs.readdir(this.config.steeringDirectory, { withFileTypes: true });
-        const markdownFiles = entries.filter(entry => 
-          entry.isFile() && entry.name.endsWith('.md')
-        );
-
-        for (const file of markdownFiles) {
-          try {
-            const fileInfo = await this.getSteeringFileInfo(file.name);
-            files.push(fileInfo);
-          } catch (error) {
-            SteeringLogger.warn('Failed to process steering file', {
-              filename: file.name,
-              error: error instanceof Error ? error.message : 'Unknown error'
-            });
-          }
-        }
-
-        SteeringLogger.info('Steering file listing completed', {
-          totalFiles: files.length,
-          validFiles: files.filter(f => f.isValid).length
+      try {
+        await fs.access(this.config.steeringDirectory);
+      } catch {
+        SteeringLogger.warn('Steering directory does not exist', {
+          directory: this.config.steeringDirectory,
         });
-
         return files;
-      },
-      'listSteeringFiles'
-    ).then(result => result.success ? result.result! : []);
+      }
+
+      const entries = await fs.readdir(this.config.steeringDirectory, { withFileTypes: true });
+      const markdownFiles = entries.filter(entry => entry.isFile() && entry.name.endsWith('.md'));
+
+      for (const file of markdownFiles) {
+        try {
+          const fileInfo = await this.getSteeringFileInfo(file.name);
+          files.push(fileInfo);
+        } catch (error) {
+          SteeringLogger.warn('Failed to process steering file', {
+            filename: file.name,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
+      }
+
+      SteeringLogger.info('Steering file listing completed', {
+        totalFiles: files.length,
+        validFiles: files.filter(f => f.isValid).length,
+      });
+
+      return files;
+    }, 'listSteeringFiles').then(result => (result.success ? result.result! : []));
   }
 
   /**
@@ -198,13 +193,13 @@ export class SteeringFileUtilities {
     outdated: SteeringFileInfo[];
   }> {
     const files = await this.listSteeringFiles();
-    
+
     const organized = {
       byFeature: {} as Record<string, SteeringFileInfo[]>,
       byType: {} as Record<DocumentType, SteeringFileInfo[]>,
       byInclusionRule: {} as Record<InclusionRule, SteeringFileInfo[]>,
       invalid: [] as SteeringFileInfo[],
-      outdated: [] as SteeringFileInfo[]
+      outdated: [] as SteeringFileInfo[],
     };
 
     const maxAge = this.config.defaultMaxAgeDays * 24 * 60 * 60 * 1000;
@@ -251,7 +246,7 @@ export class SteeringFileUtilities {
       totalFeatures: Object.keys(organized.byFeature).length,
       totalTypes: Object.keys(organized.byType).length,
       invalidFiles: organized.invalid.length,
-      outdatedFiles: organized.outdated.length
+      outdatedFiles: organized.outdated.length,
     });
 
     return organized;
@@ -278,7 +273,7 @@ export class SteeringFileUtilities {
       invalidFiles: [],
       totalSizeBytes: 0,
       topFeatures: [],
-      brokenReferences: []
+      brokenReferences: [],
     };
 
     // Initialize counters
@@ -339,9 +334,8 @@ export class SteeringFileUtilities {
     }
 
     // Calculate average age
-    analytics.averageAgeDays = files.length > 0 
-      ? Math.round(totalAge / files.length / (24 * 60 * 60 * 1000))
-      : 0;
+    analytics.averageAgeDays =
+      files.length > 0 ? Math.round(totalAge / files.length / (24 * 60 * 60 * 1000)) : 0;
 
     // Get top features
     analytics.topFeatures = Object.entries(featureCounts)
@@ -353,7 +347,7 @@ export class SteeringFileUtilities {
       totalFiles: analytics.totalFiles,
       outdatedFiles: analytics.outdatedFiles.length,
       invalidFiles: analytics.invalidFiles.length,
-      totalSizeMB: Math.round(analytics.totalSizeBytes / 1024 / 1024 * 100) / 100
+      totalSizeMB: Math.round((analytics.totalSizeBytes / 1024 / 1024) * 100) / 100,
     });
 
     return analytics;
@@ -369,7 +363,7 @@ export class SteeringFileUtilities {
       removeInvalid: options.removeInvalid ?? false,
       removeBrokenRefs: options.removeBrokenRefs ?? false,
       dryRun: options.dryRun ?? false,
-      createBackups: options.createBackups ?? true
+      createBackups: options.createBackups ?? true,
     };
 
     SteeringLogger.info('Starting steering file cleanup', { options: opts });
@@ -380,7 +374,7 @@ export class SteeringFileUtilities {
       removedFiles: [],
       backedUpFiles: [],
       errors: [],
-      spaceFreedBytes: 0
+      spaceFreedBytes: 0,
     };
 
     const files = await this.listSteeringFiles();
@@ -403,8 +397,9 @@ export class SteeringFileUtilities {
       // Check unused
       else if (now - file.lastModified.getTime() > maxUnused) {
         shouldRemove = true;
-        reason = reason ? `${reason} and unused for ${opts.maxUnusedDays} days` 
-                        : `unused for ${opts.maxUnusedDays} days`;
+        reason = reason
+          ? `${reason} and unused for ${opts.maxUnusedDays} days`
+          : `unused for ${opts.maxUnusedDays} days`;
       }
 
       // Check invalid
@@ -426,7 +421,7 @@ export class SteeringFileUtilities {
         filesToRemove.push(file);
         SteeringLogger.debug('File marked for removal', {
           filename: file.filename,
-          reason
+          reason,
         });
       }
     }
@@ -453,9 +448,8 @@ export class SteeringFileUtilities {
         SteeringLogger.info('Steering file removed', {
           filename: file.filename,
           dryRun: opts.dryRun,
-          sizeBytes: file.sizeBytes
+          sizeBytes: file.sizeBytes,
         });
-
       } catch (error) {
         const errorMsg = `Failed to remove ${file.filename}: ${
           error instanceof Error ? error.message : 'Unknown error'
@@ -463,7 +457,7 @@ export class SteeringFileUtilities {
         result.errors.push(errorMsg);
         SteeringLogger.error('Failed to remove steering file', {
           filename: file.filename,
-          error: errorMsg
+          error: errorMsg,
         });
       }
     }
@@ -471,9 +465,9 @@ export class SteeringFileUtilities {
     SteeringLogger.info('Steering file cleanup completed', {
       filesRemoved: result.filesRemoved,
       filesBackedUp: result.filesBackedUp,
-      spaceFreedMB: Math.round(result.spaceFreedBytes / 1024 / 1024 * 100) / 100,
+      spaceFreedMB: Math.round((result.spaceFreedBytes / 1024 / 1024) * 100) / 100,
       errors: result.errors.length,
-      dryRun: opts.dryRun
+      dryRun: opts.dryRun,
     });
 
     return result;
@@ -494,7 +488,7 @@ export class SteeringFileUtilities {
       lastModified: stats.mtime,
       created: stats.birthtime,
       isValid: false,
-      validationErrors: []
+      validationErrors: [],
     };
 
     try {
@@ -516,7 +510,6 @@ export class SteeringFileUtilities {
       if (fileInfo.validationErrors.length === 0 && fileInfo.frontMatter) {
         fileInfo.isValid = true;
       }
-
     } catch (error) {
       fileInfo.validationErrors.push(
         `Failed to parse file: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -585,7 +578,7 @@ export class SteeringFileUtilities {
       while ((match = referencePattern.exec(content)) !== null) {
         const referencedPath = match[1];
         const fullReferencedPath = path.resolve(referencedPath);
-        
+
         try {
           await fs.access(fullReferencedPath);
         } catch {
@@ -612,9 +605,8 @@ export class SteeringFileUtilities {
 
       SteeringLogger.debug('Backup created', {
         original: file.filename,
-        backup: backupFilename
+        backup: backupFilename,
       });
-
     } catch (error) {
       throw new FileSystemError(
         `Failed to create backup for ${file.filename}`,

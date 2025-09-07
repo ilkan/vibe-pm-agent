@@ -1,17 +1,17 @@
 /**
  * SteeringFilePreview Component
- * 
+ *
  * Provides preview generation and customization options for steering files
  * before they are saved to the file system.
  */
 
-import { 
-  SteeringFile, 
-  SteeringContext, 
-  FrontMatter, 
+import {
+  SteeringFile,
+  SteeringContext,
+  FrontMatter,
   DocumentType,
   InclusionRule,
-  ConflictInfo 
+  ConflictInfo,
 } from '../../models/steering';
 import { SteeringFileManager } from '../steering-file-manager';
 import { FrontMatterProcessor } from '../front-matter-processor';
@@ -136,7 +136,7 @@ export class SteeringFilePreview {
       estimatedSize: Buffer.byteLength(previewContent, 'utf8'),
       conflictInfo: conflictInfo.exists ? conflictInfo : undefined,
       warnings,
-      suggestions
+      suggestions,
     };
   }
 
@@ -154,7 +154,7 @@ export class SteeringFilePreview {
     const customizedFile: SteeringFile = {
       ...baseFile,
       frontMatter: { ...baseFile.frontMatter },
-      content: baseFile.content
+      content: baseFile.content,
     };
 
     // Apply filename customization
@@ -226,8 +226,10 @@ export class SteeringFilePreview {
           steeringFile,
           previewContent: `Error generating preview: ${error instanceof Error ? error.message : 'Unknown error'}`,
           estimatedSize: 0,
-          warnings: [`Error generating preview: ${error instanceof Error ? error.message : 'Unknown error'}`],
-          suggestions: ['Check the steering file content and customization options']
+          warnings: [
+            `Error generating preview: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          ],
+          suggestions: ['Check the steering file content and customization options'],
         };
         previews.push(errorPreview);
 
@@ -243,9 +245,7 @@ export class SteeringFilePreview {
   /**
    * Execute batch operations on multiple steering files
    */
-  async executeBatchOperation(
-    config: BatchOperationConfig
-  ): Promise<BatchOperationResult> {
+  async executeBatchOperation(config: BatchOperationConfig): Promise<BatchOperationResult> {
     const results: BatchOperationResult['results'] = [];
     let successful = 0;
     let failed = 0;
@@ -268,7 +268,7 @@ export class SteeringFilePreview {
           results.push({
             filename: customizedFile.filename,
             success: true,
-            message: saveResult.message
+            message: saveResult.message,
           });
         } else {
           failed++;
@@ -276,7 +276,7 @@ export class SteeringFilePreview {
             filename: customizedFile.filename,
             success: false,
             message: saveResult.message,
-            error: saveResult.warnings?.join(', ')
+            error: saveResult.warnings?.join(', '),
           });
         }
       } catch (error) {
@@ -285,7 +285,7 @@ export class SteeringFilePreview {
           filename: steeringFile.filename,
           success: false,
           message: 'Failed to process file',
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
 
         if (config.stopOnError) {
@@ -299,7 +299,7 @@ export class SteeringFilePreview {
       successful,
       failed,
       results,
-      summary: `Processed ${results.length} files: ${successful} successful, ${failed} failed`
+      summary: `Processed ${results.length} files: ${successful} successful, ${failed} failed`,
     };
   }
 
@@ -327,12 +327,12 @@ export class SteeringFilePreview {
         suggestions.push({
           type: 'inclusionRule',
           suggestion: 'fileMatch',
-          reason: 'Requirements guidance is most useful when working on spec or requirements files'
+          reason: 'Requirements guidance is most useful when working on spec or requirements files',
         });
         suggestions.push({
           type: 'fileMatchPattern',
           suggestion: 'requirements*|spec*|*.md',
-          reason: 'Match requirements, spec, and markdown files for contextual guidance'
+          reason: 'Match requirements, spec, and markdown files for contextual guidance',
         });
         break;
 
@@ -340,12 +340,12 @@ export class SteeringFilePreview {
         suggestions.push({
           type: 'inclusionRule',
           suggestion: 'fileMatch',
-          reason: 'Design guidance should activate when working on architecture or design files'
+          reason: 'Design guidance should activate when working on architecture or design files',
         });
         suggestions.push({
           type: 'fileMatchPattern',
           suggestion: 'design*|architecture*|*.ts|*.js',
-          reason: 'Match design files and source code for implementation guidance'
+          reason: 'Match design files and source code for implementation guidance',
         });
         break;
 
@@ -353,7 +353,7 @@ export class SteeringFilePreview {
         suggestions.push({
           type: 'inclusionRule',
           suggestion: 'manual',
-          reason: 'Executive guidance is typically needed on-demand rather than automatically'
+          reason: 'Executive guidance is typically needed on-demand rather than automatically',
         });
         break;
 
@@ -361,7 +361,7 @@ export class SteeringFilePreview {
         suggestions.push({
           type: 'inclusionRule',
           suggestion: 'manual',
-          reason: 'PR-FAQ guidance is usually needed for specific communication tasks'
+          reason: 'PR-FAQ guidance is usually needed for specific communication tasks',
         });
         break;
 
@@ -369,12 +369,12 @@ export class SteeringFilePreview {
         suggestions.push({
           type: 'inclusionRule',
           suggestion: 'fileMatch',
-          reason: 'Task guidance helps during implementation work'
+          reason: 'Task guidance helps during implementation work',
         });
         suggestions.push({
           type: 'fileMatchPattern',
           suggestion: 'tasks*|todo*|*.ts|*.js',
-          reason: 'Match task files and source code for implementation guidance'
+          reason: 'Match task files and source code for implementation guidance',
         });
         break;
     }
@@ -384,14 +384,14 @@ export class SteeringFilePreview {
     suggestions.push({
       type: 'filename',
       suggestion: `${documentType}-${sanitizedFeatureName}`,
-      reason: 'Clear naming convention that includes document type and feature name'
+      reason: 'Clear naming convention that includes document type and feature name',
     });
 
     // Description suggestions
     suggestions.push({
       type: 'description',
       suggestion: `${documentType.charAt(0).toUpperCase() + documentType.slice(1)} guidance for ${featureName} feature`,
-      reason: 'Descriptive summary of the steering file purpose'
+      reason: 'Descriptive summary of the steering file purpose',
     });
 
     return suggestions;
@@ -402,25 +402,25 @@ export class SteeringFilePreview {
   private generateCompleteFileContent(steeringFile: SteeringFile): string {
     // Generate front-matter YAML
     const frontMatterLines = ['---'];
-    
+
     // Add required front-matter fields
     frontMatterLines.push(`inclusion: ${steeringFile.frontMatter.inclusion}`);
-    
+
     if (steeringFile.frontMatter.fileMatchPattern) {
       frontMatterLines.push(`fileMatchPattern: '${steeringFile.frontMatter.fileMatchPattern}'`);
     }
-    
+
     frontMatterLines.push(
       `generatedBy: ${steeringFile.frontMatter.generatedBy}`,
       `generatedAt: ${steeringFile.frontMatter.generatedAt}`,
       `featureName: ${steeringFile.frontMatter.featureName}`,
       `documentType: ${steeringFile.frontMatter.documentType}`
     );
-    
+
     if (steeringFile.frontMatter.description) {
       frontMatterLines.push(`description: ${steeringFile.frontMatter.description}`);
     }
-    
+
     frontMatterLines.push('---', '');
 
     // Add content
@@ -447,7 +447,9 @@ export class SteeringFilePreview {
     // Check file size
     const sizeInKB = Buffer.byteLength(content, 'utf8') / 1024;
     if (sizeInKB > 100) {
-      warnings.push(`Large file size (${sizeInKB.toFixed(1)}KB). Consider splitting into smaller files.`);
+      warnings.push(
+        `Large file size (${sizeInKB.toFixed(1)}KB). Consider splitting into smaller files.`
+      );
     }
 
     // Check filename
@@ -456,7 +458,10 @@ export class SteeringFilePreview {
     }
 
     // Check inclusion rule consistency
-    if (steeringFile.frontMatter.inclusion === 'fileMatch' && !steeringFile.frontMatter.fileMatchPattern) {
+    if (
+      steeringFile.frontMatter.inclusion === 'fileMatch' &&
+      !steeringFile.frontMatter.fileMatchPattern
+    ) {
       warnings.push('fileMatch inclusion rule requires a fileMatchPattern');
     }
 
@@ -527,8 +532,8 @@ export class SteeringFilePreview {
       ...individual,
       contentModifications: {
         ...common?.contentModifications,
-        ...individual?.contentModifications
-      }
+        ...individual?.contentModifications,
+      },
     };
   }
 

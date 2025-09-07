@@ -24,9 +24,9 @@ describe('FrontMatterProcessor', () => {
       const customProcessor = new FrontMatterProcessor({
         generatorId: 'custom-generator',
         includeDescription: false,
-        timestampFormat: 'unix'
+        timestampFormat: 'unix',
       });
-      
+
       const config = customProcessor.getConfig();
       expect(config.generatorId).toBe('custom-generator');
       expect(config.includeDescription).toBe(false);
@@ -40,12 +40,12 @@ describe('FrontMatterProcessor', () => {
       projectName: 'test-project',
       relatedFiles: ['auth.ts', 'user.model.ts'],
       inclusionRule: 'fileMatch',
-      fileMatchPattern: 'auth*'
+      fileMatchPattern: 'auth*',
     };
 
     it('should generate front-matter for requirements document', () => {
       const frontMatter = processor.generateFrontMatter(DocumentType.REQUIREMENTS, baseContext);
-      
+
       expect(frontMatter.inclusion).toBe('fileMatch');
       expect(frontMatter.fileMatchPattern).toBe('auth*');
       expect(frontMatter.generatedBy).toBe('vibe-pm-agent');
@@ -56,7 +56,7 @@ describe('FrontMatterProcessor', () => {
 
     it('should generate front-matter for design document', () => {
       const frontMatter = processor.generateFrontMatter(DocumentType.DESIGN, baseContext);
-      
+
       expect(frontMatter.inclusion).toBe('fileMatch');
       expect(frontMatter.documentType).toBe(DocumentType.DESIGN);
       expect(frontMatter.fileMatchPattern).toBe('auth*');
@@ -64,7 +64,7 @@ describe('FrontMatterProcessor', () => {
 
     it('should generate front-matter for one-pager document with manual inclusion', () => {
       const frontMatter = processor.generateFrontMatter(DocumentType.ONEPAGER, baseContext);
-      
+
       expect(frontMatter.inclusion).toBe('fileMatch'); // Uses context rule
       expect(frontMatter.documentType).toBe(DocumentType.ONEPAGER);
     });
@@ -73,18 +73,18 @@ describe('FrontMatterProcessor', () => {
       const contextWithoutRule: SteeringContext = {
         featureName: 'test-feature',
         relatedFiles: [],
-        inclusionRule: 'always' // This will be overridden by context
+        inclusionRule: 'always', // This will be overridden by context
       };
 
       const requirementsFM = processor.generateFrontMatter(DocumentType.REQUIREMENTS, {
         ...contextWithoutRule,
-        inclusionRule: undefined as any
+        inclusionRule: undefined as any,
       });
       expect(requirementsFM.inclusion).toBe('fileMatch'); // Default for requirements
 
       const onePagerFM = processor.generateFrontMatter(DocumentType.ONEPAGER, {
         ...contextWithoutRule,
-        inclusionRule: undefined as any
+        inclusionRule: undefined as any,
       });
       expect(onePagerFM.inclusion).toBe('manual'); // Default for one-pager
     });
@@ -93,10 +93,13 @@ describe('FrontMatterProcessor', () => {
       const contextWithoutPattern: SteeringContext = {
         featureName: 'test-feature',
         relatedFiles: [],
-        inclusionRule: 'fileMatch'
+        inclusionRule: 'fileMatch',
       };
 
-      const requirementsFM = processor.generateFrontMatter(DocumentType.REQUIREMENTS, contextWithoutPattern);
+      const requirementsFM = processor.generateFrontMatter(
+        DocumentType.REQUIREMENTS,
+        contextWithoutPattern
+      );
       expect(requirementsFM.fileMatchPattern).toBe('requirements*|spec*|*requirements*');
 
       const designFM = processor.generateFrontMatter(DocumentType.DESIGN, contextWithoutPattern);
@@ -110,7 +113,7 @@ describe('FrontMatterProcessor', () => {
       const manualContext: SteeringContext = {
         featureName: 'test-feature',
         relatedFiles: [],
-        inclusionRule: 'manual'
+        inclusionRule: 'manual',
       };
 
       const frontMatter = processor.generateFrontMatter(DocumentType.REQUIREMENTS, manualContext);
@@ -123,10 +126,13 @@ describe('FrontMatterProcessor', () => {
         featureName: 'test-feature',
         relatedFiles: [],
         inclusionRule: 'always',
-        description: 'Test steering file for authentication'
+        description: 'Test steering file for authentication',
       };
 
-      const frontMatter = processor.generateFrontMatter(DocumentType.REQUIREMENTS, contextWithDescription);
+      const frontMatter = processor.generateFrontMatter(
+        DocumentType.REQUIREMENTS,
+        contextWithDescription
+      );
       expect(frontMatter.description).toBe('Test steering file for authentication');
     });
 
@@ -136,10 +142,13 @@ describe('FrontMatterProcessor', () => {
         featureName: 'test-feature',
         relatedFiles: [],
         inclusionRule: 'always',
-        description: 'Test description'
+        description: 'Test description',
       };
 
-      const frontMatter = processorNoDesc.generateFrontMatter(DocumentType.REQUIREMENTS, contextWithDescription);
+      const frontMatter = processorNoDesc.generateFrontMatter(
+        DocumentType.REQUIREMENTS,
+        contextWithDescription
+      );
       expect(frontMatter.description).toBeUndefined();
     });
   });
@@ -161,7 +170,7 @@ describe('FrontMatterProcessor', () => {
     it('should use custom timestamp formatter when provided', () => {
       const customProcessor = new FrontMatterProcessor({
         timestampFormat: 'custom',
-        customTimestampFormatter: () => '2024-01-01T00:00:00Z'
+        customTimestampFormatter: () => '2024-01-01T00:00:00Z',
       });
       const timestamp = customProcessor.generateTimestamp();
       expect(timestamp).toBe('2024-01-01T00:00:00Z');
@@ -177,7 +186,7 @@ describe('FrontMatterProcessor', () => {
         generatedAt: '2024-01-01T00:00:00Z',
         featureName: 'user-authentication',
         documentType: DocumentType.REQUIREMENTS,
-        description: 'Authentication requirements guidance'
+        description: 'Authentication requirements guidance',
       };
 
       const formatted = processor.formatFrontMatter(frontMatter);
@@ -201,7 +210,7 @@ describe('FrontMatterProcessor', () => {
         generatedBy: 'vibe-pm-agent',
         generatedAt: '2024-01-01T00:00:00Z',
         featureName: 'test-feature',
-        documentType: DocumentType.ONEPAGER
+        documentType: DocumentType.ONEPAGER,
       };
 
       const formatted = processor.formatFrontMatter(frontMatter);
@@ -217,7 +226,7 @@ describe('FrontMatterProcessor', () => {
         generatedAt: '2024-01-01T00:00:00Z',
         featureName: 'test',
         documentType: DocumentType.REQUIREMENTS,
-        description: "User's authentication requirements"
+        description: "User's authentication requirements",
       };
 
       const formatted = processor.formatFrontMatter(frontMatter);
@@ -232,7 +241,7 @@ describe('FrontMatterProcessor', () => {
       generatedBy: 'vibe-pm-agent',
       generatedAt: '2024-01-01T00:00:00Z',
       featureName: 'user-authentication',
-      documentType: DocumentType.REQUIREMENTS
+      documentType: DocumentType.REQUIREMENTS,
     };
 
     it('should validate complete front-matter as valid', () => {
@@ -259,7 +268,7 @@ describe('FrontMatterProcessor', () => {
       const frontMatterWithoutPattern: FrontMatter = {
         ...validFrontMatter,
         inclusion: 'fileMatch',
-        fileMatchPattern: undefined
+        fileMatchPattern: undefined,
       };
 
       const result = processor.validateFrontMatter(frontMatterWithoutPattern);
@@ -270,7 +279,7 @@ describe('FrontMatterProcessor', () => {
     it('should validate timestamp format', () => {
       const frontMatterWithInvalidDate: FrontMatter = {
         ...validFrontMatter,
-        generatedAt: 'invalid-date'
+        generatedAt: 'invalid-date',
       };
 
       const result = processor.validateFrontMatter(frontMatterWithInvalidDate);
@@ -282,7 +291,7 @@ describe('FrontMatterProcessor', () => {
       const manualFrontMatter: FrontMatter = {
         ...validFrontMatter,
         inclusion: 'manual',
-        fileMatchPattern: undefined
+        fileMatchPattern: undefined,
       };
 
       const result = processor.validateFrontMatter(manualFrontMatter);
@@ -303,9 +312,9 @@ describe('FrontMatterProcessor', () => {
       processor.updateConfig({
         generatorId: 'updated-generator',
         includeDescription: false,
-        timestampFormat: 'unix'
+        timestampFormat: 'unix',
       });
-      
+
       const config = processor.getConfig();
       expect(config.generatorId).toBe('updated-generator');
       expect(config.includeDescription).toBe(false);
@@ -318,28 +327,28 @@ describe('FrontMatterProcessor', () => {
       {
         documentType: DocumentType.REQUIREMENTS,
         expectedInclusion: 'fileMatch' as const,
-        expectedPattern: 'requirements*|spec*|*requirements*'
+        expectedPattern: 'requirements*|spec*|*requirements*',
       },
       {
         documentType: DocumentType.DESIGN,
         expectedInclusion: 'fileMatch' as const,
-        expectedPattern: 'design*|architecture*|*design*|*arch*'
+        expectedPattern: 'design*|architecture*|*design*|*arch*',
       },
       {
         documentType: DocumentType.ONEPAGER,
         expectedInclusion: 'manual' as const,
-        expectedPattern: undefined
+        expectedPattern: undefined,
       },
       {
         documentType: DocumentType.PRFAQ,
         expectedInclusion: 'manual' as const,
-        expectedPattern: undefined
+        expectedPattern: undefined,
       },
       {
         documentType: DocumentType.TASKS,
         expectedInclusion: 'fileMatch' as const,
-        expectedPattern: 'tasks*|todo*|*tasks*|implementation*'
-      }
+        expectedPattern: 'tasks*|todo*|*tasks*|implementation*',
+      },
     ];
 
     testCases.forEach(({ documentType, expectedInclusion, expectedPattern }) => {
@@ -347,14 +356,14 @@ describe('FrontMatterProcessor', () => {
         const context: SteeringContext = {
           featureName: 'test-feature',
           relatedFiles: [],
-          inclusionRule: undefined as any // Use defaults
+          inclusionRule: undefined as any, // Use defaults
         };
 
         const frontMatter = processor.generateFrontMatter(documentType, context);
-        
+
         expect(frontMatter.documentType).toBe(documentType);
         expect(frontMatter.inclusion).toBe(expectedInclusion);
-        
+
         if (expectedPattern) {
           expect(frontMatter.fileMatchPattern).toBe(expectedPattern);
         } else {

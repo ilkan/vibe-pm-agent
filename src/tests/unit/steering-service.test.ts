@@ -17,9 +17,15 @@ import { SteeringFileManager } from '../../components/steering-file-manager';
 import { DocumentReferenceLinker } from '../../components/document-reference-linker';
 
 // Create mock implementations
-const MockedSteeringFileGenerator = SteeringFileGenerator as jest.MockedClass<typeof SteeringFileGenerator>;
-const MockedSteeringFileManager = SteeringFileManager as jest.MockedClass<typeof SteeringFileManager>;
-const MockedDocumentReferenceLinker = DocumentReferenceLinker as jest.MockedClass<typeof DocumentReferenceLinker>;
+const MockedSteeringFileGenerator = SteeringFileGenerator as jest.MockedClass<
+  typeof SteeringFileGenerator
+>;
+const MockedSteeringFileManager = SteeringFileManager as jest.MockedClass<
+  typeof SteeringFileManager
+>;
+const MockedDocumentReferenceLinker = DocumentReferenceLinker as jest.MockedClass<
+  typeof DocumentReferenceLinker
+>;
 
 describe('SteeringService', () => {
   let service: SteeringService;
@@ -37,7 +43,7 @@ describe('SteeringService', () => {
       generateFromDesign: jest.fn(),
       generateFromOnePager: jest.fn(),
       generateFromPRFAQ: jest.fn(),
-      generateFromTaskPlan: jest.fn()
+      generateFromTaskPlan: jest.fn(),
     } as any;
 
     mockManager = {
@@ -45,14 +51,14 @@ describe('SteeringService', () => {
       checkConflicts: jest.fn(),
       resolveNaming: jest.fn(),
       listExistingSteeringFiles: jest.fn(),
-      getStats: jest.fn()
+      getStats: jest.fn(),
     } as any;
 
     mockReferenceLinker = {
       addFileReferences: jest.fn(),
       generateFileReferences: jest.fn(),
       detectRelatedFiles: jest.fn(),
-      validateCrossReferences: jest.fn()
+      validateCrossReferences: jest.fn(),
     } as any;
 
     // Setup mock implementations
@@ -68,10 +74,10 @@ describe('SteeringService', () => {
         generatedBy: 'vibe-pm-agent',
         generatedAt: new Date().toISOString(),
         featureName: 'test-feature',
-        documentType: DocumentType.REQUIREMENTS
+        documentType: DocumentType.REQUIREMENTS,
       },
       content: 'Test steering file content',
-      references: []
+      references: [],
     };
 
     const mockSaveResult: SaveResult = {
@@ -79,7 +85,7 @@ describe('SteeringService', () => {
       filename: 'test-steering-file.md',
       action: 'created',
       message: 'Steering file created successfully',
-      fullPath: '.kiro/steering/test-steering-file.md'
+      fullPath: '.kiro/steering/test-steering-file.md',
     };
 
     mockGenerator.generateFromRequirements.mockReturnValue(mockSteeringFile);
@@ -94,16 +100,16 @@ describe('SteeringService', () => {
       filesUpdated: 0,
       conflictsEncountered: 0,
       documentTypesProcessed: [],
-      processingTimeMs: 0
+      processingTimeMs: 0,
     });
 
-    mockReferenceLinker.addFileReferences.mockImplementation((context) => context);
+    mockReferenceLinker.addFileReferences.mockImplementation(context => context);
     mockReferenceLinker.generateFileReferences.mockReturnValue([]);
 
     service = new SteeringService({
       userPreferences: {
-        autoCreate: true
-      }
+        autoCreate: true,
+      },
     });
   });
 
@@ -112,14 +118,14 @@ describe('SteeringService', () => {
       const requirements = JSON.stringify({
         businessGoal: 'Improve user authentication',
         functionalRequirements: ['Secure login', 'User registration'],
-        priority: { must: ['Security'], should: ['UX'], could: [], wont: [] }
+        priority: { must: ['Security'], should: ['UX'], could: [], wont: [] },
       });
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'auth-system',
         inclusion_rule: 'fileMatch',
-        file_match_pattern: 'requirements*'
+        file_match_pattern: 'requirements*',
       };
 
       const result = await service.createFromRequirements(requirements, steeringOptions);
@@ -133,7 +139,7 @@ describe('SteeringService', () => {
       const requirements = 'Test requirements';
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: false,
-        feature_name: 'test'
+        feature_name: 'test',
       };
 
       const result = await service.createFromRequirements(requirements, steeringOptions);
@@ -160,15 +166,15 @@ describe('SteeringService', () => {
         options: {
           conservative: { description: 'Basic approach' },
           balanced: { description: 'Moderate approach' },
-          bold: { description: 'Advanced approach' }
-        }
+          bold: { description: 'Advanced approach' },
+        },
       });
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'design-system',
         inclusion_rule: 'fileMatch',
-        file_match_pattern: 'design*'
+        file_match_pattern: 'design*',
       };
 
       const result = await service.createFromDesignOptions(design, steeringOptions);
@@ -192,7 +198,7 @@ describe('SteeringService', () => {
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'executive-summary',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       };
 
       const result = await service.createFromOnePager(onePager, steeringOptions);
@@ -221,7 +227,7 @@ describe('SteeringService', () => {
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'product-launch',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       };
 
       const result = await service.createFromPRFAQ(prfaq, steeringOptions);
@@ -238,15 +244,15 @@ describe('SteeringService', () => {
           guardrailsCheck: { limits: { max_vibes: 50 } },
           immediateWins: ['Setup project structure'],
           shortTerm: ['Implement core features'],
-          longTerm: ['Scale and optimize']
-        }
+          longTerm: ['Scale and optimize'],
+        },
       });
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'implementation',
         inclusion_rule: 'fileMatch',
-        file_match_pattern: 'tasks*'
+        file_match_pattern: 'tasks*',
       };
 
       const result = await service.createFromTaskPlan(taskPlan, steeringOptions);
@@ -263,13 +269,13 @@ describe('SteeringService', () => {
         { method: 'createFromDesignOptions', content: 'design', expectedRule: 'fileMatch' },
         { method: 'createFromOnePager', content: 'onepager', expectedRule: 'manual' },
         { method: 'createFromPRFAQ', content: 'prfaq', expectedRule: 'manual' },
-        { method: 'createFromTaskPlan', content: 'tasks', expectedRule: 'fileMatch' }
+        { method: 'createFromTaskPlan', content: 'tasks', expectedRule: 'fileMatch' },
       ];
 
       for (const testCase of testCases) {
         const steeringOptions: SteeringFileOptions = {
           create_steering_files: true,
-          feature_name: 'test-defaults'
+          feature_name: 'test-defaults',
           // No inclusion_rule specified, should use defaults
         };
 
@@ -285,7 +291,7 @@ describe('SteeringService', () => {
         create_steering_files: true,
         feature_name: 'custom-prefix-test',
         filename_prefix: 'custom',
-        inclusion_rule: 'always'
+        inclusion_rule: 'always',
       };
 
       const result = await service.createFromRequirements('test', steeringOptions);
@@ -297,7 +303,7 @@ describe('SteeringService', () => {
         create_steering_files: true,
         feature_name: 'overwrite-test',
         inclusion_rule: 'always',
-        overwrite_existing: true
+        overwrite_existing: true,
       };
 
       const result = await service.createFromRequirements('test', steeringOptions);
@@ -310,11 +316,11 @@ describe('SteeringService', () => {
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         // Missing feature_name
-        inclusion_rule: 'always'
+        inclusion_rule: 'always',
       };
 
       const result = await service.createFromRequirements('test', steeringOptions);
-      
+
       // Should still attempt creation with default name
       expect(result.created).toBe(true);
     });
@@ -323,24 +329,24 @@ describe('SteeringService', () => {
       // Mock a service that throws an error
       const errorService = new SteeringService({
         userPreferences: {
-          autoCreate: true
-        }
+          autoCreate: true,
+        },
       });
-      
+
       // Override the generator to throw an error
       (errorService as any).generator = {
         generateFromRequirements: () => {
           throw new Error('Generator error');
-        }
+        },
       };
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'error-test'
+        feature_name: 'error-test',
       };
 
       const result = await errorService.createFromRequirements('test', steeringOptions);
-      
+
       expect(result.created).toBe(false);
       expect(result.message).toContain('Failed to create');
       expect(result.warnings).toContain('Generator error');
@@ -350,7 +356,7 @@ describe('SteeringService', () => {
   describe('Statistics and monitoring', () => {
     test('should provide statistics about operations', () => {
       const stats = service.getStats();
-      
+
       expect(stats).toBeDefined();
       expect(typeof stats.filesCreated).toBe('number');
       expect(typeof stats.filesUpdated).toBe('number');

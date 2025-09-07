@@ -17,7 +17,7 @@ describe('MCP Market Sizing Handler', () => {
       sessionId: 'test-session-456',
       timestamp: Date.now(),
       requestId: 'test-request-456',
-      traceId: 'test-trace-456'
+      traceId: 'test-trace-456',
     };
   });
 
@@ -30,9 +30,9 @@ describe('MCP Market Sizing Handler', () => {
       const args: MarketSizingArgs = {
         feature_idea: 'AI-powered project management tool for software teams',
         market_definition: {
-          industry: 'Software'
+          industry: 'Software',
         },
-        sizing_methods: ['top-down', 'bottom-up']
+        sizing_methods: ['top-down', 'bottom-up'],
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -60,9 +60,9 @@ describe('MCP Market Sizing Handler', () => {
         market_definition: {
           industry: 'Enterprise Software',
           geography: ['US', 'EU', 'APAC'],
-          customer_segments: ['Large Enterprise', 'Mid-Market', 'SMB']
+          customer_segments: ['Large Enterprise', 'Mid-Market', 'SMB'],
         },
-        sizing_methods: ['top-down', 'bottom-up', 'value-theory']
+        sizing_methods: ['top-down', 'bottom-up', 'value-theory'],
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -80,9 +80,9 @@ describe('MCP Market Sizing Handler', () => {
       const args: MarketSizingArgs = {
         feature_idea: 'Project management software',
         market_definition: {
-          industry: 'Software'
+          industry: 'Software',
         },
-        sizing_methods: ['top-down']
+        sizing_methods: ['top-down'],
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -93,17 +93,17 @@ describe('MCP Market Sizing Handler', () => {
       expect(sizingData.tam.value).toBeGreaterThan(sizingData.sam.value);
       expect(sizingData.sam.value).toBeGreaterThan(sizingData.som.value);
       expect(sizingData.tam.value).toBe(50000000000); // $50B
-      expect(sizingData.sam.value).toBe(5000000000);  // $5B
-      expect(sizingData.som.value).toBe(500000000);   // $500M
+      expect(sizingData.sam.value).toBe(5000000000); // $5B
+      expect(sizingData.som.value).toBe(500000000); // $500M
     });
 
     it('should include multiple scenarios with different probabilities', async () => {
       const args: MarketSizingArgs = {
         feature_idea: 'AI analytics platform',
         market_definition: {
-          industry: 'Analytics'
+          industry: 'Analytics',
         },
-        sizing_methods: ['bottom-up']
+        sizing_methods: ['bottom-up'],
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -112,7 +112,7 @@ describe('MCP Market Sizing Handler', () => {
 
       const sizingData = result.content[0].json;
       expect(sizingData.scenarios).toHaveLength(3);
-      
+
       const scenarios = sizingData.scenarios;
       const conservative = scenarios.find((s: any) => s.name === 'conservative');
       const balanced = scenarios.find((s: any) => s.name === 'balanced');
@@ -135,9 +135,9 @@ describe('MCP Market Sizing Handler', () => {
       const args: MarketSizingArgs = {
         feature_idea: 'Enterprise software solution',
         market_definition: {
-          industry: 'Enterprise Software'
+          industry: 'Enterprise Software',
         },
-        sizing_methods: ['top-down', 'bottom-up']
+        sizing_methods: ['top-down', 'bottom-up'],
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -163,15 +163,15 @@ describe('MCP Market Sizing Handler', () => {
       const args: MarketSizingArgs = {
         feature_idea: 'AI-powered analytics platform',
         market_definition: {
-          industry: 'Analytics'
+          industry: 'Analytics',
         },
         sizing_methods: ['top-down'],
         steering_options: {
           create_steering_files: true,
           feature_name: 'ai-analytics',
           inclusion_rule: 'fileMatch',
-          file_match_pattern: 'market*'
-        }
+          file_match_pattern: 'market*',
+        },
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -184,7 +184,7 @@ describe('MCP Market Sizing Handler', () => {
 
     it('should validate required arguments', async () => {
       const invalidArgs = {
-        feature_idea: 'Test feature'
+        feature_idea: 'Test feature',
         // Missing market_definition
       } as MarketSizingArgs;
 
@@ -199,9 +199,9 @@ describe('MCP Market Sizing Handler', () => {
         feature_idea: 'Test feature',
         market_definition: {
           // Missing industry
-          geography: ['US']
+          geography: ['US'],
         } as any,
-        sizing_methods: ['top-down']
+        sizing_methods: ['top-down'],
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -216,16 +216,16 @@ describe('MCP Market Sizing Handler', () => {
         { methods: ['bottom-up'], expectedQuota: 2 },
         { methods: ['value-theory'], expectedQuota: 2 },
         { methods: ['top-down', 'bottom-up'], expectedQuota: 4 },
-        { methods: ['top-down', 'bottom-up', 'value-theory'], expectedQuota: 6 }
+        { methods: ['top-down', 'bottom-up', 'value-theory'], expectedQuota: 6 },
       ];
 
       for (const testCase of testCases) {
         const args: MarketSizingArgs = {
           feature_idea: 'Test feature for sizing methods',
           market_definition: {
-            industry: 'Test Industry'
+            industry: 'Test Industry',
           },
-          sizing_methods: testCase.methods as any
+          sizing_methods: testCase.methods as any,
         };
 
         const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -240,9 +240,9 @@ describe('MCP Market Sizing Handler', () => {
       const args: MarketSizingArgs = {
         feature_idea: 'Enterprise software solution',
         market_definition: {
-          industry: 'Software'
+          industry: 'Software',
         },
-        sizing_methods: ['top-down']
+        sizing_methods: ['top-down'],
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -262,9 +262,9 @@ describe('MCP Market Sizing Handler', () => {
       const args: MarketSizingArgs = {
         feature_idea: 'AI-powered platform',
         market_definition: {
-          industry: 'AI/ML'
+          industry: 'AI/ML',
         },
-        sizing_methods: ['bottom-up']
+        sizing_methods: ['bottom-up'],
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);
@@ -273,9 +273,13 @@ describe('MCP Market Sizing Handler', () => {
 
       const sizingData = result.content[0].json;
       expect(sizingData.assumptions).toHaveLength(2);
-      
-      const growthAssumption = sizingData.assumptions.find((a: any) => a.category === 'market-growth');
-      const penetrationAssumption = sizingData.assumptions.find((a: any) => a.category === 'penetration-rate');
+
+      const growthAssumption = sizingData.assumptions.find(
+        (a: any) => a.category === 'market-growth'
+      );
+      const penetrationAssumption = sizingData.assumptions.find(
+        (a: any) => a.category === 'penetration-rate'
+      );
 
       expect(growthAssumption).toBeDefined();
       expect(penetrationAssumption).toBeDefined();
@@ -287,9 +291,9 @@ describe('MCP Market Sizing Handler', () => {
       const args: MarketSizingArgs = {
         feature_idea: 'Digital transformation platform',
         market_definition: {
-          industry: 'Digital Transformation'
+          industry: 'Digital Transformation',
         },
-        sizing_methods: ['value-theory']
+        sizing_methods: ['value-theory'],
       };
 
       const result = await server.handleCalculateMarketSizing(args, mockContext);

@@ -1,5 +1,11 @@
 import { WorkflowOptimizer } from '../../components/workflow-optimizer';
-import { Workflow, WorkflowStep, EfficiencyIssue, Optimization, OptionalParams } from '../../models';
+import {
+  Workflow,
+  WorkflowStep,
+  EfficiencyIssue,
+  Optimization,
+  OptionalParams,
+} from '../../models';
 
 describe('WorkflowOptimizer', () => {
   let optimizer: WorkflowOptimizer;
@@ -19,7 +25,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Query user data',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 10
+            quotaCost: 10,
           },
           {
             id: 'step2',
@@ -27,11 +33,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Query user data again',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 10
-          }
+            quotaCost: 10,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 2
+        estimatedComplexity: 2,
       };
 
       const issues: EfficiencyIssue[] = [
@@ -40,8 +46,8 @@ describe('WorkflowOptimizer', () => {
           severity: 'medium',
           description: 'Duplicate user data queries',
           suggestedFix: 'Cache the first query result',
-          stepsAffected: ['step1', 'step2']
-        }
+          stepsAffected: ['step1', 'step2'],
+        },
       ];
 
       const optimizations = await optimizer.identifyOptimizationOpportunities(workflow, issues);
@@ -63,7 +69,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Process item 1',
             inputs: ['item1'],
             outputs: ['result1'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -71,7 +77,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Process item 2',
             inputs: ['item2'],
             outputs: ['result2'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step3',
@@ -79,11 +85,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Process item 3',
             inputs: ['item3'],
             outputs: ['result3'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const issues: EfficiencyIssue[] = [
@@ -92,8 +98,8 @@ describe('WorkflowOptimizer', () => {
           severity: 'high',
           description: 'Multiple similar processing steps in loop',
           suggestedFix: 'Batch process all items together',
-          stepsAffected: ['step1', 'step2', 'step3']
-        }
+          stepsAffected: ['step1', 'step2', 'step3'],
+        },
       ];
 
       const optimizations = await optimizer.identifyOptimizationOpportunities(workflow, issues);
@@ -115,7 +121,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate email format',
             inputs: ['email'],
             outputs: ['isValid'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step2',
@@ -123,7 +129,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate phone format',
             inputs: ['phone'],
             outputs: ['isValid'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step3',
@@ -131,11 +137,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate address format',
             inputs: ['address'],
             outputs: ['isValid'],
-            quotaCost: 3
-          }
+            quotaCost: 3,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const issues: EfficiencyIssue[] = [
@@ -144,8 +150,8 @@ describe('WorkflowOptimizer', () => {
           severity: 'medium',
           description: 'Simple validation tasks using vibes',
           suggestedFix: 'Convert to structured validation spec',
-          stepsAffected: ['step1', 'step2', 'step3']
-        }
+          stepsAffected: ['step1', 'step2', 'step3'],
+        },
       ];
 
       const optimizations = await optimizer.identifyOptimizationOpportunities(workflow, issues);
@@ -167,16 +173,16 @@ describe('WorkflowOptimizer', () => {
           description: `Process data ${i + 1}`,
           inputs: [`input${i + 1}`],
           outputs: [`output${i + 1}`],
-          quotaCost: 10
+          quotaCost: 10,
         })),
         dataFlow: [],
-        estimatedComplexity: 12
+        estimatedComplexity: 12,
       };
 
       const optimizations = await optimizer.identifyOptimizationOpportunities(workflow, []);
 
       expect(optimizations.length).toBeGreaterThan(0);
-      
+
       const decompositionOpt = optimizations.find(opt => opt.type === 'decomposition');
       expect(decompositionOpt).toBeDefined();
       expect(decompositionOpt?.estimatedSavings.percentage).toBe(15);
@@ -192,7 +198,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Query data',
             inputs: ['id1'],
             outputs: ['data1'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -200,7 +206,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Query data',
             inputs: ['id2'],
             outputs: ['data2'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step3',
@@ -208,11 +214,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Query data',
             inputs: ['id3'],
             outputs: ['data3'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const issues: EfficiencyIssue[] = [
@@ -221,15 +227,15 @@ describe('WorkflowOptimizer', () => {
           severity: 'medium',
           description: 'Duplicate query 1',
           suggestedFix: 'Cache result',
-          stepsAffected: ['step1', 'step2']
+          stepsAffected: ['step1', 'step2'],
         },
         {
           type: 'redundant_query',
           severity: 'medium',
           description: 'Duplicate query 2',
           suggestedFix: 'Cache result',
-          stepsAffected: ['step2', 'step3']
-        }
+          stepsAffected: ['step2', 'step3'],
+        },
       ];
 
       const optimizations = await optimizer.identifyOptimizationOpportunities(workflow, issues);
@@ -244,7 +250,7 @@ describe('WorkflowOptimizer', () => {
         id: 'empty-workflow',
         steps: [],
         dataFlow: [],
-        estimatedComplexity: 0
+        estimatedComplexity: 0,
       };
 
       const optimizations = await optimizer.identifyOptimizationOpportunities(workflow, []);
@@ -262,11 +268,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Efficient processing',
             inputs: ['data'],
             outputs: ['result'],
-            quotaCost: 2
-          }
+            quotaCost: 2,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const optimizations = await optimizer.identifyOptimizationOpportunities(workflow, []);
@@ -284,11 +290,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Process data',
             inputs: ['data'],
             outputs: ['result'],
-            quotaCost: 10
-          }
+            quotaCost: 10,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const issues: EfficiencyIssue[] = [
@@ -297,22 +303,33 @@ describe('WorkflowOptimizer', () => {
           severity: 'medium',
           description: 'Simple task using vibe',
           suggestedFix: 'Convert to spec',
-          stepsAffected: ['step1']
-        }
+          stepsAffected: ['step1'],
+        },
       ];
 
       const tightConstraintsParams: OptionalParams = {
         costConstraints: {
           maxVibes: 5,
-          maxCostDollars: 3
-        }
+          maxCostDollars: 3,
+        },
       };
 
-      const optimizationsWithConstraints = await optimizer.identifyOptimizationOpportunities(workflow, issues, tightConstraintsParams);
-      const optimizationsWithoutConstraints = await optimizer.identifyOptimizationOpportunities(workflow, issues);
+      const optimizationsWithConstraints = await optimizer.identifyOptimizationOpportunities(
+        workflow,
+        issues,
+        tightConstraintsParams
+      );
+      const optimizationsWithoutConstraints = await optimizer.identifyOptimizationOpportunities(
+        workflow,
+        issues
+      );
 
-      expect(optimizationsWithConstraints[0].estimatedSavings.percentage).toBeGreaterThan(optimizationsWithoutConstraints[0].estimatedSavings.percentage);
-      expect(optimizationsWithConstraints[0].estimatedSavings.vibes).toBeGreaterThan(optimizationsWithoutConstraints[0].estimatedSavings.vibes);
+      expect(optimizationsWithConstraints[0].estimatedSavings.percentage).toBeGreaterThan(
+        optimizationsWithoutConstraints[0].estimatedSavings.percentage
+      );
+      expect(optimizationsWithConstraints[0].estimatedSavings.vibes).toBeGreaterThan(
+        optimizationsWithoutConstraints[0].estimatedSavings.vibes
+      );
     });
 
     it('should boost caching and batching savings for high user volume', async () => {
@@ -325,7 +342,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Query data',
             inputs: ['id'],
             outputs: ['data'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -333,11 +350,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Query data',
             inputs: ['id'],
             outputs: ['data'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 2
+        estimatedComplexity: 2,
       };
 
       const issues: EfficiencyIssue[] = [
@@ -346,21 +363,32 @@ describe('WorkflowOptimizer', () => {
           severity: 'medium',
           description: 'Duplicate queries',
           suggestedFix: 'Cache results',
-          stepsAffected: ['step1', 'step2']
-        }
+          stepsAffected: ['step1', 'step2'],
+        },
       ];
 
       const highVolumeParams: OptionalParams = {
-        expectedUserVolume: 10000
+        expectedUserVolume: 10000,
       };
 
-      const optimizationsWithVolume = await optimizer.identifyOptimizationOpportunities(workflow, issues, highVolumeParams);
-      const optimizationsWithoutVolume = await optimizer.identifyOptimizationOpportunities(workflow, issues);
+      const optimizationsWithVolume = await optimizer.identifyOptimizationOpportunities(
+        workflow,
+        issues,
+        highVolumeParams
+      );
+      const optimizationsWithoutVolume = await optimizer.identifyOptimizationOpportunities(
+        workflow,
+        issues
+      );
 
       const cachingOptWithVolume = optimizationsWithVolume.find(opt => opt.type === 'caching');
-      const cachingOptWithoutVolume = optimizationsWithoutVolume.find(opt => opt.type === 'caching');
+      const cachingOptWithoutVolume = optimizationsWithoutVolume.find(
+        opt => opt.type === 'caching'
+      );
 
-      expect(cachingOptWithVolume?.estimatedSavings.percentage).toBeGreaterThan(cachingOptWithoutVolume?.estimatedSavings.percentage || 0);
+      expect(cachingOptWithVolume?.estimatedSavings.percentage).toBeGreaterThan(
+        cachingOptWithoutVolume?.estimatedSavings.percentage || 0
+      );
     });
 
     it('should boost vibe-to-spec conversion for high performance sensitivity', async () => {
@@ -373,11 +401,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Simple validation',
             inputs: ['data'],
             outputs: ['isValid'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const issues: EfficiencyIssue[] = [
@@ -386,21 +414,32 @@ describe('WorkflowOptimizer', () => {
           severity: 'medium',
           description: 'Simple validation using vibe',
           suggestedFix: 'Convert to spec',
-          stepsAffected: ['step1']
-        }
+          stepsAffected: ['step1'],
+        },
       ];
 
       const highPerfParams: OptionalParams = {
-        performanceSensitivity: 'high'
+        performanceSensitivity: 'high',
       };
 
-      const optimizationsWithPerf = await optimizer.identifyOptimizationOpportunities(workflow, issues, highPerfParams);
-      const optimizationsWithoutPerf = await optimizer.identifyOptimizationOpportunities(workflow, issues);
+      const optimizationsWithPerf = await optimizer.identifyOptimizationOpportunities(
+        workflow,
+        issues,
+        highPerfParams
+      );
+      const optimizationsWithoutPerf = await optimizer.identifyOptimizationOpportunities(
+        workflow,
+        issues
+      );
 
       const vibeToSpecOptWithPerf = optimizationsWithPerf.find(opt => opt.type === 'vibe_to_spec');
-      const vibeToSpecOptWithoutPerf = optimizationsWithoutPerf.find(opt => opt.type === 'vibe_to_spec');
+      const vibeToSpecOptWithoutPerf = optimizationsWithoutPerf.find(
+        opt => opt.type === 'vibe_to_spec'
+      );
 
-      expect(vibeToSpecOptWithPerf?.estimatedSavings.percentage).toBeGreaterThan(vibeToSpecOptWithoutPerf?.estimatedSavings.percentage || 0);
+      expect(vibeToSpecOptWithPerf?.estimatedSavings.percentage).toBeGreaterThan(
+        vibeToSpecOptWithoutPerf?.estimatedSavings.percentage || 0
+      );
     });
   });
 
@@ -415,7 +454,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Process user data for user_123',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -423,7 +462,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Process user data for user_456',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step3',
@@ -431,11 +470,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Process user data for user_789',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const batchedOps = await optimizer.applyBatchingStrategy(workflow);
@@ -457,7 +496,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Process user data',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -465,7 +504,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate email format',
             inputs: ['email'],
             outputs: ['isValid'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step3',
@@ -473,11 +512,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Fetch configuration',
             inputs: ['configId'],
             outputs: ['config'],
-            quotaCost: 2
-          }
+            quotaCost: 2,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const batchedOps = await optimizer.applyBatchingStrategy(workflow);
@@ -495,7 +534,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate email john@example.com',
             inputs: ['email'],
             outputs: ['isValid'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step2',
@@ -503,7 +542,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate email jane@test.org',
             inputs: ['email'],
             outputs: ['isValid'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step3',
@@ -511,11 +550,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate email bob@company.net',
             inputs: ['email'],
             outputs: ['isValid'],
-            quotaCost: 3
-          }
+            quotaCost: 3,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const batchedOps = await optimizer.applyBatchingStrategy(workflow);
@@ -535,10 +574,10 @@ describe('WorkflowOptimizer', () => {
           description: `Process item ${i + 1}`,
           inputs: ['itemId'],
           outputs: ['result'],
-          quotaCost: 5
+          quotaCost: 5,
         })),
         dataFlow: [],
-        estimatedComplexity: stepCount
+        estimatedComplexity: stepCount,
       });
 
       const smallBatch = await optimizer.applyBatchingStrategy(createWorkflow(2));
@@ -552,7 +591,7 @@ describe('WorkflowOptimizer', () => {
         id: 'empty-workflow',
         steps: [],
         dataFlow: [],
-        estimatedComplexity: 0
+        estimatedComplexity: 0,
       };
 
       const batchedOps = await optimizer.applyBatchingStrategy(workflow);
@@ -570,11 +609,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Process data',
             inputs: ['data'],
             outputs: ['result'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const batchedOps = await optimizer.applyBatchingStrategy(workflow);
@@ -594,7 +633,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Fetch user configuration',
             inputs: ['userId'],
             outputs: ['config'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -602,7 +641,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Analyze user behavior',
             inputs: ['userId', 'timeframe'],
             outputs: ['analysis'],
-            quotaCost: 10
+            quotaCost: 10,
           },
           {
             id: 'step3',
@@ -610,11 +649,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Transform data format',
             inputs: ['data'],
             outputs: ['transformedData'],
-            quotaCost: 3
-          }
+            quotaCost: 3,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const cachedWorkflow = await optimizer.implementCachingLayer(workflow);
@@ -635,11 +674,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Query user data',
             inputs: ['userId', 'fields'],
             outputs: ['userData'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const cachedWorkflow = await optimizer.implementCachingLayer(workflow);
@@ -659,7 +698,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Fetch system config',
             inputs: ['configId'],
             outputs: ['config'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'data-step',
@@ -667,7 +706,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Fetch user data',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'vibe-step',
@@ -675,11 +714,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Analyze sentiment',
             inputs: ['text'],
             outputs: ['sentiment'],
-            quotaCost: 8
-          }
+            quotaCost: 8,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const cachedWorkflow = await optimizer.implementCachingLayer(workflow);
@@ -703,7 +742,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Query user data',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -711,7 +750,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Query user data',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step3',
@@ -719,7 +758,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Query user data',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step4',
@@ -727,16 +766,16 @@ describe('WorkflowOptimizer', () => {
             description: 'Query different data',
             inputs: ['dataId'],
             outputs: ['otherData'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 4
+        estimatedComplexity: 4,
       };
 
       const cachedWorkflow = await optimizer.implementCachingLayer(workflow);
 
-      const frequentOps = cachedWorkflow.cachePoints.filter(cp => 
+      const frequentOps = cachedWorkflow.cachePoints.filter(cp =>
         ['step1', 'step2', 'step3'].includes(cp.stepId)
       );
       const singleOp = cachedWorkflow.cachePoints.find(cp => cp.stepId === 'step4');
@@ -754,7 +793,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Execute specification',
             inputs: ['specData'],
             outputs: ['result'],
-            quotaCost: 2
+            quotaCost: 2,
           },
           {
             id: 'step2',
@@ -762,11 +801,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Random number generation',
             inputs: [],
             outputs: ['randomNumber'],
-            quotaCost: 1
-          }
+            quotaCost: 1,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 2
+        estimatedComplexity: 2,
       };
 
       const cachedWorkflow = await optimizer.implementCachingLayer(workflow);
@@ -780,7 +819,7 @@ describe('WorkflowOptimizer', () => {
         id: 'empty-workflow',
         steps: [],
         dataFlow: [],
-        estimatedComplexity: 0
+        estimatedComplexity: 0,
       };
 
       const cachedWorkflow = await optimizer.implementCachingLayer(workflow);
@@ -799,7 +838,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Query data',
             inputs: ['id'],
             outputs: ['data'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -807,11 +846,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Analyze data',
             inputs: ['data'],
             outputs: ['analysis'],
-            quotaCost: 8
-          }
+            quotaCost: 8,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 2
+        estimatedComplexity: 2,
       };
 
       const cachedWorkflow = await optimizer.implementCachingLayer(workflow);
@@ -819,9 +858,10 @@ describe('WorkflowOptimizer', () => {
       expect(cachedWorkflow.cachePoints).toHaveLength(2);
       expect(cachedWorkflow.estimatedHitRate).toBeGreaterThan(0);
       expect(cachedWorkflow.estimatedHitRate).toBeLessThanOrEqual(1);
-      
+
       // Should be average of individual hit rates
-      const avgHitRate = cachedWorkflow.cachePoints.reduce((sum, cp) => sum + cp.estimatedHitRate, 0) / 2;
+      const avgHitRate =
+        cachedWorkflow.cachePoints.reduce((sum, cp) => sum + cp.estimatedHitRate, 0) / 2;
       expect(cachedWorkflow.estimatedHitRate).toBeCloseTo(avgHitRate, 2);
     });
   });
@@ -837,7 +877,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Process data',
             inputs: ['data'],
             outputs: ['result'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -845,11 +885,11 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate result',
             inputs: ['result'],
             outputs: ['isValid'],
-            quotaCost: 3
-          }
+            quotaCost: 3,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 2
+        estimatedComplexity: 2,
       };
 
       const specs = await optimizer.breakIntoSpecs(workflow);
@@ -867,7 +907,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Fetch user data',
             inputs: ['userId'],
             outputs: ['userData'],
-            quotaCost: 5
+            quotaCost: 5,
           },
           {
             id: 'step2',
@@ -875,7 +915,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Fetch config data',
             inputs: ['configId'],
             outputs: ['config'],
-            quotaCost: 4
+            quotaCost: 4,
           },
           {
             id: 'step3',
@@ -883,7 +923,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Analyze user behavior',
             inputs: ['userData'],
             outputs: ['analysis'],
-            quotaCost: 10
+            quotaCost: 10,
           },
           {
             id: 'step4',
@@ -891,25 +931,25 @@ describe('WorkflowOptimizer', () => {
             description: 'Generate recommendations',
             inputs: ['analysis'],
             outputs: ['recommendations'],
-            quotaCost: 8
-          }
+            quotaCost: 8,
+          },
         ],
         dataFlow: [
           { from: 'step1', to: 'step3', dataType: 'userData', required: true },
-          { from: 'step3', to: 'step4', dataType: 'analysis', required: true }
+          { from: 'step3', to: 'step4', dataType: 'analysis', required: true },
         ],
-        estimatedComplexity: 4
+        estimatedComplexity: 4,
       };
 
       const specs = await optimizer.breakIntoSpecs(workflow);
 
       expect(specs.length).toBeGreaterThan(0);
       expect(specs.length).toBeLessThanOrEqual(2);
-      
+
       // Should have data retrieval spec and analysis spec
       const dataSpec = specs.find(spec => spec.name.includes('Data Retrieval'));
       const analysisSpec = specs.find(spec => spec.name.includes('Analysis'));
-      
+
       expect(dataSpec).toBeDefined();
       expect(analysisSpec).toBeDefined();
     });
@@ -924,7 +964,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate email format',
             inputs: ['email'],
             outputs: ['isValidEmail'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step2',
@@ -932,7 +972,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Validate phone format',
             inputs: ['phone'],
             outputs: ['isValidPhone'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step3',
@@ -940,7 +980,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Process user registration',
             inputs: ['userData'],
             outputs: ['userId'],
-            quotaCost: 8
+            quotaCost: 8,
           },
           {
             id: 'step4',
@@ -948,21 +988,21 @@ describe('WorkflowOptimizer', () => {
             description: 'Transform user data',
             inputs: ['userData'],
             outputs: ['transformedData'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 4
+        estimatedComplexity: 4,
       };
 
       const specs = await optimizer.breakIntoSpecs(workflow);
 
       expect(specs.length).toBeGreaterThan(0);
-      
+
       // Should separate validation from processing/transformation
       const validationSpec = specs.find(spec => spec.name.includes('Validation'));
       const processingSpec = specs.find(spec => spec.name.includes('Processing'));
-      
+
       expect(validationSpec || processingSpec).toBeDefined();
     });
 
@@ -976,7 +1016,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Simple validation',
             inputs: ['data'],
             outputs: ['isValid'],
-            quotaCost: 2
+            quotaCost: 2,
           },
           {
             id: 'step2',
@@ -984,7 +1024,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Complex AI analysis',
             inputs: ['data'],
             outputs: ['analysis'],
-            quotaCost: 20 // Expensive operation
+            quotaCost: 20, // Expensive operation
           },
           {
             id: 'step3',
@@ -992,7 +1032,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Format results',
             inputs: ['analysis'],
             outputs: ['formattedResults'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step4',
@@ -1000,22 +1040,22 @@ describe('WorkflowOptimizer', () => {
             description: 'Generate report',
             inputs: ['formattedResults'],
             outputs: ['report'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 4
+        estimatedComplexity: 4,
       };
 
       const specs = await optimizer.breakIntoSpecs(workflow);
 
       expect(specs.length).toBeGreaterThan(1);
-      
+
       // The expensive operation should be in its own spec or isolated
-      const expensiveSpec = specs.find(spec => 
-        spec.steps.includes('step2') && spec.estimatedQuotaCost >= 20
+      const expensiveSpec = specs.find(
+        spec => spec.steps.includes('step2') && spec.estimatedQuotaCost >= 20
       );
-      
+
       expect(expensiveSpec).toBeDefined();
     });
 
@@ -1029,7 +1069,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Fetch user profile',
             inputs: ['userId'],
             outputs: ['profile'],
-            quotaCost: 4
+            quotaCost: 4,
           },
           {
             id: 'step2',
@@ -1037,7 +1077,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Query user preferences',
             inputs: ['userId'],
             outputs: ['preferences'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step3',
@@ -1045,7 +1085,7 @@ describe('WorkflowOptimizer', () => {
             description: 'Analyze user behavior patterns',
             inputs: ['profile', 'preferences'],
             outputs: ['patterns'],
-            quotaCost: 12
+            quotaCost: 12,
           },
           {
             id: 'step4',
@@ -1053,17 +1093,17 @@ describe('WorkflowOptimizer', () => {
             description: 'Generate recommendations',
             inputs: ['patterns'],
             outputs: ['recommendations'],
-            quotaCost: 8
-          }
+            quotaCost: 8,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 4
+        estimatedComplexity: 4,
       };
 
       const specs = await optimizer.breakIntoSpecs(workflow);
 
       expect(specs.length).toBeGreaterThan(0);
-      
+
       for (const spec of specs) {
         expect(spec.id).toContain('test-workflow-spec-');
         expect(spec.name).toBeTruthy();
@@ -1082,22 +1122,22 @@ describe('WorkflowOptimizer', () => {
           description: `Process item ${i + 1}`,
           inputs: [`input${i + 1}`],
           outputs: [`output${i + 1}`],
-          quotaCost: 5
+          quotaCost: 5,
         })),
         dataFlow: [],
-        estimatedComplexity: 15
+        estimatedComplexity: 15,
       };
 
       const specs = await optimizer.breakIntoSpecs(workflow);
 
       expect(specs.length).toBeGreaterThan(1);
-      
+
       // Each spec should have reasonable size (2-8 steps)
       for (const spec of specs) {
         expect(spec.steps.length).toBeGreaterThanOrEqual(2);
         expect(spec.steps.length).toBeLessThanOrEqual(8);
       }
-      
+
       // All original steps should be covered
       const allSpecSteps = specs.flatMap(spec => spec.steps);
       const originalSteps = workflow.steps.map(step => step.id);
@@ -1113,17 +1153,17 @@ describe('WorkflowOptimizer', () => {
           description: `Similar processing step ${i + 1}`,
           inputs: ['data'],
           outputs: ['result'],
-          quotaCost: 5
+          quotaCost: 5,
         })),
         dataFlow: [],
-        estimatedComplexity: 6
+        estimatedComplexity: 6,
       };
 
       const specs = await optimizer.breakIntoSpecs(workflow);
 
       // Should still create some decomposition for large uniform workflows
       expect(specs.length).toBeGreaterThanOrEqual(1);
-      
+
       // All steps should be covered
       const allSpecSteps = specs.flatMap(spec => spec.steps);
       expect(allSpecSteps).toHaveLength(6);

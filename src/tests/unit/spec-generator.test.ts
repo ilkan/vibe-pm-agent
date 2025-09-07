@@ -1,7 +1,7 @@
 import { SpecGenerator } from '../../components/spec-generator';
-import { 
-  OptimizedWorkflow, 
-  KiroSpec, 
+import {
+  OptimizedWorkflow,
+  KiroSpec,
   EnhancedKiroSpec,
   QuotaForecast,
   ConsultingSummary,
@@ -9,7 +9,7 @@ import {
   ThreeOptionAnalysis,
   TechniqueInsight,
   StructuredRecommendation,
-  Evidence
+  Evidence,
 } from '../../models';
 
 describe('SpecGenerator', () => {
@@ -21,7 +21,7 @@ describe('SpecGenerator', () => {
 
   beforeEach(() => {
     specGenerator = new SpecGenerator();
-    
+
     mockOptimizedWorkflow = {
       id: 'test-workflow',
       steps: [
@@ -31,7 +31,7 @@ describe('SpecGenerator', () => {
           description: 'Analyze user requirements',
           inputs: ['user_input'],
           outputs: ['parsed_requirements'],
-          quotaCost: 5
+          quotaCost: 5,
         },
         {
           id: 'step2',
@@ -39,16 +39,16 @@ describe('SpecGenerator', () => {
           description: 'Generate implementation plan',
           inputs: ['parsed_requirements'],
           outputs: ['implementation_plan'],
-          quotaCost: 3
-        }
+          quotaCost: 3,
+        },
       ],
       dataFlow: [
         {
           from: 'step1',
           to: 'step2',
           dataType: 'requirements',
-          required: true
-        }
+          required: true,
+        },
       ],
       estimatedComplexity: 7,
       optimizations: [
@@ -59,9 +59,9 @@ describe('SpecGenerator', () => {
           estimatedSavings: {
             vibes: 2,
             specs: 0,
-            percentage: 25
-          }
-        }
+            percentage: 25,
+          },
+        },
       ],
       originalWorkflow: {
         id: 'original-workflow',
@@ -72,7 +72,7 @@ describe('SpecGenerator', () => {
             description: 'Analyze user requirements individually',
             inputs: ['user_input'],
             outputs: ['parsed_requirements'],
-            quotaCost: 7
+            quotaCost: 7,
           },
           {
             id: 'orig-step2',
@@ -80,39 +80,39 @@ describe('SpecGenerator', () => {
             description: 'Generate implementation plan',
             inputs: ['parsed_requirements'],
             outputs: ['implementation_plan'],
-            quotaCost: 3
-          }
+            quotaCost: 3,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 10
+        estimatedComplexity: 10,
       },
       efficiencyGains: {
         vibeReduction: 28.6,
         specReduction: 0,
         costSavings: 2,
-        totalSavingsPercentage: 20
-      }
+        totalSavingsPercentage: 20,
+      },
     };
 
     const mockTechniqueInsight: TechniqueInsight = {
       techniqueName: 'MECE',
       keyInsight: 'Requirements can be categorized into mutually exclusive groups',
       supportingData: { categories: 3, overlap: 0 },
-      actionableRecommendation: 'Group similar requirements for batch processing'
+      actionableRecommendation: 'Group similar requirements for batch processing',
     };
 
     const mockEvidence: Evidence = {
       type: 'quantitative',
       description: 'Batching reduces API calls by 25%',
       source: 'optimization_analysis',
-      confidence: 'high'
+      confidence: 'high',
     };
 
     const mockRecommendation: StructuredRecommendation = {
       mainRecommendation: 'Implement batching optimization for requirement analysis',
       supportingReasons: ['Reduces quota consumption', 'Maintains functionality'],
       evidence: [mockEvidence],
-      expectedOutcome: '25% reduction in vibe usage'
+      expectedOutcome: '25% reduction in vibe usage',
     };
 
     mockConsultingSummary = {
@@ -120,7 +120,7 @@ describe('SpecGenerator', () => {
       keyFindings: ['Batching opportunities identified', 'No functionality loss'],
       recommendations: [mockRecommendation],
       techniquesApplied: [mockTechniqueInsight],
-      supportingEvidence: [mockEvidence]
+      supportingEvidence: [mockEvidence],
     };
 
     mockROIAnalysis = {
@@ -133,16 +133,16 @@ describe('SpecGenerator', () => {
             estimatedCost: 8,
             confidenceLevel: 'high',
             scenario: 'optimized',
-            breakdown: []
+            breakdown: [],
           },
           savingsPercentage: 20,
           implementationEffort: 'medium',
-          riskLevel: 'low'
-        }
+          riskLevel: 'low',
+        },
       ],
       recommendations: ['Implement batching optimization'],
       bestOption: 'optimized',
-      riskAssessment: 'Low risk with high confidence'
+      riskAssessment: 'Low risk with high confidence',
     };
 
     mockAlternativeOptions = {
@@ -152,7 +152,7 @@ describe('SpecGenerator', () => {
         quotaSavings: 15,
         implementationEffort: 'low',
         riskLevel: 'low',
-        estimatedROI: 1.5
+        estimatedROI: 1.5,
       },
       balanced: {
         name: 'Balanced',
@@ -160,7 +160,7 @@ describe('SpecGenerator', () => {
         quotaSavings: 25,
         implementationEffort: 'medium',
         riskLevel: 'medium',
-        estimatedROI: 2.0
+        estimatedROI: 2.0,
       },
       bold: {
         name: 'Bold',
@@ -168,17 +168,18 @@ describe('SpecGenerator', () => {
         quotaSavings: 40,
         implementationEffort: 'high',
         riskLevel: 'high',
-        estimatedROI: 3.0
-      }
+        estimatedROI: 3.0,
+      },
     };
   });
 
   describe('generateKiroSpec', () => {
     it('should generate a complete Kiro spec from optimized workflow', async () => {
-      const originalIntent = 'Create a system to analyze user requirements and generate implementation plans';
-      
+      const originalIntent =
+        'Create a system to analyze user requirements and generate implementation plans';
+
       const result = await specGenerator.generateKiroSpec(mockOptimizedWorkflow, originalIntent);
-      
+
       expect(result).toBeDefined();
       expect(result.name).toContain('Optimizer');
       expect(result.description).toContain(originalIntent);
@@ -192,10 +193,10 @@ describe('SpecGenerator', () => {
 
     it('should generate requirements with proper priority based on quota cost', async () => {
       const result = await specGenerator.generateKiroSpec(mockOptimizedWorkflow, 'test intent');
-      
+
       const highCostReq = result.requirements.find(req => req.id === 'REQ-1');
       expect(highCostReq?.priority).toBe('low'); // quotaCost = 5
-      
+
       const optReq = result.requirements.find(req => req.id === 'REQ-OPT');
       expect(optReq?.priority).toBe('high');
       expect(optReq?.acceptanceCriteria[0]).toContain('20.0%');
@@ -203,7 +204,7 @@ describe('SpecGenerator', () => {
 
     it('should generate design with correct component structure', async () => {
       const result = await specGenerator.generateKiroSpec(mockOptimizedWorkflow, 'test intent');
-      
+
       expect(result.design.overview).toContain('1 efficiency improvements');
       expect(result.design.architecture).toContain('20.0% quota reduction');
       expect(result.design.components).toHaveLength(2);
@@ -213,7 +214,7 @@ describe('SpecGenerator', () => {
 
     it('should generate tasks with appropriate effort estimation', async () => {
       const result = await specGenerator.generateKiroSpec(mockOptimizedWorkflow, 'test intent');
-      
+
       const optimizationTask = result.tasks.find(task => task.id === 'TASK-1');
       expect(optimizationTask?.description).toContain('batching optimization');
       expect(optimizationTask?.estimatedEffort).toBe('medium'); // 25% savings
@@ -224,7 +225,7 @@ describe('SpecGenerator', () => {
   describe('generateEnhancedKiroSpec', () => {
     it('should generate enhanced spec with consulting insights', async () => {
       const originalIntent = 'Optimize workflow efficiency';
-      
+
       const result = await specGenerator.generateEnhancedKiroSpec(
         mockOptimizedWorkflow,
         originalIntent,
@@ -232,7 +233,7 @@ describe('SpecGenerator', () => {
         mockROIAnalysis,
         mockAlternativeOptions
       );
-      
+
       expect(result).toBeDefined();
       expect(result.consultingSummary).toBe(mockConsultingSummary);
       expect(result.roiAnalysis).toBe(mockROIAnalysis);
@@ -249,7 +250,7 @@ describe('SpecGenerator', () => {
         mockROIAnalysis,
         mockAlternativeOptions
       );
-      
+
       expect(result.name).toBeDefined();
       expect(result.description).toBeDefined();
       expect(result.requirements).toBeDefined();
@@ -269,7 +270,7 @@ describe('SpecGenerator', () => {
           overview: 'Test overview',
           architecture: 'Test architecture',
           components: [],
-          dataModels: []
+          dataModels: [],
         },
         tasks: [],
         metadata: {
@@ -281,15 +282,18 @@ describe('SpecGenerator', () => {
             estimatedCost: 8,
             confidenceLevel: 'medium',
             scenario: 'optimized',
-            breakdown: []
+            breakdown: [],
           },
           generatedAt: new Date(),
-          version: '1.0.0'
-        }
+          version: '1.0.0',
+        },
       };
-      
-      const result = specGenerator.formatSpecWithConsultingInsights(baseSpec, mockConsultingSummary);
-      
+
+      const result = specGenerator.formatSpecWithConsultingInsights(
+        baseSpec,
+        mockConsultingSummary
+      );
+
       expect(result.consultingSummary).toBe(mockConsultingSummary);
       expect(result.roiAnalysis).toBeDefined();
       expect(result.alternativeOptions).toBeDefined();
@@ -309,19 +313,28 @@ describe('SpecGenerator', () => {
           originalIntent: 'test',
           optimizationApplied: [],
           estimatedQuotaUsage: {
-            vibesConsumed: 5, specsConsumed: 3, estimatedCost: 8,
-            confidenceLevel: 'medium', scenario: 'optimized', breakdown: []
+            vibesConsumed: 5,
+            specsConsumed: 3,
+            estimatedCost: 8,
+            confidenceLevel: 'medium',
+            scenario: 'optimized',
+            breakdown: [],
           },
           generatedAt: new Date(),
-          version: '1.0.0'
-        }
+          version: '1.0.0',
+        },
       };
-      
-      const result = specGenerator.formatSpecWithConsultingInsights(baseSpec, mockConsultingSummary);
-      
+
+      const result = specGenerator.formatSpecWithConsultingInsights(
+        baseSpec,
+        mockConsultingSummary
+      );
+
       expect(result.description).toContain('Original description');
       expect(result.description).toContain('Enhanced with consulting analysis');
-      expect(result.description).toContain('Requirements can be categorized into mutually exclusive groups');
+      expect(result.description).toContain(
+        'Requirements can be categorized into mutually exclusive groups'
+      );
       expect(result.description).toContain('Implement batching optimization');
     });
 
@@ -334,8 +347,8 @@ describe('SpecGenerator', () => {
             id: 'REQ-1',
             userStory: 'Original requirement',
             acceptanceCriteria: ['Original criteria'],
-            priority: 'high'
-          }
+            priority: 'high',
+          },
         ],
         design: { overview: '', architecture: '', components: [], dataModels: [] },
         tasks: [],
@@ -343,16 +356,23 @@ describe('SpecGenerator', () => {
           originalIntent: 'test',
           optimizationApplied: [],
           estimatedQuotaUsage: {
-            vibesConsumed: 5, specsConsumed: 3, estimatedCost: 8,
-            confidenceLevel: 'medium', scenario: 'optimized', breakdown: []
+            vibesConsumed: 5,
+            specsConsumed: 3,
+            estimatedCost: 8,
+            confidenceLevel: 'medium',
+            scenario: 'optimized',
+            breakdown: [],
           },
           generatedAt: new Date(),
-          version: '1.0.0'
-        }
+          version: '1.0.0',
+        },
       };
-      
-      const result = specGenerator.formatSpecWithConsultingInsights(baseSpec, mockConsultingSummary);
-      
+
+      const result = specGenerator.formatSpecWithConsultingInsights(
+        baseSpec,
+        mockConsultingSummary
+      );
+
       expect(result.requirements).toHaveLength(2); // 1 original + 1 consulting
       expect(result.requirements[0].id).toBe('REQ-1');
       expect(result.requirements[1].id).toBe('REQ-CONSULTING-1');
@@ -371,23 +391,30 @@ describe('SpecGenerator', () => {
             id: 'TASK-1',
             description: 'Original task',
             requirements: ['REQ-1'],
-            estimatedEffort: 'medium'
-          }
+            estimatedEffort: 'medium',
+          },
         ],
         metadata: {
           originalIntent: 'test',
           optimizationApplied: [],
           estimatedQuotaUsage: {
-            vibesConsumed: 5, specsConsumed: 3, estimatedCost: 8,
-            confidenceLevel: 'medium', scenario: 'optimized', breakdown: []
+            vibesConsumed: 5,
+            specsConsumed: 3,
+            estimatedCost: 8,
+            confidenceLevel: 'medium',
+            scenario: 'optimized',
+            breakdown: [],
           },
           generatedAt: new Date(),
-          version: '1.0.0'
-        }
+          version: '1.0.0',
+        },
       };
-      
-      const result = specGenerator.formatSpecWithConsultingInsights(baseSpec, mockConsultingSummary);
-      
+
+      const result = specGenerator.formatSpecWithConsultingInsights(
+        baseSpec,
+        mockConsultingSummary
+      );
+
       expect(result.tasks).toHaveLength(2); // 1 original + 1 consulting
       expect(result.tasks[0].id).toBe('TASK-1');
       expect(result.tasks[1].id).toBe('TASK-CONSULTING-1');
@@ -406,21 +433,32 @@ describe('SpecGenerator', () => {
           originalIntent: 'test',
           optimizationApplied: [],
           estimatedQuotaUsage: {
-            vibesConsumed: 10, specsConsumed: 5, estimatedCost: 15,
-            confidenceLevel: 'medium', scenario: 'optimized', breakdown: []
+            vibesConsumed: 10,
+            specsConsumed: 5,
+            estimatedCost: 15,
+            confidenceLevel: 'medium',
+            scenario: 'optimized',
+            breakdown: [],
           },
           generatedAt: new Date(),
-          version: '1.0.0'
-        }
+          version: '1.0.0',
+        },
       };
-      
-      const result = specGenerator.formatSpecWithConsultingInsights(baseSpec, mockConsultingSummary);
-      
+
+      const result = specGenerator.formatSpecWithConsultingInsights(
+        baseSpec,
+        mockConsultingSummary
+      );
+
       expect(result.roiAnalysis.scenarios).toHaveLength(1);
       expect(result.roiAnalysis.scenarios[0].savingsPercentage).toBe(25); // extracted from "25% reduction"
       expect(result.roiAnalysis.scenarios[0].forecast.vibesConsumed).toBe(8); // 10 * (1 - 0.25)
-      expect(result.roiAnalysis.recommendations).toContain('Implement batching optimization for requirement analysis');
-      expect(result.roiAnalysis.riskAssessment).toContain('Low risk with strong quantitative evidence');
+      expect(result.roiAnalysis.recommendations).toContain(
+        'Implement batching optimization for requirement analysis'
+      );
+      expect(result.roiAnalysis.riskAssessment).toContain(
+        'Low risk with strong quantitative evidence'
+      );
     });
 
     it('should update metadata with consulting techniques', () => {
@@ -434,16 +472,23 @@ describe('SpecGenerator', () => {
           originalIntent: 'test',
           optimizationApplied: ['batching'],
           estimatedQuotaUsage: {
-            vibesConsumed: 5, specsConsumed: 3, estimatedCost: 8,
-            confidenceLevel: 'medium', scenario: 'optimized', breakdown: []
+            vibesConsumed: 5,
+            specsConsumed: 3,
+            estimatedCost: 8,
+            confidenceLevel: 'medium',
+            scenario: 'optimized',
+            breakdown: [],
           },
           generatedAt: new Date(),
-          version: '1.0.0'
-        }
+          version: '1.0.0',
+        },
       };
-      
-      const result = specGenerator.formatSpecWithConsultingInsights(baseSpec, mockConsultingSummary);
-      
+
+      const result = specGenerator.formatSpecWithConsultingInsights(
+        baseSpec,
+        mockConsultingSummary
+      );
+
       expect(result.metadata.optimizationApplied).toContain('batching');
       expect(result.metadata.optimizationApplied).toContain('MECE');
     });
@@ -457,20 +502,20 @@ describe('SpecGenerator', () => {
         estimatedCost: 15,
         confidenceLevel: 'medium',
         scenario: 'naive',
-        breakdown: []
+        breakdown: [],
       };
-      
+
       const optimizedForecast: QuotaForecast = {
         vibesConsumed: 7,
         specsConsumed: 4,
         estimatedCost: 11,
         confidenceLevel: 'high',
         scenario: 'optimized',
-        breakdown: []
+        breakdown: [],
       };
-      
+
       const result = specGenerator.generateEfficiencySummary(naiveForecast, optimizedForecast);
-      
+
       expect(result.naiveApproach).toBe(naiveForecast);
       expect(result.optimizedApproach).toBe(optimizedForecast);
       expect(result.savings.vibeReduction).toBe(30); // (10-7)/10 * 100
@@ -489,31 +534,31 @@ describe('SpecGenerator', () => {
             type: 'batching',
             description: 'Batch operations',
             stepsAffected: ['step1', 'step2'],
-            estimatedSavings: { vibes: 2, specs: 0, percentage: 25 }
+            estimatedSavings: { vibes: 2, specs: 0, percentage: 25 },
           },
           {
             type: 'caching',
             description: 'Add cache layer',
             stepsAffected: ['step1'],
-            estimatedSavings: { vibes: 1, specs: 0, percentage: 15 }
+            estimatedSavings: { vibes: 1, specs: 0, percentage: 15 },
           },
           {
             type: 'decomposition',
             description: 'Split into smaller specs',
             stepsAffected: ['step1', 'step2', 'step3'],
-            estimatedSavings: { vibes: 0, specs: 1, percentage: 10 }
+            estimatedSavings: { vibes: 0, specs: 1, percentage: 10 },
           },
           {
             type: 'vibe_to_spec',
             description: 'Convert vibes to specs',
             stepsAffected: ['step1'],
-            estimatedSavings: { vibes: 3, specs: 1, percentage: 30 }
-          }
-        ]
+            estimatedSavings: { vibes: 3, specs: 1, percentage: 30 },
+          },
+        ],
       };
-      
+
       const result = specGenerator.generateOptimizationNotes(workflowWithMultipleOptimizations);
-      
+
       expect(result).toHaveLength(4);
       expect(result[0]).toContain('Batched 2 operations');
       expect(result[0]).toContain('25%');
@@ -526,11 +571,11 @@ describe('SpecGenerator', () => {
     it('should handle empty optimizations array', () => {
       const workflowWithNoOptimizations: OptimizedWorkflow = {
         ...mockOptimizedWorkflow,
-        optimizations: []
+        optimizations: [],
       };
-      
+
       const result = specGenerator.generateOptimizationNotes(workflowWithNoOptimizations);
-      
+
       expect(result).toHaveLength(0);
     });
   });
@@ -540,9 +585,9 @@ describe('SpecGenerator', () => {
       const intents = [
         'Create a user authentication system',
         'Build data processing pipeline',
-        'Implement real-time notifications'
+        'Implement real-time notifications',
       ];
-      
+
       for (const intent of intents) {
         const result = await specGenerator.generateKiroSpec(mockOptimizedWorkflow, intent);
         expect(result.name).toMatch(/\w+\s+\w+\s+Optimizer/);
@@ -554,7 +599,7 @@ describe('SpecGenerator', () => {
 
     it('should generate metadata with correct quota calculations', async () => {
       const result = await specGenerator.generateKiroSpec(mockOptimizedWorkflow, 'test intent');
-      
+
       expect(result.metadata.estimatedQuotaUsage.vibesConsumed).toBe(5);
       expect(result.metadata.estimatedQuotaUsage.specsConsumed).toBe(3);
       expect(result.metadata.estimatedQuotaUsage.estimatedCost).toBe(8);

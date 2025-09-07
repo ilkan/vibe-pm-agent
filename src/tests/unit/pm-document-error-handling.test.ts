@@ -3,7 +3,7 @@
 import {
   PMDocumentFallbackProvider,
   PMDocumentErrorRecovery,
-  PMDocumentGenerationError
+  PMDocumentGenerationError,
 } from '../../utils/pm-document-error-handling';
 import { PMDocumentValidationError } from '../../utils/pm-document-validation';
 import {
@@ -14,7 +14,7 @@ import {
   PRFAQ,
   PMRequirements,
   DesignOptions,
-  TaskPlan
+  TaskPlan,
 } from '../../components/pm-document-generator';
 
 describe('PM Document Error Handling', () => {
@@ -73,7 +73,11 @@ describe('PM Document Error Handling', () => {
 
       it('should use provided target date', () => {
         const targetDate = '2025-06-01';
-        const fallback = PMDocumentFallbackProvider.generateFallbackPRFAQ(undefined, undefined, targetDate);
+        const fallback = PMDocumentFallbackProvider.generateFallbackPRFAQ(
+          undefined,
+          undefined,
+          targetDate
+        );
 
         expect(fallback.pressRelease.date).toBe(targetDate);
       });
@@ -118,12 +122,16 @@ describe('PM Document Error Handling', () => {
         expect(fallback.rightTimeRecommendation).toBeDefined();
 
         // Verify impact/effort matrix categorization
-        const allOptions = [fallback.options.conservative, fallback.options.balanced, fallback.options.bold];
+        const allOptions = [
+          fallback.options.conservative,
+          fallback.options.balanced,
+          fallback.options.bold,
+        ];
         const matrixOptions = [
           ...fallback.impactEffortMatrix.highImpactLowEffort,
           ...fallback.impactEffortMatrix.highImpactHighEffort,
           ...fallback.impactEffortMatrix.lowImpactLowEffort,
-          ...fallback.impactEffortMatrix.lowImpactHighEffort
+          ...fallback.impactEffortMatrix.lowImpactHighEffort,
         ];
 
         expect(matrixOptions.length).toBe(allOptions.length);
@@ -151,7 +159,7 @@ describe('PM Document Error Handling', () => {
           expect(task.acceptanceCriteria.length).toBeGreaterThan(0);
           expect(['S', 'M', 'L']).toContain(task.effort);
           expect(['Low', 'Med', 'High']).toContain(task.impact);
-          expect(['Must', 'Should', 'Could', 'Won\'t']).toContain(task.priority);
+          expect(['Must', 'Should', 'Could', "Won't"]).toContain(task.priority);
         });
       });
 
@@ -159,7 +167,7 @@ describe('PM Document Error Handling', () => {
         const limits: TaskLimits = {
           maxVibes: 5000,
           maxSpecs: 500,
-          budgetUSD: 250000
+          budgetUSD: 250000,
         };
 
         const fallback = PMDocumentFallbackProvider.generateFallbackTaskPlan(undefined, limits);
@@ -176,11 +184,10 @@ describe('PM Document Error Handling', () => {
         const operation = jest.fn().mockResolvedValue(successResult);
         const fallback = jest.fn();
 
-        const result = await PMDocumentErrorRecovery.recoverFromError(
-          operation,
-          fallback,
-          { documentType: 'test', operation: 'test' }
-        );
+        const result = await PMDocumentErrorRecovery.recoverFromError(operation, fallback, {
+          documentType: 'test',
+          operation: 'test',
+        });
 
         expect(result).toBe(successResult);
         expect(operation).toHaveBeenCalled();
@@ -195,11 +202,10 @@ describe('PM Document Error Handling', () => {
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
 
-        const result = await PMDocumentErrorRecovery.recoverFromError(
-          operation,
-          fallback,
-          { documentType: 'test', operation: 'test' }
-        );
+        const result = await PMDocumentErrorRecovery.recoverFromError(operation, fallback, {
+          documentType: 'test',
+          operation: 'test',
+        });
 
         expect(result).toBe(fallbackResult);
         expect(operation).toHaveBeenCalled();
@@ -215,15 +221,16 @@ describe('PM Document Error Handling', () => {
         const operationError = new Error('Operation failed');
         const fallbackError = new Error('Fallback failed');
         const operation = jest.fn().mockRejectedValue(operationError);
-        const fallback = jest.fn().mockImplementation(() => { throw fallbackError; });
+        const fallback = jest.fn().mockImplementation(() => {
+          throw fallbackError;
+        });
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
         await expect(
-          PMDocumentErrorRecovery.recoverFromError(
-            operation,
-            fallback,
-            { documentType: 'test', operation: 'test' }
-          )
+          PMDocumentErrorRecovery.recoverFromError(operation, fallback, {
+            documentType: 'test',
+            operation: 'test',
+          })
         ).rejects.toThrow(PMDocumentGenerationError);
 
         consoleSpy.mockRestore();
@@ -235,16 +242,15 @@ describe('PM Document Error Handling', () => {
         const fallback = jest.fn().mockReturnValue({ fallback: true });
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
-        await PMDocumentErrorRecovery.recoverFromError(
-          operation,
-          fallback,
-          { documentType: 'test', operation: 'test' }
-        );
+        await PMDocumentErrorRecovery.recoverFromError(operation, fallback, {
+          documentType: 'test',
+          operation: 'test',
+        });
 
         expect(consoleSpy).toHaveBeenCalledWith('Validation error details:', {
           field: 'field',
           documentType: 'test',
-          message: 'Invalid input'
+          message: 'Invalid input',
         });
 
         consoleSpy.mockRestore();
@@ -281,7 +287,9 @@ describe('PM Document Error Handling', () => {
 
         expect(result).toHaveLength(1015); // 1000 + '... [truncated]'
         expect(result.endsWith('... [truncated]')).toBe(true);
-        expect(consoleSpy).toHaveBeenCalledWith('test input truncated from 60000 to 1000 characters');
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'test input truncated from 60000 to 1000 characters'
+        );
 
         consoleSpy.mockRestore();
       });
@@ -309,7 +317,7 @@ describe('PM Document Error Handling', () => {
     describe('extractMeaningfulContent', () => {
       it('should extract content from markdown', () => {
         const markdownInput = `# Title\n\n**Bold text** and *italic text*\n\n- List item 1\n- List item 2\n\n1. Numbered item\n\nRegular paragraph with meaningful content.`;
-        
+
         const result = PMDocumentErrorRecovery.extractMeaningfulContent(markdownInput);
 
         expect(result).toContain('Bold text and italic text');
@@ -327,7 +335,8 @@ describe('PM Document Error Handling', () => {
       });
 
       it('should filter out test/placeholder sentences', () => {
-        const testInput = 'This is a test. This is meaningful content that should be preserved and contains enough words to pass filtering. Example text here.';
+        const testInput =
+          'This is a test. This is meaningful content that should be preserved and contains enough words to pass filtering. Example text here.';
         const result = PMDocumentErrorRecovery.extractMeaningfulContent(testInput);
 
         expect(result).toContain('meaningful content');
@@ -345,7 +354,11 @@ describe('PM Document Error Handling', () => {
     describe('getContextualErrorMessage', () => {
       it('should provide validation error message', () => {
         const error = new PMDocumentValidationError('Invalid field', 'test', 'fieldName');
-        const message = PMDocumentErrorRecovery.getContextualErrorMessage(error, 'document', 'operation');
+        const message = PMDocumentErrorRecovery.getContextualErrorMessage(
+          error,
+          'document',
+          'operation'
+        );
 
         expect(message).toContain('Input validation failed');
         expect(message).toContain('fieldName');
@@ -354,7 +367,11 @@ describe('PM Document Error Handling', () => {
 
       it('should provide timeout error message', () => {
         const error = new Error('Operation timeout');
-        const message = PMDocumentErrorRecovery.getContextualErrorMessage(error, 'document', 'operation');
+        const message = PMDocumentErrorRecovery.getContextualErrorMessage(
+          error,
+          'document',
+          'operation'
+        );
 
         expect(message).toContain('timed out');
         expect(message).toContain('complex input');
@@ -362,7 +379,11 @@ describe('PM Document Error Handling', () => {
 
       it('should provide memory error message', () => {
         const error = new Error('Out of memory');
-        const message = PMDocumentErrorRecovery.getContextualErrorMessage(error, 'document', 'operation');
+        const message = PMDocumentErrorRecovery.getContextualErrorMessage(
+          error,
+          'document',
+          'operation'
+        );
 
         expect(message).toContain('memory constraints');
         expect(message).toContain('shorter input');
@@ -370,7 +391,11 @@ describe('PM Document Error Handling', () => {
 
       it('should provide network error message', () => {
         const error = new Error('Network connection failed');
-        const message = PMDocumentErrorRecovery.getContextualErrorMessage(error, 'document', 'operation');
+        const message = PMDocumentErrorRecovery.getContextualErrorMessage(
+          error,
+          'document',
+          'operation'
+        );
 
         expect(message).toContain('network issues');
         expect(message).toContain('connectivity');
@@ -378,7 +403,11 @@ describe('PM Document Error Handling', () => {
 
       it('should provide generic error message', () => {
         const error = new Error('Unknown error');
-        const message = PMDocumentErrorRecovery.getContextualErrorMessage(error, 'document', 'operation');
+        const message = PMDocumentErrorRecovery.getContextualErrorMessage(
+          error,
+          'document',
+          'operation'
+        );
 
         expect(message).toContain('document operation failed');
         expect(message).toContain('fallback generation');

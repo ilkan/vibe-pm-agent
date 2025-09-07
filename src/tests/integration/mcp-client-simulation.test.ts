@@ -2,13 +2,13 @@
 
 import { PMAgentMCPServer } from '../../mcp/server';
 import { MCPToolRegistry } from '../../mcp/server-config';
-import { 
+import {
   MCPServerOptions,
   MCPToolContext,
   OptimizeIntentArgs,
   AnalyzeWorkflowArgs,
   GenerateROIArgs,
-  ConsultingSummaryArgs
+  ConsultingSummaryArgs,
 } from '../../models/mcp';
 import { Workflow } from '../../models/workflow';
 import { ConsultingAnalysis } from '../../components/business-analyzer';
@@ -33,8 +33,8 @@ class MockMCPClient {
       tools: registry.getAllTools().map(tool => ({
         name: tool.name,
         description: tool.description,
-        inputSchema: tool.inputSchema
-      }))
+        inputSchema: tool.inputSchema,
+      })),
     };
   }
 
@@ -45,7 +45,7 @@ class MockMCPClient {
       sessionId: `client-session-${Date.now()}`,
       timestamp: startTime,
       requestId: `client-req-${this.requestId++}`,
-      traceId: `client-trace-${Date.now()}`
+      traceId: `client-trace-${Date.now()}`,
     };
 
     try {
@@ -61,7 +61,10 @@ class MockMCPClient {
           result = await this.server.handleGenerateROI(args as GenerateROIArgs, context);
           break;
         case 'get_consulting_summary':
-          result = await this.server.handleConsultingSummary(args as ConsultingSummaryArgs, context);
+          result = await this.server.handleConsultingSummary(
+            args as ConsultingSummaryArgs,
+            context
+          );
           break;
         default:
           throw new Error(`Unknown tool: ${name}`);
@@ -88,9 +91,9 @@ describe('MCP Client Simulation Tests', () => {
   beforeEach(() => {
     const options: MCPServerOptions = {
       enableLogging: false, // Disable logging for cleaner test output
-      enableMetrics: true
+      enableMetrics: true,
     };
-    
+
     server = new PMAgentMCPServer(options);
     client = new MockMCPClient(server);
     mockPipeline = (server as any).pipeline;
@@ -105,7 +108,7 @@ describe('MCP Client Simulation Tests', () => {
       const toolsResponse = await client.listTools();
 
       expect(toolsResponse.tools).toHaveLength(10);
-      
+
       const toolNames = toolsResponse.tools.map((tool: any) => tool.name);
       expect(toolNames).toContain('optimize_intent');
       expect(toolNames).toContain('analyze_workflow');
@@ -129,14 +132,18 @@ describe('MCP Client Simulation Tests', () => {
 
     it('should provide detailed schema information for each tool', async () => {
       const toolsResponse = await client.listTools();
-      
-      const optimizeIntentTool = toolsResponse.tools.find((tool: any) => tool.name === 'optimize_intent');
+
+      const optimizeIntentTool = toolsResponse.tools.find(
+        (tool: any) => tool.name === 'optimize_intent'
+      );
       expect(optimizeIntentTool).toBeDefined();
       expect(optimizeIntentTool!.inputSchema.required).toContain('intent');
       expect(optimizeIntentTool!.inputSchema.properties?.intent).toBeDefined();
       expect(optimizeIntentTool!.inputSchema.properties?.parameters).toBeDefined();
 
-      const analyzeWorkflowTool = toolsResponse.tools.find((tool: any) => tool.name === 'analyze_workflow');
+      const analyzeWorkflowTool = toolsResponse.tools.find(
+        (tool: any) => tool.name === 'analyze_workflow'
+      );
       expect(analyzeWorkflowTool).toBeDefined();
       expect(analyzeWorkflowTool!.inputSchema.required).toContain('workflow');
       expect(analyzeWorkflowTool!.inputSchema.properties?.workflow).toBeDefined();
@@ -159,29 +166,50 @@ describe('MCP Client Simulation Tests', () => {
             keyFindings: ['Sequential processing works'],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       const mockAnalysis: ConsultingAnalysis = {
         techniquesUsed: [
-          { name: 'MECE', relevanceScore: 0.8, applicableScenarios: ['sequential-test'] }
+          { name: 'MECE', relevanceScore: 0.8, applicableScenarios: ['sequential-test'] },
         ],
         keyFindings: ['Sequential analysis completed'],
         totalQuotaSavings: 25,
-        implementationComplexity: 'low'
+        implementationComplexity: 'low',
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockOptimizeResult);
@@ -189,25 +217,34 @@ describe('MCP Client Simulation Tests', () => {
 
       // First call: optimize_intent
       const optimizeArgs: OptimizeIntentArgs = {
-        intent: 'Create a simple user management system'
+        intent: 'Create a simple user management system',
       };
 
       const optimizeResult = await client.callTool('optimize_intent', optimizeArgs);
       expect(optimizeResult.isError).toBeFalsy();
-      expect(optimizeResult.content[0].json.data.enhancedKiroSpec.name).toBe('Sequential Test Spec');
+      expect(optimizeResult.content[0].json.data.enhancedKiroSpec.name).toBe(
+        'Sequential Test Spec'
+      );
 
       // Second call: analyze_workflow (using result from first call)
       const workflow: Workflow = {
         id: 'sequential-test-workflow',
         steps: [
-          { id: 'step-1', type: 'vibe', description: 'User registration', inputs: [], outputs: [], quotaCost: 5 }
+          {
+            id: 'step-1',
+            type: 'vibe',
+            description: 'User registration',
+            inputs: [],
+            outputs: [],
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const analyzeArgs: AnalyzeWorkflowArgs = {
-        workflow
+        workflow,
       };
 
       const analyzeResult = await client.callTool('analyze_workflow', analyzeArgs);
@@ -234,35 +271,63 @@ describe('MCP Client Simulation Tests', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       const mockROIAnalysis = {
         scenarios: [
           {
             name: 'Concurrent Scenario',
-            forecast: { vibesConsumed: 10, specsConsumed: 5, estimatedCost: 50, confidenceLevel: 'high', scenario: 'naive', breakdown: [] },
+            forecast: {
+              vibesConsumed: 10,
+              specsConsumed: 5,
+              estimatedCost: 50,
+              confidenceLevel: 'high',
+              scenario: 'naive',
+              breakdown: [],
+            },
             savingsPercentage: 0,
             implementationEffort: 'low',
-            riskLevel: 'low'
-          }
+            riskLevel: 'low',
+          },
         ],
         recommendations: ['Concurrent processing recommendation'],
         bestOption: 'Concurrent Scenario',
-        riskAssessment: 'Low risk for concurrent processing'
+        riskAssessment: 'Low risk for concurrent processing',
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockOptimizeResult);
@@ -270,31 +335,40 @@ describe('MCP Client Simulation Tests', () => {
 
       // Prepare concurrent calls
       const optimizeArgs: OptimizeIntentArgs = {
-        intent: 'Create concurrent system 1'
+        intent: 'Create concurrent system 1',
       };
 
       const roiArgs: GenerateROIArgs = {
         workflow: {
           id: 'concurrent-workflow',
           steps: [
-            { id: 'step-1', type: 'spec', description: 'Concurrent processing', inputs: [], outputs: [], quotaCost: 3 }
+            {
+              id: 'step-1',
+              type: 'spec',
+              description: 'Concurrent processing',
+              inputs: [],
+              outputs: [],
+              quotaCost: 3,
+            },
           ],
           dataFlow: [],
-          estimatedComplexity: 1
-        }
+          estimatedComplexity: 1,
+        },
       };
 
       // Execute concurrent calls
       const [optimizeResult, roiResult] = await Promise.all([
         client.callTool('optimize_intent', optimizeArgs),
-        client.callTool('generate_roi_analysis', roiArgs)
+        client.callTool('generate_roi_analysis', roiArgs),
       ]);
 
       // Verify both calls succeeded
       expect(optimizeResult.isError).toBeFalsy();
       expect(roiResult.isError).toBeFalsy();
-      
-      expect(optimizeResult.content[0].json.data.enhancedKiroSpec.name).toBe('Concurrent Test Spec 1');
+
+      expect(optimizeResult.content[0].json.data.enhancedKiroSpec.name).toBe(
+        'Concurrent Test Spec 1'
+      );
       expect(roiResult.content[0].json.data.roiAnalysis.bestOption).toBe('Concurrent Scenario');
 
       // Verify both pipeline methods were called
@@ -304,7 +378,7 @@ describe('MCP Client Simulation Tests', () => {
 
     it('should maintain session context across multiple calls', async () => {
       const sessionId = `persistent-session-${Date.now()}`;
-      
+
       // Create a custom client that maintains session context
       class SessionAwareMockClient extends MockMCPClient {
         async callToolWithSession(name: string, args: any, sessionId: string) {
@@ -313,7 +387,7 @@ describe('MCP Client Simulation Tests', () => {
             sessionId: sessionId,
             timestamp: Date.now(),
             requestId: `session-req-${this.requestId++}`,
-            traceId: `session-trace-${Date.now()}`
+            traceId: `session-trace-${Date.now()}`,
           };
 
           switch (name) {
@@ -343,29 +417,50 @@ describe('MCP Client Simulation Tests', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       const mockAnalysis: ConsultingAnalysis = {
         techniquesUsed: [
-          { name: 'MECE', relevanceScore: 0.9, applicableScenarios: ['session-test'] }
+          { name: 'MECE', relevanceScore: 0.9, applicableScenarios: ['session-test'] },
         ],
         keyFindings: ['Session context maintained'],
         totalQuotaSavings: 30,
-        implementationComplexity: 'medium'
+        implementationComplexity: 'medium',
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockOptimizeResult);
@@ -373,27 +468,42 @@ describe('MCP Client Simulation Tests', () => {
 
       // First call with session
       const optimizeArgs: OptimizeIntentArgs = {
-        intent: 'Create session-aware system'
+        intent: 'Create session-aware system',
       };
 
-      const optimizeResult = await sessionClient.callToolWithSession('optimize_intent', optimizeArgs, sessionId);
+      const optimizeResult = await sessionClient.callToolWithSession(
+        'optimize_intent',
+        optimizeArgs,
+        sessionId
+      );
       expect(optimizeResult.isError).toBeFalsy();
 
       // Second call with same session
       const workflow: Workflow = {
         id: 'session-workflow',
         steps: [
-          { id: 'step-1', type: 'vibe', description: 'Session processing', inputs: [], outputs: [], quotaCost: 4 }
+          {
+            id: 'step-1',
+            type: 'vibe',
+            description: 'Session processing',
+            inputs: [],
+            outputs: [],
+            quotaCost: 4,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const analyzeArgs: AnalyzeWorkflowArgs = {
-        workflow
+        workflow,
       };
 
-      const analyzeResult = await sessionClient.callToolWithSession('analyze_workflow', analyzeArgs, sessionId);
+      const analyzeResult = await sessionClient.callToolWithSession(
+        'analyze_workflow',
+        analyzeArgs,
+        sessionId
+      );
       expect(analyzeResult.isError).toBeFalsy();
       expect(analyzeResult.content[0].markdown).toContain('Session context maintained');
 
@@ -408,10 +518,12 @@ describe('MCP Client Simulation Tests', () => {
       // Test with invalid arguments
       const invalidArgs = {
         // Missing required 'intent' field
-        parameters: { expectedUserVolume: 1000 }
+        parameters: { expectedUserVolume: 1000 },
       };
 
-      mockPipeline.processIntent.mockRejectedValue(new Error('Validation failed: intent is required'));
+      mockPipeline.processIntent.mockRejectedValue(
+        new Error('Validation failed: intent is required')
+      );
 
       const result = await client.callTool('optimize_intent', invalidArgs);
 
@@ -422,7 +534,7 @@ describe('MCP Client Simulation Tests', () => {
 
     it('should handle server-side processing errors', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Test intent that causes server error'
+        intent: 'Test intent that causes server error',
       };
 
       mockPipeline.processIntent.mockRejectedValue(new Error('Internal server error'));
@@ -435,7 +547,9 @@ describe('MCP Client Simulation Tests', () => {
     });
 
     it('should handle unknown tool requests', async () => {
-      await expect(client.callTool('unknown_tool', {})).rejects.toThrow('Unknown tool: unknown_tool');
+      await expect(client.callTool('unknown_tool', {})).rejects.toThrow(
+        'Unknown tool: unknown_tool'
+      );
     });
 
     it('should handle malformed requests gracefully', async () => {
@@ -446,7 +560,9 @@ describe('MCP Client Simulation Tests', () => {
       const result = await client.callTool('optimize_intent', malformedArgs);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].json.message).toContain('Validation failed: intent is required and must be a string');
+      expect(result.content[0].json.message).toContain(
+        'Validation failed: intent is required and must be a string'
+      );
     });
   });
 
@@ -469,28 +585,49 @@ describe('MCP Client Simulation Tests', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockResult);
 
       // Create concurrent requests from multiple clients
-      const requests = clients.map((client, index) => 
+      const requests = clients.map((client, index) =>
         client.callTool('optimize_intent', {
-          intent: `Load test intent from client ${index + 1}`
+          intent: `Load test intent from client ${index + 1}`,
         })
       );
 
@@ -525,20 +662,41 @@ describe('MCP Client Simulation Tests', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockResult);
@@ -546,7 +704,7 @@ describe('MCP Client Simulation Tests', () => {
       // Execute multiple requests
       const requests = Array.from({ length: numRequests }, (_, index) =>
         client.callTool('optimize_intent', {
-          intent: `Metrics test intent ${index + 1}`
+          intent: `Metrics test intent ${index + 1}`,
         })
       );
 
@@ -574,26 +732,47 @@ describe('MCP Client Simulation Tests', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockResult);
 
       const args: OptimizeIntentArgs = {
-        intent: 'Protocol compliance test'
+        intent: 'Protocol compliance test',
       };
 
       const result = await client.callTool('optimize_intent', args);
@@ -602,11 +781,11 @@ describe('MCP Client Simulation Tests', () => {
       expect(result).toHaveProperty('content');
       expect(Array.isArray(result.content)).toBe(true);
       expect(result.content).toHaveLength(1);
-      
+
       const content = result.content[0];
       expect(content).toHaveProperty('type');
       expect(['text', 'json', 'markdown']).toContain(content.type);
-      
+
       if (content.type === 'json') {
         expect(content).toHaveProperty('json');
         expect(typeof content.json).toBe('object');
@@ -633,29 +812,50 @@ describe('MCP Client Simulation Tests', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       const mockAnalysis: ConsultingAnalysis = {
         techniquesUsed: [
-          { name: 'MECE', relevanceScore: 0.8, applicableScenarios: ['content-test'] }
+          { name: 'MECE', relevanceScore: 0.8, applicableScenarios: ['content-test'] },
         ],
         keyFindings: ['Content type test finding'],
         totalQuotaSavings: 20,
-        implementationComplexity: 'low'
+        implementationComplexity: 'low',
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockOptimizeResult);
@@ -663,7 +863,7 @@ describe('MCP Client Simulation Tests', () => {
 
       // Test JSON response
       const optimizeResult = await client.callTool('optimize_intent', {
-        intent: 'Content type test'
+        intent: 'Content type test',
       });
 
       expect(optimizeResult.content[0].type).toBe('json');
@@ -674,11 +874,18 @@ describe('MCP Client Simulation Tests', () => {
         workflow: {
           id: 'content-test-workflow',
           steps: [
-            { id: 'step-1', type: 'vibe', description: 'Content test', inputs: [], outputs: [], quotaCost: 2 }
+            {
+              id: 'step-1',
+              type: 'vibe',
+              description: 'Content test',
+              inputs: [],
+              outputs: [],
+              quotaCost: 2,
+            },
           ],
           dataFlow: [],
-          estimatedComplexity: 1
-        }
+          estimatedComplexity: 1,
+        },
       });
 
       expect(analyzeResult.content[0].type).toBe('markdown');

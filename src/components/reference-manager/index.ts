@@ -1,6 +1,6 @@
 /**
  * Reference Manager Component
- * 
+ *
  * This component manages credible source referencing for McKinsey, Gartner, and WEF sources.
  * It provides source validation, citation formatting, and data freshness tracking.
  */
@@ -11,7 +11,7 @@ import {
   UpdateRecommendation,
   ValidationResult,
   SOURCE_RELIABILITY_THRESHOLDS,
-  COMPETITIVE_ANALYSIS_DEFAULTS
+  COMPETITIVE_ANALYSIS_DEFAULTS,
 } from '../../models/competitive';
 
 /**
@@ -33,40 +33,55 @@ export class ReferenceManager {
       'pwc.com',
       'accenture.com',
       'forrester.com',
-      'idc.com'
+      'idc.com',
     ]);
 
     this.sourceTemplates = new Map([
-      ['mckinsey', {
-        type: 'mckinsey',
-        organization: 'McKinsey & Company',
-        reliability: 0.95,
-        citationFormat: 'McKinsey & Company ({year}). {title}. Retrieved from {url}'
-      }],
-      ['gartner', {
-        type: 'gartner',
-        organization: 'Gartner Inc.',
-        reliability: 0.90,
-        citationFormat: 'Gartner ({year}). {title}. Gartner Research.'
-      }],
-      ['wef', {
-        type: 'wef',
-        organization: 'World Economic Forum',
-        reliability: 0.85,
-        citationFormat: 'World Economic Forum ({year}). {title}. Retrieved from {url}'
-      }],
-      ['bcg', {
-        type: 'industry-report',
-        organization: 'Boston Consulting Group',
-        reliability: 0.90,
-        citationFormat: 'Boston Consulting Group ({year}). {title}. Retrieved from {url}'
-      }],
-      ['forrester', {
-        type: 'market-research',
-        organization: 'Forrester Research',
-        reliability: 0.85,
-        citationFormat: 'Forrester Research ({year}). {title}. Forrester.'
-      }]
+      [
+        'mckinsey',
+        {
+          type: 'mckinsey',
+          organization: 'McKinsey & Company',
+          reliability: 0.95,
+          citationFormat: 'McKinsey & Company ({year}). {title}. Retrieved from {url}',
+        },
+      ],
+      [
+        'gartner',
+        {
+          type: 'gartner',
+          organization: 'Gartner Inc.',
+          reliability: 0.9,
+          citationFormat: 'Gartner ({year}). {title}. Gartner Research.',
+        },
+      ],
+      [
+        'wef',
+        {
+          type: 'wef',
+          organization: 'World Economic Forum',
+          reliability: 0.85,
+          citationFormat: 'World Economic Forum ({year}). {title}. Retrieved from {url}',
+        },
+      ],
+      [
+        'bcg',
+        {
+          type: 'industry-report',
+          organization: 'Boston Consulting Group',
+          reliability: 0.9,
+          citationFormat: 'Boston Consulting Group ({year}). {title}. Retrieved from {url}',
+        },
+      ],
+      [
+        'forrester',
+        {
+          type: 'market-research',
+          organization: 'Forrester Research',
+          reliability: 0.85,
+          citationFormat: 'Forrester Research ({year}). {title}. Forrester.',
+        },
+      ],
     ]);
   }
 
@@ -93,7 +108,7 @@ export class ReferenceManager {
     }
 
     const year = new Date(source.publishDate).getFullYear().toString();
-    
+
     return template.citationFormat
       .replace('{year}', year)
       .replace('{title}', source.title)
@@ -107,7 +122,9 @@ export class ReferenceManager {
   checkDataFreshness(source: SourceReference): FreshnessStatus {
     const publishDate = new Date(source.publishDate);
     const currentDate = new Date();
-    const ageInDays = Math.floor((currentDate.getTime() - publishDate.getTime()) / (1000 * 60 * 60 * 24));
+    const ageInDays = Math.floor(
+      (currentDate.getTime() - publishDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
 
     let status: 'fresh' | 'recent' | 'stale' | 'outdated';
     let recommendedUpdateFrequency: number;
@@ -137,7 +154,7 @@ export class ReferenceManager {
       status,
       ageInDays,
       recommendedUpdateFrequency,
-      lastValidated: new Date().toISOString().split('T')[0]
+      lastValidated: new Date().toISOString().split('T')[0],
     };
   }
 
@@ -149,7 +166,7 @@ export class ReferenceManager {
 
     sources.forEach(source => {
       const freshness = this.checkDataFreshness(source);
-      
+
       if (freshness.status === 'outdated') {
         recommendations.push({
           type: 'data-refresh',
@@ -157,7 +174,7 @@ export class ReferenceManager {
           description: `Source "${source.title}" is outdated (${freshness.ageInDays} days old)`,
           estimatedEffort: '2-4 hours',
           expectedImpact: 'Improved analysis accuracy and credibility',
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 1 week
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 week
         });
       } else if (freshness.status === 'stale') {
         recommendations.push({
@@ -166,7 +183,7 @@ export class ReferenceManager {
           description: `Verify if newer data is available for "${source.title}"`,
           estimatedEffort: '1-2 hours',
           expectedImpact: 'Enhanced data currency',
-          dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 2 weeks
+          dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 weeks
         });
       }
     });
@@ -182,7 +199,7 @@ export class ReferenceManager {
         priority: 'high',
         description: 'Add authoritative sources (McKinsey, Gartner, or WEF) to improve credibility',
         estimatedEffort: '4-6 hours',
-        expectedImpact: 'Significantly improved analysis credibility'
+        expectedImpact: 'Significantly improved analysis credibility',
       });
     }
 
@@ -199,7 +216,7 @@ export class ReferenceManager {
     return this.createSourceReference('mckinsey', title, publishDate, url, [
       'Market analysis and trends',
       'Industry transformation insights',
-      'Strategic recommendations'
+      'Strategic recommendations',
     ]);
   }
 
@@ -210,7 +227,7 @@ export class ReferenceManager {
     return this.createSourceReference('gartner', title, publishDate, url, [
       'Technology market analysis',
       'Vendor positioning and capabilities',
-      'Market forecasts and trends'
+      'Market forecasts and trends',
     ]);
   }
 
@@ -221,7 +238,7 @@ export class ReferenceManager {
     return this.createSourceReference('wef', title, publishDate, url, [
       'Global economic trends',
       'Industry transformation drivers',
-      'Future of work insights'
+      'Future of work insights',
     ]);
   }
 
@@ -242,7 +259,7 @@ export class ReferenceManager {
     }
 
     // Check for authoritative sources
-    const hasAuthoritativeSources = sources.some(s => 
+    const hasAuthoritativeSources = sources.some(s =>
       ['mckinsey', 'gartner', 'wef'].includes(s.type)
     );
     if (!hasAuthoritativeSources) {
@@ -292,7 +309,7 @@ export class ReferenceManager {
       warnings,
       recommendations,
       dataGaps,
-      qualityScore
+      qualityScore,
     };
   }
 
@@ -308,28 +325,34 @@ export class ReferenceManager {
     const recentDate = new Date(currentDate.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 days ago
 
     // Add McKinsey source
-    sources.push(this.createMcKinseyReference(
-      `${industry} Industry Transformation Report 2024`,
-      recentDate.toISOString().split('T')[0],
-      'https://mckinsey.com/industries/technology'
-    ));
+    sources.push(
+      this.createMcKinseyReference(
+        `${industry} Industry Transformation Report 2024`,
+        recentDate.toISOString().split('T')[0],
+        'https://mckinsey.com/industries/technology'
+      )
+    );
 
     // Add Gartner source for technology-related analysis
     if (analysisType === 'competitive' || industry.toLowerCase().includes('tech')) {
-      sources.push(this.createGartnerReference(
-        `Magic Quadrant for ${industry} Platforms 2024`,
-        recentDate.toISOString().split('T')[0],
-        'https://gartner.com/research'
-      ));
+      sources.push(
+        this.createGartnerReference(
+          `Magic Quadrant for ${industry} Platforms 2024`,
+          recentDate.toISOString().split('T')[0],
+          'https://gartner.com/research'
+        )
+      );
     }
 
     // Add WEF source for broader market context
     if (analysisType === 'market-sizing' || analysisType === 'business-opportunity') {
-      sources.push(this.createWEFReference(
-        `Future of ${industry}: Global Trends and Opportunities`,
-        recentDate.toISOString().split('T')[0],
-        'https://weforum.org/reports'
-      ));
+      sources.push(
+        this.createWEFReference(
+          `Future of ${industry}: Global Trends and Opportunities`,
+          recentDate.toISOString().split('T')[0],
+          'https://weforum.org/reports'
+        )
+      );
     }
 
     // Add industry-specific sources
@@ -341,20 +364,17 @@ export class ReferenceManager {
       publishDate: recentDate.toISOString().split('T')[0],
       accessDate: currentDate.toISOString().split('T')[0],
       reliability: 0.75,
-      relevance: 0.90,
+      relevance: 0.9,
       dataFreshness: this.checkDataFreshness({
-        publishDate: recentDate.toISOString().split('T')[0]
+        publishDate: recentDate.toISOString().split('T')[0],
       } as SourceReference),
       citationFormat: 'Industry Research Institute (2024). Market Analysis Report.',
       keyFindings: [
         'Market size and growth projections',
         'Competitive landscape analysis',
-        'Key market drivers and challenges'
+        'Key market drivers and challenges',
       ],
-      limitations: [
-        'Limited geographic scope',
-        'Sample size constraints for smaller players'
-      ]
+      limitations: ['Limited geographic scope', 'Sample size constraints for smaller players'],
     });
 
     return sources;
@@ -367,8 +387,8 @@ export class ReferenceManager {
   private isUrlFromTrustedSource(url: string): boolean {
     try {
       const domain = new URL(url).hostname.toLowerCase();
-      return Array.from(this.trustedSources).some(trusted => 
-        domain.includes(trusted) || trusted.includes(domain.replace('www.', ''))
+      return Array.from(this.trustedSources).some(
+        trusted => domain.includes(trusted) || trusted.includes(domain.replace('www.', ''))
       );
     } catch {
       return false;
@@ -377,16 +397,18 @@ export class ReferenceManager {
 
   private isTrustedSourceName(sourceName: string): boolean {
     const name = sourceName.toLowerCase();
-    return name.includes('mckinsey') || 
-           name.includes('gartner') || 
-           name.includes('world economic forum') ||
-           name.includes('wef') ||
-           name.includes('boston consulting') ||
-           name.includes('bcg') ||
-           name.includes('forrester') ||
-           name.includes('deloitte') ||
-           name.includes('pwc') ||
-           name.includes('accenture');
+    return (
+      name.includes('mckinsey') ||
+      name.includes('gartner') ||
+      name.includes('world economic forum') ||
+      name.includes('wef') ||
+      name.includes('boston consulting') ||
+      name.includes('bcg') ||
+      name.includes('forrester') ||
+      name.includes('deloitte') ||
+      name.includes('pwc') ||
+      name.includes('accenture')
+    );
   }
 
   private validateSourceReference(source: SourceReference): boolean {
@@ -402,7 +424,11 @@ export class ReferenceManager {
     }
 
     // Check reliability score
-    if (typeof source.reliability !== 'number' || source.reliability < 0 || source.reliability > 1) {
+    if (
+      typeof source.reliability !== 'number' ||
+      source.reliability < 0 ||
+      source.reliability > 1
+    ) {
       return false;
     }
 
@@ -417,7 +443,15 @@ export class ReferenceManager {
     }
 
     // Check if source type is valid
-    const validTypes = ['mckinsey', 'gartner', 'wef', 'industry-report', 'market-research', 'company-filing', 'news-article'];
+    const validTypes = [
+      'mckinsey',
+      'gartner',
+      'wef',
+      'industry-report',
+      'market-research',
+      'company-filing',
+      'news-article',
+    ];
     if (!validTypes.includes(source.type)) {
       return false;
     }
@@ -444,7 +478,7 @@ export class ReferenceManager {
     }
 
     const currentDate = new Date().toISOString().split('T')[0];
-    
+
     return {
       id: `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type: template.type!,
@@ -460,12 +494,12 @@ export class ReferenceManager {
       keyFindings: keyFindings || [
         'Market trends and analysis',
         'Competitive positioning insights',
-        'Strategic recommendations'
+        'Strategic recommendations',
       ],
       limitations: [
         'Analysis based on available public information',
-        'Market conditions subject to change'
-      ]
+        'Market conditions subject to change',
+      ],
     };
   }
 }
@@ -486,7 +520,7 @@ export function validateAndFormatSources(sources: SourceReference[]): {
   validationResult: ValidationResult;
 } {
   const manager = createReferenceManager();
-  
+
   const validSources = sources.filter(source => manager.validateSource(source));
   const formattedCitations = validSources.map(source => manager.formatCitation(source));
   const validationResult = manager.validateSourceCollection(validSources);
@@ -494,7 +528,7 @@ export function validateAndFormatSources(sources: SourceReference[]): {
   return {
     validSources,
     formattedCitations,
-    validationResult
+    validationResult,
   };
 }
 

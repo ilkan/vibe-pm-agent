@@ -14,7 +14,10 @@ describe('PM Document Generation Error Scenarios', () => {
     it('should use fallback when requirements are invalid', async () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
-      const result = await generator.generateManagementOnePager('', 'valid design document with sufficient content');
+      const result = await generator.generateManagementOnePager(
+        '',
+        'valid design document with sufficient content'
+      );
 
       expect(result).toBeDefined();
       expect(result.answer).toContain('cautious implementation');
@@ -28,13 +31,20 @@ describe('PM Document Generation Error Scenarios', () => {
     });
 
     it('should handle malformed ROI inputs gracefully', async () => {
-      const validRequirements = 'This is a comprehensive requirements document with user stories and business objectives.';
-      const validDesign = 'This is a detailed design document with architecture and technical specifications.';
+      const validRequirements =
+        'This is a comprehensive requirements document with user stories and business objectives.';
+      const validDesign =
+        'This is a detailed design document with architecture and technical specifications.';
       const invalidROI = { cost_naive: -1000 } as any;
 
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
-      const result = await generator.generateManagementOnePager(validRequirements, validDesign, undefined, invalidROI);
+      const result = await generator.generateManagementOnePager(
+        validRequirements,
+        validDesign,
+        undefined,
+        invalidROI
+      );
 
       expect(result).toBeDefined();
       expect(result.roiSnapshot).toBeDefined();
@@ -45,7 +55,8 @@ describe('PM Document Generation Error Scenarios', () => {
 
     it('should sanitize excessively long inputs', async () => {
       const longRequirements = 'This is a requirements document. '.repeat(2000); // Very long
-      const validDesign = 'This is a detailed design document with architecture and technical specifications.';
+      const validDesign =
+        'This is a detailed design document with architecture and technical specifications.';
 
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
@@ -63,7 +74,8 @@ describe('PM Document Generation Error Scenarios', () => {
 
   describe('PR-FAQ Error Handling', () => {
     it('should use fallback when design is invalid', async () => {
-      const validRequirements = 'This is a comprehensive requirements document with user stories and business objectives.';
+      const validRequirements =
+        'This is a comprehensive requirements document with user stories and business objectives.';
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
       const result = await generator.generatePRFAQ(validRequirements, '');
@@ -80,8 +92,10 @@ describe('PM Document Generation Error Scenarios', () => {
     });
 
     it('should handle invalid target dates gracefully', async () => {
-      const validRequirements = 'This is a comprehensive requirements document with user stories and business objectives.';
-      const validDesign = 'This is a detailed design document with architecture and technical specifications.';
+      const validRequirements =
+        'This is a comprehensive requirements document with user stories and business objectives.';
+      const validDesign =
+        'This is a detailed design document with architecture and technical specifications.';
       const invalidDate = '2020-01-01'; // Past date
 
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
@@ -115,7 +129,8 @@ describe('PM Document Generation Error Scenarios', () => {
     });
 
     it('should handle invalid context gracefully', async () => {
-      const validIntent = 'I want to build a system that optimizes workflows and reduces costs through intelligent analysis.';
+      const validIntent =
+        'I want to build a system that optimizes workflows and reduces costs through intelligent analysis.';
       const invalidContext = { budget: -1000 } as any;
 
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
@@ -170,7 +185,8 @@ describe('PM Document Generation Error Scenarios', () => {
     });
 
     it('should handle invalid limits gracefully', async () => {
-      const validDesign = 'This is a detailed design document with architecture and technical specifications.';
+      const validDesign =
+        'This is a detailed design document with architecture and technical specifications.';
       const invalidLimits = { maxVibes: -100 } as any;
 
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
@@ -196,9 +212,7 @@ describe('PM Document Generation Error Scenarios', () => {
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('Invalid requirements input')
       );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Invalid design input')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid design input'));
 
       consoleSpy.mockRestore();
     });
@@ -213,9 +227,7 @@ describe('PM Document Generation Error Scenarios', () => {
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('Invalid requirements input')
       );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Invalid design input')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid design input'));
 
       consoleSpy.mockRestore();
     });

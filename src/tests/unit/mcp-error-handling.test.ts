@@ -1,17 +1,8 @@
 // Unit tests for MCP error handling and response formatting
 
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
-import { 
-  MCPErrorHandler, 
-  MCPResponseFormatter, 
-  MCPLogger 
-} from '../../utils/mcp-error-handling';
-import { 
-  MCPErrorCode, 
-  ErrorSeverity, 
-  MCPToolContext,
-  LogLevel 
-} from '../../models/mcp';
+import { MCPErrorHandler, MCPResponseFormatter, MCPLogger } from '../../utils/mcp-error-handling';
+import { MCPErrorCode, ErrorSeverity, MCPToolContext, LogLevel } from '../../models/mcp';
 
 describe('MCP Error Handling', () => {
   describe('MCPErrorHandler', () => {
@@ -20,7 +11,7 @@ describe('MCP Error Handling', () => {
       sessionId: 'test-session',
       timestamp: Date.now(),
       requestId: 'test-request',
-      traceId: 'test-trace'
+      traceId: 'test-trace',
     };
 
     describe('createError', () => {
@@ -36,7 +27,7 @@ describe('MCP Error Handling', () => {
         expect(error.message).toBe('Invalid input parameters');
         expect(error.code).toBe(ErrorCode.InvalidParams);
         expect(error.data).toBeDefined();
-        
+
         const errorData = error.data as any;
         expect(errorData.code).toBe(MCPErrorCode.VALIDATION_FAILED);
         expect(errorData.severity).toBe(ErrorSeverity.MEDIUM);
@@ -54,7 +45,7 @@ describe('MCP Error Handling', () => {
           { mcpCode: MCPErrorCode.INVALID_PARAMS, expectedJsonRpc: ErrorCode.InvalidParams },
           { mcpCode: MCPErrorCode.INTERNAL_ERROR, expectedJsonRpc: ErrorCode.InternalError },
           { mcpCode: MCPErrorCode.TOOL_NOT_FOUND, expectedJsonRpc: ErrorCode.MethodNotFound },
-          { mcpCode: MCPErrorCode.TOOL_EXECUTION_FAILED, expectedJsonRpc: ErrorCode.InternalError }
+          { mcpCode: MCPErrorCode.TOOL_EXECUTION_FAILED, expectedJsonRpc: ErrorCode.InternalError },
         ];
 
         testCases.forEach(({ mcpCode, expectedJsonRpc }) => {
@@ -73,7 +64,7 @@ describe('MCP Error Handling', () => {
           { code: MCPErrorCode.INVALID_PARAMS, expectedSeverity: ErrorSeverity.MEDIUM },
           { code: MCPErrorCode.VALIDATION_FAILED, expectedSeverity: ErrorSeverity.MEDIUM },
           { code: MCPErrorCode.TIMEOUT, expectedSeverity: ErrorSeverity.LOW },
-          { code: MCPErrorCode.RATE_LIMITED, expectedSeverity: ErrorSeverity.LOW }
+          { code: MCPErrorCode.RATE_LIMITED, expectedSeverity: ErrorSeverity.LOW },
         ];
 
         testCases.forEach(({ code, expectedSeverity }) => {
@@ -88,7 +79,7 @@ describe('MCP Error Handling', () => {
           MCPErrorCode.TIMEOUT,
           MCPErrorCode.RATE_LIMITED,
           MCPErrorCode.INSUFFICIENT_RESOURCES,
-          MCPErrorCode.INTERNAL_ERROR
+          MCPErrorCode.INTERNAL_ERROR,
         ];
 
         const nonRetryableCodes = [
@@ -97,7 +88,7 @@ describe('MCP Error Handling', () => {
           MCPErrorCode.METHOD_NOT_FOUND,
           MCPErrorCode.INVALID_PARAMS,
           MCPErrorCode.TOOL_NOT_FOUND,
-          MCPErrorCode.VALIDATION_FAILED
+          MCPErrorCode.VALIDATION_FAILED,
         ];
 
         retryableCodes.forEach(code => {
@@ -169,20 +160,18 @@ describe('MCP Error Handling', () => {
       recommendations: [
         {
           mainRecommendation: 'Implement optimization',
-          supportingReasons: ['Reduces cost', 'Improves performance']
+          supportingReasons: ['Reduces cost', 'Improves performance'],
         },
-        'Simple recommendation'
+        'Simple recommendation',
       ],
-      additionalData: { complexity: 'medium', savings: 25 }
+      additionalData: { complexity: 'medium', savings: 25 },
     };
 
     describe('formatSuccess', () => {
       it('should format JSON response correctly', () => {
-        const response = MCPResponseFormatter.formatSuccess(
-          testData,
-          'json',
-          { executionTime: 150 }
-        );
+        const response = MCPResponseFormatter.formatSuccess(testData, 'json', {
+          executionTime: 150,
+        });
 
         expect(response.isError).toBe(false);
         expect(response.content).toHaveLength(1);
@@ -223,7 +212,7 @@ describe('MCP Error Handling', () => {
         const resourceData = {
           uri: 'file://test.json',
           mimeType: 'application/json',
-          text: 'Resource content'
+          text: 'Resource content',
         };
 
         const response = MCPResponseFormatter.formatSuccess(resourceData, 'resource');
@@ -278,16 +267,14 @@ describe('MCP Error Handling', () => {
     const mockContext: MCPToolContext = {
       toolName: 'test_tool',
       sessionId: 'test-session',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     describe('logging methods', () => {
       it('should log info messages correctly', () => {
         MCPLogger.info('Test info message', mockContext, { extra: 'data' });
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"INFO"')
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"INFO"'));
         expect(consoleSpy).toHaveBeenCalledWith(
           expect.stringContaining('"message":"Test info message"')
         );
@@ -300,40 +287,30 @@ describe('MCP Error Handling', () => {
         const testError = new Error('Test error');
         MCPLogger.error('Test error message', testError, mockContext);
 
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"ERROR"')
-        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"ERROR"'));
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           expect.stringContaining('"message":"Test error message"')
         );
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"error":{')
-        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"error":{'));
       });
 
       it('should log warning messages correctly', () => {
         MCPLogger.warn('Test warning', mockContext);
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"WARN"')
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"WARN"'));
       });
 
       it('should log debug messages correctly', () => {
         MCPLogger.debug('Test debug', mockContext);
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"DEBUG"')
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"DEBUG"'));
       });
 
       it('should log fatal messages correctly', () => {
         const testError = new Error('Fatal error');
         MCPLogger.fatal('Test fatal', testError, mockContext);
 
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"FATAL"')
-        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"FATAL"'));
       });
     });
 
@@ -346,72 +323,42 @@ describe('MCP Error Handling', () => {
         MCPLogger.warn('Warning message');
         MCPLogger.error('Error message');
 
-        expect(consoleSpy).not.toHaveBeenCalledWith(
-          expect.stringContaining('"level":"DEBUG"')
-        );
-        expect(consoleSpy).not.toHaveBeenCalledWith(
-          expect.stringContaining('"level":"INFO"')
-        );
-        expect(consoleSpy).not.toHaveBeenCalledWith(
-          expect.stringContaining('"level":"WARN"')
-        );
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"ERROR"')
-        );
+        expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('"level":"DEBUG"'));
+        expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('"level":"INFO"'));
+        expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('"level":"WARN"'));
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"ERROR"'));
       });
     });
 
     describe('logToolExecution', () => {
       it('should log successful tool execution', () => {
         const startTime = Date.now() - 100;
-        MCPLogger.logToolExecution(
-          'test_tool',
-          mockContext,
-          startTime,
-          true,
-          undefined,
-          { quotaUsed: 5 }
-        );
+        MCPLogger.logToolExecution('test_tool', mockContext, startTime, true, undefined, {
+          quotaUsed: 5,
+        });
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"INFO"')
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"INFO"'));
         expect(consoleSpy).toHaveBeenCalledWith(
           expect.stringContaining('"message":"Tool test_tool completed"')
         );
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"success":true')
-        );
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"duration"')
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"success":true'));
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"duration"'));
       });
 
       it('should log failed tool execution', () => {
         const startTime = Date.now() - 200;
         const error = new Error('Tool failed');
-        
-        MCPLogger.logToolExecution(
-          'test_tool',
-          mockContext,
-          startTime,
-          false,
-          error,
-          { attemptNumber: 1 }
-        );
 
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"ERROR"')
-        );
+        MCPLogger.logToolExecution('test_tool', mockContext, startTime, false, error, {
+          attemptNumber: 1,
+        });
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"ERROR"'));
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           expect.stringContaining('"message":"Tool test_tool failed"')
         );
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"success":false')
-        );
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"error":{')
-        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"success":false'));
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"error":{'));
       });
     });
 
@@ -435,7 +382,7 @@ describe('MCP Error Handling', () => {
       it('should format error information correctly', () => {
         const testError = new Error('Test error');
         testError.stack = 'Error stack trace';
-        
+
         MCPLogger.error('Error occurred', testError, mockContext);
 
         const logCall = consoleErrorSpy.mock.calls[0][0];

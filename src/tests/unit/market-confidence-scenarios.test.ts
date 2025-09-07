@@ -1,7 +1,7 @@
 /**
  * Unit Tests for Market Analyzer Confidence Intervals and Scenario Analysis
- * 
- * Tests confidence interval calculations for market estimates and 
+ *
+ * Tests confidence interval calculations for market estimates and
  * multiple scenario generation (conservative, balanced, aggressive).
  */
 
@@ -10,7 +10,7 @@ import {
   MarketSizingArgs,
   MarketScenario,
   ConfidenceInterval,
-  MARKET_SIZING_DEFAULTS
+  MARKET_SIZING_DEFAULTS,
 } from '../../models/competitive';
 
 describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
@@ -26,25 +26,25 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
       market_definition: {
         industry: 'technology',
         geography: ['north america', 'europe'],
-        customer_segments: ['enterprise', 'mid-market']
+        customer_segments: ['enterprise', 'mid-market'],
       },
-      sizing_methods: ['top-down', 'bottom-up'] as const
+      sizing_methods: ['top-down', 'bottom-up'] as const,
     };
 
     it('should calculate confidence intervals with proper statistical bounds', async () => {
       const result = await marketAnalyzer.analyzeMarketSize(validArgs);
 
       expect(result.confidenceIntervals).toHaveLength(3);
-      
+
       result.confidenceIntervals.forEach(interval => {
         // Lower bound should be positive and less than upper bound
         expect(interval.lowerBound).toBeGreaterThan(0);
         expect(interval.upperBound).toBeGreaterThan(interval.lowerBound);
-        
+
         // Confidence level should be between 0 and 1
         expect(interval.confidenceLevel).toBeGreaterThan(0);
         expect(interval.confidenceLevel).toBeLessThanOrEqual(1);
-        
+
         // Should have methodology reference
         expect(interval.methodology).toBeDefined();
         expect(interval.methodology.length).toBeGreaterThan(0);
@@ -65,7 +65,7 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
 
       // TAM should have the widest confidence interval (most uncertainty)
       expect(tamWidth).toBeGreaterThanOrEqual(samWidth);
-      
+
       // SOM should have the widest relative interval due to highest uncertainty
       const tamRelativeWidth = tamWidth / result.tam.value;
       const somRelativeWidth = somWidth / result.som.value;
@@ -82,10 +82,10 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
       // Actual values should fall within confidence intervals
       expect(result.tam.value).toBeGreaterThanOrEqual(tamInterval.lowerBound);
       expect(result.tam.value).toBeLessThanOrEqual(tamInterval.upperBound);
-      
+
       expect(result.sam.value).toBeGreaterThanOrEqual(samInterval.lowerBound);
       expect(result.sam.value).toBeLessThanOrEqual(samInterval.upperBound);
-      
+
       expect(result.som.value).toBeGreaterThanOrEqual(somInterval.lowerBound);
       expect(result.som.value).toBeLessThanOrEqual(somInterval.upperBound);
     });
@@ -93,47 +93,54 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
     it('should adjust confidence levels based on methodology reliability', async () => {
       const topDownArgs = {
         ...validArgs,
-        sizing_methods: ['top-down'] as const
+        sizing_methods: ['top-down'] as const,
       };
 
       const bottomUpArgs = {
         ...validArgs,
-        sizing_methods: ['bottom-up'] as const
+        sizing_methods: ['bottom-up'] as const,
       };
 
       const topDownResult = await marketAnalyzer.analyzeMarketSize(topDownArgs);
       const bottomUpResult = await marketAnalyzer.analyzeMarketSize(bottomUpArgs);
 
-      const topDownTamInterval = topDownResult.confidenceIntervals.find(ci => ci.marketType === 'tam')!;
-      const bottomUpTamInterval = bottomUpResult.confidenceIntervals.find(ci => ci.marketType === 'tam')!;
+      const topDownTamInterval = topDownResult.confidenceIntervals.find(
+        ci => ci.marketType === 'tam'
+      )!;
+      const bottomUpTamInterval = bottomUpResult.confidenceIntervals.find(
+        ci => ci.marketType === 'tam'
+      )!;
 
       // Bottom-up methodology should have higher confidence (based on implementation)
-      expect(bottomUpTamInterval.confidenceLevel).toBeGreaterThanOrEqual(topDownTamInterval.confidenceLevel);
+      expect(bottomUpTamInterval.confidenceLevel).toBeGreaterThanOrEqual(
+        topDownTamInterval.confidenceLevel
+      );
     });
 
     it('should provide meaningful confidence intervals for different industries', async () => {
       const industries = ['technology', 'healthcare', 'finance', 'retail'];
-      
+
       for (const industry of industries) {
         const industryArgs = {
           ...validArgs,
           market_definition: {
             ...validArgs.market_definition,
-            industry
-          }
+            industry,
+          },
         };
 
         const result = await marketAnalyzer.analyzeMarketSize(industryArgs);
-        
+
         result.confidenceIntervals.forEach(interval => {
           // Should have reasonable confidence levels (not too low)
           expect(interval.confidenceLevel).toBeGreaterThan(0.4);
-          
+
           // Interval should be meaningful (not too narrow or too wide)
-          const relativeWidth = (interval.upperBound - interval.lowerBound) / 
-                               ((interval.upperBound + interval.lowerBound) / 2);
+          const relativeWidth =
+            (interval.upperBound - interval.lowerBound) /
+            ((interval.upperBound + interval.lowerBound) / 2);
           expect(relativeWidth).toBeGreaterThan(0.2); // At least 20% relative width
-          expect(relativeWidth).toBeLessThan(3.0);    // Not more than 300% relative width
+          expect(relativeWidth).toBeLessThan(3.0); // Not more than 300% relative width
         });
       }
     });
@@ -145,9 +152,9 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
       market_definition: {
         industry: 'manufacturing',
         geography: ['global'],
-        customer_segments: ['enterprise']
+        customer_segments: ['enterprise'],
       },
-      sizing_methods: ['bottom-up', 'value-theory'] as const
+      sizing_methods: ['bottom-up', 'value-theory'] as const,
     };
 
     it('should generate three distinct scenarios with proper characteristics', async () => {
@@ -183,7 +190,8 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
       const aggressive = result.scenarios.find(s => s.name === 'aggressive')!;
 
       // Probabilities should sum to 1.0
-      const totalProbability = conservative.probability + balanced.probability + aggressive.probability;
+      const totalProbability =
+        conservative.probability + balanced.probability + aggressive.probability;
       expect(totalProbability).toBeCloseTo(1.0, 1);
 
       // Balanced should have highest probability
@@ -277,9 +285,9 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
       market_definition: {
         industry: 'technology',
         geography: ['north america'],
-        customer_segments: ['enterprise']
+        customer_segments: ['enterprise'],
       },
-      sizing_methods: ['top-down'] as const
+      sizing_methods: ['top-down'] as const,
     };
 
     it('should disable scenario analysis when configured', async () => {
@@ -311,9 +319,11 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
       for (let i = 0; i < 3; i++) {
         const enabledInterval = enabledResult.confidenceIntervals[i];
         const disabledInterval = disabledResult.confidenceIntervals[i];
-        
+
         expect(enabledInterval.marketType).toBe(disabledInterval.marketType);
-        expect(Math.abs(enabledInterval.confidenceLevel - disabledInterval.confidenceLevel)).toBeLessThan(0.05);
+        expect(
+          Math.abs(enabledInterval.confidenceLevel - disabledInterval.confidenceLevel)
+        ).toBeLessThan(0.05);
       }
     });
   });
@@ -324,9 +334,9 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
       market_definition: {
         industry: 'technology',
         geography: ['north america', 'europe', 'asia pacific'],
-        customer_segments: ['enterprise', 'government', 'mid-market']
+        customer_segments: ['enterprise', 'government', 'mid-market'],
       },
-      sizing_methods: ['top-down', 'bottom-up', 'value-theory'] as const
+      sizing_methods: ['top-down', 'bottom-up', 'value-theory'] as const,
     };
 
     it('should adjust confidence based on market complexity', async () => {
@@ -335,22 +345,26 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
         market_definition: {
           industry: 'technology',
           geography: ['north america'],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['bottom-up'] as const
+        sizing_methods: ['bottom-up'] as const,
       };
 
       const complexResult = await marketAnalyzer.analyzeMarketSize(complexArgs);
       const simpleResult = await marketAnalyzer.analyzeMarketSize(simpleArgs);
 
-      const complexTamInterval = complexResult.confidenceIntervals.find(ci => ci.marketType === 'tam')!;
-      const simpleTamInterval = simpleResult.confidenceIntervals.find(ci => ci.marketType === 'tam')!;
+      const complexTamInterval = complexResult.confidenceIntervals.find(
+        ci => ci.marketType === 'tam'
+      )!;
+      const simpleTamInterval = simpleResult.confidenceIntervals.find(
+        ci => ci.marketType === 'tam'
+      )!;
 
       // Complex market should have wider confidence intervals (lower confidence or wider bounds)
-      const complexRelativeWidth = (complexTamInterval.upperBound - complexTamInterval.lowerBound) / 
-                                  complexResult.tam.value;
-      const simpleRelativeWidth = (simpleTamInterval.upperBound - simpleTamInterval.lowerBound) / 
-                                 simpleResult.tam.value;
+      const complexRelativeWidth =
+        (complexTamInterval.upperBound - complexTamInterval.lowerBound) / complexResult.tam.value;
+      const simpleRelativeWidth =
+        (simpleTamInterval.upperBound - simpleTamInterval.lowerBound) / simpleResult.tam.value;
 
       expect(complexRelativeWidth).toBeGreaterThanOrEqual(simpleRelativeWidth);
     });
@@ -373,16 +387,16 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
         market_definition: {
           industry: 'manufacturing',
           geography: ['middle east'],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['value-theory'] as const
+        sizing_methods: ['value-theory'] as const,
       };
 
       const result = await marketAnalyzer.analyzeMarketSize(edgeCaseArgs);
 
       // Should still provide valid confidence intervals even for edge cases
       expect(result.confidenceIntervals).toHaveLength(3);
-      
+
       result.confidenceIntervals.forEach(interval => {
         expect(interval.lowerBound).toBeGreaterThan(0);
         expect(interval.upperBound).toBeGreaterThan(interval.lowerBound);
@@ -398,9 +412,9 @@ describe('MarketAnalyzer - Confidence Intervals and Scenarios', () => {
       market_definition: {
         industry: 'technology',
         geography: ['global'],
-        customer_segments: ['enterprise', 'mid-market']
+        customer_segments: ['enterprise', 'mid-market'],
       },
-      sizing_methods: ['top-down', 'bottom-up'] as const
+      sizing_methods: ['top-down', 'bottom-up'] as const,
     };
 
     it('should identify different risk factors for each scenario', async () => {

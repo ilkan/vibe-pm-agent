@@ -13,7 +13,7 @@ import {
   SteeringContext,
   SteeringFileCustomization,
   BatchOperationConfig,
-  SteeringFilePreviewInfo
+  SteeringFilePreviewInfo,
 } from '../../models/steering';
 
 describe('SteeringFilePreview Integration Tests', () => {
@@ -31,7 +31,7 @@ describe('SteeringFilePreview Integration Tests', () => {
     manager = new SteeringFileManager({
       steeringDirectory: testDir,
       createBackups: false,
-      validateContent: true
+      validateContent: true,
     });
 
     generator = new SteeringFileGenerator();
@@ -71,7 +71,7 @@ This feature will improve user experience by providing better navigation.
         projectName: 'web-app',
         relatedFiles: [],
         inclusionRule: 'fileMatch',
-        fileMatchPattern: 'navigation*|nav*'
+        fileMatchPattern: 'navigation*|nav*',
       };
 
       const baseSteeringFile = generator.generateFromRequirements(requirementsContent, context);
@@ -81,16 +81,20 @@ This feature will improve user experience by providing better navigation.
         filename: 'custom-navigation-guidance',
         description: 'Custom guidance for navigation improvements',
         contentModifications: {
-          prependContent: '## Important Note\n\nThis guidance was customized for the navigation project.',
-          appendContent: '## Additional Resources\n\n- [Navigation Best Practices](https://example.com)\n- [Accessibility Guidelines](https://example.com)'
-        }
+          prependContent:
+            '## Important Note\n\nThis guidance was customized for the navigation project.',
+          appendContent:
+            '## Additional Resources\n\n- [Navigation Best Practices](https://example.com)\n- [Accessibility Guidelines](https://example.com)',
+        },
       };
 
       const previewResult = await preview.generatePreview(baseSteeringFile, customization);
 
       // Verify preview structure
       expect(previewResult.steeringFile.filename).toBe('custom-navigation-guidance.md');
-      expect(previewResult.steeringFile.frontMatter.description).toBe('Custom guidance for navigation improvements');
+      expect(previewResult.steeringFile.frontMatter.description).toBe(
+        'Custom guidance for navigation improvements'
+      );
       expect(previewResult.previewContent).toContain('## Important Note');
       expect(previewResult.previewContent).toContain('## Additional Resources');
       expect(previewResult.estimatedSize).toBeGreaterThan(0);
@@ -125,10 +129,10 @@ This feature will improve user experience by providing better navigation.
           generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'test-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'New content',
-        references: []
+        references: [],
       };
 
       // Generate preview - should detect conflict
@@ -148,26 +152,30 @@ This feature will improve user experience by providing better navigation.
           generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'test-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
           // Missing description
         },
         content: 'Short', // Very short content
-        references: [] // No references
+        references: [], // No references
       };
 
       const previewResult = await preview.generatePreview(problematicFile);
 
       // Should have warnings about issues
-      expect(previewResult.warnings).toEqual(expect.arrayContaining([
-        expect.stringContaining('fileMatch inclusion rule requires a fileMatchPattern'),
-        expect.stringContaining('Content is very short')
-      ]));
+      expect(previewResult.warnings).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('fileMatch inclusion rule requires a fileMatchPattern'),
+          expect.stringContaining('Content is very short'),
+        ])
+      );
 
       // Should have suggestions for improvement
-      expect(previewResult.suggestions).toEqual(expect.arrayContaining([
-        expect.stringContaining('Adding a description helps'),
-        expect.stringContaining('Consider adding references')
-      ]));
+      expect(previewResult.suggestions).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('Adding a description helps'),
+          expect.stringContaining('Consider adding references'),
+        ])
+      );
     });
   });
 
@@ -183,10 +191,10 @@ This feature will improve user experience by providing better navigation.
             generatedBy: 'vibe-pm-agent',
             generatedAt: new Date().toISOString(),
             featureName: 'batch-test-1',
-            documentType: DocumentType.REQUIREMENTS
+            documentType: DocumentType.REQUIREMENTS,
           },
           content: 'Content for file 1',
-          references: []
+          references: [],
         },
         {
           filename: 'batch-file-2.md',
@@ -195,27 +203,28 @@ This feature will improve user experience by providing better navigation.
             generatedBy: 'vibe-pm-agent',
             generatedAt: new Date().toISOString(),
             featureName: 'batch-test-2',
-            documentType: DocumentType.DESIGN
+            documentType: DocumentType.DESIGN,
           },
           content: 'Content for file 2',
-          references: []
-        }
+          references: [],
+        },
       ];
 
       const batchConfig: BatchOperationConfig = {
         steeringFiles,
         commonCustomization: {
           contentModifications: {
-            appendContent: '\n\n## Batch Processing Note\n\nThis file was processed in a batch operation.'
-          }
+            appendContent:
+              '\n\n## Batch Processing Note\n\nThis file was processed in a batch operation.',
+          },
         },
         individualCustomizations: {
           'batch-file-1.md': {
-            description: 'Individual description for file 1'
-          }
+            description: 'Individual description for file 1',
+          },
         },
         stopOnError: false,
-        createBackups: false
+        createBackups: false,
       };
 
       // Execute batch operation
@@ -243,10 +252,10 @@ This feature will improve user experience by providing better navigation.
             generatedBy: 'vibe-pm-agent',
             generatedAt: new Date().toISOString(),
             featureName: 'preview-test-1',
-            documentType: DocumentType.REQUIREMENTS
+            documentType: DocumentType.REQUIREMENTS,
           },
           content: 'Content for preview file 1',
-          references: []
+          references: [],
         },
         {
           filename: 'preview-file-2.md',
@@ -255,24 +264,24 @@ This feature will improve user experience by providing better navigation.
             generatedBy: 'vibe-pm-agent',
             generatedAt: new Date().toISOString(),
             featureName: 'preview-test-2',
-            documentType: DocumentType.DESIGN
+            documentType: DocumentType.DESIGN,
           },
           content: 'Content for preview file 2',
-          references: []
-        }
+          references: [],
+        },
       ];
 
       const batchConfig: BatchOperationConfig = {
         steeringFiles,
         commonCustomization: {
-          inclusionRule: 'manual'
-        }
+          inclusionRule: 'manual',
+        },
       };
 
       const previews = await preview.generateBatchPreview(batchConfig);
 
       expect(previews).toHaveLength(2);
-      
+
       // Both files should have the common customization applied
       expect(previews[0].steeringFile.frontMatter.inclusion).toBe('manual');
       expect(previews[1].steeringFile.frontMatter.inclusion).toBe('manual');
@@ -291,10 +300,10 @@ This feature will improve user experience by providing better navigation.
           generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'invalid-test',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Content',
-        references: []
+        references: [],
       };
 
       const validFile: SteeringFile = {
@@ -304,15 +313,15 @@ This feature will improve user experience by providing better navigation.
           generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'valid-test',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Valid content',
-        references: []
+        references: [],
       };
 
       const batchConfig: BatchOperationConfig = {
         steeringFiles: [invalidFile, validFile],
-        stopOnError: false
+        stopOnError: false,
       };
 
       const batchResult = await preview.executeBatchOperation(batchConfig);
@@ -323,7 +332,10 @@ This feature will improve user experience by providing better navigation.
 
       // Valid file should have been created
       const validFilePath = path.join(testDir, 'valid-file.md');
-      const validFileExists = await fs.access(validFilePath).then(() => true).catch(() => false);
+      const validFileExists = await fs
+        .access(validFilePath)
+        .then(() => true)
+        .catch(() => false);
       expect(validFileExists).toBe(true);
     });
   });
@@ -331,11 +343,15 @@ This feature will improve user experience by providing better navigation.
   describe('Customization Suggestions Integration', () => {
     it('should provide contextual suggestions based on existing files', async () => {
       // Create some existing files to provide context
-      await fs.writeFile(path.join(testDir, 'requirements-existing.md'), 'Existing requirements', 'utf8');
+      await fs.writeFile(
+        path.join(testDir, 'requirements-existing.md'),
+        'Existing requirements',
+        'utf8'
+      );
       await fs.writeFile(path.join(testDir, 'design-existing.md'), 'Existing design', 'utf8');
 
       const existingFiles = await manager.listExistingSteeringFiles();
-      
+
       const suggestions = preview.getCustomizationSuggestions(
         DocumentType.REQUIREMENTS,
         'new-feature',
@@ -345,14 +361,14 @@ This feature will improve user experience by providing better navigation.
       expect(suggestions).toContainEqual(
         expect.objectContaining({
           type: 'filename',
-          suggestion: 'requirements-new-feature'
+          suggestion: 'requirements-new-feature',
         })
       );
 
       expect(suggestions).toContainEqual(
         expect.objectContaining({
           type: 'inclusionRule',
-          suggestion: 'fileMatch'
+          suggestion: 'fileMatch',
         })
       );
     });
@@ -363,33 +379,31 @@ This feature will improve user experience by providing better navigation.
         DocumentType.DESIGN,
         DocumentType.ONEPAGER,
         DocumentType.PRFAQ,
-        DocumentType.TASKS
+        DocumentType.TASKS,
       ];
 
       for (const docType of documentTypes) {
         const suggestions = preview.getCustomizationSuggestions(docType, 'test-feature');
-        
+
         // All document types should have filename and description suggestions
-        expect(suggestions).toContainEqual(
-          expect.objectContaining({ type: 'filename' })
-        );
-        expect(suggestions).toContainEqual(
-          expect.objectContaining({ type: 'description' })
-        );
+        expect(suggestions).toContainEqual(expect.objectContaining({ type: 'filename' }));
+        expect(suggestions).toContainEqual(expect.objectContaining({ type: 'description' }));
 
         // Check document-specific suggestions
-        if ([DocumentType.REQUIREMENTS, DocumentType.DESIGN, DocumentType.TASKS].includes(docType)) {
+        if (
+          [DocumentType.REQUIREMENTS, DocumentType.DESIGN, DocumentType.TASKS].includes(docType)
+        ) {
           expect(suggestions).toContainEqual(
             expect.objectContaining({
               type: 'inclusionRule',
-              suggestion: 'fileMatch'
+              suggestion: 'fileMatch',
             })
           );
         } else {
           expect(suggestions).toContainEqual(
             expect.objectContaining({
               type: 'inclusionRule',
-              suggestion: 'manual'
+              suggestion: 'manual',
             })
           );
         }
@@ -400,8 +414,9 @@ This feature will improve user experience by providing better navigation.
   describe('Performance and Large File Handling', () => {
     it('should handle large content efficiently', async () => {
       // Generate large content (over 100KB to trigger warning)
-      const largeContent = 'Large content section with lots of text to make it really big.\n'.repeat(2000);
-      
+      const largeContent =
+        'Large content section with lots of text to make it really big.\n'.repeat(2000);
+
       const largeSteeringFile: SteeringFile = {
         filename: 'large-file.md',
         frontMatter: {
@@ -410,10 +425,10 @@ This feature will improve user experience by providing better navigation.
           generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'large-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: largeContent,
-        references: []
+        references: [],
       };
 
       const startTime = Date.now();
@@ -424,9 +439,9 @@ This feature will improve user experience by providing better navigation.
       expect(endTime - startTime).toBeLessThan(1000);
 
       // Should have warning about large file size
-      expect(previewResult.warnings).toEqual(expect.arrayContaining([
-        expect.stringContaining('Large file size')
-      ]));
+      expect(previewResult.warnings).toEqual(
+        expect.arrayContaining([expect.stringContaining('Large file size')])
+      );
 
       // Estimated size should be accurate
       expect(previewResult.estimatedSize).toBeGreaterThan(10000); // Should be > 10KB
@@ -442,15 +457,15 @@ This feature will improve user experience by providing better navigation.
           generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: `batch-feature-${i}`,
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: `Content for file ${i}`,
-        references: []
+        references: [],
       }));
 
       const batchConfig: BatchOperationConfig = {
         steeringFiles: manyFiles,
-        stopOnError: false
+        stopOnError: false,
       };
 
       const startTime = Date.now();

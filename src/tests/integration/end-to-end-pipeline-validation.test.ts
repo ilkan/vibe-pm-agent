@@ -2,13 +2,13 @@
 
 import { PMAgentMCPServer } from '../../mcp/server';
 import { AIAgentPipeline } from '../../pipeline/ai-agent-pipeline';
-import { 
+import {
   MCPServerOptions,
   MCPToolContext,
   OptimizeIntentArgs,
   AnalyzeWorkflowArgs,
   GenerateROIArgs,
-  ConsultingSummaryArgs
+  ConsultingSummaryArgs,
 } from '../../models/mcp';
 import { Workflow, OptimizedWorkflow } from '../../models/workflow';
 import { ConsultingAnalysis } from '../../components/business-analyzer';
@@ -24,9 +24,9 @@ describe('End-to-End Pipeline Validation', () => {
   beforeEach(() => {
     const options: MCPServerOptions = {
       enableLogging: false,
-      enableMetrics: true
+      enableMetrics: true,
     };
-    
+
     server = new PMAgentMCPServer(options);
     pipeline = new AIAgentPipeline();
   });
@@ -34,13 +34,13 @@ describe('End-to-End Pipeline Validation', () => {
   describe('Performance Benchmarks', () => {
     it('should complete simple intent optimization within performance thresholds', async () => {
       const startTime = Date.now();
-      
+
       const args: OptimizeIntentArgs = {
         intent: 'Create a simple user registration system with email verification',
         parameters: {
           expectedUserVolume: 100,
-          performanceSensitivity: 'medium'
-        }
+          performanceSensitivity: 'medium',
+        },
       };
 
       const context: MCPToolContext = {
@@ -48,7 +48,7 @@ describe('End-to-End Pipeline Validation', () => {
         sessionId: 'perf-test-simple',
         timestamp: startTime,
         requestId: 'perf-req-001',
-        traceId: 'perf-trace-001'
+        traceId: 'perf-trace-001',
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -69,7 +69,7 @@ describe('End-to-End Pipeline Validation', () => {
 
     it('should handle complex intent optimization within acceptable time limits', async () => {
       const startTime = Date.now();
-      
+
       const complexIntent = `
         Create a comprehensive e-commerce platform with the following features:
         - Multi-tenant architecture supporting 1000+ merchants
@@ -90,8 +90,8 @@ describe('End-to-End Pipeline Validation', () => {
         parameters: {
           expectedUserVolume: 10000,
           costConstraints: { maxCostDollars: 1000 },
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const context: MCPToolContext = {
@@ -99,7 +99,7 @@ describe('End-to-End Pipeline Validation', () => {
         sessionId: 'perf-test-complex',
         timestamp: startTime,
         requestId: 'perf-req-002',
-        traceId: 'perf-trace-002'
+        traceId: 'perf-trace-002',
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -127,8 +127,8 @@ describe('End-to-End Pipeline Validation', () => {
           intent: `Create a microservice for ${['user management', 'product catalog', 'order processing', 'payment handling', 'notification service'][index]}`,
           parameters: {
             expectedUserVolume: 1000,
-            performanceSensitivity: 'medium'
-          }
+            performanceSensitivity: 'medium',
+          },
         };
 
         const context: MCPToolContext = {
@@ -136,7 +136,7 @@ describe('End-to-End Pipeline Validation', () => {
           sessionId: `concurrent-session-${index}`,
           timestamp: Date.now(),
           requestId: `concurrent-req-${index}`,
-          traceId: `concurrent-trace-${index}`
+          traceId: `concurrent-trace-${index}`,
         };
 
         return server.handleOptimizeIntent(args, context);
@@ -147,7 +147,7 @@ describe('End-to-End Pipeline Validation', () => {
 
       // Performance assertions for concurrent processing
       expect(totalExecutionTime).toBeLessThan(20000); // All requests should complete within 20 seconds
-      
+
       // Validate all requests succeeded
       results.forEach((result, index) => {
         expect(result.isError).toBeFalsy();
@@ -165,14 +165,70 @@ describe('End-to-End Pipeline Validation', () => {
       const complexWorkflow: Workflow = {
         id: 'complex-benchmark-workflow',
         steps: [
-          { id: 'step-1', type: 'vibe', description: 'User input validation', inputs: [], outputs: ['validated-input'], quotaCost: 3 },
-          { id: 'step-2', type: 'vibe', description: 'Business logic processing', inputs: ['validated-input'], outputs: ['processed-data'], quotaCost: 5 },
-          { id: 'step-3', type: 'spec', description: 'Data transformation', inputs: ['processed-data'], outputs: ['transformed-data'], quotaCost: 2 },
-          { id: 'step-4', type: 'vibe', description: 'ML model inference', inputs: ['transformed-data'], outputs: ['predictions'], quotaCost: 8 },
-          { id: 'step-5', type: 'spec', description: 'Result formatting', inputs: ['predictions'], outputs: ['formatted-results'], quotaCost: 1 },
-          { id: 'step-6', type: 'vibe', description: 'Notification sending', inputs: ['formatted-results'], outputs: [], quotaCost: 4 },
-          { id: 'step-7', type: 'spec', description: 'Audit logging', inputs: ['formatted-results'], outputs: [], quotaCost: 1 },
-          { id: 'step-8', type: 'vibe', description: 'Cache update', inputs: ['formatted-results'], outputs: [], quotaCost: 2 }
+          {
+            id: 'step-1',
+            type: 'vibe',
+            description: 'User input validation',
+            inputs: [],
+            outputs: ['validated-input'],
+            quotaCost: 3,
+          },
+          {
+            id: 'step-2',
+            type: 'vibe',
+            description: 'Business logic processing',
+            inputs: ['validated-input'],
+            outputs: ['processed-data'],
+            quotaCost: 5,
+          },
+          {
+            id: 'step-3',
+            type: 'spec',
+            description: 'Data transformation',
+            inputs: ['processed-data'],
+            outputs: ['transformed-data'],
+            quotaCost: 2,
+          },
+          {
+            id: 'step-4',
+            type: 'vibe',
+            description: 'ML model inference',
+            inputs: ['transformed-data'],
+            outputs: ['predictions'],
+            quotaCost: 8,
+          },
+          {
+            id: 'step-5',
+            type: 'spec',
+            description: 'Result formatting',
+            inputs: ['predictions'],
+            outputs: ['formatted-results'],
+            quotaCost: 1,
+          },
+          {
+            id: 'step-6',
+            type: 'vibe',
+            description: 'Notification sending',
+            inputs: ['formatted-results'],
+            outputs: [],
+            quotaCost: 4,
+          },
+          {
+            id: 'step-7',
+            type: 'spec',
+            description: 'Audit logging',
+            inputs: ['formatted-results'],
+            outputs: [],
+            quotaCost: 1,
+          },
+          {
+            id: 'step-8',
+            type: 'vibe',
+            description: 'Cache update',
+            inputs: ['formatted-results'],
+            outputs: [],
+            quotaCost: 2,
+          },
         ],
         dataFlow: [
           { from: 'step-1', to: 'step-2', dataType: 'validated-input', required: true },
@@ -181,16 +237,16 @@ describe('End-to-End Pipeline Validation', () => {
           { from: 'step-4', to: 'step-5', dataType: 'predictions', required: true },
           { from: 'step-5', to: 'step-6', dataType: 'formatted-results', required: true },
           { from: 'step-5', to: 'step-7', dataType: 'formatted-results', required: false },
-          { from: 'step-5', to: 'step-8', dataType: 'formatted-results', required: false }
+          { from: 'step-5', to: 'step-8', dataType: 'formatted-results', required: false },
         ],
-        estimatedComplexity: 8
+        estimatedComplexity: 8,
       };
 
       const startTime = Date.now();
 
       const args: AnalyzeWorkflowArgs = {
         workflow: complexWorkflow,
-        techniques: ['MECE', 'ValueDriverTree', 'ImpactEffort']
+        techniques: ['MECE', 'ValueDriverTree', 'ImpactEffort'],
       };
 
       const context: MCPToolContext = {
@@ -198,7 +254,7 @@ describe('End-to-End Pipeline Validation', () => {
         sessionId: 'workflow-perf-test',
         timestamp: startTime,
         requestId: 'workflow-perf-req-001',
-        traceId: 'workflow-perf-trace-001'
+        traceId: 'workflow-perf-trace-001',
       };
 
       const result = await server.handleAnalyzeWorkflow(args, context);
@@ -216,19 +272,19 @@ describe('End-to-End Pipeline Validation', () => {
   describe('Quota Estimation Accuracy', () => {
     it('should provide accurate quota estimates for simple workflows', async () => {
       const simpleIntent = 'Create a basic CRUD API for user management with authentication';
-      
+
       const args: OptimizeIntentArgs = {
         intent: simpleIntent,
         parameters: {
           expectedUserVolume: 500,
-          performanceSensitivity: 'medium'
-        }
+          performanceSensitivity: 'medium',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'quota-accuracy-simple',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -240,12 +296,16 @@ describe('End-to-End Pipeline Validation', () => {
       // Validate quota estimates are reasonable for simple CRUD API
       expect(efficiencySummary.naiveApproach.vibesConsumed).toBeGreaterThan(0);
       expect(efficiencySummary.naiveApproach.vibesConsumed).toBeLessThan(50); // Should be reasonable for simple API
-      expect(efficiencySummary.optimizedApproach.vibesConsumed).toBeLessThan(efficiencySummary.naiveApproach.vibesConsumed);
-      
+      expect(efficiencySummary.optimizedApproach.vibesConsumed).toBeLessThan(
+        efficiencySummary.naiveApproach.vibesConsumed
+      );
+
       // Validate cost estimates
       expect(efficiencySummary.naiveApproach.estimatedCost).toBeGreaterThan(0);
-      expect(efficiencySummary.optimizedApproach.estimatedCost).toBeLessThan(efficiencySummary.naiveApproach.estimatedCost);
-      
+      expect(efficiencySummary.optimizedApproach.estimatedCost).toBeLessThan(
+        efficiencySummary.naiveApproach.estimatedCost
+      );
+
       // Validate savings calculations
       expect(efficiencySummary.savings.totalSavingsPercentage).toBeGreaterThan(0);
       expect(efficiencySummary.savings.totalSavingsPercentage).toBeLessThan(100);
@@ -268,14 +328,14 @@ describe('End-to-End Pipeline Validation', () => {
         parameters: {
           expectedUserVolume: 10000,
           costConstraints: { maxCostDollars: 500 },
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'quota-accuracy-complex',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -287,38 +347,75 @@ describe('End-to-End Pipeline Validation', () => {
       // Validate quota estimates reflect complexity
       expect(efficiencySummary.naiveApproach.vibesConsumed).toBeGreaterThan(50); // Should be higher for complex processing
       expect(efficiencySummary.naiveApproach.vibesConsumed).toBeLessThan(1000); // But still reasonable
-      
+
       // Validate optimization provides significant savings for complex workflows
       const savingsPercentage = efficiencySummary.savings.totalSavingsPercentage;
       expect(savingsPercentage).toBeGreaterThan(20); // Should achieve at least 20% savings
       expect(savingsPercentage).toBeLessThan(80); // But not unrealistically high
-      
+
       // Validate cost constraints are considered
-      expect(efficiencySummary.optimizedApproach.estimatedCost).toBeLessThanOrEqual((args.parameters!.costConstraints as any).maxCostDollars * 1.1); // Allow 10% tolerance
+      expect(efficiencySummary.optimizedApproach.estimatedCost).toBeLessThanOrEqual(
+        (args.parameters!.costConstraints as any).maxCostDollars * 1.1
+      ); // Allow 10% tolerance
     });
 
     it('should validate quota breakdown accuracy', async () => {
       const workflow: Workflow = {
         id: 'quota-breakdown-test',
         steps: [
-          { id: 'step-1', type: 'vibe', description: 'Data ingestion', inputs: [], outputs: ['raw-data'], quotaCost: 10 },
-          { id: 'step-2', type: 'vibe', description: 'Data validation', inputs: ['raw-data'], outputs: ['validated-data'], quotaCost: 5 },
-          { id: 'step-3', type: 'spec', description: 'Data transformation', inputs: ['validated-data'], outputs: ['transformed-data'], quotaCost: 3 },
-          { id: 'step-4', type: 'vibe', description: 'ML processing', inputs: ['transformed-data'], outputs: ['results'], quotaCost: 15 },
-          { id: 'step-5', type: 'spec', description: 'Result storage', inputs: ['results'], outputs: [], quotaCost: 2 }
+          {
+            id: 'step-1',
+            type: 'vibe',
+            description: 'Data ingestion',
+            inputs: [],
+            outputs: ['raw-data'],
+            quotaCost: 10,
+          },
+          {
+            id: 'step-2',
+            type: 'vibe',
+            description: 'Data validation',
+            inputs: ['raw-data'],
+            outputs: ['validated-data'],
+            quotaCost: 5,
+          },
+          {
+            id: 'step-3',
+            type: 'spec',
+            description: 'Data transformation',
+            inputs: ['validated-data'],
+            outputs: ['transformed-data'],
+            quotaCost: 3,
+          },
+          {
+            id: 'step-4',
+            type: 'vibe',
+            description: 'ML processing',
+            inputs: ['transformed-data'],
+            outputs: ['results'],
+            quotaCost: 15,
+          },
+          {
+            id: 'step-5',
+            type: 'spec',
+            description: 'Result storage',
+            inputs: ['results'],
+            outputs: [],
+            quotaCost: 2,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 5
+        estimatedComplexity: 5,
       };
 
       const args: GenerateROIArgs = {
-        workflow
+        workflow,
       };
 
       const context: MCPToolContext = {
         toolName: 'generate_roi_analysis',
         sessionId: 'quota-breakdown-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleGenerateROI(args, context);
@@ -329,20 +426,29 @@ describe('End-to-End Pipeline Validation', () => {
 
       // Validate ROI scenarios
       expect(roiAnalysis.scenarios).toHaveLength(2); // Should have at least current and optimized scenarios
-      
-      const currentScenario = roiAnalysis.scenarios.find((s: any) => s.name.toLowerCase().includes('current') || s.name.toLowerCase().includes('naive'));
-      const optimizedScenario = roiAnalysis.scenarios.find((s: any) => s.name.toLowerCase().includes('optimized'));
-      
+
+      const currentScenario = roiAnalysis.scenarios.find(
+        (s: any) =>
+          s.name.toLowerCase().includes('current') || s.name.toLowerCase().includes('naive')
+      );
+      const optimizedScenario = roiAnalysis.scenarios.find((s: any) =>
+        s.name.toLowerCase().includes('optimized')
+      );
+
       expect(currentScenario).toBeDefined();
       expect(optimizedScenario).toBeDefined();
-      
+
       // Validate quota calculations match workflow steps
       const totalQuotaCost = workflow.steps.reduce((sum, step) => sum + step.quotaCost, 0);
-      expect(currentScenario.forecast.vibesConsumed + currentScenario.forecast.specsConsumed).toBeGreaterThanOrEqual(totalQuotaCost * 0.8); // Allow some variance
-      
+      expect(
+        currentScenario.forecast.vibesConsumed + currentScenario.forecast.specsConsumed
+      ).toBeGreaterThanOrEqual(totalQuotaCost * 0.8); // Allow some variance
+
       // Validate optimization provides savings
       expect(optimizedScenario.savingsPercentage).toBeGreaterThan(0);
-      expect(optimizedScenario.forecast.estimatedCost).toBeLessThan(currentScenario.forecast.estimatedCost);
+      expect(optimizedScenario.forecast.estimatedCost).toBeLessThan(
+        currentScenario.forecast.estimatedCost
+      );
     });
   });
 
@@ -358,14 +464,14 @@ describe('End-to-End Pipeline Validation', () => {
         intent: strategicIntent,
         parameters: {
           expectedUserVolume: 5000,
-          performanceSensitivity: 'medium'
-        }
+          performanceSensitivity: 'medium',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'consulting-accuracy-strategic',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -376,15 +482,15 @@ describe('End-to-End Pipeline Validation', () => {
 
       // Validate appropriate techniques were selected for strategic intent
       expect(consultingSummary.techniquesApplied).toHaveLength(2); // Should apply 2-3 techniques as per requirements
-      
+
       const techniqueNames = consultingSummary.techniquesApplied.map((t: any) => t.techniqueName);
       expect(techniqueNames).toContain('MECE'); // Should use MECE for complex strategic analysis
-      
+
       // Validate executive summary quality
       expect(consultingSummary.executiveSummary).toBeDefined();
       expect(consultingSummary.executiveSummary.length).toBeGreaterThan(50); // Should be substantial
       expect(consultingSummary.executiveSummary.toLowerCase()).toContain('transformation'); // Should reference the intent
-      
+
       // Validate recommendations are actionable
       expect(consultingSummary.recommendations).toHaveLength(1); // Should have at least one recommendation
       consultingSummary.recommendations.forEach((rec: any) => {
@@ -398,38 +504,80 @@ describe('End-to-End Pipeline Validation', () => {
       const technicalWorkflow: Workflow = {
         id: 'technical-analysis-test',
         steps: [
-          { id: 'api-call-1', type: 'vibe', description: 'Fetch user data', inputs: [], outputs: ['user-data'], quotaCost: 3 },
-          { id: 'api-call-2', type: 'vibe', description: 'Fetch user preferences', inputs: [], outputs: ['preferences'], quotaCost: 3 },
-          { id: 'api-call-3', type: 'vibe', description: 'Fetch user history', inputs: [], outputs: ['history'], quotaCost: 4 },
-          { id: 'processing-1', type: 'vibe', description: 'Merge user data', inputs: ['user-data', 'preferences', 'history'], outputs: ['merged-data'], quotaCost: 5 },
-          { id: 'ml-inference', type: 'vibe', description: 'Generate recommendations', inputs: ['merged-data'], outputs: ['recommendations'], quotaCost: 8 },
-          { id: 'formatting', type: 'spec', description: 'Format response', inputs: ['recommendations'], outputs: ['formatted-response'], quotaCost: 2 }
+          {
+            id: 'api-call-1',
+            type: 'vibe',
+            description: 'Fetch user data',
+            inputs: [],
+            outputs: ['user-data'],
+            quotaCost: 3,
+          },
+          {
+            id: 'api-call-2',
+            type: 'vibe',
+            description: 'Fetch user preferences',
+            inputs: [],
+            outputs: ['preferences'],
+            quotaCost: 3,
+          },
+          {
+            id: 'api-call-3',
+            type: 'vibe',
+            description: 'Fetch user history',
+            inputs: [],
+            outputs: ['history'],
+            quotaCost: 4,
+          },
+          {
+            id: 'processing-1',
+            type: 'vibe',
+            description: 'Merge user data',
+            inputs: ['user-data', 'preferences', 'history'],
+            outputs: ['merged-data'],
+            quotaCost: 5,
+          },
+          {
+            id: 'ml-inference',
+            type: 'vibe',
+            description: 'Generate recommendations',
+            inputs: ['merged-data'],
+            outputs: ['recommendations'],
+            quotaCost: 8,
+          },
+          {
+            id: 'formatting',
+            type: 'spec',
+            description: 'Format response',
+            inputs: ['recommendations'],
+            outputs: ['formatted-response'],
+            quotaCost: 2,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 6
+        estimatedComplexity: 6,
       };
 
       const args: AnalyzeWorkflowArgs = {
         workflow: technicalWorkflow,
-        techniques: ['ValueDriverTree', 'ImpactEffort']
+        techniques: ['ValueDriverTree', 'ImpactEffort'],
       };
 
       const context: MCPToolContext = {
         toolName: 'analyze_workflow',
         sessionId: 'technical-analysis-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleAnalyzeWorkflow(args, context);
       expect(result.isError).toBeFalsy();
 
       const markdownContent = result.content[0].markdown;
-      
+
       // Validate analysis identifies key optimization opportunities
       expect(markdownContent).toContain('optimization'); // Should mention optimization opportunities
       expect(markdownContent).toContain('batching'); // Should identify batching opportunities for multiple API calls
       expect(markdownContent).toContain('25'); // Should show quota savings (totalQuotaSavings from workflow)
-      
+
       // Validate technique-specific insights
       expect(markdownContent).toContain('ValueDriverTree'); // Should reference applied technique
       expect(markdownContent).toContain('API calls'); // Should identify API calls as cost drivers
@@ -446,14 +594,14 @@ describe('End-to-End Pipeline Validation', () => {
         parameters: {
           expectedUserVolume: 1000000,
           costConstraints: { maxCostDollars: 5000 },
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'option-framing-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -470,15 +618,23 @@ describe('End-to-End Pipeline Validation', () => {
       // Validate option characteristics
       expect(alternativeOptions.conservative.riskLevel).toBe('low');
       expect(alternativeOptions.conservative.implementationEffort).toBe('low');
-      expect(alternativeOptions.conservative.quotaSavings).toBeLessThan(alternativeOptions.balanced.quotaSavings);
+      expect(alternativeOptions.conservative.quotaSavings).toBeLessThan(
+        alternativeOptions.balanced.quotaSavings
+      );
 
       expect(alternativeOptions.balanced.riskLevel).toBe('low');
       expect(alternativeOptions.balanced.implementationEffort).toBe('medium');
-      expect(alternativeOptions.balanced.quotaSavings).toBeLessThan(alternativeOptions.bold.quotaSavings);
+      expect(alternativeOptions.balanced.quotaSavings).toBeLessThan(
+        alternativeOptions.bold.quotaSavings
+      );
 
       expect(alternativeOptions.bold.implementationEffort).toBe('high');
-      expect(alternativeOptions.bold.quotaSavings).toBeGreaterThan(alternativeOptions.balanced.quotaSavings);
-      expect(alternativeOptions.bold.estimatedROI).toBeGreaterThan(alternativeOptions.conservative.estimatedROI);
+      expect(alternativeOptions.bold.quotaSavings).toBeGreaterThan(
+        alternativeOptions.balanced.quotaSavings
+      );
+      expect(alternativeOptions.bold.estimatedROI).toBeGreaterThan(
+        alternativeOptions.conservative.estimatedROI
+      );
 
       // Validate ROI calculations are realistic
       expect(alternativeOptions.conservative.estimatedROI).toBeGreaterThan(1.0);
@@ -490,17 +646,18 @@ describe('End-to-End Pipeline Validation', () => {
   describe('Spec Format Compliance', () => {
     it('should generate Kiro-compliant spec format', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Create a task management system with user authentication and real-time collaboration',
+        intent:
+          'Create a task management system with user authentication and real-time collaboration',
         parameters: {
           expectedUserVolume: 1000,
-          performanceSensitivity: 'medium'
-        }
+          performanceSensitivity: 'medium',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'spec-compliance-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -514,13 +671,13 @@ describe('End-to-End Pipeline Validation', () => {
       expect(enhancedKiroSpec.name).toBeTruthy();
       expect(enhancedKiroSpec.description).toBeDefined();
       expect(enhancedKiroSpec.description).toBeTruthy();
-      
+
       expect(enhancedKiroSpec.requirements).toBeDefined();
       expect(Array.isArray(enhancedKiroSpec.requirements)).toBe(true);
-      
+
       expect(enhancedKiroSpec.design).toBeDefined();
       expect(enhancedKiroSpec.design.overview).toBeDefined();
-      
+
       expect(enhancedKiroSpec.tasks).toBeDefined();
       expect(Array.isArray(enhancedKiroSpec.tasks)).toBe(true);
 
@@ -558,14 +715,14 @@ describe('End-to-End Pipeline Validation', () => {
         parameters: {
           expectedUserVolume: 50000,
           costConstraints: { maxCostDollars: 2000 },
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'spec-completeness-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -576,9 +733,11 @@ describe('End-to-End Pipeline Validation', () => {
 
       // Validate comprehensive requirements coverage
       expect(enhancedKiroSpec.requirements.length).toBeGreaterThan(5); // Should have multiple requirements for complex system
-      
+
       // Validate requirements reference key aspects of the intent
-      const requirementTexts = enhancedKiroSpec.requirements.map((req: any) => req.description.toLowerCase()).join(' ');
+      const requirementTexts = enhancedKiroSpec.requirements
+        .map((req: any) => req.description.toLowerCase())
+        .join(' ');
       expect(requirementTexts).toContain('authentication'); // Should cover auth requirements
       expect(requirementTexts).toContain('integration'); // Should cover integration requirements
       expect(requirementTexts).toContain('mobile'); // Should cover mobile requirements
@@ -586,10 +745,10 @@ describe('End-to-End Pipeline Validation', () => {
       // Validate design addresses complexity
       expect(enhancedKiroSpec.design.overview).toBeDefined();
       expect(enhancedKiroSpec.design.overview.length).toBeGreaterThan(100); // Should be detailed for complex system
-      
+
       // Validate tasks are comprehensive
       expect(enhancedKiroSpec.tasks.length).toBeGreaterThan(8); // Should have multiple tasks for complex system
-      
+
       // Validate consulting analysis addresses complexity
       expect(enhancedKiroSpec.consultingSummary.keyFindings.length).toBeGreaterThan(2); // Should have multiple findings
       expect(enhancedKiroSpec.consultingSummary.techniquesApplied.length).toBeGreaterThanOrEqual(2); // Should apply 2-3 techniques
@@ -597,17 +756,18 @@ describe('End-to-End Pipeline Validation', () => {
 
     it('should ensure spec actionability and implementation readiness', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Create a REST API for a blog platform with CRUD operations, authentication, and search',
+        intent:
+          'Create a REST API for a blog platform with CRUD operations, authentication, and search',
         parameters: {
           expectedUserVolume: 500,
-          performanceSensitivity: 'medium'
-        }
+          performanceSensitivity: 'medium',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'spec-actionability-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -641,7 +801,7 @@ describe('End-to-End Pipeline Validation', () => {
       expect(efficiencySummary.optimizationNotes).toBeDefined();
       expect(Array.isArray(efficiencySummary.optimizationNotes)).toBe(true);
       expect(efficiencySummary.optimizationNotes.length).toBeGreaterThan(0);
-      
+
       efficiencySummary.optimizationNotes.forEach((note: string) => {
         expect(note.length).toBeGreaterThan(5); // Should be meaningful
         expect(note.toLowerCase()).toMatch(/(batch|cach|optim|effic|reduc)/); // Should contain optimization keywords
@@ -670,14 +830,14 @@ describe('End-to-End Pipeline Validation', () => {
         parameters: {
           expectedUserVolume: 25000,
           costConstraints: { maxCostDollars: 1500 },
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'fintech-scenario-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -687,7 +847,9 @@ describe('End-to-End Pipeline Validation', () => {
       const enhancedKiroSpec = responseData.data.enhancedKiroSpec;
 
       // Validate fintech-specific requirements are addressed
-      const requirementTexts = enhancedKiroSpec.requirements.map((req: any) => req.description.toLowerCase()).join(' ');
+      const requirementTexts = enhancedKiroSpec.requirements
+        .map((req: any) => req.description.toLowerCase())
+        .join(' ');
       expect(requirementTexts).toContain('security'); // Should address security requirements
       expect(requirementTexts).toContain('compliance'); // Should address regulatory compliance
       expect(requirementTexts).toContain('authentication'); // Should address auth requirements
@@ -699,9 +861,12 @@ describe('End-to-End Pipeline Validation', () => {
       // Validate ROI analysis considers high-volume scenario
       const roiAnalysis = enhancedKiroSpec.roiAnalysis;
       expect(roiAnalysis.scenarios.length).toBeGreaterThanOrEqual(2);
-      
+
       // For high-volume fintech app, should show significant savings potential
-      const optimizedScenario = roiAnalysis.scenarios.find((s: any) => s.name.toLowerCase().includes('balanced') || s.name.toLowerCase().includes('optimized'));
+      const optimizedScenario = roiAnalysis.scenarios.find(
+        (s: any) =>
+          s.name.toLowerCase().includes('balanced') || s.name.toLowerCase().includes('optimized')
+      );
       expect(optimizedScenario?.savingsPercentage).toBeGreaterThan(15); // Should achieve meaningful savings for complex fintech app
     });
 
@@ -725,14 +890,14 @@ describe('End-to-End Pipeline Validation', () => {
         parameters: {
           expectedUserVolume: 50000,
           costConstraints: { maxCostDollars: 3000 },
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'ecommerce-scenario-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -743,15 +908,17 @@ describe('End-to-End Pipeline Validation', () => {
 
       // Validate e-commerce specific requirements
       expect(enhancedKiroSpec.requirements.length).toBeGreaterThan(6); // Should have comprehensive requirements
-      
-      const requirementTexts = enhancedKiroSpec.requirements.map((req: any) => req.description.toLowerCase()).join(' ');
+
+      const requirementTexts = enhancedKiroSpec.requirements
+        .map((req: any) => req.description.toLowerCase())
+        .join(' ');
       expect(requirementTexts).toContain('inventory'); // Should address inventory management
       expect(requirementTexts).toContain('payment'); // Should address payment processing
       expect(requirementTexts).toContain('search'); // Should address search functionality
 
       // Validate design addresses scalability
       expect(enhancedKiroSpec.design.overview.length).toBeGreaterThan(200); // Should be detailed for complex platform
-      
+
       // Validate tasks are comprehensive for e-commerce complexity
       expect(enhancedKiroSpec.tasks.length).toBeGreaterThan(10); // Should have many tasks for complex platform
 
@@ -781,14 +948,14 @@ describe('End-to-End Pipeline Validation', () => {
         parameters: {
           expectedUserVolume: 10000,
           costConstraints: { maxCostDollars: 2000 },
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'healthcare-scenario-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -798,7 +965,9 @@ describe('End-to-End Pipeline Validation', () => {
       const enhancedKiroSpec = responseData.data.enhancedKiroSpec;
 
       // Validate healthcare-specific compliance requirements
-      const requirementTexts = enhancedKiroSpec.requirements.map((req: any) => req.description.toLowerCase()).join(' ');
+      const requirementTexts = enhancedKiroSpec.requirements
+        .map((req: any) => req.description.toLowerCase())
+        .join(' ');
       expect(requirementTexts).toContain('hipaa'); // Should address HIPAA compliance
       expect(requirementTexts).toContain('audit'); // Should address audit requirements
       expect(requirementTexts).toContain('access control'); // Should address security requirements
@@ -806,13 +975,15 @@ describe('End-to-End Pipeline Validation', () => {
       // Validate consulting analysis addresses healthcare complexity and compliance
       const consultingSummary = enhancedKiroSpec.consultingSummary;
       expect(consultingSummary.techniquesApplied.length).toBeGreaterThanOrEqual(2);
-      
+
       // Should mention compliance or regulatory considerations
       const summaryText = consultingSummary.executiveSummary.toLowerCase();
       expect(summaryText).toMatch(/(compliance|regulatory|security|privacy)/);
 
       // Validate tasks address compliance requirements
-      const taskTexts = enhancedKiroSpec.tasks.map((task: any) => task.description.toLowerCase()).join(' ');
+      const taskTexts = enhancedKiroSpec.tasks
+        .map((task: any) => task.description.toLowerCase())
+        .join(' ');
       expect(taskTexts).toMatch(/(security|compliance|audit|access)/);
     });
 
@@ -836,14 +1007,14 @@ describe('End-to-End Pipeline Validation', () => {
         parameters: {
           expectedUserVolume: 1000000, // High volume for IoT
           costConstraints: { maxCostDollars: 5000 },
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'iot-scenario-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -853,7 +1024,9 @@ describe('End-to-End Pipeline Validation', () => {
       const enhancedKiroSpec = responseData.data.enhancedKiroSpec;
 
       // Validate IoT-specific scalability requirements
-      const requirementTexts = enhancedKiroSpec.requirements.map((req: any) => req.description.toLowerCase()).join(' ');
+      const requirementTexts = enhancedKiroSpec.requirements
+        .map((req: any) => req.description.toLowerCase())
+        .join(' ');
       expect(requirementTexts).toContain('scale'); // Should address scalability
       expect(requirementTexts).toContain('real-time'); // Should address real-time processing
       expect(requirementTexts).toContain('device'); // Should address device management
@@ -861,7 +1034,7 @@ describe('End-to-End Pipeline Validation', () => {
       // For high-volume IoT, optimization should be significant
       const efficiencySummary = responseData.data.efficiencySummary;
       expect(efficiencySummary.savings.totalSavingsPercentage).toBeGreaterThan(25); // Should achieve high savings for high-volume system
-      
+
       // Should have multiple optimization strategies for scalability
       expect(efficiencySummary.optimizationNotes.length).toBeGreaterThan(4);
       const optimizationText = efficiencySummary.optimizationNotes.join(' ').toLowerCase();
@@ -888,14 +1061,14 @@ describe('End-to-End Pipeline Validation', () => {
         parameters: {
           expectedUserVolume: 20000,
           costConstraints: { maxCostDollars: 1000 },
-          performanceSensitivity: 'medium'
-        }
+          performanceSensitivity: 'medium',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'education-scenario-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
@@ -905,7 +1078,9 @@ describe('End-to-End Pipeline Validation', () => {
       const enhancedKiroSpec = responseData.data.enhancedKiroSpec;
 
       // Validate education-specific requirements
-      const requirementTexts = enhancedKiroSpec.requirements.map((req: any) => req.description.toLowerCase()).join(' ');
+      const requirementTexts = enhancedKiroSpec.requirements
+        .map((req: any) => req.description.toLowerCase())
+        .join(' ');
       expect(requirementTexts).toContain('course'); // Should address course management
       expect(requirementTexts).toContain('student'); // Should address student management
       expect(requirementTexts).toContain('assessment'); // Should address assessment features
@@ -928,20 +1103,22 @@ describe('End-to-End Pipeline Validation', () => {
           name: 'Simple CRUD API',
           intent: 'Create a basic REST API for user management with CRUD operations',
           expectedComplexity: 'low',
-          expectedSavings: { min: 5, max: 30 }
+          expectedSavings: { min: 5, max: 30 },
         },
         {
           name: 'Medium Complexity Service',
-          intent: 'Build a notification service with email, SMS, and push notifications, including templates and scheduling',
+          intent:
+            'Build a notification service with email, SMS, and push notifications, including templates and scheduling',
           expectedComplexity: 'medium',
-          expectedSavings: { min: 15, max: 45 }
+          expectedSavings: { min: 15, max: 45 },
         },
         {
           name: 'Complex Enterprise System',
-          intent: 'Create a comprehensive ERP system with inventory, accounting, HR, and CRM modules with advanced reporting',
+          intent:
+            'Create a comprehensive ERP system with inventory, accounting, HR, and CRM modules with advanced reporting',
           expectedComplexity: 'high',
-          expectedSavings: { min: 25, max: 65 }
-        }
+          expectedSavings: { min: 25, max: 65 },
+        },
       ];
 
       const results = [];
@@ -951,14 +1128,14 @@ describe('End-to-End Pipeline Validation', () => {
           intent: testCase.intent,
           parameters: {
             expectedUserVolume: 1000,
-            performanceSensitivity: 'medium'
-          }
+            performanceSensitivity: 'medium',
+          },
         };
 
         const context: MCPToolContext = {
           toolName: 'optimize_intent',
           sessionId: `cross-domain-${testCase.name.toLowerCase().replace(/\s+/g, '-')}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
         const result = await server.handleOptimizeIntent(args, context);
@@ -971,14 +1148,14 @@ describe('End-to-End Pipeline Validation', () => {
           savings: responseData.data.efficiencySummary.savings.totalSavingsPercentage,
           requirements: responseData.data.enhancedKiroSpec.requirements.length,
           tasks: responseData.data.enhancedKiroSpec.tasks.length,
-          techniques: responseData.data.enhancedKiroSpec.consultingSummary.techniquesApplied.length
+          techniques: responseData.data.enhancedKiroSpec.consultingSummary.techniquesApplied.length,
         });
       }
 
       // Validate complexity correlation
       expect(results[0].requirements).toBeLessThan(results[1].requirements); // Simple < Medium
       expect(results[1].requirements).toBeLessThan(results[2].requirements); // Medium < Complex
-      
+
       expect(results[0].tasks).toBeLessThan(results[1].tasks); // Simple < Medium
       expect(results[1].tasks).toBeLessThan(results[2].tasks); // Medium < Complex
 
@@ -1000,26 +1177,33 @@ describe('End-to-End Pipeline Validation', () => {
           name: 'Very short intent',
           intent: 'API',
           shouldSucceed: true,
-          expectedBehavior: 'Should expand minimal intent into workable spec'
+          expectedBehavior: 'Should expand minimal intent into workable spec',
         },
         {
           name: 'Very long intent',
-          intent: 'Create a ' + 'comprehensive '.repeat(100) + 'system with ' + 'advanced '.repeat(50) + 'features',
+          intent:
+            'Create a ' +
+            'comprehensive '.repeat(100) +
+            'system with ' +
+            'advanced '.repeat(50) +
+            'features',
           shouldSucceed: true,
-          expectedBehavior: 'Should handle long intent without performance degradation'
+          expectedBehavior: 'Should handle long intent without performance degradation',
         },
         {
           name: 'Ambiguous intent',
           intent: 'Build something that does things for users in a way that works',
           shouldSucceed: true,
-          expectedBehavior: 'Should provide clarifying assumptions and generic implementation'
+          expectedBehavior: 'Should provide clarifying assumptions and generic implementation',
         },
         {
           name: 'Technical jargon heavy',
-          intent: 'Implement microservices architecture with event sourcing, CQRS, saga patterns, distributed caching, and polyglot persistence',
+          intent:
+            'Implement microservices architecture with event sourcing, CQRS, saga patterns, distributed caching, and polyglot persistence',
           shouldSucceed: true,
-          expectedBehavior: 'Should understand technical concepts and provide appropriate optimization'
-        }
+          expectedBehavior:
+            'Should understand technical concepts and provide appropriate optimization',
+        },
       ];
 
       for (const edgeCase of edgeCases) {
@@ -1027,14 +1211,14 @@ describe('End-to-End Pipeline Validation', () => {
           intent: edgeCase.intent,
           parameters: {
             expectedUserVolume: 1000,
-            performanceSensitivity: 'medium'
-          }
+            performanceSensitivity: 'medium',
+          },
         };
 
         const context: MCPToolContext = {
           toolName: 'optimize_intent',
           sessionId: `edge-case-${edgeCase.name.toLowerCase().replace(/\s+/g, '-')}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
         const startTime = Date.now();
@@ -1044,7 +1228,7 @@ describe('End-to-End Pipeline Validation', () => {
         if (edgeCase.shouldSucceed) {
           expect(result.isError).toBeFalsy();
           expect(executionTime).toBeLessThan(20000); // Should complete within 20 seconds even for edge cases
-          
+
           const responseData = result.content[0].json;
           expect(responseData.data.enhancedKiroSpec).toBeDefined();
           expect(responseData.data.enhancedKiroSpec.requirements.length).toBeGreaterThan(0);
@@ -1058,7 +1242,8 @@ describe('End-to-End Pipeline Validation', () => {
 
   describe('Performance Regression Testing', () => {
     it('should maintain performance benchmarks over multiple runs', async () => {
-      const benchmarkIntent = 'Create a social media platform with user profiles, posts, comments, likes, and real-time messaging';
+      const benchmarkIntent =
+        'Create a social media platform with user profiles, posts, comments, likes, and real-time messaging';
       const runs = 5;
       const executionTimes: number[] = [];
       const quotaUsages: number[] = [];
@@ -1068,14 +1253,14 @@ describe('End-to-End Pipeline Validation', () => {
           intent: benchmarkIntent,
           parameters: {
             expectedUserVolume: 5000,
-            performanceSensitivity: 'medium'
-          }
+            performanceSensitivity: 'medium',
+          },
         };
 
         const context: MCPToolContext = {
           toolName: 'optimize_intent',
           sessionId: `benchmark-run-${i + 1}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
         const startTime = Date.now();
@@ -1083,7 +1268,7 @@ describe('End-to-End Pipeline Validation', () => {
         const executionTime = Date.now() - startTime;
 
         expect(result.isError).toBeFalsy();
-        
+
         executionTimes.push(executionTime);
         quotaUsages.push(result.metadata?.quotaUsed || 0);
       }
@@ -1092,7 +1277,8 @@ describe('End-to-End Pipeline Validation', () => {
       const avgExecutionTime = executionTimes.reduce((a, b) => a + b, 0) / runs;
       const maxExecutionTime = Math.max(...executionTimes);
       const minExecutionTime = Math.min(...executionTimes);
-      const executionTimeVariance = executionTimes.reduce((acc, time) => acc + Math.pow(time - avgExecutionTime, 2), 0) / runs;
+      const executionTimeVariance =
+        executionTimes.reduce((acc, time) => acc + Math.pow(time - avgExecutionTime, 2), 0) / runs;
 
       // Performance assertions
       expect(avgExecutionTime).toBeLessThan(10000); // Average should be under 10 seconds
@@ -1101,7 +1287,8 @@ describe('End-to-End Pipeline Validation', () => {
 
       // Quota usage should be consistent
       const avgQuotaUsage = quotaUsages.reduce((a, b) => a + b, 0) / runs;
-      const quotaVariance = quotaUsages.reduce((acc, quota) => acc + Math.pow(quota - avgQuotaUsage, 2), 0) / runs;
+      const quotaVariance =
+        quotaUsages.reduce((acc, quota) => acc + Math.pow(quota - avgQuotaUsage, 2), 0) / runs;
       expect(quotaVariance).toBeLessThan(4); // Quota usage should be very consistent (std dev < 2)
 
       console.log(`Performance Benchmark Results:
@@ -1115,20 +1302,20 @@ describe('End-to-End Pipeline Validation', () => {
     it('should handle memory usage efficiently during extended operation', async () => {
       const initialMemory = process.memoryUsage();
       const iterations = 10;
-      
+
       for (let i = 0; i < iterations; i++) {
         const args: OptimizeIntentArgs = {
           intent: `Create microservice ${i + 1} for handling user data processing with caching and validation`,
           parameters: {
             expectedUserVolume: 1000,
-            performanceSensitivity: 'medium'
-          }
+            performanceSensitivity: 'medium',
+          },
         };
 
         const context: MCPToolContext = {
           toolName: 'optimize_intent',
           sessionId: `memory-test-${i + 1}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
         const result = await server.handleOptimizeIntent(args, context);
@@ -1160,17 +1347,18 @@ describe('End-to-End Pipeline Validation', () => {
     it('should validate complete MCP tool integration workflow', async () => {
       // Step 1: Optimize intent
       const optimizeArgs: OptimizeIntentArgs = {
-        intent: 'Create a task management API with user authentication, task CRUD operations, and team collaboration features',
+        intent:
+          'Create a task management API with user authentication, task CRUD operations, and team collaboration features',
         parameters: {
           expectedUserVolume: 2000,
-          performanceSensitivity: 'medium'
-        }
+          performanceSensitivity: 'medium',
+        },
       };
 
       const optimizeContext: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'integration-workflow-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const optimizeResult = await server.handleOptimizeIntent(optimizeArgs, optimizeContext);
@@ -1188,21 +1376,21 @@ describe('End-to-End Pipeline Validation', () => {
           description: task.description,
           inputs: [],
           outputs: [],
-          quotaCost: 3 + index
+          quotaCost: 3 + index,
         })),
         dataFlow: [],
-        estimatedComplexity: 5
+        estimatedComplexity: 5,
       };
 
       const analyzeArgs: AnalyzeWorkflowArgs = {
         workflow,
-        techniques: ['MECE', 'ValueDriverTree']
+        techniques: ['MECE', 'ValueDriverTree'],
       };
 
       const analyzeContext: MCPToolContext = {
         toolName: 'analyze_workflow',
         sessionId: 'integration-workflow-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const analyzeResult = await server.handleAnalyzeWorkflow(analyzeArgs, analyzeContext);
@@ -1210,13 +1398,13 @@ describe('End-to-End Pipeline Validation', () => {
 
       // Step 3: Generate ROI analysis
       const roiArgs: GenerateROIArgs = {
-        workflow
+        workflow,
       };
 
       const roiContext: MCPToolContext = {
         toolName: 'generate_roi_analysis',
         sessionId: 'integration-workflow-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const roiResult = await server.handleGenerateROI(roiArgs, roiContext);
@@ -1230,20 +1418,24 @@ describe('End-to-End Pipeline Validation', () => {
         analysis: {
           techniquesUsed: [
             { name: 'MECE', relevanceScore: 0.8, applicableScenarios: ['workflow analysis'] },
-            { name: 'ValueDriverTree', relevanceScore: 0.7, applicableScenarios: ['cost optimization'] }
+            {
+              name: 'ValueDriverTree',
+              relevanceScore: 0.7,
+              applicableScenarios: ['cost optimization'],
+            },
           ],
           keyFindings: ['Workflow has optimization potential', 'Batching opportunities identified'],
           totalQuotaSavings: 25,
           implementationComplexity: 'medium',
-          zeroBasedSolution: undefined
+          zeroBasedSolution: undefined,
         },
-        techniques: ['MECE', 'ValueDriverTree']
+        techniques: ['MECE', 'ValueDriverTree'],
       };
 
       const summaryContext: MCPToolContext = {
         toolName: 'get_consulting_summary',
         sessionId: 'integration-workflow-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const summaryResult = await server.handleConsultingSummary(summaryArgs, summaryContext);

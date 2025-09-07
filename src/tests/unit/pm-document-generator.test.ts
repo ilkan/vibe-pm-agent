@@ -20,7 +20,7 @@ import {
   DesignOption,
   ImpactEffortMatrix,
   Task,
-  GuardrailsTask
+  GuardrailsTask,
 } from '../../components/pm-document-generator';
 
 describe('PMDocumentGenerator Core Infrastructure', () => {
@@ -37,41 +37,41 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         because: [
           'Market timing is optimal with competitor gaps',
           'Technical foundation is ready for implementation',
-          'ROI projections show 3x return within 6 months'
+          'ROI projections show 3x return within 6 months',
         ],
         whatScopeToday: [
           'Core workflow optimization engine',
           'Basic PM document generation',
-          'MCP server integration'
+          'MCP server integration',
         ],
         risksAndMitigations: [
           {
             risk: 'Technical complexity may cause delays',
-            mitigation: 'Start with MVP and iterate based on feedback'
+            mitigation: 'Start with MVP and iterate based on feedback',
           },
           {
             risk: 'Resource constraints during Q4',
-            mitigation: 'Secure dedicated team allocation upfront'
+            mitigation: 'Secure dedicated team allocation upfront',
           },
           {
             risk: 'Market adoption uncertainty',
-            mitigation: 'Pilot with 3 key customers before full launch'
-          }
+            mitigation: 'Pilot with 3 key customers before full launch',
+          },
         ],
         options: {
           conservative: {
             name: 'Conservative',
-            summary: 'Basic optimization with manual processes'
+            summary: 'Basic optimization with manual processes',
           },
           balanced: {
             name: 'Balanced',
             summary: 'Automated optimization with PM document generation',
-            recommended: true
+            recommended: true,
           },
           bold: {
             name: 'Bold',
-            summary: 'Full AI-powered consulting analysis platform'
-          }
+            summary: 'Full AI-powered consulting analysis platform',
+          },
         },
         roiSnapshot: {
           options: {
@@ -79,23 +79,24 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
               effort: 'Low',
               impact: 'Med',
               estimatedCost: '$50K',
-              timing: 'Now'
+              timing: 'Now',
             },
             balanced: {
               effort: 'Med',
               impact: 'High',
               estimatedCost: '$150K',
-              timing: 'Now'
+              timing: 'Now',
             },
             bold: {
               effort: 'High',
               impact: 'VeryH',
               estimatedCost: '$300K',
-              timing: 'Later'
-            }
-          }
+              timing: 'Later',
+            },
+          },
         },
-        rightTimeRecommendation: 'Now is the right time because market conditions are favorable and technical foundation is solid. Waiting would mean missing the Q4 opportunity window.'
+        rightTimeRecommendation:
+          'Now is the right time because market conditions are favorable and technical foundation is solid. Waiting would mean missing the Q4 opportunity window.',
       };
 
       expect(mockOnePager.answer).toBeDefined();
@@ -110,32 +111,35 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         pressRelease: {
           date: '2024-03-15',
           headline: 'Revolutionary PM Agent Transforms Developer Workflows',
-          subHeadline: 'AI-powered optimization reduces quota consumption by 60% while maintaining functionality',
-          body: 'Today we announced the PM Agent Intent-to-Spec Optimizer, solving the critical problem of excessive quota consumption in developer workflows. Our solution applies consulting-grade analysis to optimize workflows automatically. "This tool has transformed how we approach automation," said Jane Developer, Senior Engineer at TechCorp. Available now through MCP integration.'
+          subHeadline:
+            'AI-powered optimization reduces quota consumption by 60% while maintaining functionality',
+          body: 'Today we announced the PM Agent Intent-to-Spec Optimizer, solving the critical problem of excessive quota consumption in developer workflows. Our solution applies consulting-grade analysis to optimize workflows automatically. "This tool has transformed how we approach automation," said Jane Developer, Senior Engineer at TechCorp. Available now through MCP integration.',
         },
         faq: [
           {
             question: 'Who is the customer?',
-            answer: 'Developers and teams using Kiro who want to optimize their workflow efficiency and reduce quota consumption.'
+            answer:
+              'Developers and teams using Kiro who want to optimize their workflow efficiency and reduce quota consumption.',
           },
           {
             question: 'What problem are we solving now?',
-            answer: 'Excessive vibe and spec quota consumption due to inefficient workflow design and lack of optimization expertise.'
-          }
+            answer:
+              'Excessive vibe and spec quota consumption due to inefficient workflow design and lack of optimization expertise.',
+          },
         ],
         launchChecklist: [
           {
             task: 'Complete MVP development',
             owner: 'Engineering Team',
             dueDate: '2024-02-28',
-            dependencies: ['Requirements finalization', 'Design approval']
+            dependencies: ['Requirements finalization', 'Design approval'],
           },
           {
             task: 'Conduct beta testing',
             owner: 'Product Team',
-            dueDate: '2024-03-10'
-          }
-        ]
+            dueDate: '2024-03-10',
+          },
+        ],
       };
 
       expect(mockPRFAQ.pressRelease.date).toBeDefined();
@@ -147,53 +151,59 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('PMRequirements interface should support MoSCoW prioritization', () => {
       const mockRequirements: PMRequirements = {
-        businessGoal: 'Reduce developer workflow costs by 50% while maintaining functionality and improving user experience',
+        businessGoal:
+          'Reduce developer workflow costs by 50% while maintaining functionality and improving user experience',
         userNeeds: {
-          jobs: ['Optimize workflow efficiency', 'Reduce quota consumption', 'Maintain functionality'],
+          jobs: [
+            'Optimize workflow efficiency',
+            'Reduce quota consumption',
+            'Maintain functionality',
+          ],
           pains: ['High quota costs', 'Manual optimization effort', 'Lack of expertise'],
-          gains: ['Cost savings', 'Time efficiency', 'Professional analysis']
+          gains: ['Cost savings', 'Time efficiency', 'Professional analysis'],
         },
         functionalRequirements: [
           'Parse natural language intent',
           'Apply consulting techniques',
           'Generate optimized specs',
-          'Provide ROI analysis'
+          'Provide ROI analysis',
         ],
         constraintsRisks: [
           'Technical complexity of NLP parsing',
           'Accuracy of optimization recommendations',
-          'Integration with existing Kiro workflows'
+          'Integration with existing Kiro workflows',
         ],
         priority: {
           must: [
             {
               requirement: 'Intent parsing functionality',
-              justification: 'Core capability without which the system cannot function'
-            }
+              justification: 'Core capability without which the system cannot function',
+            },
           ],
           should: [
             {
               requirement: 'ROI analysis generation',
-              justification: 'Critical for user decision-making and value demonstration'
-            }
+              justification: 'Critical for user decision-making and value demonstration',
+            },
           ],
           could: [
             {
               requirement: 'Advanced consulting techniques',
-              justification: 'Nice to have for comprehensive analysis but not essential for MVP'
-            }
+              justification: 'Nice to have for comprehensive analysis but not essential for MVP',
+            },
           ],
           wont: [
             {
               requirement: 'Real-time collaboration features',
-              justification: 'Out of scope for initial release, focus on core optimization'
-            }
-          ]
+              justification: 'Out of scope for initial release, focus on core optimization',
+            },
+          ],
         },
         rightTimeVerdict: {
           decision: 'do_now',
-          reasoning: 'Market opportunity is optimal and technical foundation is ready for implementation'
-        }
+          reasoning:
+            'Market opportunity is optimal and technical foundation is ready for implementation',
+        },
       };
 
       expect(mockRequirements.businessGoal).toBeDefined();
@@ -207,14 +217,18 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
       const conservativeOption: DesignOption = {
         name: 'Conservative',
         summary: 'Basic optimization with minimal risk',
-        keyTradeoffs: ['Lower impact but safer implementation', 'Faster delivery but limited features'],
+        keyTradeoffs: [
+          'Lower impact but safer implementation',
+          'Faster delivery but limited features',
+        ],
         impact: 'Medium',
         effort: 'Low',
-        majorRisks: ['May not meet all user expectations']
+        majorRisks: ['May not meet all user expectations'],
       };
 
       const mockDesignOptions: DesignOptions = {
-        problemFraming: 'Current workflows consume excessive quotas due to inefficient patterns. Now is the right time to address this because market demand is high and technical foundation is ready.',
+        problemFraming:
+          'Current workflows consume excessive quotas due to inefficient patterns. Now is the right time to address this because market demand is high and technical foundation is ready.',
         options: {
           conservative: conservativeOption,
           balanced: {
@@ -223,7 +237,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
             keyTradeoffs: ['Good balance of features and implementation complexity'],
             impact: 'High',
             effort: 'Medium',
-            majorRisks: ['Moderate technical complexity']
+            majorRisks: ['Moderate technical complexity'],
           },
           bold: {
             name: 'Bold',
@@ -231,16 +245,17 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
             keyTradeoffs: ['Maximum impact but highest implementation risk'],
             impact: 'High',
             effort: 'High',
-            majorRisks: ['High technical complexity', 'Longer development timeline']
-          }
+            majorRisks: ['High technical complexity', 'Longer development timeline'],
+          },
         },
         impactEffortMatrix: {
           highImpactLowEffort: [],
           highImpactHighEffort: [conservativeOption],
           lowImpactLowEffort: [],
-          lowImpactHighEffort: []
+          lowImpactHighEffort: [],
         },
-        rightTimeRecommendation: 'Balanced approach is recommended now because it provides optimal value while managing implementation risk effectively.'
+        rightTimeRecommendation:
+          'Balanced approach is recommended now because it provides optimal value while managing implementation risk effectively.',
       };
 
       expect(mockDesignOptions.problemFraming).toBeDefined();
@@ -257,7 +272,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         acceptanceCriteria: [
           'Quota consumption stays within budget limits',
           'Technical complexity is manageable',
-          'Resource allocation is confirmed'
+          'Resource allocation is confirmed',
         ],
         effort: 'S',
         impact: 'High',
@@ -265,13 +280,13 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         limits: {
           maxVibes: 1000,
           maxSpecs: 50,
-          budgetUSD: 100000
+          budgetUSD: 100000,
         },
         checkCriteria: [
           'Estimated quota usage < 80% of limits',
           'Team capacity confirmed for timeline',
-          'Technical dependencies resolved'
-        ]
+          'Technical dependencies resolved',
+        ],
       };
 
       const mockTaskPlan: TaskPlan = {
@@ -284,8 +299,8 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
             acceptanceCriteria: ['Directory structure created', 'Core interfaces defined'],
             effort: 'S',
             impact: 'Med',
-            priority: 'Must'
-          }
+            priority: 'Must',
+          },
         ],
         shortTerm: [
           {
@@ -295,8 +310,8 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
             acceptanceCriteria: ['Intent parser functional', 'Unit tests passing'],
             effort: 'M',
             impact: 'High',
-            priority: 'Must'
-          }
+            priority: 'Must',
+          },
         ],
         longTerm: [
           {
@@ -306,9 +321,9 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
             acceptanceCriteria: ['Multiple techniques supported', 'Quality analysis output'],
             effort: 'L',
             impact: 'High',
-            priority: 'Should'
-          }
-        ]
+            priority: 'Should',
+          },
+        ],
       };
 
       expect(mockTaskPlan.guardrailsCheck.limits).toBeDefined();
@@ -366,7 +381,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
       expect(questions).toContain('What are the top 3 risks and mitigations?');
       expect(questions).toContain('What is not included?');
       expect(questions).toContain('How does this compare to alternatives?');
-      expect(questions).toContain('What\'s the estimated cost/quota footprint?');
+      expect(questions).toContain("What's the estimated cost/quota footprint?");
       expect(questions).toContain('What are the next 2 releases after v1?');
     });
   });
@@ -376,7 +391,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
       const roiInputs: ROIInputs = {
         cost_naive: 1000,
         cost_balanced: 600,
-        cost_bold: 300
+        cost_bold: 300,
       };
 
       expect(roiInputs.cost_naive).toBe(1000);
@@ -385,7 +400,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
       // Should also work with partial data
       const partialROI: ROIInputs = {
-        cost_balanced: 500
+        cost_balanced: 500,
       };
       expect(partialROI.cost_balanced).toBe(500);
     });
@@ -396,9 +411,9 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         budget: 100000,
         quotas: {
           maxVibes: 1000,
-          maxSpecs: 50
+          maxSpecs: 50,
         },
-        deadlines: 'Q1 2024 launch target'
+        deadlines: 'Q1 2024 launch target',
       };
 
       expect(context.roadmapTheme).toBe('Developer Experience');
@@ -410,7 +425,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
       const limits: TaskLimits = {
         maxVibes: 500,
         maxSpecs: 25,
-        budgetUSD: 50000
+        budgetUSD: 50000,
       };
 
       expect(limits.maxVibes).toBe(500);
@@ -446,7 +461,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
     const mockROIInputs: ROIInputs = {
       cost_naive: 100000,
       cost_balanced: 60000,
-      cost_bold: 30000
+      cost_bold: 30000,
     };
 
     test('should generate complete management one-pager', async () => {
@@ -469,14 +484,14 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should extract decision with urgency and technical readiness', async () => {
       const result = await generator.generateManagementOnePager(mockRequirements, mockDesign);
-      
+
       expect(result.answer).toContain('immediately');
       expect(result.answer.toLowerCase()).toContain('critical');
     });
 
     test('should generate exactly 3 core reasons', async () => {
       const result = await generator.generateManagementOnePager(mockRequirements, mockDesign);
-      
+
       expect(result.because).toHaveLength(3);
       result.because.forEach(reason => {
         expect(reason.length).toBeGreaterThan(20);
@@ -485,19 +500,26 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
     });
 
     test('should identify scope items from requirements and design', async () => {
-      const result = await generator.generateManagementOnePager(mockRequirements, mockDesign, mockTasks);
-      
+      const result = await generator.generateManagementOnePager(
+        mockRequirements,
+        mockDesign,
+        mockTasks
+      );
+
       expect(result.whatScopeToday.length).toBeGreaterThan(2);
-      expect(result.whatScopeToday.some(item => 
-        item.toLowerCase().includes('optimization') || 
-        item.toLowerCase().includes('analysis') ||
-        item.toLowerCase().includes('mcp')
-      )).toBe(true);
+      expect(
+        result.whatScopeToday.some(
+          item =>
+            item.toLowerCase().includes('optimization') ||
+            item.toLowerCase().includes('analysis') ||
+            item.toLowerCase().includes('mcp')
+        )
+      ).toBe(true);
     });
 
     test('should generate exactly 3 risks with mitigations', async () => {
       const result = await generator.generateManagementOnePager(mockRequirements, mockDesign);
-      
+
       expect(result.risksAndMitigations).toHaveLength(3);
       result.risksAndMitigations.forEach(rm => {
         expect(rm.risk).toBeDefined();
@@ -509,7 +531,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should generate three options with balanced recommended', async () => {
       const result = await generator.generateManagementOnePager(mockRequirements, mockDesign);
-      
+
       expect(result.options.conservative.name).toBe('Conservative');
       expect(result.options.balanced.name).toBe('Balanced');
       expect(result.options.bold.name).toBe('Bold (Zero-Based)');
@@ -525,7 +547,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         undefined,
         mockROIInputs
       );
-      
+
       expect(result.roiSnapshot.options.conservative.effort).toMatch(/^(Low|Med|High)$/);
       expect(result.roiSnapshot.options.balanced.impact).toMatch(/^(Med|High|VeryH)$/);
       expect(result.roiSnapshot.options.bold.timing).toMatch(/^(Now|Later)$/);
@@ -536,7 +558,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should use default costs when ROI inputs not provided', async () => {
       const result = await generator.generateManagementOnePager(mockRequirements, mockDesign);
-      
+
       expect(result.roiSnapshot.options.conservative.estimatedCost).toBe('$50K');
       expect(result.roiSnapshot.options.balanced.estimatedCost).toBe('$150K');
       expect(result.roiSnapshot.options.bold.estimatedCost).toBe('$300K');
@@ -544,7 +566,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should generate timing recommendation with proper length', async () => {
       const result = await generator.generateManagementOnePager(mockRequirements, mockDesign);
-      
+
       expect(result.rightTimeRecommendation.length).toBeGreaterThan(100);
       expect(result.rightTimeRecommendation.length).toBeLessThan(800);
       expect(result.rightTimeRecommendation).toMatch(/\./); // Should contain sentences
@@ -557,8 +579,11 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         Cost efficiency is important but not urgent.
       `;
 
-      const result = await generator.generateManagementOnePager(opportunityRequirements, mockDesign);
-      
+      const result = await generator.generateManagementOnePager(
+        opportunityRequirements,
+        mockDesign
+      );
+
       expect(result.answer.toLowerCase()).toMatch(/(proceed|build|move|initiate)/);
       expect(result.because[0]).toMatch(/(value|opportunity|strategic)/);
     });
@@ -571,21 +596,21 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
       `;
 
       const result = await generator.generateManagementOnePager(mockRequirements, basicDesign);
-      
+
       expect(result.answer).toBeDefined();
       expect(result.risksAndMitigations[0].risk).toContain('Integration');
     });
 
     test('should apply Pyramid Principle structure', async () => {
       const result = await generator.generateManagementOnePager(mockRequirements, mockDesign);
-      
+
       // Answer first (clear decision)
       expect(result.answer).toMatch(/^[A-Z]/);
       expect(result.answer.length).toBeLessThan(200);
-      
+
       // Then reasons (supporting the answer)
       expect(result.because).toHaveLength(3);
-      
+
       // Then evidence (in scope, risks, options, ROI)
       expect(result.whatScopeToday.length).toBeGreaterThan(0);
       expect(result.risksAndMitigations.length).toBeGreaterThan(0);
@@ -631,26 +656,28 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should use default launch date when not provided', async () => {
       const result = await generator.generatePRFAQ(mockRequirements, mockDesign);
-      
+
       const today = new Date();
       const expectedDate = new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000); // ~3 months
       const resultDate = new Date(result.pressRelease.date);
-      
+
       expect(resultDate.getTime()).toBeGreaterThan(today.getTime());
-      expect(Math.abs(resultDate.getTime() - expectedDate.getTime())).toBeLessThan(7 * 24 * 60 * 60 * 1000); // Within a week
+      expect(Math.abs(resultDate.getTime() - expectedDate.getTime())).toBeLessThan(
+        7 * 24 * 60 * 60 * 1000
+      ); // Within a week
     });
 
     test('should generate appropriate headline based on requirements', async () => {
       const quotaRequirements = 'System must optimize quota consumption and reduce costs';
       const result = await generator.generatePRFAQ(quotaRequirements, mockDesign);
-      
+
       expect(result.pressRelease.headline.length).toBeGreaterThan(10);
       expect(result.pressRelease.headline.length).toBeLessThanOrEqual(100);
     });
 
     test('should generate press release body under 250 words', async () => {
       const result = await generator.generatePRFAQ(mockRequirements, mockDesign);
-      
+
       const wordCount = result.pressRelease.body.split(/\s+/).length;
       expect(wordCount).toBeLessThanOrEqual(250);
       expect(result.pressRelease.body).toContain('Today we announced');
@@ -659,9 +686,9 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should generate exactly 10 FAQ items with required questions', async () => {
       const result = await generator.generatePRFAQ(mockRequirements, mockDesign);
-      
+
       expect(result.faq).toHaveLength(10);
-      
+
       const expectedQuestions = [
         'Who is the customer?',
         'What problem are we solving now?',
@@ -671,8 +698,8 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         'What are the top 3 risks and mitigations?',
         'What is not included?',
         'How does this compare to alternatives?',
-        'What\'s the estimated cost/quota footprint?',
-        'What are the next 2 releases after v1?'
+        "What's the estimated cost/quota footprint?",
+        'What are the next 2 releases after v1?',
       ];
 
       expectedQuestions.forEach((expectedQ, index) => {
@@ -683,29 +710,35 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should generate contextual FAQ answers', async () => {
       const result = await generator.generatePRFAQ(mockRequirements, mockDesign);
-      
+
       // Check that answers are contextual to requirements
       const problemAnswer = result.faq.find(item => item.question.includes('What problem'))?.answer;
       expect(problemAnswer?.toLowerCase()).toMatch(/(quota|cost|efficiency|workflow)/);
-      
-      const customerAnswer = result.faq.find(item => item.question.includes('Who is the customer'))?.answer;
+
+      const customerAnswer = result.faq.find(item =>
+        item.question.includes('Who is the customer')
+      )?.answer;
       expect(customerAnswer?.toLowerCase()).toContain('developer');
     });
 
     test('should generate comprehensive launch checklist', async () => {
       const result = await generator.generatePRFAQ(mockRequirements, mockDesign);
-      
+
       expect(result.launchChecklist.length).toBeGreaterThanOrEqual(8);
-      
+
       // Should have scope freeze as first major milestone
-      const scopeFreeze = result.launchChecklist.find(item => item.task.toLowerCase().includes('scope freeze'));
+      const scopeFreeze = result.launchChecklist.find(item =>
+        item.task.toLowerCase().includes('scope freeze')
+      );
       expect(scopeFreeze).toBeDefined();
       expect(scopeFreeze?.owner).toBe('Product Team');
-      
+
       // Should have launch as final item
-      const launch = result.launchChecklist.find(item => item.task.toLowerCase().includes('launch'));
+      const launch = result.launchChecklist.find(item =>
+        item.task.toLowerCase().includes('launch')
+      );
       expect(launch).toBeDefined();
-      
+
       // All items should have required fields
       result.launchChecklist.forEach(item => {
         expect(item.task).toBeDefined();
@@ -718,37 +751,41 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
     test('should generate chronological launch timeline', async () => {
       const targetDate = '2024-06-15';
       const result = await generator.generatePRFAQ(mockRequirements, mockDesign, targetDate);
-      
+
       const dates = result.launchChecklist.map(item => new Date(item.dueDate));
       const launchDate = new Date(targetDate);
-      
+
       // All dates should be before or on launch date
       dates.forEach(date => {
         expect(date.getTime()).toBeLessThanOrEqual(launchDate.getTime());
       });
-      
+
       // Dates should be valid and in reasonable order
       const dates = result.launchChecklist.map(item => new Date(item.dueDate));
       const validDates = dates.filter(date => !isNaN(date.getTime()));
-      
+
       expect(validDates.length).toBeGreaterThan(0);
       if (validDates.length > 1) {
         const sortedDates = [...validDates].sort((a, b) => a.getTime() - b.getTime());
-        expect(sortedDates[0].getTime()).toBeLessThanOrEqual(sortedDates[sortedDates.length - 1].getTime());
+        expect(sortedDates[0].getTime()).toBeLessThanOrEqual(
+          sortedDates[sortedDates.length - 1].getTime()
+        );
       }
     });
 
     test('should include dependencies in checklist items', async () => {
       const result = await generator.generatePRFAQ(mockRequirements, mockDesign);
-      
-      const itemsWithDependencies = result.launchChecklist.filter(item => 
-        item.dependencies && item.dependencies.length > 0);
-      
+
+      const itemsWithDependencies = result.launchChecklist.filter(
+        item => item.dependencies && item.dependencies.length > 0
+      );
+
       expect(itemsWithDependencies.length).toBeGreaterThan(3);
-      
+
       // Scope freeze should have dependencies
-      const scopeFreeze = result.launchChecklist.find(item => 
-        item.task.toLowerCase().includes('scope freeze'));
+      const scopeFreeze = result.launchChecklist.find(item =>
+        item.task.toLowerCase().includes('scope freeze')
+      );
       expect(scopeFreeze?.dependencies).toBeDefined();
       expect(scopeFreeze?.dependencies?.length).toBeGreaterThan(0);
     });
@@ -761,19 +798,21 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
       `;
 
       const result = await generator.generatePRFAQ(consultingRequirements, mockDesign);
-      
-      expect(result.pressRelease.headline.toLowerCase()).toMatch(/(consulting|analysis|professional)/);
+
+      expect(result.pressRelease.headline.toLowerCase()).toMatch(
+        /(consulting|analysis|professional)/
+      );
       expect(result.pressRelease.body.toLowerCase()).toMatch(/(consulting|technique|analysis)/);
     });
 
     test('should format press release with proper structure', async () => {
       const result = await generator.generatePRFAQ(mockRequirements, mockDesign);
-      
+
       // Should contain key elements
       expect(result.pressRelease.body).toContain('Today we announced');
       expect(result.pressRelease.body).toMatch(/[""].*[""].*said.*[A-Z][a-z]+ [A-Z][a-z]+/); // Customer quote pattern
       expect(result.pressRelease.body.toLowerCase()).toMatch(/(available|now)/);
-      
+
       // Should be well-structured sentences
       const sentences = result.pressRelease.body.split('. ');
       expect(sentences.length).toBeGreaterThan(3);
@@ -794,9 +833,9 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
       budget: 150000,
       quotas: {
         maxVibes: 1000,
-        maxSpecs: 50
+        maxSpecs: 50,
       },
-      deadlines: 'Q2 2024 launch target'
+      deadlines: 'Q2 2024 launch target',
     };
 
     test('should generate complete requirements structure', async () => {
@@ -816,32 +855,41 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
     test('should extract appropriate business goal based on intent', async () => {
       const quotaIntent = 'Reduce quota costs and optimize workflow efficiency';
       const result = await generator.generateRequirements(quotaIntent);
-      
+
       expect(result.businessGoal.toLowerCase()).toMatch(/(reduce|cost|quota|40-60%)/);
     });
 
     test('should analyze user needs with Jobs, Pains, and Gains', async () => {
       const result = await generator.generateRequirements(mockRawIntent, mockContext);
-      
+
       // Jobs should include optimization and automation
-      expect(result.userNeeds.jobs.some(job => 
-        job.toLowerCase().includes('optimize') || job.toLowerCase().includes('automate')
-      )).toBe(true);
-      
+      expect(
+        result.userNeeds.jobs.some(
+          job => job.toLowerCase().includes('optimize') || job.toLowerCase().includes('automate')
+        )
+      ).toBe(true);
+
       // Pains should include cost or quota issues (updated expectation)
-      expect(result.userNeeds.pains.some(pain => 
-        pain.toLowerCase().includes('quota') || pain.toLowerCase().includes('resource') || pain.toLowerCase().includes('inefficient')
-      )).toBe(true);
-      
+      expect(
+        result.userNeeds.pains.some(
+          pain =>
+            pain.toLowerCase().includes('quota') ||
+            pain.toLowerCase().includes('resource') ||
+            pain.toLowerCase().includes('inefficient')
+        )
+      ).toBe(true);
+
       // Gains should include savings or efficiency
-      expect(result.userNeeds.gains.some(gain => 
-        gain.toLowerCase().includes('saving') || gain.toLowerCase().includes('efficiency')
-      )).toBe(true);
+      expect(
+        result.userNeeds.gains.some(
+          gain => gain.toLowerCase().includes('saving') || gain.toLowerCase().includes('efficiency')
+        )
+      ).toBe(true);
     });
 
     test('should apply MoSCoW prioritization with justifications', async () => {
       const result = await generator.generateRequirements(mockRawIntent, mockContext);
-      
+
       // Must have should include core functionality
       expect(result.priority.must.length).toBeGreaterThan(0);
       result.priority.must.forEach(item => {
@@ -849,13 +897,13 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         expect(item.justification).toBeDefined();
         expect(item.justification.length).toBeGreaterThan(20);
       });
-      
+
       // Should have items
       expect(result.priority.should.length).toBeGreaterThan(0);
       result.priority.should.forEach(item => {
         expect(item.justification).toBeDefined();
       });
-      
+
       // Could and Won't categories
       expect(result.priority.could).toBeInstanceOf(Array);
       expect(result.priority.wont).toBeInstanceOf(Array);
@@ -864,21 +912,22 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
     test('should generate right-time verdict with reasoning', async () => {
       const urgentIntent = 'Critical urgent need to reduce quota costs immediately';
       const result = await generator.generateRequirements(urgentIntent, mockContext);
-      
+
       expect(result.rightTimeVerdict.decision).toBe('do_now');
       expect(result.rightTimeVerdict.reasoning).toContain('Urgent');
       expect(result.rightTimeVerdict.reasoning.length).toBeGreaterThan(50);
     });
 
     test('should recommend do_later for complex uncertain projects', async () => {
-      const uncertainIntent = 'Complex system with unclear requirements and challenging implementation';
+      const uncertainIntent =
+        'Complex system with unclear requirements and challenging implementation';
       const limitedContext: RequirementsContext = {
         budget: 25000,
-        deadlines: 'Tight timeline with limited resources'
+        deadlines: 'Tight timeline with limited resources',
       };
-      
+
       const result = await generator.generateRequirements(uncertainIntent, limitedContext);
-      
+
       expect(result.rightTimeVerdict.decision).toBe('do_later');
       expect(result.rightTimeVerdict.reasoning.toLowerCase()).toMatch(/(complex|uncertain|risk)/);
     });
@@ -886,7 +935,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
     test('should handle minimal context gracefully', async () => {
       const simpleIntent = 'Build a workflow optimizer';
       const result = await generator.generateRequirements(simpleIntent);
-      
+
       expect(result.businessGoal).toBeDefined();
       expect(result.userNeeds.jobs.length).toBeGreaterThan(0);
       expect(result.functionalRequirements.length).toBeGreaterThan(0);
@@ -920,7 +969,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should generate problem framing explaining why now', async () => {
       const result = await generator.generateDesignOptions(mockRequirements);
-      
+
       expect(result.problemFraming.length).toBeGreaterThan(200);
       expect(result.problemFraming.length).toBeLessThan(800);
       expect(result.problemFraming.toLowerCase()).toMatch(/(quota|cost|workflow|efficiency)/);
@@ -929,32 +978,34 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should generate three distinct design options', async () => {
       const result = await generator.generateDesignOptions(mockRequirements);
-      
+
       expect(result.options.conservative.name).toBe('Conservative');
       expect(result.options.balanced.name).toBe('Balanced');
       expect(result.options.bold.name).toBe('Bold (Zero-Based)');
-      
+
       // Each option should have required properties
-      [result.options.conservative, result.options.balanced, result.options.bold].forEach(option => {
-        expect(option.summary).toBeDefined();
-        expect(option.keyTradeoffs.length).toBeGreaterThan(0);
-        expect(option.impact).toMatch(/^(Low|Medium|High)$/);
-        expect(option.effort).toMatch(/^(Low|Medium|High)$/);
-        expect(option.majorRisks.length).toBeGreaterThan(0);
-      });
+      [result.options.conservative, result.options.balanced, result.options.bold].forEach(
+        option => {
+          expect(option.summary).toBeDefined();
+          expect(option.keyTradeoffs.length).toBeGreaterThan(0);
+          expect(option.impact).toMatch(/^(Low|Medium|High)$/);
+          expect(option.effort).toMatch(/^(Low|Medium|High)$/);
+          expect(option.majorRisks.length).toBeGreaterThan(0);
+        }
+      );
     });
 
     test('should assign appropriate impact and effort levels', async () => {
       const result = await generator.generateDesignOptions(mockRequirements);
-      
+
       // Conservative should be low effort
       expect(result.options.conservative.effort).toBe('Low');
       expect(result.options.conservative.impact).toBe('Medium');
-      
+
       // Balanced should be medium effort, high impact
       expect(result.options.balanced.effort).toBe('Medium');
       expect(result.options.balanced.impact).toBe('High');
-      
+
       // Bold should be high effort and high impact
       expect(result.options.bold.effort).toBe('High');
       expect(result.options.bold.impact).toBe('High');
@@ -962,17 +1013,21 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should create accurate Impact vs Effort matrix', async () => {
       const result = await generator.generateDesignOptions(mockRequirements);
-      
+
       // Conservative (Medium Impact, Low Effort) should not be in high impact categories
-      expect(result.impactEffortMatrix.highImpactLowEffort).not.toContain(result.options.conservative);
-      expect(result.impactEffortMatrix.highImpactHighEffort).not.toContain(result.options.conservative);
-      
+      expect(result.impactEffortMatrix.highImpactLowEffort).not.toContain(
+        result.options.conservative
+      );
+      expect(result.impactEffortMatrix.highImpactHighEffort).not.toContain(
+        result.options.conservative
+      );
+
       // Balanced (High Impact, Medium Effort) should be in high impact, high effort
       expect(result.impactEffortMatrix.highImpactHighEffort).toContain(result.options.balanced);
-      
+
       // Bold (High Impact, High Effort) should be in high impact, high effort
       expect(result.impactEffortMatrix.highImpactHighEffort).toContain(result.options.bold);
-      
+
       // Verify matrix structure
       expect(result.impactEffortMatrix.highImpactLowEffort).toBeInstanceOf(Array);
       expect(result.impactEffortMatrix.highImpactHighEffort).toBeInstanceOf(Array);
@@ -982,7 +1037,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should generate contextual right-time recommendation', async () => {
       const result = await generator.generateDesignOptions(mockRequirements);
-      
+
       expect(result.rightTimeRecommendation.length).toBeGreaterThan(100);
       expect(result.rightTimeRecommendation.length).toBeLessThan(600);
       expect(result.rightTimeRecommendation.toLowerCase()).toMatch(/(balanced|conservative|bold)/);
@@ -995,9 +1050,9 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         Timeline is very tight with limited resources.
         Must deliver basic functionality quickly.
       `;
-      
+
       const result = await generator.generateDesignOptions(urgentRequirements);
-      
+
       expect(result.rightTimeRecommendation.toLowerCase()).toContain('conservative');
       expect(result.rightTimeRecommendation.toLowerCase()).toMatch(/(urgent|immediate|timeline)/);
     });
@@ -1009,11 +1064,13 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         Market leadership opportunity with advanced capabilities.
         Revolutionary breakthrough potential justifies bold approach.
       `;
-      
+
       const result = await generator.generateDesignOptions(innovativeRequirements);
-      
+
       expect(result.rightTimeRecommendation.toLowerCase()).toContain('bold');
-      expect(result.rightTimeRecommendation.toLowerCase()).toMatch(/(innovation|breakthrough|leadership|revolutionary)/);
+      expect(result.rightTimeRecommendation.toLowerCase()).toMatch(
+        /(innovation|breakthrough|leadership|revolutionary)/
+      );
     });
 
     test('should recommend balanced as default optimal choice', async () => {
@@ -1023,11 +1080,13 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         Want high impact without excessive development effort.
         Moderate approach preferred over risky alternatives.
       `;
-      
+
       const result = await generator.generateDesignOptions(standardRequirements);
-      
+
       expect(result.rightTimeRecommendation.toLowerCase()).toContain('balanced');
-      expect(result.rightTimeRecommendation.toLowerCase()).toMatch(/(optimal|balance|professional)/);
+      expect(result.rightTimeRecommendation.toLowerCase()).toMatch(
+        /(optimal|balance|professional)/
+      );
     });
 
     test('should customize bold option based on requirements', async () => {
@@ -1036,51 +1095,74 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         Challenge all assumptions for maximum optimization potential.
         Revolutionary approach that could redefine industry standards.
       `;
-      
+
       const result = await generator.generateDesignOptions(zeroBasedRequirements);
-      
-      expect(result.options.bold.summary.toLowerCase()).toMatch(/(zero-based|radical|revolutionary)/);
-      expect(result.options.bold.keyTradeoffs.some(tradeoff => 
-        tradeoff.toLowerCase().includes('assumption') || tradeoff.toLowerCase().includes('breakthrough')
-      )).toBe(true);
+
+      expect(result.options.bold.summary.toLowerCase()).toMatch(
+        /(zero-based|radical|revolutionary)/
+      );
+      expect(
+        result.options.bold.keyTradeoffs.some(
+          tradeoff =>
+            tradeoff.toLowerCase().includes('assumption') ||
+            tradeoff.toLowerCase().includes('breakthrough')
+        )
+      ).toBe(true);
     });
 
     test('should include appropriate tradeoffs for each option', async () => {
       const result = await generator.generateDesignOptions(mockRequirements);
-      
+
       // Conservative tradeoffs should mention risk and limitations
-      expect(result.options.conservative.keyTradeoffs.some(tradeoff => 
-        tradeoff.toLowerCase().includes('risk') || tradeoff.toLowerCase().includes('limited')
-      )).toBe(true);
-      
+      expect(
+        result.options.conservative.keyTradeoffs.some(
+          tradeoff =>
+            tradeoff.toLowerCase().includes('risk') || tradeoff.toLowerCase().includes('limited')
+        )
+      ).toBe(true);
+
       // Balanced tradeoffs should mention balance
-      expect(result.options.balanced.keyTradeoffs.some(tradeoff => 
-        tradeoff.toLowerCase().includes('balance') || tradeoff.toLowerCase().includes('moderate')
-      )).toBe(true);
-      
+      expect(
+        result.options.balanced.keyTradeoffs.some(
+          tradeoff =>
+            tradeoff.toLowerCase().includes('balance') ||
+            tradeoff.toLowerCase().includes('moderate')
+        )
+      ).toBe(true);
+
       // Bold tradeoffs should mention maximum impact
-      expect(result.options.bold.keyTradeoffs.some(tradeoff => 
-        tradeoff.toLowerCase().includes('maximum') || tradeoff.toLowerCase().includes('comprehensive')
-      )).toBe(true);
+      expect(
+        result.options.bold.keyTradeoffs.some(
+          tradeoff =>
+            tradeoff.toLowerCase().includes('maximum') ||
+            tradeoff.toLowerCase().includes('comprehensive')
+        )
+      ).toBe(true);
     });
 
     test('should identify major risks for each option', async () => {
       const result = await generator.generateDesignOptions(mockRequirements);
-      
+
       // Each option should have at least 2 major risks
       expect(result.options.conservative.majorRisks.length).toBeGreaterThanOrEqual(2);
       expect(result.options.balanced.majorRisks.length).toBeGreaterThanOrEqual(2);
       expect(result.options.bold.majorRisks.length).toBeGreaterThanOrEqual(2);
-      
+
       // Conservative risks should be about limitations
-      expect(result.options.conservative.majorRisks.some(risk => 
-        risk.toLowerCase().includes('expectation') || risk.toLowerCase().includes('scalability')
-      )).toBe(true);
-      
+      expect(
+        result.options.conservative.majorRisks.some(
+          risk =>
+            risk.toLowerCase().includes('expectation') || risk.toLowerCase().includes('scalability')
+        )
+      ).toBe(true);
+
       // Bold risks should be about complexity
-      expect(result.options.bold.majorRisks.some(risk => 
-        risk.toLowerCase().includes('complexity') || risk.toLowerCase().includes('timeline')
-      )).toBe(true);
+      expect(
+        result.options.bold.majorRisks.some(
+          risk =>
+            risk.toLowerCase().includes('complexity') || risk.toLowerCase().includes('timeline')
+        )
+      ).toBe(true);
     });
 
     test('should handle different requirement contexts', async () => {
@@ -1089,9 +1171,9 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
         Cutting-edge capabilities for superior performance.
         Self-improving system that gets better with usage.
       `;
-      
+
       const result = await generator.generateDesignOptions(aiRequirements);
-      
+
       expect(result.options.bold.summary.toLowerCase()).toMatch(/(ai|machine learning|advanced)/);
       expect(result.problemFraming.toLowerCase()).toMatch(/(workflow|optimization|efficiency)/);
     });
@@ -1112,7 +1194,7 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
     const mockLimits: TaskLimits = {
       maxVibes: 500,
       maxSpecs: 25,
-      budgetUSD: 75000
+      budgetUSD: 75000,
     };
 
     test('should generate complete task plan structure', async () => {
@@ -1130,26 +1212,28 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should generate guardrails check with proper limits', async () => {
       const result = await generator.generateTaskPlan(mockDesign, mockLimits);
-      
+
       expect(result.guardrailsCheck.name).toBe('Guardrails Check');
       expect(result.guardrailsCheck.description).toContain('limits');
       expect(result.guardrailsCheck.effort).toBe('S');
       expect(result.guardrailsCheck.impact).toBe('High');
       expect(result.guardrailsCheck.priority).toBe('Must');
-      
+
       expect(result.guardrailsCheck.limits.maxVibes).toBe(500);
       expect(result.guardrailsCheck.limits.maxSpecs).toBe(25);
       expect(result.guardrailsCheck.limits.budgetUSD).toBe(75000);
-      
+
       expect(result.guardrailsCheck.checkCriteria.length).toBeGreaterThan(3);
-      expect(result.guardrailsCheck.checkCriteria.some(criteria => 
-        criteria.includes('400') && criteria.includes('80%')
-      )).toBe(true); // 80% of 500 vibes
+      expect(
+        result.guardrailsCheck.checkCriteria.some(
+          criteria => criteria.includes('400') && criteria.includes('80%')
+        )
+      ).toBe(true); // 80% of 500 vibes
     });
 
     test('should use default limits when not provided', async () => {
       const result = await generator.generateTaskPlan(mockDesign);
-      
+
       expect(result.guardrailsCheck.limits.maxVibes).toBe(1000);
       expect(result.guardrailsCheck.limits.maxSpecs).toBe(50);
       expect(result.guardrailsCheck.limits.budgetUSD).toBe(100000);
@@ -1157,44 +1241,59 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should extract tasks based on design content', async () => {
       const result = await generator.generateTaskPlan(mockDesign);
-      
+
       const allTasks = [...result.immediateWins, ...result.shortTerm, ...result.longTerm];
-      
+
       // Should have architecture task
-      expect(allTasks.some(task => 
-        task.name.toLowerCase().includes('architecture') || task.name.toLowerCase().includes('component')
-      )).toBe(true);
-      
+      expect(
+        allTasks.some(
+          task =>
+            task.name.toLowerCase().includes('architecture') ||
+            task.name.toLowerCase().includes('component')
+        )
+      ).toBe(true);
+
       // Should have intent parsing task (check for "intent" or "engine")
-      expect(allTasks.some(task => 
-        task.name.toLowerCase().includes('intent') || task.name.toLowerCase().includes('engine')
-      )).toBe(true);
-      
+      expect(
+        allTasks.some(
+          task =>
+            task.name.toLowerCase().includes('intent') || task.name.toLowerCase().includes('engine')
+        )
+      ).toBe(true);
+
       // Should have optimization task
-      expect(allTasks.some(task => 
-        task.name.toLowerCase().includes('optimization') || task.name.toLowerCase().includes('workflow')
-      )).toBe(true);
-      
+      expect(
+        allTasks.some(
+          task =>
+            task.name.toLowerCase().includes('optimization') ||
+            task.name.toLowerCase().includes('workflow')
+        )
+      ).toBe(true);
+
       // Should have MCP integration task
-      expect(allTasks.some(task => 
-        task.name.toLowerCase().includes('mcp') || task.name.toLowerCase().includes('integration')
-      )).toBe(true);
+      expect(
+        allTasks.some(
+          task =>
+            task.name.toLowerCase().includes('mcp') ||
+            task.name.toLowerCase().includes('integration')
+        )
+      ).toBe(true);
     });
 
     test('should categorize tasks appropriately by phase', async () => {
       const result = await generator.generateTaskPlan(mockDesign);
-      
+
       // Immediate wins should be Must-have with small/medium effort
       result.immediateWins.forEach(task => {
         expect(task.priority).toMatch(/^(Must|Should)$/);
         expect(task.effort).toMatch(/^(S|M)$/);
       });
-      
+
       // Long-term should include large effort or Could-have tasks
       result.longTerm.forEach(task => {
         expect(task.effort === 'L' || task.priority === 'Could').toBe(true);
       });
-      
+
       // All tasks should have required properties
       const allTasks = [...result.immediateWins, ...result.shortTerm, ...result.longTerm];
       allTasks.forEach(task => {
@@ -1210,15 +1309,15 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should maintain proper phase distribution', async () => {
       const result = await generator.generateTaskPlan(mockDesign);
-      
+
       // Immediate wins: 1-3 tasks
       expect(result.immediateWins.length).toBeGreaterThanOrEqual(1);
       expect(result.immediateWins.length).toBeLessThanOrEqual(3);
-      
+
       // Short-term: 3-6 tasks
       expect(result.shortTerm.length).toBeGreaterThanOrEqual(3);
       expect(result.shortTerm.length).toBeLessThanOrEqual(6);
-      
+
       // Long-term: 2-4 tasks
       expect(result.longTerm.length).toBeGreaterThanOrEqual(2);
       expect(result.longTerm.length).toBeLessThanOrEqual(4);
@@ -1226,20 +1325,25 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should generate unique task IDs', async () => {
       const result = await generator.generateTaskPlan(mockDesign);
-      
-      const allTasks = [result.guardrailsCheck, ...result.immediateWins, ...result.shortTerm, ...result.longTerm];
+
+      const allTasks = [
+        result.guardrailsCheck,
+        ...result.immediateWins,
+        ...result.shortTerm,
+        ...result.longTerm,
+      ];
       const taskIds = allTasks.map(task => task.id);
       const uniqueIds = new Set(taskIds);
-      
+
       expect(uniqueIds.size).toBe(taskIds.length);
       expect(result.guardrailsCheck.id).toBe('0');
     });
 
     test('should include comprehensive acceptance criteria', async () => {
       const result = await generator.generateTaskPlan(mockDesign);
-      
+
       const allTasks = [...result.immediateWins, ...result.shortTerm, ...result.longTerm];
-      
+
       allTasks.forEach(task => {
         expect(task.acceptanceCriteria.length).toBeGreaterThanOrEqual(3);
         task.acceptanceCriteria.forEach(criteria => {
@@ -1252,12 +1356,12 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
     test('should handle minimal design content', async () => {
       const minimalDesign = 'Basic system design with core functionality';
       const result = await generator.generateTaskPlan(minimalDesign);
-      
+
       expect(result.guardrailsCheck).toBeDefined();
       expect(result.immediateWins.length).toBeGreaterThan(0);
       expect(result.shortTerm.length).toBeGreaterThan(0);
       expect(result.longTerm.length).toBeGreaterThan(0);
-      
+
       // Should have reasonable tasks across all phases
       const allTasks = [...result.immediateWins, ...result.shortTerm, ...result.longTerm];
       expect(allTasks.length).toBeGreaterThan(0);
@@ -1266,30 +1370,32 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
 
     test('should prioritize Must-have tasks in immediate wins', async () => {
       const result = await generator.generateTaskPlan(mockDesign);
-      
+
       const mustHaveTasks = result.immediateWins.filter(task => task.priority === 'Must');
       expect(mustHaveTasks.length).toBeGreaterThan(0);
-      
+
       // Most immediate wins should be Must-have
       expect(mustHaveTasks.length / result.immediateWins.length).toBeGreaterThan(0.5);
     });
 
     test('should include performance and scalability in long-term', async () => {
       const result = await generator.generateTaskPlan(mockDesign);
-      
+
       // Performance task is always added regardless of design content
       const allTasks = [...result.immediateWins, ...result.shortTerm, ...result.longTerm];
-      const performanceTasks = allTasks.filter(task => 
-        task.name.toLowerCase().includes('performance') || 
-        task.name.toLowerCase().includes('scalability')
+      const performanceTasks = allTasks.filter(
+        task =>
+          task.name.toLowerCase().includes('performance') ||
+          task.name.toLowerCase().includes('scalability')
       );
-      
+
       expect(performanceTasks.length).toBeGreaterThan(0);
-      
+
       // Performance tasks should typically be in long-term due to Could priority and L effort
-      const longTermPerformanceTasks = result.longTerm.filter(task => 
-        task.name.toLowerCase().includes('performance') || 
-        task.name.toLowerCase().includes('scalability')
+      const longTermPerformanceTasks = result.longTerm.filter(
+        task =>
+          task.name.toLowerCase().includes('performance') ||
+          task.name.toLowerCase().includes('scalability')
       );
       expect(longTermPerformanceTasks.length).toBeGreaterThanOrEqual(0);
     });
@@ -1298,38 +1404,45 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
       const customLimits: TaskLimits = {
         maxVibes: 2000,
         maxSpecs: 100,
-        budgetUSD: 200000
+        budgetUSD: 200000,
       };
-      
+
       const result = await generator.generateTaskPlan(mockDesign, customLimits);
-      
-      expect(result.guardrailsCheck.checkCriteria.some(criteria => 
-        criteria.includes('1600') // 80% of 2000
-      )).toBe(true);
-      
-      expect(result.guardrailsCheck.checkCriteria.some(criteria => 
-        criteria.includes('80') // 80% of 100
-      )).toBe(true);
-      
-      expect(result.guardrailsCheck.checkCriteria.some(criteria => 
-        criteria.includes('$200,000')
-      )).toBe(true);
+
+      expect(
+        result.guardrailsCheck.checkCriteria.some(
+          criteria => criteria.includes('1600') // 80% of 2000
+        )
+      ).toBe(true);
+
+      expect(
+        result.guardrailsCheck.checkCriteria.some(
+          criteria => criteria.includes('80') // 80% of 100
+        )
+      ).toBe(true);
+
+      expect(
+        result.guardrailsCheck.checkCriteria.some(criteria => criteria.includes('$200,000'))
+      ).toBe(true);
     });
 
     test('should balance task distribution across phases', async () => {
       const result = await generator.generateTaskPlan(mockDesign);
-      
-      const totalTasks = result.immediateWins.length + result.shortTerm.length + result.longTerm.length;
-      
+
+      const totalTasks =
+        result.immediateWins.length + result.shortTerm.length + result.longTerm.length;
+
       // Should have reasonable distribution
       expect(totalTasks).toBeGreaterThanOrEqual(6);
       expect(totalTasks).toBeLessThanOrEqual(13);
-      
+
       // Short-term should have at least as many tasks as immediate wins
       expect(result.shortTerm.length).toBeGreaterThanOrEqual(result.immediateWins.length);
-      
+
       // Total distribution should be reasonable
-      expect(result.immediateWins.length + result.shortTerm.length).toBeGreaterThanOrEqual(result.longTerm.length);
+      expect(result.immediateWins.length + result.shortTerm.length).toBeGreaterThanOrEqual(
+        result.longTerm.length
+      );
     });
   });
 });

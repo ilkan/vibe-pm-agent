@@ -21,8 +21,8 @@ describe('QuotaForecaster', () => {
         ['processing', 2],
         ['analysis', 3],
         ['vibe', 1],
-        ['spec', 5]
-      ])
+        ['spec', 5],
+      ]),
     };
 
     quotaForecaster = new QuotaForecaster(mockCostModel);
@@ -34,7 +34,7 @@ describe('QuotaForecaster', () => {
         description: 'Parse user input',
         inputs: ['user_input'],
         outputs: ['parsed_data'],
-        quotaCost: 0.01
+        quotaCost: 0.01,
       },
       {
         id: 'step2',
@@ -42,7 +42,7 @@ describe('QuotaForecaster', () => {
         description: 'Fetch data from API',
         inputs: ['parsed_data'],
         outputs: ['api_data'],
-        quotaCost: 0.02
+        quotaCost: 0.02,
       },
       {
         id: 'step3',
@@ -50,8 +50,8 @@ describe('QuotaForecaster', () => {
         description: 'Analyze retrieved data',
         inputs: ['api_data'],
         outputs: ['analysis_result'],
-        quotaCost: 0.04
-      }
+        quotaCost: 0.04,
+      },
     ];
 
     mockWorkflow = {
@@ -59,9 +59,9 @@ describe('QuotaForecaster', () => {
       steps: mockSteps,
       dataFlow: [
         { from: 'step1', to: 'step2', dataType: 'parsed_data', required: true },
-        { from: 'step2', to: 'step3', dataType: 'api_data', required: true }
+        { from: 'step2', to: 'step3', dataType: 'api_data', required: true },
       ],
-      estimatedComplexity: 5
+      estimatedComplexity: 5,
     };
 
     mockOptimizedWorkflow = {
@@ -74,17 +74,17 @@ describe('QuotaForecaster', () => {
           estimatedSavings: {
             vibes: 20,
             specs: 0,
-            percentage: 15
-          }
-        }
+            percentage: 15,
+          },
+        },
       ],
       originalWorkflow: mockWorkflow,
       efficiencyGains: {
         vibeReduction: 20,
         specReduction: 0,
         costSavings: 0.004,
-        totalSavingsPercentage: 15
-      }
+        totalSavingsPercentage: 15,
+      },
     };
   });
 
@@ -109,11 +109,11 @@ describe('QuotaForecaster', () => {
             description: 'Simple vibe operation',
             inputs: [],
             outputs: ['result'],
-            quotaCost: 0.01
-          }
+            quotaCost: 0.01,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 2
+        estimatedComplexity: 2,
       };
 
       const result = await quotaForecaster.estimateNaiveConsumption(vibeWorkflow);
@@ -133,11 +133,11 @@ describe('QuotaForecaster', () => {
             description: 'Spec operation',
             inputs: [],
             outputs: ['result'],
-            quotaCost: 0.05
-          }
+            quotaCost: 0.05,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const result = await quotaForecaster.estimateNaiveConsumption(specWorkflow);
@@ -168,7 +168,7 @@ describe('QuotaForecaster', () => {
 
     it('should update breakdown for affected steps', async () => {
       const result = await quotaForecaster.estimateOptimizedConsumption(mockOptimizedWorkflow);
-      
+
       const affectedStep = result.breakdown.find(b => b.stepId === 'step2');
       expect(affectedStep).toBeDefined();
       expect(affectedStep!.cost).toBeGreaterThanOrEqual(0);
@@ -185,10 +185,10 @@ describe('QuotaForecaster', () => {
             estimatedSavings: {
               vibes: 100,
               specs: 100,
-              percentage: 100
-            }
-          }
-        ]
+              percentage: 100,
+            },
+          },
+        ],
       };
 
       const result = await quotaForecaster.estimateOptimizedConsumption(aggressiveOptimization);
@@ -204,7 +204,7 @@ describe('QuotaForecaster', () => {
         radicalApproach: 'Complete workflow redesign with minimal operations',
         assumptionsChallenged: ['Need for multiple API calls', 'Complex data processing'],
         potentialSavings: 80,
-        implementationRisk: 'medium'
+        implementationRisk: 'medium',
       };
 
       const result = await quotaForecaster.estimateZeroBasedConsumption(zeroBasedSolution);
@@ -221,14 +221,14 @@ describe('QuotaForecaster', () => {
         radicalApproach: 'Low risk approach',
         assumptionsChallenged: [],
         potentialSavings: 50,
-        implementationRisk: 'low'
+        implementationRisk: 'low',
       };
 
       const highRiskSolution: ZeroBasedSolution = {
         radicalApproach: 'High risk approach',
         assumptionsChallenged: [],
         potentialSavings: 90,
-        implementationRisk: 'high'
+        implementationRisk: 'high',
       };
 
       const lowRiskResult = await quotaForecaster.estimateZeroBasedConsumption(lowRiskSolution);
@@ -259,7 +259,7 @@ describe('QuotaForecaster', () => {
         estimatedCost: 0,
         confidenceLevel: 'high' as const,
         scenario: 'naive' as const,
-        breakdown: []
+        breakdown: [],
       };
 
       const savings = quotaForecaster.calculateSavings(zeroForecast, zeroForecast);
@@ -279,14 +279,14 @@ describe('QuotaForecaster', () => {
           forecast: await quotaForecaster.estimateNaiveConsumption(mockWorkflow),
           savingsPercentage: 0,
           implementationEffort: 'low',
-          riskLevel: 'low'
+          riskLevel: 'low',
         },
         {
           name: 'Optimized Approach',
           forecast: await quotaForecaster.estimateOptimizedConsumption(mockOptimizedWorkflow),
           savingsPercentage: 25,
           implementationEffort: 'medium',
-          riskLevel: 'medium'
+          riskLevel: 'medium',
         },
         {
           name: 'Zero-Based Approach',
@@ -294,12 +294,12 @@ describe('QuotaForecaster', () => {
             radicalApproach: 'Complete redesign',
             assumptionsChallenged: ['All assumptions'],
             potentialSavings: 70,
-            implementationRisk: 'high'
+            implementationRisk: 'high',
           }),
           savingsPercentage: 70,
           implementationEffort: 'high',
-          riskLevel: 'high'
-        }
+          riskLevel: 'high',
+        },
       ];
 
       const result = await quotaForecaster.generateROITable(scenarios);
@@ -318,20 +318,22 @@ describe('QuotaForecaster', () => {
           forecast: await quotaForecaster.estimateNaiveConsumption(mockWorkflow),
           savingsPercentage: 10,
           implementationEffort: 'low',
-          riskLevel: 'low'
+          riskLevel: 'low',
         },
         {
           name: 'High Savings',
           forecast: await quotaForecaster.estimateOptimizedConsumption(mockOptimizedWorkflow),
           savingsPercentage: 50,
           implementationEffort: 'high',
-          riskLevel: 'high'
-        }
+          riskLevel: 'high',
+        },
       ];
 
       const result = await quotaForecaster.generateROITable(scenarios);
 
-      expect(result.scenarios[0].savingsPercentage).toBeGreaterThan(result.scenarios[1].savingsPercentage);
+      expect(result.scenarios[0].savingsPercentage).toBeGreaterThan(
+        result.scenarios[1].savingsPercentage
+      );
     });
 
     it('should identify best option based on risk/effort/savings balance', async () => {
@@ -341,15 +343,15 @@ describe('QuotaForecaster', () => {
           forecast: await quotaForecaster.estimateNaiveConsumption(mockWorkflow),
           savingsPercentage: 80,
           implementationEffort: 'high',
-          riskLevel: 'high'
+          riskLevel: 'high',
         },
         {
           name: 'Balanced Option',
           forecast: await quotaForecaster.estimateOptimizedConsumption(mockOptimizedWorkflow),
           savingsPercentage: 50,
           implementationEffort: 'medium',
-          riskLevel: 'medium'
-        }
+          riskLevel: 'medium',
+        },
       ];
 
       const result = await quotaForecaster.generateROITable(scenarios);
@@ -362,7 +364,9 @@ describe('QuotaForecaster', () => {
     });
 
     it('should throw error for empty scenarios', async () => {
-      await expect(quotaForecaster.generateROITable([])).rejects.toThrow('At least one scenario is required for ROI analysis');
+      await expect(quotaForecaster.generateROITable([])).rejects.toThrow(
+        'At least one scenario is required for ROI analysis'
+      );
     });
 
     it('should provide risk assessment for high-risk scenarios', async () => {
@@ -372,8 +376,8 @@ describe('QuotaForecaster', () => {
           forecast: await quotaForecaster.estimateNaiveConsumption(mockWorkflow),
           savingsPercentage: 60,
           implementationEffort: 'high',
-          riskLevel: 'high'
-        }
+          riskLevel: 'high',
+        },
       ];
 
       const result = await quotaForecaster.generateROITable(scenarios);
@@ -385,12 +389,13 @@ describe('QuotaForecaster', () => {
   describe('calculateMultiScenarioSavings', () => {
     it('should calculate savings across multiple scenarios', async () => {
       const naiveForecast = await quotaForecaster.estimateNaiveConsumption(mockWorkflow);
-      const optimizedForecast = await quotaForecaster.estimateOptimizedConsumption(mockOptimizedWorkflow);
+      const optimizedForecast =
+        await quotaForecaster.estimateOptimizedConsumption(mockOptimizedWorkflow);
       const zeroBasedForecast = await quotaForecaster.estimateZeroBasedConsumption({
         radicalApproach: 'Complete redesign',
         assumptionsChallenged: ['All assumptions'],
         potentialSavings: 70,
-        implementationRisk: 'medium'
+        implementationRisk: 'medium',
       });
 
       const forecasts = [naiveForecast, optimizedForecast, zeroBasedForecast];
@@ -422,7 +427,7 @@ describe('QuotaForecaster', () => {
         estimatedCost: 1.5,
         confidenceLevel: 'high' as const,
         scenario: 'naive' as const,
-        breakdown: []
+        breakdown: [],
       };
 
       const zeroBasedForecast = {
@@ -431,7 +436,7 @@ describe('QuotaForecaster', () => {
         estimatedCost: 0.15,
         confidenceLevel: 'high' as const,
         scenario: 'zero-based' as const,
-        breakdown: []
+        breakdown: [],
       };
 
       const forecasts = [naiveForecast, zeroBasedForecast];
@@ -448,7 +453,7 @@ describe('QuotaForecaster', () => {
         estimatedCost: 0.15,
         confidenceLevel: 'high' as const,
         scenario: 'naive' as const,
-        breakdown: []
+        breakdown: [],
       };
 
       const optimizedForecast = {
@@ -457,7 +462,7 @@ describe('QuotaForecaster', () => {
         estimatedCost: 0.14,
         confidenceLevel: 'high' as const,
         scenario: 'optimized' as const,
-        breakdown: []
+        breakdown: [],
       };
 
       const forecasts = [naiveForecast, optimizedForecast];
@@ -474,7 +479,7 @@ describe('QuotaForecaster', () => {
         estimatedCost: 0.75,
         confidenceLevel: 'high' as const,
         scenario: 'naive' as const,
-        breakdown: []
+        breakdown: [],
       };
 
       const optimizedForecast = {
@@ -483,16 +488,16 @@ describe('QuotaForecaster', () => {
         estimatedCost: 0.55,
         confidenceLevel: 'high' as const,
         scenario: 'optimized' as const,
-        breakdown: []
+        breakdown: [],
       };
 
       const zeroBasedForecast = {
         vibesConsumed: 20,
         specsConsumed: 2,
-        estimatedCost: 0.30,
+        estimatedCost: 0.3,
         confidenceLevel: 'medium' as const,
         scenario: 'zero-based' as const,
-        breakdown: []
+        breakdown: [],
       };
 
       const forecasts = [naiveForecast, optimizedForecast, zeroBasedForecast];
@@ -504,7 +509,9 @@ describe('QuotaForecaster', () => {
     });
 
     it('should throw error for empty forecasts array', () => {
-      expect(() => quotaForecaster.calculateMultiScenarioSavings([])).toThrow('At least one forecast is required for multi-scenario savings calculation');
+      expect(() => quotaForecaster.calculateMultiScenarioSavings([])).toThrow(
+        'At least one forecast is required for multi-scenario savings calculation'
+      );
     });
   });
 
@@ -512,8 +519,8 @@ describe('QuotaForecaster', () => {
     it('should update the cost model', () => {
       const newCostModel: QuotaCostModel = {
         vibeUnitCost: 0.02,
-        specUnitCost: 0.10,
-        operationCosts: new Map([['test', 1]])
+        specUnitCost: 0.1,
+        operationCosts: new Map([['test', 1]]),
       };
 
       quotaForecaster.setCostModel(newCostModel);
@@ -526,22 +533,30 @@ describe('QuotaForecaster', () => {
   describe('parameter integration', () => {
     it('should adjust consumption for high user volume', async () => {
       const highVolumeParams: OptionalParams = {
-        expectedUserVolume: 5000
+        expectedUserVolume: 5000,
       };
 
-      const resultWithVolume = await quotaForecaster.estimateNaiveConsumption(mockWorkflow, highVolumeParams);
+      const resultWithVolume = await quotaForecaster.estimateNaiveConsumption(
+        mockWorkflow,
+        highVolumeParams
+      );
       const resultWithoutVolume = await quotaForecaster.estimateNaiveConsumption(mockWorkflow);
 
       expect(resultWithVolume.vibesConsumed).toBeGreaterThan(resultWithoutVolume.vibesConsumed);
-      expect(resultWithVolume.specsConsumed).toBeGreaterThanOrEqual(resultWithoutVolume.specsConsumed);
+      expect(resultWithVolume.specsConsumed).toBeGreaterThanOrEqual(
+        resultWithoutVolume.specsConsumed
+      );
     });
 
     it('should reduce consumption for low user volume', async () => {
       const lowVolumeParams: OptionalParams = {
-        expectedUserVolume: 5
+        expectedUserVolume: 5,
       };
 
-      const resultWithVolume = await quotaForecaster.estimateNaiveConsumption(mockWorkflow, lowVolumeParams);
+      const resultWithVolume = await quotaForecaster.estimateNaiveConsumption(
+        mockWorkflow,
+        lowVolumeParams
+      );
       const resultWithoutVolume = await quotaForecaster.estimateNaiveConsumption(mockWorkflow);
 
       expect(resultWithVolume.vibesConsumed).toBeLessThanOrEqual(resultWithoutVolume.vibesConsumed);
@@ -550,15 +565,21 @@ describe('QuotaForecaster', () => {
 
     it('should adjust consumption for performance sensitivity', async () => {
       const highPerfParams: OptionalParams = {
-        performanceSensitivity: 'high'
+        performanceSensitivity: 'high',
       };
 
       const lowPerfParams: OptionalParams = {
-        performanceSensitivity: 'low'
+        performanceSensitivity: 'low',
       };
 
-      const highPerfResult = await quotaForecaster.estimateNaiveConsumption(mockWorkflow, highPerfParams);
-      const lowPerfResult = await quotaForecaster.estimateNaiveConsumption(mockWorkflow, lowPerfParams);
+      const highPerfResult = await quotaForecaster.estimateNaiveConsumption(
+        mockWorkflow,
+        highPerfParams
+      );
+      const lowPerfResult = await quotaForecaster.estimateNaiveConsumption(
+        mockWorkflow,
+        lowPerfParams
+      );
 
       expect(highPerfResult.vibesConsumed).toBeGreaterThan(lowPerfResult.vibesConsumed);
     });
@@ -568,43 +589,55 @@ describe('QuotaForecaster', () => {
         costConstraints: {
           maxVibes: 2,
           maxSpecs: 1,
-          maxCostDollars: 0.10
-        }
+          maxCostDollars: 0.1,
+        },
       };
 
-      const result = await quotaForecaster.estimateNaiveConsumption(mockWorkflow, constrainedParams);
+      const result = await quotaForecaster.estimateNaiveConsumption(
+        mockWorkflow,
+        constrainedParams
+      );
 
       expect(result.vibesConsumed).toBeLessThanOrEqual(2);
       expect(result.specsConsumed).toBeLessThanOrEqual(1);
-      expect(result.estimatedCost).toBeLessThanOrEqual(0.10);
+      expect(result.estimatedCost).toBeLessThanOrEqual(0.1);
     });
 
     it('should adjust confidence based on parameters', async () => {
       const highVolumeParams: OptionalParams = {
-        expectedUserVolume: 10000
+        expectedUserVolume: 10000,
       };
 
       const tightConstraintsParams: OptionalParams = {
         costConstraints: {
           maxVibes: 2,
-          maxCostDollars: 0.05
-        }
+          maxCostDollars: 0.05,
+        },
       };
 
       const highPerfParams: OptionalParams = {
-        performanceSensitivity: 'high'
+        performanceSensitivity: 'high',
       };
 
-      const highVolumeResult = await quotaForecaster.estimateNaiveConsumption(mockWorkflow, highVolumeParams);
-      const constrainedResult = await quotaForecaster.estimateNaiveConsumption(mockWorkflow, tightConstraintsParams);
-      const highPerfResult = await quotaForecaster.estimateNaiveConsumption(mockWorkflow, highPerfParams);
+      const highVolumeResult = await quotaForecaster.estimateNaiveConsumption(
+        mockWorkflow,
+        highVolumeParams
+      );
+      const constrainedResult = await quotaForecaster.estimateNaiveConsumption(
+        mockWorkflow,
+        tightConstraintsParams
+      );
+      const highPerfResult = await quotaForecaster.estimateNaiveConsumption(
+        mockWorkflow,
+        highPerfParams
+      );
 
       // High volume should reduce confidence
       expect(['low', 'medium']).toContain(highVolumeResult.confidenceLevel);
-      
+
       // Tight constraints should reduce confidence
       expect(['low', 'medium']).toContain(constrainedResult.confidenceLevel);
-      
+
       // High performance sensitivity should increase confidence
       expect(['medium', 'high']).toContain(highPerfResult.confidenceLevel);
     });
@@ -614,16 +647,19 @@ describe('QuotaForecaster', () => {
         radicalApproach: 'Minimal implementation',
         assumptionsChallenged: ['Current complexity'],
         potentialSavings: 80,
-        implementationRisk: 'medium'
+        implementationRisk: 'medium',
       };
 
       const constrainedParams: OptionalParams = {
         costConstraints: {
-          maxCostDollars: 0.02
-        }
+          maxCostDollars: 0.02,
+        },
       };
 
-      const result = await quotaForecaster.estimateZeroBasedConsumption(zeroBasedSolution, constrainedParams);
+      const result = await quotaForecaster.estimateZeroBasedConsumption(
+        zeroBasedSolution,
+        constrainedParams
+      );
 
       expect(result.estimatedCost).toBeLessThanOrEqual(0.02);
       expect(result.scenario).toBe('zero-based');
@@ -631,10 +667,13 @@ describe('QuotaForecaster', () => {
 
     it('should work with optimized consumption and parameters', async () => {
       const highVolumeParams: OptionalParams = {
-        expectedUserVolume: 8000
+        expectedUserVolume: 8000,
       };
 
-      const result = await quotaForecaster.estimateOptimizedConsumption(mockOptimizedWorkflow, highVolumeParams);
+      const result = await quotaForecaster.estimateOptimizedConsumption(
+        mockOptimizedWorkflow,
+        highVolumeParams
+      );
 
       expect(result.scenario).toBe('optimized');
       expect(result.vibesConsumed).toBeGreaterThan(0);

@@ -1,6 +1,6 @@
 /**
  * Integration tests for steering file format compliance and validation
- * 
+ *
  * Tests that generated steering files comply with Kiro steering conventions,
  * have valid front-matter, proper markdown structure, and correct cross-references.
  */
@@ -26,23 +26,23 @@ describe('Steering File Format Validation Tests', () => {
   beforeEach(async () => {
     testSteeringDir = path.join(process.cwd(), 'test-steering-validation');
     testSpecsDir = path.join(process.cwd(), 'test-specs-validation');
-    
+
     await fs.mkdir(testSteeringDir, { recursive: true });
     await fs.mkdir(testSpecsDir, { recursive: true });
 
     steeringService = new SteeringService({
       steeringDirectory: testSteeringDir,
-      userPreferences: { autoCreate: true, showPreview: false }
+      userPreferences: { autoCreate: true, showPreview: false },
     });
 
     steeringManager = new SteeringFileManager({
       steeringDirectory: testSteeringDir,
-      validateContent: true
+      validateContent: true,
     });
 
     frontMatterProcessor = new FrontMatterProcessor();
     referenceLinker = new DocumentReferenceLinker(process.cwd(), {
-      baseDirectory: testSpecsDir
+      baseDirectory: testSpecsDir,
     });
   });
 
@@ -61,28 +61,28 @@ describe('Steering File Format Validation Tests', () => {
         {
           method: 'createFromRequirements',
           content: '# Requirements\n## User Story\nAs a user, I want valid front-matter.',
-          expectedDocType: DocumentType.REQUIREMENTS
+          expectedDocType: DocumentType.REQUIREMENTS,
         },
         {
           method: 'createFromDesignOptions',
           content: '# Design Options\n## Conservative\nBasic implementation.',
-          expectedDocType: DocumentType.DESIGN
+          expectedDocType: DocumentType.DESIGN,
         },
         {
           method: 'createFromOnePager',
           content: '# Executive Summary\n## Problem\nNeed better steering files.',
-          expectedDocType: DocumentType.ONEPAGER
+          expectedDocType: DocumentType.ONEPAGER,
         },
         {
           method: 'createFromPRFAQ',
           content: '# Press Release\nNew steering system launched.',
-          expectedDocType: DocumentType.PRFAQ
+          expectedDocType: DocumentType.PRFAQ,
         },
         {
           method: 'createFromTaskPlan',
           content: '# Tasks\n- [ ] Implement validation',
-          expectedDocType: DocumentType.TASKS
-        }
+          expectedDocType: DocumentType.TASKS,
+        },
       ];
 
       for (const testCase of testCases) {
@@ -91,19 +91,19 @@ describe('Steering File Format Validation Tests', () => {
           result = await steeringService.createFromRequirements(testCase.content, {
             create_steering_files: true,
             feature_name: `validation-${testCase.expectedDocType}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         } else if (testCase.method === 'createFromDesignOptions') {
           result = await steeringService.createFromDesignOptions(testCase.content, {
             create_steering_files: true,
             feature_name: `validation-${testCase.expectedDocType}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         } else if (testCase.method === 'createFromOnePager') {
           result = await steeringService.createFromOnePager(testCase.content, {
             create_steering_files: true,
             feature_name: `validation-${testCase.expectedDocType}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         } else {
           throw new Error(`Unsupported method: ${testCase.method}`);
@@ -121,7 +121,7 @@ describe('Steering File Format Validation Tests', () => {
         expect(frontMatterMatch).toBeTruthy();
 
         const frontMatterYaml = frontMatterMatch![1];
-        
+
         // Validate YAML syntax
         let frontMatter;
         expect(() => {
@@ -149,13 +149,13 @@ describe('Steering File Format Validation Tests', () => {
 
     it('should handle different inclusion rules correctly', async () => {
       const inclusionRules: InclusionRule[] = ['always', 'fileMatch', 'manual'];
-      
+
       for (const inclusionRule of inclusionRules) {
         const steeringOptions: SteeringFileOptions = {
           create_steering_files: true,
           feature_name: `inclusion-${inclusionRule}`,
           inclusion_rule: inclusionRule,
-          file_match_pattern: inclusionRule === 'fileMatch' ? 'test*|spec*' : undefined
+          file_match_pattern: inclusionRule === 'fileMatch' ? 'test*|spec*' : undefined,
         };
 
         const result = await steeringService.createFromRequirements(
@@ -171,7 +171,7 @@ describe('Steering File Format Validation Tests', () => {
         const frontMatter = yaml.load(frontMatterMatch![1]) as any;
 
         expect(frontMatter.inclusion).toBe(inclusionRule);
-        
+
         if (inclusionRule === 'fileMatch') {
           expect(frontMatter).toHaveProperty('fileMatchPattern');
           expect(frontMatter.fileMatchPattern).toBe('test*|spec*');
@@ -187,7 +187,7 @@ describe('Steering File Format Validation Tests', () => {
         feature_name: 'custom-fields-test',
         inclusion_rule: 'fileMatch',
         file_match_pattern: 'custom*',
-        filename_prefix: 'custom-prefix'
+        filename_prefix: 'custom-prefix',
       };
 
       const result = await steeringService.createFromRequirements(
@@ -216,7 +216,7 @@ describe('Steering File Format Validation Tests', () => {
           create_steering_files: true,
           feature_name: specialFeatureName,
           inclusion_rule: 'fileMatch',
-          file_match_pattern: specialPattern
+          file_match_pattern: specialPattern,
         }
       );
 
@@ -239,7 +239,7 @@ describe('Steering File Format Validation Tests', () => {
         {
           create_steering_files: true,
           feature_name: 'markdown-test',
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         }
       );
 
@@ -251,11 +251,11 @@ describe('Steering File Format Validation Tests', () => {
       // Validate basic markdown structure
       expect(content).toMatch(/^---\n[\s\S]*?\n---\n\n/); // Front-matter followed by content
       expect(content).toMatch(/\n---\n\n# /); // Content starts with H1 header
-      
+
       // Validate no malformed markdown
       expect(content).not.toMatch(/#{7,}/); // No headers deeper than H6
       expect(content).not.toMatch(/\n\n\n\n+/); // No excessive blank lines
-      
+
       // Validate proper line endings
       expect(content).not.toMatch(/\r\n/); // Should use Unix line endings
       expect(content.endsWith('\n')).toBe(true); // Should end with newline
@@ -304,7 +304,7 @@ interface Example {
       const result = await steeringService.createFromRequirements(markdownContent, {
         create_steering_files: true,
         feature_name: 'markdown-formatting-test',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       });
 
       expect(result.created).toBe(true);
@@ -339,7 +339,7 @@ Math: α β γ δ ∑ ∏ ∫
 \\* \\_ \\# \\[ \\] \\( \\)
 
 ## Mixed Content
-Normal text with **bold \\*escaped\\*** and \`code with \\`backticks\\`\`
+Normal text with **bold \\*escaped\\*** and \`code with \\\`backticks\\\`\`
 
 ## Empty Sections
 
@@ -357,7 +357,7 @@ This is a very long line that should be preserved as-is without any automatic li
       const result = await steeringService.createFromRequirements(edgeCaseContent, {
         create_steering_files: true,
         feature_name: 'edge-case-test',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       });
 
       expect(result.created).toBe(true);
@@ -381,7 +381,7 @@ This is a very long line that should be preserved as-is without any automatic li
       const featureName = 'reference-syntax-test';
       const specsFeatureDir = path.join(testSpecsDir, featureName);
       await fs.mkdir(specsFeatureDir, { recursive: true });
-      
+
       await fs.writeFile(path.join(specsFeatureDir, 'requirements.md'), '# Mock Requirements');
       await fs.writeFile(path.join(specsFeatureDir, 'design.md'), '# Mock Design');
       await fs.writeFile(path.join(specsFeatureDir, 'tasks.md'), '# Mock Tasks');
@@ -391,7 +391,7 @@ This is a very long line that should be preserved as-is without any automatic li
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -407,15 +407,15 @@ This is a very long line that should be preserved as-is without any automatic li
       references.forEach(ref => {
         // Should match the pattern #[[file:path]]
         expect(ref).toMatch(/^#\[\[file:[^\]]+\]\]$/);
-        
+
         // Should not contain spaces in the file path
         const filePath = ref.match(/#\[\[file:([^\]]+)\]\]/)?.[1];
         expect(filePath).toBeDefined();
         expect(filePath).not.toMatch(/\s/);
-        
+
         // Should use forward slashes for paths
         expect(filePath).not.toMatch(/\\/);
-        
+
         // Should be relative paths (not starting with /)
         expect(filePath).not.toMatch(/^\//);
       });
@@ -426,7 +426,7 @@ This is a very long line that should be preserved as-is without any automatic li
       const featureName = 'partial-references-test';
       const specsFeatureDir = path.join(testSpecsDir, featureName);
       await fs.mkdir(specsFeatureDir, { recursive: true });
-      
+
       // Only create requirements file, not design or tasks
       await fs.writeFile(path.join(specsFeatureDir, 'requirements.md'), '# Existing Requirements');
 
@@ -435,7 +435,7 @@ This is a very long line that should be preserved as-is without any automatic li
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -443,9 +443,10 @@ This is a very long line that should be preserved as-is without any automatic li
 
       // Check if warnings were generated for missing references
       if (result.warnings && result.warnings.length > 0) {
-        const hasReferenceWarning = result.warnings.some(warning => 
-          warning.toLowerCase().includes('reference') || 
-          warning.toLowerCase().includes('file not found')
+        const hasReferenceWarning = result.warnings.some(
+          warning =>
+            warning.toLowerCase().includes('reference') ||
+            warning.toLowerCase().includes('file not found')
         );
         // This is acceptable - the system should warn about missing references
       }
@@ -455,24 +456,22 @@ This is a very long line that should be preserved as-is without any automatic li
 
       // Should still contain references even if files don't exist
       const references = content.match(/#\[\[file:[^\]]+\]\]/g) || [];
-      
+
       // Validate that existing file is referenced
-      const hasRequirementsRef = references.some(ref => 
-        ref.includes('requirements.md')
-      );
+      const hasRequirementsRef = references.some(ref => ref.includes('requirements.md'));
       expect(hasRequirementsRef).toBe(true);
     });
 
     it('should handle circular reference prevention', async () => {
       const featureName = 'circular-ref-test';
-      
+
       // Create multiple documents that could create circular references
       const reqResult = await steeringService.createFromRequirements(
         '# Requirements\n## User Story\nTesting circular references.',
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -481,7 +480,7 @@ This is a very long line that should be preserved as-is without any automatic li
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -490,11 +489,11 @@ This is a very long line that should be preserved as-is without any automatic li
 
       // Verify no self-references exist
       const steeringFiles = await fs.readdir(testSteeringDir);
-      
+
       for (const filename of steeringFiles) {
         const content = await fs.readFile(path.join(testSteeringDir, filename), 'utf8');
         const references = content.match(/#\[\[file:[^\]]+\]\]/g) || [];
-        
+
         // No reference should point to the same file
         const baseFilename = filename.replace('.md', '');
         references.forEach(ref => {
@@ -509,7 +508,7 @@ This is a very long line that should be preserved as-is without any automatic li
         {
           create_steering_files: true,
           feature_name: 'path-format-test',
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -521,20 +520,20 @@ This is a very long line that should be preserved as-is without any automatic li
 
       references.forEach(ref => {
         const filePath = ref.match(/#\[\[file:([^\]]+)\]\]/)?.[1];
-        
+
         // Should be valid file paths
         expect(filePath).toBeDefined();
         expect(filePath).not.toBe('');
-        
+
         // Should not contain invalid characters
         expect(filePath).not.toMatch(/[<>:"|?*]/);
-        
+
         // Should end with .md
         expect(filePath).toMatch(/\.md$/);
-        
+
         // Should use consistent path separators
         expect(filePath).not.toMatch(/\\/); // No backslashes
-        
+
         // Should be relative paths
         expect(filePath).not.toMatch(/^[A-Z]:/); // No Windows drive letters
         expect(filePath).not.toMatch(/^\//); // No absolute Unix paths
@@ -545,9 +544,18 @@ This is a very long line that should be preserved as-is without any automatic li
   describe('Content Structure Validation', () => {
     it('should maintain consistent content structure across document types', async () => {
       const documentTypes = [
-        { method: 'createFromRequirements', content: '# Requirements\n## User Story\nConsistent structure test.' },
-        { method: 'createFromDesignOptions', content: '# Design\n## Architecture\nConsistent structure test.' },
-        { method: 'createFromOnePager', content: '# Executive Summary\n## Problem\nConsistent structure test.' }
+        {
+          method: 'createFromRequirements',
+          content: '# Requirements\n## User Story\nConsistent structure test.',
+        },
+        {
+          method: 'createFromDesignOptions',
+          content: '# Design\n## Architecture\nConsistent structure test.',
+        },
+        {
+          method: 'createFromOnePager',
+          content: '# Executive Summary\n## Problem\nConsistent structure test.',
+        },
       ];
 
       for (const docType of documentTypes) {
@@ -556,19 +564,19 @@ This is a very long line that should be preserved as-is without any automatic li
           result = await steeringService.createFromRequirements(docType.content, {
             create_steering_files: true,
             feature_name: `structure-${docType.method}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         } else if (docType.method === 'createFromDesignOptions') {
           result = await steeringService.createFromDesignOptions(docType.content, {
             create_steering_files: true,
             feature_name: `structure-${docType.method}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         } else if (docType.method === 'createFromOnePager') {
           result = await steeringService.createFromOnePager(docType.content, {
             create_steering_files: true,
             feature_name: `structure-${docType.method}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         } else {
           throw new Error(`Unsupported method: ${docType.method}`);
@@ -584,7 +592,7 @@ This is a very long line that should be preserved as-is without any automatic li
         expect(content).toMatch(/\n---\n\n# /); // Front-matter ends, content starts with H1
         expect(content).toMatch(/\n\n## /); // Contains H2 sections
         expect(content.endsWith('\n')); // Ends with newline
-        
+
         // Should not have excessive whitespace
         expect(content).not.toMatch(/\n\n\n\n+/);
         expect(content).not.toMatch(/[ \t]+\n/); // No trailing whitespace
@@ -597,14 +605,14 @@ This is a very long line that should be preserved as-is without any automatic li
       const result = await steeringService.createFromRequirements(minimalContent, {
         create_steering_files: true,
         feature_name: 'minimal-content-test',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       });
 
       // Should handle minimal content without errors
       if (result.created) {
         const filename = result.results[0].filename;
         const content = await fs.readFile(path.join(testSteeringDir, filename), 'utf8');
-        
+
         // Should still have valid structure
         expect(content).toMatch(/^---\n/);
         expect(content).toMatch(/\n---\n/);
@@ -641,7 +649,7 @@ Currency: $ € £ ¥ ₹ ₿
       const result = await steeringService.createFromRequirements(unicodeContent, {
         create_steering_files: true,
         feature_name: 'unicode-test',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       });
 
       expect(result.created).toBe(true);
@@ -671,7 +679,7 @@ Currency: $ € £ ¥ ₹ ₿
       const testCases = [
         { featureName: 'simple-feature', expectedPattern: /simple-feature.*\.md$/ },
         { featureName: 'complex_feature_name', expectedPattern: /complex_feature_name.*\.md$/ },
-        { featureName: 'Feature-With-Caps', expectedPattern: /Feature-With-Caps.*\.md$/ }
+        { featureName: 'Feature-With-Caps', expectedPattern: /Feature-With-Caps.*\.md$/ },
       ];
 
       for (const testCase of testCases) {
@@ -680,7 +688,7 @@ Currency: $ € £ ¥ ₹ ₿
           {
             create_steering_files: true,
             feature_name: testCase.featureName,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           }
         );
 
@@ -691,10 +699,7 @@ Currency: $ € £ ¥ ₹ ₿
 
     it('should integrate with existing Kiro steering directory structure', async () => {
       // Create some existing steering files to test integration
-      const existingFiles = [
-        'existing-manual-file.md',
-        'another-steering-file.md'
-      ];
+      const existingFiles = ['existing-manual-file.md', 'another-steering-file.md'];
 
       for (const filename of existingFiles) {
         await fs.writeFile(
@@ -709,7 +714,7 @@ Currency: $ € £ ¥ ₹ ₿
         {
           create_steering_files: true,
           feature_name: 'integration-test',
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         }
       );
 
@@ -730,17 +735,17 @@ Currency: $ € £ ¥ ₹ ₿
       const inclusionTests = [
         {
           rule: 'always' as InclusionRule,
-          description: 'should be included in all contexts'
+          description: 'should be included in all contexts',
         },
         {
           rule: 'fileMatch' as InclusionRule,
           pattern: 'requirements*|spec*',
-          description: 'should be included when matching files are in context'
+          description: 'should be included when matching files are in context',
         },
         {
           rule: 'manual' as InclusionRule,
-          description: 'should only be included when explicitly referenced'
-        }
+          description: 'should only be included when explicitly referenced',
+        },
       ];
 
       for (const test of inclusionTests) {
@@ -750,7 +755,7 @@ Currency: $ € £ ¥ ₹ ₿
             create_steering_files: true,
             feature_name: `inclusion-${test.rule}`,
             inclusion_rule: test.rule,
-            file_match_pattern: test.pattern
+            file_match_pattern: test.pattern,
           }
         );
 
@@ -762,7 +767,7 @@ Currency: $ € £ ¥ ₹ ₿
         const frontMatter = yaml.load(frontMatterMatch![1]) as any;
 
         expect(frontMatter.inclusion).toBe(test.rule);
-        
+
         if (test.pattern) {
           expect(frontMatter.fileMatchPattern).toBe(test.pattern);
         }

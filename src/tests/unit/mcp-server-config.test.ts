@@ -14,7 +14,7 @@ describe('MCP Server Configuration', () => {
     it('should define all required tools', () => {
       const expectedTools = [
         'optimize_intent',
-        'analyze_workflow', 
+        'analyze_workflow',
         'generate_roi_analysis',
         'get_consulting_summary',
         'generate_management_onepager',
@@ -22,7 +22,7 @@ describe('MCP Server Configuration', () => {
         'generate_requirements',
         'generate_design_options',
         'generate_task_plan',
-        'validate_idea_quick'
+        'validate_idea_quick',
       ];
 
       const toolNames = MCP_SERVER_CONFIG.tools.map(tool => tool.name);
@@ -61,7 +61,7 @@ describe('MCP Server Configuration', () => {
         const params = schema.properties?.parameters;
         expect(params).toBeDefined();
         expect(params.type).toBe('object');
-        
+
         const expectedUserVolume = params.properties?.expectedUserVolume;
         expect(expectedUserVolume?.type).toBe('number');
         expect(expectedUserVolume?.minimum).toBe(1);
@@ -92,9 +92,14 @@ describe('MCP Server Configuration', () => {
         const workflow = schema.properties?.workflow;
         const steps = workflow.properties?.steps;
         expect(steps.type).toBe('array');
-        
+
         const stepItem = steps.items;
-        expect(stepItem.properties?.type?.enum).toEqual(['vibe', 'spec', 'data_retrieval', 'processing']);
+        expect(stepItem.properties?.type?.enum).toEqual([
+          'vibe',
+          'spec',
+          'data_retrieval',
+          'processing',
+        ]);
         expect(stepItem.required).toContain('id');
         expect(stepItem.required).toContain('type');
         expect(stepItem.required).toContain('description');
@@ -105,8 +110,13 @@ describe('MCP Server Configuration', () => {
         const techniques = schema.properties?.techniques;
         expect(techniques?.type).toBe('array');
         expect(techniques?.items?.enum).toEqual([
-          'MECE', 'Pyramid', 'ValueDriverTree', 'ZeroBased', 
-          'ImpactEffort', 'ValueProp', 'OptionFraming'
+          'MECE',
+          'Pyramid',
+          'ValueDriverTree',
+          'ZeroBased',
+          'ImpactEffort',
+          'ValueProp',
+          'OptionFraming',
         ]);
       });
     });
@@ -159,7 +169,7 @@ describe('MCP Server Configuration', () => {
         const context = schema.properties?.context;
         expect(context).toBeDefined();
         expect(context.type).toBe('object');
-        
+
         const urgency = context.properties?.urgency;
         expect(urgency?.enum).toEqual(['low', 'medium', 'high']);
 
@@ -264,7 +274,7 @@ describe('MCP Server Configuration', () => {
         name: 'test_tool',
         description: 'Test tool',
         inputSchema: { type: 'object' },
-        handler: async () => ({ content: [] })
+        handler: async () => ({ content: [] }),
       };
 
       registry.registerTool(mockTool);
@@ -276,11 +286,13 @@ describe('MCP Server Configuration', () => {
         name: 'test_tool',
         description: 'Test tool',
         inputSchema: { type: 'object' },
-        handler: async () => ({ content: [] })
+        handler: async () => ({ content: [] }),
       };
 
       registry.registerTool(mockTool);
-      expect(() => registry.registerTool(mockTool)).toThrow("Tool 'test_tool' is already registered");
+      expect(() => registry.registerTool(mockTool)).toThrow(
+        "Tool 'test_tool' is already registered"
+      );
     });
 
     it('should return undefined for non-existent tools', () => {
@@ -292,13 +304,13 @@ describe('MCP Server Configuration', () => {
         name: 'tool1',
         description: 'Tool 1',
         inputSchema: { type: 'object' },
-        handler: async () => ({ content: [] })
+        handler: async () => ({ content: [] }),
       };
       const tool2: MCPTool = {
         name: 'tool2',
         description: 'Tool 2',
         inputSchema: { type: 'object' },
-        handler: async () => ({ content: [] })
+        handler: async () => ({ content: [] }),
       };
 
       registry.registerTool(tool1);
@@ -315,13 +327,13 @@ describe('MCP Server Configuration', () => {
         name: 'tool1',
         description: 'Tool 1',
         inputSchema: { type: 'object' },
-        handler: async () => ({ content: [] })
+        handler: async () => ({ content: [] }),
       };
       const tool2: MCPTool = {
         name: 'tool2',
         description: 'Tool 2',
         inputSchema: { type: 'object' },
-        handler: async () => ({ content: [] })
+        handler: async () => ({ content: [] }),
       };
 
       registry.registerTool(tool1);
@@ -340,10 +352,10 @@ describe('MCP Server Configuration', () => {
             type: 'object',
             required: ['requiredField'],
             properties: {
-              requiredField: { type: 'string' }
-            }
+              requiredField: { type: 'string' },
+            },
           },
-          handler: async () => ({ content: [] })
+          handler: async () => ({ content: [] }),
         };
         registry.registerTool(mockTool);
       });
@@ -373,7 +385,7 @@ describe('MCP Server Configuration', () => {
       it('should create registry with default tools', () => {
         const defaultRegistry = MCPToolRegistry.createDefault();
         const toolNames = defaultRegistry.getToolNames();
-        
+
         expect(toolNames).toContain('optimize_intent');
         expect(toolNames).toContain('analyze_workflow');
         expect(toolNames).toContain('generate_roi_analysis');
@@ -389,9 +401,9 @@ describe('MCP Server Configuration', () => {
       it('should have all tools from MCP_SERVER_CONFIG', () => {
         const defaultRegistry = MCPToolRegistry.createDefault();
         const registryTools = defaultRegistry.getAllTools();
-        
+
         expect(registryTools).toHaveLength(MCP_SERVER_CONFIG.tools.length);
-        
+
         MCP_SERVER_CONFIG.tools.forEach(configTool => {
           const registryTool = defaultRegistry.getTool(configTool.name);
           expect(registryTool).toBeDefined();

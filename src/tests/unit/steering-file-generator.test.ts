@@ -17,11 +17,11 @@ describe('SteeringFileGenerator', () => {
       relatedFiles: [
         '.kiro/specs/user-authentication/requirements.md',
         '.kiro/specs/user-authentication/design.md',
-        '.kiro/specs/user-authentication/tasks.md'
+        '.kiro/specs/user-authentication/tasks.md',
       ],
       inclusionRule: 'fileMatch' as InclusionRule,
       fileMatchPattern: 'auth*|user*',
-      description: 'Test steering file generation'
+      description: 'Test steering file generation',
     };
   });
 
@@ -68,12 +68,14 @@ This feature implements user authentication with OAuth2 support for secure login
       expect(result.content).toContain('OAuth2 support');
       expect(result.content).toContain('EARS (Easy Approach to Requirements Syntax)');
       expect(result.references).toHaveLength(3);
-      expect(result.references[0]).toBe('#[[file:.kiro/specs/user-authentication/requirements.md]]');
+      expect(result.references[0]).toBe(
+        '#[[file:.kiro/specs/user-authentication/requirements.md]]'
+      );
     });
 
     it('should handle requirements without clear structure', () => {
       const mockRequirements = 'Simple requirements text without proper structure.';
-      
+
       const result = generator.generateFromRequirements(mockRequirements, mockContext);
 
       expect(result).toBeDefined();
@@ -148,7 +150,7 @@ The system uses a modular authentication service with pluggable providers.
 
     it('should handle design without structured options', () => {
       const mockDesign = 'Basic design description without structured options.';
-      
+
       const result = generator.generateFromDesign(mockDesign, mockContext);
 
       expect(result.content).toContain('Design options not explicitly structured');
@@ -160,7 +162,7 @@ The system uses a modular authentication service with pluggable providers.
     it('should generate steering file from management one-pager', () => {
       const onePagerContext = {
         ...mockContext,
-        inclusionRule: undefined as any // Use template default
+        inclusionRule: undefined as any, // Use template default
       };
       const mockOnePager = `# Executive Summary
 
@@ -207,7 +209,7 @@ Proceed with Balanced approach for optimal impact vs effort ratio.
     it('should generate steering file from PR-FAQ document', () => {
       const prfaqContext = {
         ...mockContext,
-        inclusionRule: undefined as any // Use template default
+        inclusionRule: undefined as any, // Use template default
       };
       const mockPRFAQ = `# Press Release
 
@@ -247,7 +249,7 @@ A: No, existing accounts will be migrated automatically.
       const taskContext = {
         ...mockContext,
         inclusionRule: undefined as any, // Use template default
-        fileMatchPattern: undefined // Use template default
+        fileMatchPattern: undefined, // Use template default
       };
       const mockTaskPlan = `# Implementation Plan
 
@@ -296,13 +298,13 @@ Each task includes verification steps and automated testing.
       const contexts = [
         { ...mockContext, featureName: 'User Authentication' },
         { ...mockContext, featureName: 'user_auth_system' },
-        { ...mockContext, featureName: 'user-auth-2.0' }
+        { ...mockContext, featureName: 'user-auth-2.0' },
       ];
 
       contexts.forEach(context => {
         const reqResult = generator.generateFromRequirements('test', context);
         const designResult = generator.generateFromDesign('test', context);
-        
+
         expect(reqResult.filename).toMatch(/^[a-z0-9-]+-requirements\.md$/);
         expect(designResult.filename).toMatch(/^[a-z0-9-]+-design\.md$/);
       });
@@ -314,7 +316,7 @@ Each task includes verification steps and automated testing.
       const customContext = {
         ...mockContext,
         inclusionRule: 'always' as InclusionRule,
-        fileMatchPattern: undefined
+        fileMatchPattern: undefined,
       };
 
       const result = generator.generateFromRequirements('test', customContext);
@@ -328,7 +330,7 @@ Each task includes verification steps and automated testing.
         featureName: 'test-feature',
         relatedFiles: [],
         inclusionRule: undefined as any,
-        fileMatchPattern: undefined
+        fileMatchPattern: undefined,
       };
 
       const reqResult = generator.generateFromRequirements('test', minimalContext);
@@ -355,7 +357,9 @@ Each task includes verification steps and automated testing.
       const result = generator.generateFromRequirements('test', mockContext);
 
       expect(result.references).toHaveLength(3);
-      expect(result.references).toContain('#[[file:.kiro/specs/user-authentication/requirements.md]]');
+      expect(result.references).toContain(
+        '#[[file:.kiro/specs/user-authentication/requirements.md]]'
+      );
       expect(result.references).toContain('#[[file:.kiro/specs/user-authentication/design.md]]');
       expect(result.references).toContain('#[[file:.kiro/specs/user-authentication/tasks.md]]');
     });
@@ -363,7 +367,7 @@ Each task includes verification steps and automated testing.
     it('should handle empty related files', () => {
       const contextWithoutFiles = {
         ...mockContext,
-        relatedFiles: []
+        relatedFiles: [],
       };
 
       const result = generator.generateFromRequirements('test', contextWithoutFiles);
@@ -418,7 +422,7 @@ Acceptance Criteria: System shall validate.
     it('should handle special characters in feature names', () => {
       const specialContext = {
         ...mockContext,
-        featureName: 'Feature with Spaces & Special-Chars!'
+        featureName: 'Feature with Spaces & Special-Chars!',
       };
 
       const result = generator.generateFromRequirements('test', specialContext);

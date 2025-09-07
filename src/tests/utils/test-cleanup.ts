@@ -1,6 +1,6 @@
 /**
  * Test Cleanup Utilities
- * 
+ *
  * Utilities for cleaning up test-generated files, especially steering files
  * that accumulate during test runs.
  */
@@ -33,23 +33,23 @@ const TEST_STEERING_PATTERNS = [
   /^executive-dashboard-.*\.(md)$/,
   /^product-launch-.*\.(md)$/,
   /^implementation-plan-.*\.(md)$/,
-  
+
   // AI-generated test files (from recent cleanup)
   /^ai-analytics-.*\.(md)$/,
   /^ai-business-platform-.*\.(md)$/,
   /^ai-customer-service-.*\.(md)$/,
   /^ai-project-management-.*\.(md)$/,
   /^ai-project-mgmt-.*\.(md)$/,
-  
+
   // Files with timestamps (likely test-generated)
   /.*-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.md$/,
   /.*-\d{13}\.md$/, // Unix timestamp
-  
+
   // Backup files
   /.*\.backup$/,
   /.*\.bak$/,
   /.*\.tmp$/,
-  
+
   // Common test naming patterns
   /^test\d+-.*\.(md)$/,
   /^sample-.*\.(md)$/,
@@ -58,7 +58,7 @@ const TEST_STEERING_PATTERNS = [
   /^validation-.*\.(md)$/,
   /^benchmark-.*\.(md)$/,
   /^performance-.*\.(md)$/,
-  
+
   // MCP tool test artifacts
   /^mcp-test-.*\.(md)$/,
   /^tool-test-.*\.(md)$/,
@@ -70,12 +70,12 @@ const TEST_STEERING_PATTERNS = [
  */
 const PROTECTED_FILES = [
   'product.md',
-  'structure.md', 
+  'structure.md',
   'tech.md',
   'Hackathon Rules.md',
   '.DS_Store',
   '.gitkeep',
-  'README.md'
+  'README.md',
 ];
 
 /**
@@ -84,17 +84,13 @@ const PROTECTED_FILES = [
 const PROTECTED_DIRECTORIES = [
   '.kiro/steering/prompts',
   '.kiro/specs/vibe-pm-agent',
-  '.kiro/specs/competitive-market-analysis'
+  '.kiro/specs/competitive-market-analysis',
 ];
 
 /**
  * Directories to clean up test files from
  */
-const CLEANUP_DIRECTORIES = [
-  '.kiro/steering',
-  'test-specs-e2e',
-  'temp-test-steering'
-];
+const CLEANUP_DIRECTORIES = ['.kiro/steering', 'test-specs-e2e', 'temp-test-steering'];
 
 /**
  * Check if a filename matches test patterns
@@ -104,7 +100,7 @@ export function isTestGeneratedFile(filename: string): boolean {
   if (PROTECTED_FILES.includes(filename)) {
     return false;
   }
-  
+
   // Check against test patterns
   return TEST_STEERING_PATTERNS.some(pattern => pattern.test(filename));
 }
@@ -118,7 +114,7 @@ export async function cleanupTestSteeringFiles(): Promise<{
 }> {
   const cleaned: string[] = [];
   const errors: string[] = [];
-  
+
   for (const dir of CLEANUP_DIRECTORIES) {
     try {
       // Check if directory exists
@@ -128,9 +124,9 @@ export async function cleanupTestSteeringFiles(): Promise<{
         // Directory doesn't exist, skip
         continue;
       }
-      
+
       const files = await fs.readdir(dir);
-      
+
       for (const file of files) {
         if (isTestGeneratedFile(file)) {
           try {
@@ -146,7 +142,7 @@ export async function cleanupTestSteeringFiles(): Promise<{
       errors.push(`Failed to process directory ${dir}: ${error}`);
     }
   }
-  
+
   return { cleaned, errors };
 }
 
@@ -159,12 +155,9 @@ export async function cleanupTestDirectories(): Promise<{
 }> {
   const cleaned: string[] = [];
   const errors: string[] = [];
-  
-  const testDirs = [
-    'test-specs-e2e',
-    'temp-test-steering'
-  ];
-  
+
+  const testDirs = ['test-specs-e2e', 'temp-test-steering'];
+
   for (const dir of testDirs) {
     try {
       // Check if directory exists
@@ -174,14 +167,14 @@ export async function cleanupTestDirectories(): Promise<{
         // Directory doesn't exist, skip
         continue;
       }
-      
+
       await fs.rm(dir, { recursive: true, force: true });
       cleaned.push(dir);
     } catch (error) {
       errors.push(`Failed to delete directory ${dir}: ${error}`);
     }
   }
-  
+
   return { cleaned, errors };
 }
 
@@ -194,12 +187,12 @@ export async function cleanupMemoryLeaks(): Promise<void> {
     jest.clearAllTimers();
     jest.clearAllMocks();
   }
-  
+
   // Force garbage collection if available
   if (global.gc) {
     global.gc();
   }
-  
+
   // Clear any remaining intervals/timeouts
   const highestTimeoutId = setTimeout(() => {}, 0);
   for (let i = 0; i < Number(highestTimeoutId); i++) {
@@ -217,7 +210,7 @@ export async function cleanupTestEvidence(): Promise<{
 }> {
   const cleaned: string[] = [];
   const errors: string[] = [];
-  
+
   const evidencePatterns = [
     '.evidence/test-*.json',
     '.evidence/perf-test-*.json',
@@ -225,14 +218,14 @@ export async function cleanupTestEvidence(): Promise<{
     'coverage/tmp-*',
     'temp-*',
     '*.tmp',
-    '*.log'
+    '*.log',
   ];
-  
+
   for (const pattern of evidencePatterns) {
     try {
       const glob = await import('glob');
       const files = glob.sync(pattern);
-      
+
       for (const file of files) {
         try {
           await fs.unlink(file);
@@ -245,7 +238,7 @@ export async function cleanupTestEvidence(): Promise<{
       // Glob not available, skip pattern-based cleanup
     }
   }
-  
+
   return { cleaned, errors };
 }
 
@@ -259,11 +252,11 @@ export async function validateSteeringIntegrity(): Promise<{
 }> {
   const missing: string[] = [];
   const unexpected: string[] = [];
-  
+
   try {
     const steeringDir = '.kiro/steering';
     const files = await fs.readdir(steeringDir);
-    
+
     // Check for required files
     const requiredFiles = ['product.md', 'structure.md', 'tech.md'];
     for (const required of requiredFiles) {
@@ -271,24 +264,24 @@ export async function validateSteeringIntegrity(): Promise<{
         missing.push(required);
       }
     }
-    
+
     // Check for unexpected test files that weren't cleaned
     for (const file of files) {
       if (isTestGeneratedFile(file)) {
         unexpected.push(file);
       }
     }
-    
+
     return {
       valid: missing.length === 0 && unexpected.length === 0,
       missing,
-      unexpected
+      unexpected,
     };
   } catch (error) {
     return {
       valid: false,
       missing: ['Error accessing steering directory'],
-      unexpected: []
+      unexpected: [],
     };
   }
 }
@@ -306,7 +299,7 @@ export async function cleanupAllTestArtifacts(): Promise<{
   const filesCleanup = await cleanupTestSteeringFiles();
   const dirsCleanup = await cleanupTestDirectories();
   const evidenceCleanup = await cleanupTestEvidence();
-  
+
   // Clean up memory leaks
   let memoryCleanup = false;
   try {
@@ -315,16 +308,16 @@ export async function cleanupAllTestArtifacts(): Promise<{
   } catch (error) {
     console.warn('Memory cleanup failed:', error);
   }
-  
+
   // Validate integrity
   const validation = await validateSteeringIntegrity();
-  
-  return { 
-    filesCleanup, 
-    dirsCleanup, 
+
+  return {
+    filesCleanup,
+    dirsCleanup,
     evidenceCleanup,
     memoryCleanup,
-    validation
+    validation,
   };
 }
 
@@ -333,27 +326,29 @@ export async function cleanupAllTestArtifacts(): Promise<{
  */
 export async function globalTeardown(): Promise<void> {
   console.log('🧹 Cleaning up test artifacts...');
-  
+
   const result = await cleanupAllTestArtifacts();
-  
-  const totalCleaned = result.filesCleanup.cleaned.length + 
-                      result.dirsCleanup.cleaned.length + 
-                      result.evidenceCleanup.cleaned.length;
-  const totalErrors = result.filesCleanup.errors.length + 
-                     result.dirsCleanup.errors.length + 
-                     result.evidenceCleanup.errors.length;
-  
+
+  const totalCleaned =
+    result.filesCleanup.cleaned.length +
+    result.dirsCleanup.cleaned.length +
+    result.evidenceCleanup.cleaned.length;
+  const totalErrors =
+    result.filesCleanup.errors.length +
+    result.dirsCleanup.errors.length +
+    result.evidenceCleanup.errors.length;
+
   if (totalCleaned > 0) {
     console.log(`✅ Cleaned up ${totalCleaned} test artifacts`);
     console.log(`   Files: ${result.filesCleanup.cleaned.length}`);
     console.log(`   Directories: ${result.dirsCleanup.cleaned.length}`);
     console.log(`   Evidence: ${result.evidenceCleanup.cleaned.length}`);
   }
-  
+
   if (result.memoryCleanup) {
     console.log('✅ Memory cleanup completed');
   }
-  
+
   // Report validation results
   if (result.validation.valid) {
     console.log('✅ Steering directory integrity validated');
@@ -365,7 +360,7 @@ export async function globalTeardown(): Promise<void> {
       console.warn(`⚠️  Unexpected test files remain: ${result.validation.unexpected.join(', ')}`);
     }
   }
-  
+
   if (totalErrors > 0) {
     console.warn(`⚠️  ${totalErrors} cleanup errors occurred`);
     result.filesCleanup.errors.forEach(error => console.warn(`   Files: ${error}`));

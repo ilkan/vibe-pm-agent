@@ -1,6 +1,13 @@
 // Quota Forecaster component interface and implementation
 
-import { Workflow, OptimizedWorkflow, QuotaForecast, EfficiencySavings, QuotaCostModel, OptionalParams } from '../../models';
+import {
+  Workflow,
+  OptimizedWorkflow,
+  QuotaForecast,
+  EfficiencySavings,
+  QuotaCostModel,
+  OptionalParams,
+} from '../../models';
 
 import { ROIAnalysis, OptimizationScenario, ComprehensiveSavings } from '../../models/quota';
 import { ZeroBasedSolution } from '../../models/consulting';
@@ -9,10 +16,22 @@ import { ErrorHandler, ForecastingError } from '../../utils/error-handling';
 
 export interface IQuotaForecaster {
   estimateNaiveConsumption(workflow: Workflow, params?: OptionalParams): Promise<QuotaForecast>;
-  estimateOptimizedConsumption(optimizedWorkflow: OptimizedWorkflow, params?: OptionalParams): Promise<QuotaForecast>;
-  estimateZeroBasedConsumption(zeroBasedSolution: ZeroBasedSolution, params?: OptionalParams): Promise<QuotaForecast>;
-  generateROITable(scenarios: OptimizationScenario[], params?: OptionalParams): Promise<ROIAnalysis>;
-  calculateMultiScenarioSavings(forecasts: QuotaForecast[], params?: OptionalParams): ComprehensiveSavings;
+  estimateOptimizedConsumption(
+    optimizedWorkflow: OptimizedWorkflow,
+    params?: OptionalParams
+  ): Promise<QuotaForecast>;
+  estimateZeroBasedConsumption(
+    zeroBasedSolution: ZeroBasedSolution,
+    params?: OptionalParams
+  ): Promise<QuotaForecast>;
+  generateROITable(
+    scenarios: OptimizationScenario[],
+    params?: OptionalParams
+  ): Promise<ROIAnalysis>;
+  calculateMultiScenarioSavings(
+    forecasts: QuotaForecast[],
+    params?: OptionalParams
+  ): ComprehensiveSavings;
   calculateSavings(naive: QuotaForecast, optimized: QuotaForecast): EfficiencySavings;
   setCostModel(costModel: QuotaCostModel): void;
 }
@@ -30,12 +49,15 @@ export class QuotaForecaster implements IQuotaForecaster {
         ['processing', 2],
         ['analysis', 3],
         ['vibe', 1],
-        ['spec', 5]
-      ])
+        ['spec', 5],
+      ]),
     };
   }
 
-  async estimateNaiveConsumption(workflow: Workflow, params?: OptionalParams): Promise<QuotaForecast> {
+  async estimateNaiveConsumption(
+    workflow: Workflow,
+    params?: OptionalParams
+  ): Promise<QuotaForecast> {
     // Validate workflow input
     try {
       validateWorkflow(workflow);
@@ -80,7 +102,12 @@ export class QuotaForecaster implements IQuotaForecaster {
           // Processing operations may use vibes or specs depending on complexity
           if (step.quotaCost > this.costModel.specUnitCost) {
             stepSpecs = 1;
-            stepVibes = Math.max(0, Math.floor((step.quotaCost - this.costModel.specUnitCost) / this.costModel.vibeUnitCost));
+            stepVibes = Math.max(
+              0,
+              Math.floor(
+                (step.quotaCost - this.costModel.specUnitCost) / this.costModel.vibeUnitCost
+              )
+            );
           } else {
             stepVibes = Math.max(1, Math.floor(step.quotaCost / this.costModel.vibeUnitCost));
           }
@@ -101,21 +128,28 @@ export class QuotaForecaster implements IQuotaForecaster {
       totalVibes += stepVibes;
       totalSpecs += stepSpecs;
 
-      const stepCost = (stepVibes * this.costModel.vibeUnitCost) + (stepSpecs * this.costModel.specUnitCost);
+      const stepCost =
+        stepVibes * this.costModel.vibeUnitCost + stepSpecs * this.costModel.specUnitCost;
       breakdown.push({
         stepId: step.id,
         stepDescription: step.description,
         vibes: stepVibes,
         specs: stepSpecs,
-        cost: stepCost
+        cost: stepCost,
       });
     }
 
-    let estimatedCost = (totalVibes * this.costModel.vibeUnitCost) + (totalSpecs * this.costModel.specUnitCost);
+    let estimatedCost =
+      totalVibes * this.costModel.vibeUnitCost + totalSpecs * this.costModel.specUnitCost;
 
     // Adjust costs based on optional parameters
     if (params) {
-      const adjustments = this.adjustCostsForParameters(totalVibes, totalSpecs, estimatedCost, params);
+      const adjustments = this.adjustCostsForParameters(
+        totalVibes,
+        totalSpecs,
+        estimatedCost,
+        params
+      );
       totalVibes = adjustments.vibes;
       totalSpecs = adjustments.specs;
       estimatedCost = adjustments.cost;
@@ -140,14 +174,17 @@ export class QuotaForecaster implements IQuotaForecaster {
       estimatedCost,
       confidenceLevel,
       scenario: 'naive',
-      breakdown
+      breakdown,
     };
   }
 
-  async estimateOptimizedConsumption(optimizedWorkflow: OptimizedWorkflow, params?: OptionalParams): Promise<QuotaForecast> {
+  async estimateOptimizedConsumption(
+    optimizedWorkflow: OptimizedWorkflow,
+    params?: OptionalParams
+  ): Promise<QuotaForecast> {
     // Start with naive consumption
     const naiveEstimate = await this.estimateNaiveConsumption(optimizedWorkflow, params);
-    
+
     let totalVibes = naiveEstimate.vibesConsumed;
     let totalSpecs = naiveEstimate.specsConsumed;
     const breakdown = [...naiveEstimate.breakdown];
@@ -164,18 +201,24 @@ export class QuotaForecaster implements IQuotaForecaster {
       for (const stepId of optimization.stepsAffected) {
         const stepBreakdown = breakdown.find(b => b.stepId === stepId);
         if (stepBreakdown) {
-          const stepVibeReduction = Math.floor(stepBreakdown.vibes * (optimization.estimatedSavings.vibes / 100));
-          const stepSpecReduction = Math.floor(stepBreakdown.specs * (optimization.estimatedSavings.specs / 100));
-          
+          const stepVibeReduction = Math.floor(
+            stepBreakdown.vibes * (optimization.estimatedSavings.vibes / 100)
+          );
+          const stepSpecReduction = Math.floor(
+            stepBreakdown.specs * (optimization.estimatedSavings.specs / 100)
+          );
+
           stepBreakdown.vibes = Math.max(0, stepBreakdown.vibes - stepVibeReduction);
           stepBreakdown.specs = Math.max(0, stepBreakdown.specs - stepSpecReduction);
-          stepBreakdown.cost = (stepBreakdown.vibes * this.costModel.vibeUnitCost) + 
-                              (stepBreakdown.specs * this.costModel.specUnitCost);
+          stepBreakdown.cost =
+            stepBreakdown.vibes * this.costModel.vibeUnitCost +
+            stepBreakdown.specs * this.costModel.specUnitCost;
         }
       }
     }
 
-    const estimatedCost = (totalVibes * this.costModel.vibeUnitCost) + (totalSpecs * this.costModel.specUnitCost);
+    const estimatedCost =
+      totalVibes * this.costModel.vibeUnitCost + totalSpecs * this.costModel.specUnitCost;
 
     // Confidence level is typically higher for optimized workflows due to better analysis
     let confidenceLevel: 'low' | 'medium' | 'high' = 'high';
@@ -189,24 +232,33 @@ export class QuotaForecaster implements IQuotaForecaster {
       estimatedCost,
       confidenceLevel,
       scenario: 'optimized',
-      breakdown
+      breakdown,
     };
   }
 
-  async estimateZeroBasedConsumption(zeroBasedSolution: ZeroBasedSolution, params?: OptionalParams): Promise<QuotaForecast> {
+  async estimateZeroBasedConsumption(
+    zeroBasedSolution: ZeroBasedSolution,
+    params?: OptionalParams
+  ): Promise<QuotaForecast> {
     // Zero-based approach assumes radical redesign with minimal consumption
     // Apply aggressive savings based on the zero-based solution potential
     const baseSavingsPercentage = zeroBasedSolution.potentialSavings;
-    
+
     // Create a minimal workflow representation for zero-based calculation
     let minimalVibes = Math.max(1, Math.floor(3 * (1 - baseSavingsPercentage / 100))); // Minimum viable vibes
     let minimalSpecs = Math.max(0, Math.floor(1 * (1 - baseSavingsPercentage / 100))); // Minimal specs needed
-    
-    let estimatedCost = (minimalVibes * this.costModel.vibeUnitCost) + (minimalSpecs * this.costModel.specUnitCost);
+
+    let estimatedCost =
+      minimalVibes * this.costModel.vibeUnitCost + minimalSpecs * this.costModel.specUnitCost;
 
     // Adjust costs based on optional parameters
     if (params) {
-      const adjustments = this.adjustCostsForParameters(minimalVibes, minimalSpecs, estimatedCost, params);
+      const adjustments = this.adjustCostsForParameters(
+        minimalVibes,
+        minimalSpecs,
+        estimatedCost,
+        params
+      );
       minimalVibes = adjustments.vibes;
       minimalSpecs = adjustments.specs;
       estimatedCost = adjustments.cost;
@@ -230,13 +282,15 @@ export class QuotaForecaster implements IQuotaForecaster {
       confidenceLevel = this.adjustConfidenceForParameters(confidenceLevel, params);
     }
 
-    const breakdown = [{
-      stepId: 'zero-based-solution',
-      stepDescription: zeroBasedSolution.radicalApproach,
-      vibes: minimalVibes,
-      specs: minimalSpecs,
-      cost: estimatedCost
-    }];
+    const breakdown = [
+      {
+        stepId: 'zero-based-solution',
+        stepDescription: zeroBasedSolution.radicalApproach,
+        vibes: minimalVibes,
+        specs: minimalSpecs,
+        cost: estimatedCost,
+      },
+    ];
 
     return {
       vibesConsumed: minimalVibes,
@@ -244,80 +298,95 @@ export class QuotaForecaster implements IQuotaForecaster {
       estimatedCost,
       confidenceLevel,
       scenario: 'zero-based',
-      breakdown
+      breakdown,
     };
   }
 
   calculateSavings(naive: QuotaForecast, optimized: QuotaForecast): EfficiencySavings {
-    const vibeReduction = naive.vibesConsumed > 0 ? 
-      ((naive.vibesConsumed - optimized.vibesConsumed) / naive.vibesConsumed) * 100 : 0;
-    
-    const specReduction = naive.specsConsumed > 0 ? 
-      ((naive.specsConsumed - optimized.specsConsumed) / naive.specsConsumed) * 100 : 0;
-    
+    const vibeReduction =
+      naive.vibesConsumed > 0
+        ? ((naive.vibesConsumed - optimized.vibesConsumed) / naive.vibesConsumed) * 100
+        : 0;
+
+    const specReduction =
+      naive.specsConsumed > 0
+        ? ((naive.specsConsumed - optimized.specsConsumed) / naive.specsConsumed) * 100
+        : 0;
+
     const costSavings = naive.estimatedCost - optimized.estimatedCost;
-    
-    const totalSavingsPercentage = naive.estimatedCost > 0 ? 
-      (costSavings / naive.estimatedCost) * 100 : 0;
+
+    const totalSavingsPercentage =
+      naive.estimatedCost > 0 ? (costSavings / naive.estimatedCost) * 100 : 0;
 
     return {
       vibeReduction,
       specReduction,
       costSavings,
-      totalSavingsPercentage
+      totalSavingsPercentage,
     };
   }
 
-  async generateROITable(scenarios: OptimizationScenario[], params?: OptionalParams): Promise<ROIAnalysis> {
+  async generateROITable(
+    scenarios: OptimizationScenario[],
+    params?: OptionalParams
+  ): Promise<ROIAnalysis> {
     if (scenarios.length === 0) {
       throw new Error('At least one scenario is required for ROI analysis');
     }
 
     // Sort scenarios by savings percentage for better comparison
-    const sortedScenarios = [...scenarios].sort((a, b) => b.savingsPercentage - a.savingsPercentage);
-    
+    const sortedScenarios = [...scenarios].sort(
+      (a, b) => b.savingsPercentage - a.savingsPercentage
+    );
+
     // Calculate baseline (typically the first/naive scenario)
-    const baselineScenario = scenarios.find(s => s.name.toLowerCase().includes('naive') || s.name.toLowerCase().includes('raw')) 
-                           || scenarios[0];
+    const baselineScenario =
+      scenarios.find(
+        s => s.name.toLowerCase().includes('naive') || s.name.toLowerCase().includes('raw')
+      ) || scenarios[0];
     const baselineCost = baselineScenario.forecast.estimatedCost;
 
     // Generate recommendations based on scenario analysis
     const recommendations: string[] = [];
-    
+
     // Find the best balanced option (good savings with reasonable effort/risk)
-    const balancedOptions = scenarios.filter(s => 
-      s.riskLevel === 'medium' && 
-      s.implementationEffort === 'medium' && 
-      s.savingsPercentage > 20
+    const balancedOptions = scenarios.filter(
+      s =>
+        s.riskLevel === 'medium' && s.implementationEffort === 'medium' && s.savingsPercentage > 20
     );
-    
+
     if (balancedOptions.length > 0) {
-      const bestBalanced = balancedOptions.reduce((best, current) => 
+      const bestBalanced = balancedOptions.reduce((best, current) =>
         current.savingsPercentage > best.savingsPercentage ? current : best
       );
-      recommendations.push(`Consider ${bestBalanced.name} for balanced risk/reward (${bestBalanced.savingsPercentage}% savings)`);
+      recommendations.push(
+        `Consider ${bestBalanced.name} for balanced risk/reward (${bestBalanced.savingsPercentage}% savings)`
+      );
     }
 
     // Find high-impact, low-risk options
-    const lowRiskHighImpact = scenarios.filter(s => 
-      s.riskLevel === 'low' && 
-      s.savingsPercentage > 15
+    const lowRiskHighImpact = scenarios.filter(
+      s => s.riskLevel === 'low' && s.savingsPercentage > 15
     );
-    
+
     if (lowRiskHighImpact.length > 0) {
-      const bestLowRisk = lowRiskHighImpact.reduce((best, current) => 
+      const bestLowRisk = lowRiskHighImpact.reduce((best, current) =>
         current.savingsPercentage > best.savingsPercentage ? current : best
       );
-      recommendations.push(`${bestLowRisk.name} offers ${bestLowRisk.savingsPercentage}% savings with low risk`);
+      recommendations.push(
+        `${bestLowRisk.name} offers ${bestLowRisk.savingsPercentage}% savings with low risk`
+      );
     }
 
     // Identify high-savings options with warnings
     const highSavingsOptions = scenarios.filter(s => s.savingsPercentage > 50);
     if (highSavingsOptions.length > 0) {
-      const bestHighSavings = highSavingsOptions.reduce((best, current) => 
+      const bestHighSavings = highSavingsOptions.reduce((best, current) =>
         current.savingsPercentage > best.savingsPercentage ? current : best
       );
-      recommendations.push(`${bestHighSavings.name} offers maximum savings (${bestHighSavings.savingsPercentage}%) but requires ${bestHighSavings.implementationEffort} effort and ${bestHighSavings.riskLevel} risk`);
+      recommendations.push(
+        `${bestHighSavings.name} offers maximum savings (${bestHighSavings.savingsPercentage}%) but requires ${bestHighSavings.implementationEffort} effort and ${bestHighSavings.riskLevel} risk`
+      );
     }
 
     // Determine best overall option
@@ -328,16 +397,28 @@ export class QuotaForecaster implements IQuotaForecaster {
       // Scoring algorithm: savings percentage weighted by risk and effort factors
       let riskFactor = 1.0;
       switch (scenario.riskLevel) {
-        case 'low': riskFactor = 1.0; break;
-        case 'medium': riskFactor = 0.8; break;
-        case 'high': riskFactor = 0.6; break;
+        case 'low':
+          riskFactor = 1.0;
+          break;
+        case 'medium':
+          riskFactor = 0.8;
+          break;
+        case 'high':
+          riskFactor = 0.6;
+          break;
       }
 
       let effortFactor = 1.0;
       switch (scenario.implementationEffort) {
-        case 'low': effortFactor = 1.0; break;
-        case 'medium': effortFactor = 0.9; break;
-        case 'high': effortFactor = 0.7; break;
+        case 'low':
+          effortFactor = 1.0;
+          break;
+        case 'medium':
+          effortFactor = 0.9;
+          break;
+        case 'high':
+          effortFactor = 0.7;
+          break;
       }
 
       const score = scenario.savingsPercentage * riskFactor * effortFactor;
@@ -349,19 +430,23 @@ export class QuotaForecaster implements IQuotaForecaster {
 
     // Generate risk assessment
     const highRiskScenarios = scenarios.filter(s => s.riskLevel === 'high');
-    const riskAssessment = highRiskScenarios.length > 0 
-      ? `${highRiskScenarios.length} high-risk scenarios identified. Consider starting with lower-risk options and gradually implementing more aggressive optimizations.`
-      : 'Most scenarios present manageable risk levels. Implementation can proceed with confidence.';
+    const riskAssessment =
+      highRiskScenarios.length > 0
+        ? `${highRiskScenarios.length} high-risk scenarios identified. Consider starting with lower-risk options and gradually implementing more aggressive optimizations.`
+        : 'Most scenarios present manageable risk levels. Implementation can proceed with confidence.';
 
     return {
       scenarios: sortedScenarios,
       recommendations,
       bestOption: bestOption.name,
-      riskAssessment
+      riskAssessment,
     };
   }
 
-  calculateMultiScenarioSavings(forecasts: QuotaForecast[], params?: OptionalParams): ComprehensiveSavings {
+  calculateMultiScenarioSavings(
+    forecasts: QuotaForecast[],
+    params?: OptionalParams
+  ): ComprehensiveSavings {
     if (forecasts.length === 0) {
       throw new Error('At least one forecast is required for multi-scenario savings calculation');
     }
@@ -376,15 +461,19 @@ export class QuotaForecaster implements IQuotaForecaster {
 
     // Calculate conservative savings (optimized approach or best available)
     let conservativeSavings = 0;
-    const conservativeForecast = optimizedForecast || forecasts.find(f => f.scenario !== 'naive' && f.scenario !== 'zero-based');
+    const conservativeForecast =
+      optimizedForecast ||
+      forecasts.find(f => f.scenario !== 'naive' && f.scenario !== 'zero-based');
     if (conservativeForecast && baselineCost > 0) {
-      conservativeSavings = ((baselineCost - conservativeForecast.estimatedCost) / baselineCost) * 100;
+      conservativeSavings =
+        ((baselineCost - conservativeForecast.estimatedCost) / baselineCost) * 100;
     }
 
     // Calculate balanced savings (average of optimized and zero-based if available)
     let balancedSavings = conservativeSavings;
     if (zeroBasedForecast && baselineCost > 0) {
-      const zeroBasedSavingsPercentage = ((baselineCost - zeroBasedForecast.estimatedCost) / baselineCost) * 100;
+      const zeroBasedSavingsPercentage =
+        ((baselineCost - zeroBasedForecast.estimatedCost) / baselineCost) * 100;
       balancedSavings = (conservativeSavings + zeroBasedSavingsPercentage) / 2;
     }
 
@@ -396,7 +485,7 @@ export class QuotaForecaster implements IQuotaForecaster {
 
     // Determine recommended approach based on savings and risk analysis
     let recommendedApproach = 'Conservative';
-    
+
     // Risk-adjusted recommendation logic
     if (boldSavings > 80 && zeroBasedForecast?.confidenceLevel !== 'low') {
       recommendedApproach = 'Bold (high impact potential)';
@@ -416,7 +505,7 @@ export class QuotaForecaster implements IQuotaForecaster {
       conservativeSavings: Math.max(0, conservativeSavings),
       balancedSavings: Math.max(0, balancedSavings),
       boldSavings: Math.max(0, boldSavings),
-      recommendedApproach
+      recommendedApproach,
     };
   }
 
@@ -424,7 +513,12 @@ export class QuotaForecaster implements IQuotaForecaster {
     this.costModel = costModel;
   }
 
-  private adjustCostsForParameters(vibes: number, specs: number, cost: number, params: OptionalParams): { vibes: number; specs: number; cost: number } {
+  private adjustCostsForParameters(
+    vibes: number,
+    specs: number,
+    cost: number,
+    params: OptionalParams
+  ): { vibes: number; specs: number; cost: number } {
     let adjustedVibes = vibes;
     let adjustedSpecs = specs;
     let adjustedCost = cost;
@@ -456,24 +550,25 @@ export class QuotaForecaster implements IQuotaForecaster {
     // Check against cost constraints
     if (params.costConstraints) {
       const { maxVibes, maxSpecs, maxCostDollars } = params.costConstraints;
-      
+
       // Apply hard limits if specified
       if (maxVibes !== undefined && adjustedVibes > maxVibes) {
         adjustedVibes = maxVibes;
       }
-      
+
       if (maxSpecs !== undefined && adjustedSpecs > maxSpecs) {
         adjustedSpecs = maxSpecs;
       }
-      
+
       // Recalculate cost and check against budget
-      adjustedCost = (adjustedVibes * this.costModel.vibeUnitCost) + (adjustedSpecs * this.costModel.specUnitCost);
-      
+      adjustedCost =
+        adjustedVibes * this.costModel.vibeUnitCost + adjustedSpecs * this.costModel.specUnitCost;
+
       if (maxCostDollars !== undefined && adjustedCost > maxCostDollars) {
         // Reduce consumption to fit budget, prioritizing specs over vibes
         const targetCost = maxCostDollars;
         const specCost = adjustedSpecs * this.costModel.specUnitCost;
-        
+
         if (specCost <= targetCost) {
           // Keep specs, reduce vibes to fit remaining budget
           const remainingBudget = targetCost - specCost;
@@ -481,24 +576,35 @@ export class QuotaForecaster implements IQuotaForecaster {
         } else {
           // Reduce specs to fit budget, set vibes to minimum
           adjustedSpecs = Math.max(0, Math.floor(targetCost / this.costModel.specUnitCost));
-          adjustedVibes = Math.max(1, Math.floor((targetCost - (adjustedSpecs * this.costModel.specUnitCost)) / this.costModel.vibeUnitCost));
+          adjustedVibes = Math.max(
+            1,
+            Math.floor(
+              (targetCost - adjustedSpecs * this.costModel.specUnitCost) /
+                this.costModel.vibeUnitCost
+            )
+          );
         }
-        
-        adjustedCost = (adjustedVibes * this.costModel.vibeUnitCost) + (adjustedSpecs * this.costModel.specUnitCost);
+
+        adjustedCost =
+          adjustedVibes * this.costModel.vibeUnitCost + adjustedSpecs * this.costModel.specUnitCost;
       }
     } else {
       // Recalculate cost with adjusted consumption
-      adjustedCost = (adjustedVibes * this.costModel.vibeUnitCost) + (adjustedSpecs * this.costModel.specUnitCost);
+      adjustedCost =
+        adjustedVibes * this.costModel.vibeUnitCost + adjustedSpecs * this.costModel.specUnitCost;
     }
 
     return {
       vibes: adjustedVibes,
       specs: adjustedSpecs,
-      cost: adjustedCost
+      cost: adjustedCost,
     };
   }
 
-  private adjustConfidenceForParameters(baseConfidence: 'low' | 'medium' | 'high', params: OptionalParams): 'low' | 'medium' | 'high' {
+  private adjustConfidenceForParameters(
+    baseConfidence: 'low' | 'medium' | 'high',
+    params: OptionalParams
+  ): 'low' | 'medium' | 'high' {
     let confidence = baseConfidence;
 
     // High user volume may reduce confidence due to scale complexity
@@ -510,9 +616,10 @@ export class QuotaForecaster implements IQuotaForecaster {
     // Tight cost constraints may reduce confidence due to optimization pressure
     if (params.costConstraints) {
       const { maxVibes, maxSpecs, maxCostDollars } = params.costConstraints;
-      const hasTightConstraints = (maxVibes !== undefined && maxVibes < 10) || 
-                                  (maxSpecs !== undefined && maxSpecs < 3) ||
-                                  (maxCostDollars !== undefined && maxCostDollars < 5);
+      const hasTightConstraints =
+        (maxVibes !== undefined && maxVibes < 10) ||
+        (maxSpecs !== undefined && maxSpecs < 3) ||
+        (maxCostDollars !== undefined && maxCostDollars < 5);
 
       if (hasTightConstraints) {
         if (confidence === 'high') confidence = 'medium';

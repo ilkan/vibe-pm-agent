@@ -41,7 +41,7 @@ describe('MCP Server Startup Tests', () => {
     it('should initialize with default configuration', () => {
       server = new PMAgentMCPServer();
       const status = server.getStatus();
-      
+
       expect(status.status).toBe('healthy');
       expect(status.toolsRegistered).toBeGreaterThan(0);
       expect(status.performance.totalRequests).toBe(0);
@@ -52,9 +52,9 @@ describe('MCP Server Startup Tests', () => {
       server = new PMAgentMCPServer({
         enableLogging: false,
         enableMetrics: false,
-        logLevel: LogLevel.ERROR
+        logLevel: LogLevel.ERROR,
       });
-      
+
       const status = server.getStatus();
       expect(status.status).toBe('healthy');
       expect(status.toolsRegistered).toBeGreaterThan(0);
@@ -63,7 +63,7 @@ describe('MCP Server Startup Tests', () => {
     it('should register all required MCP tools', () => {
       server = new PMAgentMCPServer();
       const status = server.getStatus();
-      
+
       // Should register all 10 MCP tools
       expect(status.toolsRegistered).toBe(10);
     });
@@ -74,7 +74,7 @@ describe('MCP Server Startup Tests', () => {
       // Test with logging enabled
       server = new PMAgentMCPServer({ enableLogging: true, logLevel: LogLevel.DEBUG });
       expect(server.getStatus().status).toBe('healthy');
-      
+
       // Test with logging disabled
       const serverNoLog = new PMAgentMCPServer({ enableLogging: false });
       expect(serverNoLog.getStatus().status).toBe('healthy');
@@ -86,15 +86,21 @@ describe('MCP Server Startup Tests', () => {
       const status = server.getStatus();
       expect(status.performance).toBeDefined();
       expect(status.performance.totalRequests).toBe(0);
-      
+
       // Test with metrics disabled
       const serverNoMetrics = new PMAgentMCPServer({ enableMetrics: false });
       expect(serverNoMetrics.getStatus().status).toBe('healthy');
     });
 
     it('should handle different log levels', () => {
-      const logLevels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR, LogLevel.FATAL];
-      
+      const logLevels = [
+        LogLevel.DEBUG,
+        LogLevel.INFO,
+        LogLevel.WARN,
+        LogLevel.ERROR,
+        LogLevel.FATAL,
+      ];
+
       logLevels.forEach(level => {
         const testServer = new PMAgentMCPServer({ logLevel: level });
         expect(testServer.getStatus().status).toBe('healthy');
@@ -106,12 +112,12 @@ describe('MCP Server Startup Tests', () => {
     it('should provide accurate status information', () => {
       server = new PMAgentMCPServer();
       const status = server.getStatus();
-      
+
       expect(status).toHaveProperty('status');
       expect(status).toHaveProperty('uptime');
       expect(status).toHaveProperty('toolsRegistered');
       expect(status).toHaveProperty('performance');
-      
+
       expect(status.performance).toHaveProperty('averageResponseTime');
       expect(status.performance).toHaveProperty('totalRequests');
       expect(status.performance).toHaveProperty('errorRate');
@@ -121,10 +127,10 @@ describe('MCP Server Startup Tests', () => {
       server = new PMAgentMCPServer();
       const initialStatus = server.getStatus();
       const initialUptime = initialStatus.uptime;
-      
+
       // Wait a bit and check uptime increased
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       const updatedStatus = server.getStatus();
       expect(updatedStatus.uptime).toBeGreaterThan(initialUptime);
     });
@@ -132,7 +138,7 @@ describe('MCP Server Startup Tests', () => {
     it('should initialize performance metrics', () => {
       server = new PMAgentMCPServer();
       const status = server.getStatus();
-      
+
       expect(status.performance.averageResponseTime).toBe(0);
       expect(status.performance.totalRequests).toBe(0);
       expect(status.performance.errorRate).toBe(0);
@@ -142,7 +148,7 @@ describe('MCP Server Startup Tests', () => {
   describe('Tool Registration', () => {
     it('should register all PM document generation tools', () => {
       server = new PMAgentMCPServer();
-      
+
       // The server should register these tools:
       // 1. optimize_intent
       // 2. analyze_workflow
@@ -154,7 +160,7 @@ describe('MCP Server Startup Tests', () => {
       // 8. generate_design_options
       // 9. generate_task_plan
       // 10. validate_idea_quick
-      
+
       const status = server.getStatus();
       expect(status.toolsRegistered).toBe(10);
     });
@@ -174,7 +180,7 @@ describe('MCP Server Startup Tests', () => {
         server = new PMAgentMCPServer({
           enableLogging: true,
           enableMetrics: true,
-          logLevel: LogLevel.DEBUG
+          logLevel: LogLevel.DEBUG,
         });
       }).not.toThrow();
     });
@@ -182,7 +188,7 @@ describe('MCP Server Startup Tests', () => {
     it('should maintain healthy status after initialization', () => {
       server = new PMAgentMCPServer();
       const status = server.getStatus();
-      
+
       expect(status.status).toBe('healthy');
       expect(status.lastError).toBeUndefined();
     });
@@ -199,7 +205,7 @@ describe('MCP Server Startup Tests', () => {
     it('should handle logging configuration changes', () => {
       server = new PMAgentMCPServer({ enableLogging: false });
       expect(server.getStatus().status).toBe('healthy');
-      
+
       // Change logging level (simulated)
       MCPLogger.setLogLevel(LogLevel.DEBUG);
       expect(server.getStatus().status).toBe('healthy');
@@ -210,7 +216,7 @@ describe('MCP Server Startup Tests', () => {
     it('should include quick validation tool in registration', () => {
       server = new PMAgentMCPServer();
       const status = server.getStatus();
-      
+
       // Should include validate_idea_quick tool
       expect(status.toolsRegistered).toBeGreaterThanOrEqual(10);
     });
@@ -219,10 +225,10 @@ describe('MCP Server Startup Tests', () => {
       expect(() => {
         server = new PMAgentMCPServer({
           enableLogging: true,
-          logLevel: LogLevel.DEBUG
+          logLevel: LogLevel.DEBUG,
         });
       }).not.toThrow();
-      
+
       if (server) {
         const status = server.getStatus();
         expect(status.status).toBe('healthy');
@@ -234,7 +240,7 @@ describe('MCP Server Startup Tests', () => {
     it('should register all PM document generation tools', () => {
       server = new PMAgentMCPServer();
       const status = server.getStatus();
-      
+
       // Should register management one-pager, PR-FAQ, requirements, design options, and task plan tools
       expect(status.toolsRegistered).toBe(10);
     });
@@ -243,7 +249,7 @@ describe('MCP Server Startup Tests', () => {
       expect(() => {
         server = new PMAgentMCPServer({
           enableLogging: true,
-          enableMetrics: true
+          enableMetrics: true,
         });
       }).not.toThrow();
     });
@@ -253,7 +259,7 @@ describe('MCP Server Startup Tests', () => {
     it('should initialize performance tracking', () => {
       server = new PMAgentMCPServer({ enableMetrics: true });
       const status = server.getStatus();
-      
+
       expect(status.performance).toBeDefined();
       expect(typeof status.performance.averageResponseTime).toBe('number');
       expect(typeof status.performance.totalRequests).toBe('number');
@@ -264,7 +270,7 @@ describe('MCP Server Startup Tests', () => {
       // Test with metrics enabled
       const serverWithMetrics = new PMAgentMCPServer({ enableMetrics: true });
       expect(serverWithMetrics.getStatus().performance).toBeDefined();
-      
+
       // Test with metrics disabled
       const serverNoMetrics = new PMAgentMCPServer({ enableMetrics: false });
       expect(serverNoMetrics.getStatus().performance).toBeDefined(); // Should still have basic structure

@@ -1,6 +1,6 @@
 /**
  * Performance tests for steering file operations
- * 
+ *
  * Tests large document processing, concurrent file operations, and memory usage
  * during steering file creation and management.
  */
@@ -25,13 +25,13 @@ describe('Steering File Performance Tests', () => {
 
     steeringService = new SteeringService({
       steeringDirectory: testSteeringDir,
-      userPreferences: { autoCreate: true, showPreview: false }
+      userPreferences: { autoCreate: true, showPreview: false },
     });
 
     steeringManager = new SteeringFileManager({
       steeringDirectory: testSteeringDir,
       createBackups: false, // Disable for performance testing
-      validateContent: true
+      validateContent: true,
     });
   });
 
@@ -53,7 +53,7 @@ describe('Steering File Performance Tests', () => {
       const result = await steeringService.createFromRequirements(largeRequirements, {
         create_steering_files: true,
         feature_name: 'large-document-test',
-        inclusion_rule: 'fileMatch'
+        inclusion_rule: 'fileMatch',
       });
 
       const endTime = Date.now();
@@ -90,12 +90,12 @@ describe('Steering File Performance Tests', () => {
         documents.push({
           type: 'requirements',
           content: generateLargeRequirementsDocument(200),
-          featureName: `concurrent-req-${i}`
+          featureName: `concurrent-req-${i}`,
         });
         documents.push({
           type: 'design',
           content: generateLargeDesignDocument(150),
-          featureName: `concurrent-design-${i}`
+          featureName: `concurrent-design-${i}`,
         });
       }
 
@@ -105,12 +105,12 @@ describe('Steering File Performance Tests', () => {
         return steeringService[methodName](doc.content, {
           create_steering_files: true,
           feature_name: doc.featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         });
       });
 
       const results = await Promise.all(promises);
-      
+
       const endTime = Date.now();
       const finalMemory = process.memoryUsage();
       const totalProcessingTime = endTime - startTime;
@@ -142,7 +142,7 @@ describe('Steering File Performance Tests', () => {
 
       // Create multiple features that will cross-reference each other
       const features = Array.from({ length: featureCount }, (_, i) => `feature-${i + 1}`);
-      
+
       // Create requirements for each feature
       for (const feature of features) {
         const requirements = `
@@ -152,19 +152,24 @@ describe('Steering File Performance Tests', () => {
 This feature integrates with other system components.
 
 ## Requirements
-${features.filter(f => f !== feature).map((otherFeature, index) => `
+${features
+  .filter(f => f !== feature)
+  .map(
+    (otherFeature, index) => `
 ### Requirement ${index + 1}
 **User Story:** As a user, I want ${feature} to work with ${otherFeature}.
 **Acceptance Criteria:**
 1. WHEN ${feature} is used THEN it SHALL integrate with ${otherFeature}
 2. WHEN ${otherFeature} changes THEN ${feature} SHALL adapt accordingly
-`).join('\n')}
+`
+  )
+  .join('\n')}
         `;
 
         await steeringService.createFromRequirements(requirements, {
           create_steering_files: true,
           feature_name: feature,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         });
       }
 
@@ -206,10 +211,10 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
             generatedBy: 'performance-test',
             generatedAt: new Date().toISOString(),
             featureName: `perf-feature-${i}`,
-            documentType: DocumentType.REQUIREMENTS
+            documentType: DocumentType.REQUIREMENTS,
           },
           content: `# Performance Test ${i}\n\nThis is a performance test steering file.`,
-          references: []
+          references: [],
         };
 
         operations.push(steeringManager.saveSteeringFile(steeringFile));
@@ -225,7 +230,7 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
       });
 
       expect(totalTime).toBeLessThan(10000); // Should complete within 10 seconds
-      
+
       // Verify all files were created
       const steeringFiles = await fs.readdir(testSteeringDir);
       expect(steeringFiles.length).toBe(operationCount);
@@ -250,10 +255,10 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
             generatedBy: 'concurrent-test',
             generatedAt: new Date().toISOString(),
             featureName: `concurrent-feature-${i}`,
-            documentType: DocumentType.DESIGN
+            documentType: DocumentType.DESIGN,
           },
           content: `# Concurrent Test ${i}\n\nConcurrent operation test file.`,
-          references: []
+          references: [],
         };
 
         return steeringManager.saveSteeringFile(steeringFile);
@@ -282,13 +287,13 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
     it('should efficiently handle file updates and versioning', async () => {
       const updateCount = 30;
       const featureName = 'version-test';
-      
+
       // Create initial file
       let currentContent = '# Initial Version\n\nInitial content.';
       await steeringService.createFromRequirements(currentContent, {
         create_steering_files: true,
         feature_name: featureName,
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       });
 
       const startTime = Date.now();
@@ -296,12 +301,12 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
       // Perform multiple updates
       for (let i = 1; i <= updateCount; i++) {
         currentContent = `# Version ${i}\n\nUpdated content for version ${i}.`;
-        
+
         await steeringService.createFromRequirements(currentContent, {
           create_steering_files: true,
           feature_name: featureName,
           inclusion_rule: 'manual',
-          overwrite_existing: true
+          overwrite_existing: true,
         });
       }
 
@@ -334,17 +339,17 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
       if (global.gc) global.gc();
       memorySnapshots.push({
         operation: 0,
-        memory: process.memoryUsage()
+        memory: process.memoryUsage(),
       });
 
       // Perform bulk operations with periodic memory monitoring
       for (let i = 1; i <= bulkOperationCount; i++) {
         const content = generateMediumRequirementsDocument(50);
-        
+
         await steeringService.createFromRequirements(content, {
           create_steering_files: true,
           feature_name: `bulk-${i}`,
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         });
 
         // Take memory snapshot every 20 operations
@@ -352,7 +357,7 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
           if (global.gc) global.gc();
           memorySnapshots.push({
             operation: i,
-            memory: process.memoryUsage()
+            memory: process.memoryUsage(),
           });
         }
       }
@@ -382,25 +387,29 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
       // Create very large documents to test memory pressure
       const largeDocumentCount = 10;
       const documentsPerBatch = 3;
-      
+
       for (let batch = 0; batch < Math.ceil(largeDocumentCount / documentsPerBatch); batch++) {
         const batchPromises = [];
-        
-        for (let i = 0; i < documentsPerBatch && (batch * documentsPerBatch + i) < largeDocumentCount; i++) {
+
+        for (
+          let i = 0;
+          i < documentsPerBatch && batch * documentsPerBatch + i < largeDocumentCount;
+          i++
+        ) {
           const docIndex = batch * documentsPerBatch + i;
           const largeContent = generateLargeRequirementsDocument(500); // Very large document
-          
+
           batchPromises.push(
             steeringService.createFromRequirements(largeContent, {
               create_steering_files: true,
               feature_name: `memory-pressure-${docIndex}`,
-              inclusion_rule: 'manual'
+              inclusion_rule: 'manual',
             })
           );
         }
 
         const batchResults = await Promise.all(batchPromises);
-        
+
         // All operations in batch should succeed
         batchResults.forEach(result => {
           expect(result.created).toBe(true);
@@ -441,12 +450,12 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
           return steeringService.createFromRequirements(content, {
             create_steering_files: true,
             feature_name: `scale-test-${size}-${i}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         });
 
         const batchResults = await Promise.all(promises);
-        
+
         const endTime = Date.now();
         const finalMemory = process.memoryUsage();
         const processingTime = endTime - startTime;
@@ -462,13 +471,13 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
           processingTime,
           memoryUsed,
           timePerDocument: processingTime / size,
-          memoryPerDocument: memoryUsed / size
+          memoryPerDocument: memoryUsed / size,
         });
 
         // Clean up for next test
         await fs.rm(testSteeringDir, { recursive: true, force: true });
         await fs.mkdir(testSteeringDir, { recursive: true });
-        
+
         if (global.gc) global.gc();
       }
 
@@ -483,8 +492,9 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
       });
 
       // Verify reasonable scalability (time per document shouldn't increase dramatically)
-      const timePerDocVariation = Math.max(...results.map(r => r.timePerDocument)) / 
-                                  Math.min(...results.map(r => r.timePerDocument));
+      const timePerDocVariation =
+        Math.max(...results.map(r => r.timePerDocument)) /
+        Math.min(...results.map(r => r.timePerDocument));
       expect(timePerDocVariation).toBeLessThan(3); // Shouldn't vary by more than 3x
     });
   });
@@ -493,7 +503,7 @@ ${features.filter(f => f !== feature).map((otherFeature, index) => `
 // Helper functions for generating test documents
 function generateLargeRequirementsDocument(requirementCount: number): string {
   const requirements = [];
-  
+
   for (let i = 1; i <= requirementCount; i++) {
     requirements.push(`
 ### Requirement ${i}
@@ -530,7 +540,7 @@ ${requirements.join('\n')}
 
 function generateLargeDesignDocument(sectionCount: number): string {
   const sections = [];
-  
+
   for (let i = 1; i <= sectionCount; i++) {
     sections.push(`
 ## Component ${i}
@@ -578,7 +588,7 @@ The architecture is designed for high performance and scalability.
 
 function generateMediumRequirementsDocument(requirementCount: number): string {
   const requirements = [];
-  
+
   for (let i = 1; i <= requirementCount; i++) {
     requirements.push(`
 ### Requirement ${i}

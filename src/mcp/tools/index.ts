@@ -11,32 +11,28 @@
 import {
   generateRequirements,
   generateRequirementsSchema,
-  generateRequirementsDescription
+  generateRequirementsDescription,
 } from './generate_requirements';
 
 import {
   generateDesignOptions,
   generateDesignOptionsSchema,
-  generateDesignOptionsDescription
+  generateDesignOptionsDescription,
 } from './generate_design_options';
 
 import {
   generateTaskPlan,
   generateTaskPlanSchema,
-  generateTaskPlanDescription
+  generateTaskPlanDescription,
 } from './generate_task_plan';
 
 import {
   generateManagementOnePager,
   generateManagementOnePagerSchema,
-  generateManagementOnePagerDescription
+  generateManagementOnePagerDescription,
 } from './generate_management_onepager';
 
-import {
-  generatePRFAQ,
-  generatePRFAQSchema,
-  generatePRFAQDescription
-} from './generate_pr_faq';
+import { generatePRFAQ, generatePRFAQSchema, generatePRFAQDescription } from './generate_pr_faq';
 
 // Re-export for external use
 export {
@@ -54,7 +50,7 @@ export {
   generateManagementOnePagerDescription,
   generatePRFAQ,
   generatePRFAQSchema,
-  generatePRFAQDescription
+  generatePRFAQDescription,
 };
 
 /**
@@ -64,28 +60,28 @@ export const MCP_TOOLS_REGISTRY = {
   generate_requirements: {
     handler: generateRequirements,
     schema: generateRequirementsSchema,
-    description: generateRequirementsDescription
+    description: generateRequirementsDescription,
   },
   generate_design_options: {
     handler: generateDesignOptions,
     schema: generateDesignOptionsSchema,
-    description: generateDesignOptionsDescription
+    description: generateDesignOptionsDescription,
   },
   generate_task_plan: {
     handler: generateTaskPlan,
     schema: generateTaskPlanSchema,
-    description: generateTaskPlanDescription
+    description: generateTaskPlanDescription,
   },
   generate_management_onepager: {
     handler: generateManagementOnePager,
     schema: generateManagementOnePagerSchema,
-    description: generateManagementOnePagerDescription
+    description: generateManagementOnePagerDescription,
   },
   generate_pr_faq: {
     handler: generatePRFAQ,
     schema: generatePRFAQSchema,
-    description: generatePRFAQDescription
-  }
+    description: generatePRFAQDescription,
+  },
 } as const;
 
 /**

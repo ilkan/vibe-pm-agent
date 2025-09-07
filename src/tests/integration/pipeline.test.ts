@@ -12,14 +12,14 @@ describe('Pipeline Integration', () => {
   describe('processIntent', () => {
     it('should handle basic intent processing', async () => {
       const intent = 'I want to create a simple todo list application with CRUD operations';
-      
+
       // This test will fail until we implement the pipeline
       // but it establishes the expected interface
       const result = await optimizer.processIntent(intent);
-      
+
       expect(result).toBeDefined();
       expect(result.success).toBeDefined();
-      
+
       if (result.success) {
         expect(result.enhancedKiroSpec).toBeDefined();
         expect(result.efficiencySummary).toBeDefined();
@@ -34,13 +34,13 @@ describe('Pipeline Integration', () => {
         expectedUserVolume: 1000,
         costConstraints: {
           maxVibes: 100,
-          maxSpecs: 20
+          maxSpecs: 20,
         },
-        performanceSensitivity: 'high' as const
+        performanceSensitivity: 'high' as const,
       };
 
       const result = await optimizer.processIntent(intent, params);
-      
+
       expect(result).toBeDefined();
       expect(result.success).toBeDefined();
     });

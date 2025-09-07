@@ -11,7 +11,7 @@ import {
   SteeringFileCustomization,
   BatchOperationConfig,
   ConflictInfo,
-  SteeringFilePreviewInfo
+  SteeringFilePreviewInfo,
 } from '../../models/steering';
 
 // Mock dependencies
@@ -32,11 +32,11 @@ describe('SteeringFilePreview', () => {
       generatedAt: '2024-01-01T00:00:00.000Z',
       featureName: 'test-feature',
       documentType: DocumentType.REQUIREMENTS,
-      description: 'Test requirements guidance'
+      description: 'Test requirements guidance',
     },
     content: '# Test Requirements\n\nThis is test content for requirements guidance.',
     references: ['#[[file:.kiro/specs/test-feature/design.md]]'],
-    fullPath: '.kiro/steering/test-requirements.md'
+    fullPath: '.kiro/steering/test-requirements.md',
   };
 
   beforeEach(() => {
@@ -53,7 +53,7 @@ describe('SteeringFilePreview', () => {
     it('should generate preview without customization', async () => {
       const mockConflictInfo: ConflictInfo = {
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       };
 
       mockManager.checkConflicts.mockResolvedValue(mockConflictInfo);
@@ -65,7 +65,7 @@ describe('SteeringFilePreview', () => {
         estimatedSize: expect.any(Number),
         previewContent: expect.stringContaining('---'),
         warnings: expect.any(Array),
-        suggestions: expect.any(Array)
+        suggestions: expect.any(Array),
       });
 
       expect(result.previewContent).toContain('inclusion: fileMatch');
@@ -76,12 +76,12 @@ describe('SteeringFilePreview', () => {
 
     it('should apply filename customization', async () => {
       const customization: SteeringFileCustomization = {
-        filename: 'custom-requirements-name'
+        filename: 'custom-requirements-name',
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const result = await preview.generatePreview(mockSteeringFile, customization);
@@ -91,12 +91,12 @@ describe('SteeringFilePreview', () => {
 
     it('should apply inclusion rule customization', async () => {
       const customization: SteeringFileCustomization = {
-        inclusionRule: 'manual'
+        inclusionRule: 'manual',
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const result = await preview.generatePreview(mockSteeringFile, customization);
@@ -107,12 +107,12 @@ describe('SteeringFilePreview', () => {
 
     it('should apply file match pattern customization', async () => {
       const customization: SteeringFileCustomization = {
-        fileMatchPattern: 'custom-pattern*'
+        fileMatchPattern: 'custom-pattern*',
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const result = await preview.generatePreview(mockSteeringFile, customization);
@@ -123,12 +123,12 @@ describe('SteeringFilePreview', () => {
 
     it('should apply description customization', async () => {
       const customization: SteeringFileCustomization = {
-        description: 'Custom description for testing'
+        description: 'Custom description for testing',
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const result = await preview.generatePreview(mockSteeringFile, customization);
@@ -142,15 +142,13 @@ describe('SteeringFilePreview', () => {
         contentModifications: {
           prependContent: '## Prepended Section\n\nThis is prepended.',
           appendContent: '## Appended Section\n\nThis is appended.',
-          replacements: [
-            { search: 'Test Requirements', replace: 'Modified Requirements' }
-          ]
-        }
+          replacements: [{ search: 'Test Requirements', replace: 'Modified Requirements' }],
+        },
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const result = await preview.generatePreview(mockSteeringFile, customization);
@@ -163,12 +161,12 @@ describe('SteeringFilePreview', () => {
 
     it('should handle reference inclusion setting', async () => {
       const customization: SteeringFileCustomization = {
-        includeReferences: false
+        includeReferences: false,
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const result = await preview.generatePreview(mockSteeringFile, customization);
@@ -182,7 +180,7 @@ describe('SteeringFilePreview', () => {
         existingFile: '.kiro/steering/test-requirements.md',
         suggestedAction: 'version',
         reason: 'File was modified recently',
-        suggestedFilename: 'test-requirements-2024-01-01.md'
+        suggestedFilename: 'test-requirements-2024-01-01.md',
       };
 
       mockManager.checkConflicts.mockResolvedValue(mockConflictInfo);
@@ -199,21 +197,23 @@ describe('SteeringFilePreview', () => {
         frontMatter: {
           ...mockSteeringFile.frontMatter,
           inclusion: 'fileMatch',
-          fileMatchPattern: undefined // Missing pattern should generate warning
-        }
+          fileMatchPattern: undefined, // Missing pattern should generate warning
+        },
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const result = await preview.generatePreview(fileWithIssues);
 
-      expect(result.warnings).toEqual(expect.arrayContaining([
-        expect.stringContaining('Content is very short'),
-        expect.stringContaining('fileMatch inclusion rule requires a fileMatchPattern')
-      ]));
+      expect(result.warnings).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('Content is very short'),
+          expect.stringContaining('fileMatch inclusion rule requires a fileMatchPattern'),
+        ])
+      );
     });
 
     it('should generate suggestions for improvement', async () => {
@@ -222,23 +222,25 @@ describe('SteeringFilePreview', () => {
         frontMatter: {
           ...mockSteeringFile.frontMatter,
           inclusion: 'always',
-          description: undefined
+          description: undefined,
         },
-        references: []
+        references: [],
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const result = await preview.generatePreview(fileWithAlwaysInclusion);
 
-      expect(result.suggestions).toEqual(expect.arrayContaining([
-        expect.stringContaining('Consider using fileMatch instead of always'),
-        expect.stringContaining('Adding a description helps'),
-        expect.stringContaining('Consider adding references')
-      ]));
+      expect(result.suggestions).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('Consider using fileMatch instead of always'),
+          expect.stringContaining('Adding a description helps'),
+          expect.stringContaining('Consider adding references'),
+        ])
+      );
     });
   });
 
@@ -252,18 +254,18 @@ describe('SteeringFilePreview', () => {
             filename: 'test-design.md',
             frontMatter: {
               ...mockSteeringFile.frontMatter,
-              documentType: DocumentType.DESIGN
-            }
-          }
+              documentType: DocumentType.DESIGN,
+            },
+          },
         ],
         commonCustomization: {
-          inclusionRule: 'manual'
-        }
+          inclusionRule: 'manual',
+        },
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const results = await preview.generateBatchPreview(config);
@@ -279,14 +281,14 @@ describe('SteeringFilePreview', () => {
         individualCustomizations: {
           'test-requirements.md': {
             filename: 'individual-custom-name',
-            description: 'Individual description'
-          }
-        }
+            description: 'Individual description',
+          },
+        },
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const results = await preview.generateBatchPreview(config);
@@ -299,60 +301,60 @@ describe('SteeringFilePreview', () => {
       const invalidFile: SteeringFile = {
         ...mockSteeringFile,
         filename: '', // Invalid filename should cause error
-        content: ''
+        content: '',
       };
 
       const config: BatchOperationConfig = {
         steeringFiles: [invalidFile, mockSteeringFile],
-        stopOnError: false
+        stopOnError: false,
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const results = await preview.generateBatchPreview(config);
 
       expect(results).toHaveLength(2);
-      expect(results[0].warnings).toEqual(expect.arrayContaining([
-        expect.stringContaining('Error generating preview')
-      ]));
-      expect(results[1].warnings).not.toEqual(expect.arrayContaining([
-        expect.stringContaining('Error generating preview')
-      ]));
+      expect(results[0].warnings).toEqual(
+        expect.arrayContaining([expect.stringContaining('Error generating preview')])
+      );
+      expect(results[1].warnings).not.toEqual(
+        expect.arrayContaining([expect.stringContaining('Error generating preview')])
+      );
     });
 
     it('should stop on first error when stopOnError is true', async () => {
       const invalidFile: SteeringFile = {
         ...mockSteeringFile,
         filename: '',
-        content: ''
+        content: '',
       };
 
       const config: BatchOperationConfig = {
         steeringFiles: [invalidFile, mockSteeringFile],
-        stopOnError: true
+        stopOnError: true,
       };
 
       mockManager.checkConflicts.mockResolvedValue({
         exists: false,
-        suggestedAction: 'update'
+        suggestedAction: 'update',
       });
 
       const results = await preview.generateBatchPreview(config);
 
       expect(results).toHaveLength(1);
-      expect(results[0].warnings).toEqual(expect.arrayContaining([
-        expect.stringContaining('Error generating preview')
-      ]));
+      expect(results[0].warnings).toEqual(
+        expect.arrayContaining([expect.stringContaining('Error generating preview')])
+      );
     });
   });
 
   describe('executeBatchOperation', () => {
     it('should execute batch save operations successfully', async () => {
       const config: BatchOperationConfig = {
-        steeringFiles: [mockSteeringFile]
+        steeringFiles: [mockSteeringFile],
       };
 
       mockManager.saveSteeringFile.mockResolvedValue({
@@ -360,7 +362,7 @@ describe('SteeringFilePreview', () => {
         filename: 'test-requirements.md',
         action: 'created',
         message: 'File created successfully',
-        fullPath: '.kiro/steering/test-requirements.md'
+        fullPath: '.kiro/steering/test-requirements.md',
       });
 
       const result = await preview.executeBatchOperation(config);
@@ -374,7 +376,7 @@ describe('SteeringFilePreview', () => {
 
     it('should handle save failures', async () => {
       const config: BatchOperationConfig = {
-        steeringFiles: [mockSteeringFile]
+        steeringFiles: [mockSteeringFile],
       };
 
       mockManager.saveSteeringFile.mockResolvedValue({
@@ -382,7 +384,7 @@ describe('SteeringFilePreview', () => {
         filename: 'test-requirements.md',
         action: 'skipped',
         message: 'Save failed',
-        warnings: ['Permission denied']
+        warnings: ['Permission denied'],
       });
 
       const result = await preview.executeBatchOperation(config);
@@ -398,20 +400,20 @@ describe('SteeringFilePreview', () => {
       const config: BatchOperationConfig = {
         steeringFiles: [mockSteeringFile],
         commonCustomization: {
-          inclusionRule: 'manual'
+          inclusionRule: 'manual',
         },
         individualCustomizations: {
           'test-requirements.md': {
-            description: 'Individual description'
-          }
-        }
+            description: 'Individual description',
+          },
+        },
       };
 
       mockManager.saveSteeringFile.mockResolvedValue({
         success: true,
         filename: 'test-requirements.md',
         action: 'created',
-        message: 'File created successfully'
+        message: 'File created successfully',
       });
 
       await preview.executeBatchOperation(config);
@@ -420,8 +422,8 @@ describe('SteeringFilePreview', () => {
         expect.objectContaining({
           frontMatter: expect.objectContaining({
             inclusion: 'manual',
-            description: 'Individual description'
-          })
+            description: 'Individual description',
+          }),
         })
       );
     });
@@ -438,7 +440,7 @@ describe('SteeringFilePreview', () => {
         expect.objectContaining({
           type: 'inclusionRule',
           suggestion: 'fileMatch',
-          reason: expect.stringContaining('Requirements guidance')
+          reason: expect.stringContaining('Requirements guidance'),
         })
       );
 
@@ -446,7 +448,7 @@ describe('SteeringFilePreview', () => {
         expect.objectContaining({
           type: 'fileMatchPattern',
           suggestion: 'requirements*|spec*|*.md',
-          reason: expect.stringContaining('Match requirements')
+          reason: expect.stringContaining('Match requirements'),
         })
       );
 
@@ -454,22 +456,19 @@ describe('SteeringFilePreview', () => {
         expect.objectContaining({
           type: 'filename',
           suggestion: 'requirements-test-feature',
-          reason: expect.stringContaining('Clear naming convention')
+          reason: expect.stringContaining('Clear naming convention'),
         })
       );
     });
 
     it('should provide suggestions for design document type', () => {
-      const suggestions = preview.getCustomizationSuggestions(
-        DocumentType.DESIGN,
-        'test-feature'
-      );
+      const suggestions = preview.getCustomizationSuggestions(DocumentType.DESIGN, 'test-feature');
 
       expect(suggestions).toContainEqual(
         expect.objectContaining({
           type: 'inclusionRule',
           suggestion: 'fileMatch',
-          reason: expect.stringContaining('Design guidance')
+          reason: expect.stringContaining('Design guidance'),
         })
       );
 
@@ -477,7 +476,7 @@ describe('SteeringFilePreview', () => {
         expect.objectContaining({
           type: 'fileMatchPattern',
           suggestion: 'design*|architecture*|*.ts|*.js',
-          reason: expect.stringContaining('Match design files')
+          reason: expect.stringContaining('Match design files'),
         })
       );
     });
@@ -497,7 +496,7 @@ describe('SteeringFilePreview', () => {
         expect.objectContaining({
           type: 'inclusionRule',
           suggestion: 'manual',
-          reason: expect.stringContaining('Executive guidance')
+          reason: expect.stringContaining('Executive guidance'),
         })
       );
 
@@ -505,22 +504,19 @@ describe('SteeringFilePreview', () => {
         expect.objectContaining({
           type: 'inclusionRule',
           suggestion: 'manual',
-          reason: expect.stringContaining('PR-FAQ guidance')
+          reason: expect.stringContaining('PR-FAQ guidance'),
         })
       );
     });
 
     it('should provide task-specific suggestions for tasks document type', () => {
-      const suggestions = preview.getCustomizationSuggestions(
-        DocumentType.TASKS,
-        'test-feature'
-      );
+      const suggestions = preview.getCustomizationSuggestions(DocumentType.TASKS, 'test-feature');
 
       expect(suggestions).toContainEqual(
         expect.objectContaining({
           type: 'fileMatchPattern',
           suggestion: 'tasks*|todo*|*.ts|*.js',
-          reason: expect.stringContaining('Match task files')
+          reason: expect.stringContaining('Match task files'),
         })
       );
     });
@@ -532,7 +528,9 @@ describe('SteeringFilePreview', () => {
       );
 
       const filenameSuggestion = suggestions.find(s => s.type === 'filename');
-      expect(filenameSuggestion?.suggestion).toBe('requirements-test-feature-with-spaces-special-characters');
+      expect(filenameSuggestion?.suggestion).toBe(
+        'requirements-test-feature-with-spaces-special-characters'
+      );
     });
   });
 
@@ -546,7 +544,7 @@ describe('SteeringFilePreview', () => {
 
     it('should sanitize and add .md extension to custom filenames', async () => {
       const customization: SteeringFileCustomization = {
-        filename: 'Custom File Name With Spaces!'
+        filename: 'Custom File Name With Spaces!',
       };
 
       const result = await preview.applyCustomizations(mockSteeringFile, customization);
@@ -556,7 +554,7 @@ describe('SteeringFilePreview', () => {
 
     it('should preserve .md extension if already present', async () => {
       const customization: SteeringFileCustomization = {
-        filename: 'custom-name.md'
+        filename: 'custom-name.md',
       };
 
       const result = await preview.applyCustomizations(mockSteeringFile, customization);
@@ -569,10 +567,8 @@ describe('SteeringFilePreview', () => {
         contentModifications: {
           prependContent: 'PREPEND',
           appendContent: 'APPEND',
-          replacements: [
-            { search: 'Test', replace: 'Modified' }
-          ]
-        }
+          replacements: [{ search: 'Test', replace: 'Modified' }],
+        },
       };
 
       const result = await preview.applyCustomizations(mockSteeringFile, customization);

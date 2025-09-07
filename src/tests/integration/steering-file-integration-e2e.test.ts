@@ -1,6 +1,6 @@
 /**
  * End-to-end integration tests for PM agent output to steering file workflow
- * 
+ *
  * Tests the complete workflow from PM agent document generation to steering file creation,
  * including cross-references, format compliance, and integration with Kiro steering system.
  */
@@ -10,14 +10,14 @@ import { PMAgentMCPServer } from '../../mcp/server';
 import { SteeringService } from '../../components/steering-service';
 import { SteeringFileManager } from '../../components/steering-file-manager';
 import { DocumentReferenceLinker } from '../../components/document-reference-linker';
-import { 
-  RequirementsArgs, 
-  DesignOptionsArgs, 
-  ManagementOnePagerArgs, 
-  PRFAQArgs, 
+import {
+  RequirementsArgs,
+  DesignOptionsArgs,
+  ManagementOnePagerArgs,
+  PRFAQArgs,
   TaskPlanArgs,
   MCPToolContext,
-  SteeringFileOptions
+  SteeringFileOptions,
 } from '../../models/mcp';
 import { DocumentType } from '../../models/steering';
 import { cleanupAfterTest } from '../utils/test-cleanup';
@@ -36,7 +36,7 @@ describe('Steering File Integration End-to-End Tests', () => {
     // Setup test directories
     testSteeringDir = path.join(process.cwd(), 'test-steering-e2e');
     testSpecsDir = path.join(process.cwd(), 'test-specs-e2e');
-    
+
     await fs.mkdir(testSteeringDir, { recursive: true });
     await fs.mkdir(testSpecsDir, { recursive: true });
 
@@ -45,7 +45,7 @@ describe('Steering File Integration End-to-End Tests', () => {
     mcpServer = new PMAgentMCPServer();
     steeringService = new SteeringService({
       steeringDirectory: testSteeringDir,
-      userPreferences: { autoCreate: true, showPreview: false }
+      userPreferences: { autoCreate: true, showPreview: false },
     });
 
     mockContext = {
@@ -53,13 +53,13 @@ describe('Steering File Integration End-to-End Tests', () => {
       sessionId: 'e2e-test-session',
       timestamp: Date.now(),
       requestId: 'e2e-test-request',
-      traceId: 'e2e-test-trace'
+      traceId: 'e2e-test-trace',
     };
   });
 
   afterEach(async () => {
     await pipeline.cleanup();
-    
+
     // Clean up test directories
     try {
       await fs.rm(testSteeringDir, { recursive: true, force: true });
@@ -67,7 +67,7 @@ describe('Steering File Integration End-to-End Tests', () => {
     } catch (error) {
       // Ignore cleanup errors
     }
-    
+
     // Clean up any test-generated steering files
     await cleanupAfterTest();
   });
@@ -75,7 +75,8 @@ describe('Steering File Integration End-to-End Tests', () => {
   describe('Complete PM Agent to Steering File Workflow', () => {
     it('should create complete steering file ecosystem from PM agent outputs', async () => {
       const featureName = 'user-authentication-system';
-      const baseIntent = 'Create a comprehensive user authentication system with OAuth, MFA, and role-based access control';
+      const baseIntent =
+        'Create a comprehensive user authentication system with OAuth, MFA, and role-based access control';
 
       // Step 1: Generate Requirements via MCP
       const requirementsArgs: RequirementsArgs = {
@@ -84,8 +85,8 @@ describe('Steering File Integration End-to-End Tests', () => {
           create_steering_files: true,
           feature_name: featureName,
           inclusion_rule: 'fileMatch',
-          file_match_pattern: 'requirements*|spec*'
-        }
+          file_match_pattern: 'requirements*|spec*',
+        },
       };
 
       const reqResult = await mcpServer.handleGenerateRequirements(requirementsArgs, mockContext);
@@ -94,14 +95,16 @@ describe('Steering File Integration End-to-End Tests', () => {
 
       // Step 2: Generate Design Options via MCP
       const designArgs: DesignOptionsArgs = {
-        requirements: reqResult.content[0].json.businessGoal + '\n' + 
-                     reqResult.content[0].json.requirements.map((r: any) => r.title).join('\n'),
+        requirements:
+          reqResult.content[0].json.businessGoal +
+          '\n' +
+          reqResult.content[0].json.requirements.map((r: any) => r.title).join('\n'),
         steering_options: {
           create_steering_files: true,
           feature_name: featureName,
           inclusion_rule: 'fileMatch',
-          file_match_pattern: 'design*|architecture*'
-        }
+          file_match_pattern: 'design*|architecture*',
+        },
       };
 
       const designResult = await mcpServer.handleGenerateDesignOptions(designArgs, mockContext);
@@ -115,11 +118,14 @@ describe('Steering File Integration End-to-End Tests', () => {
         steering_options: {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'manual'
-        }
+          inclusion_rule: 'manual',
+        },
       };
 
-      const onePagerResult = await mcpServer.handleGenerateManagementOnePager(onePagerArgs, mockContext);
+      const onePagerResult = await mcpServer.handleGenerateManagementOnePager(
+        onePagerArgs,
+        mockContext
+      );
       expect(onePagerResult.isError).toBe(false);
       expect(onePagerResult.metadata?.steeringFileCreated).toBe(true);
 
@@ -131,8 +137,8 @@ describe('Steering File Integration End-to-End Tests', () => {
         steering_options: {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'manual'
-        }
+          inclusion_rule: 'manual',
+        },
       };
 
       const prfaqResult = await mcpServer.handleGeneratePRFAQ(prfaqArgs, mockContext);
@@ -146,8 +152,8 @@ describe('Steering File Integration End-to-End Tests', () => {
           create_steering_files: true,
           feature_name: featureName,
           inclusion_rule: 'fileMatch',
-          file_match_pattern: 'tasks*|implementation*'
-        }
+          file_match_pattern: 'tasks*|implementation*',
+        },
       };
 
       const taskResult = await mcpServer.handleGenerateTaskPlan(taskArgs, mockContext);
@@ -164,7 +170,7 @@ describe('Steering File Integration End-to-End Tests', () => {
         new RegExp(`${featureName}.*design.*\\.md$`),
         new RegExp(`${featureName}.*onepager.*\\.md$`),
         new RegExp(`${featureName}.*prfaq.*\\.md$`),
-        new RegExp(`${featureName}.*tasks.*\\.md$`)
+        new RegExp(`${featureName}.*tasks.*\\.md$`),
       ];
 
       expectedPatterns.forEach(pattern => {
@@ -176,7 +182,7 @@ describe('Steering File Integration End-to-End Tests', () => {
       for (const filename of steeringFiles) {
         const filePath = path.join(testSteeringDir, filename);
         const content = await fs.readFile(filePath, 'utf8');
-        
+
         // Each file should reference related files
         if (filename.includes('requirements')) {
           expect(content).toMatch(/#\[\[file:.*design.*\]\]/);
@@ -193,19 +199,19 @@ describe('Steering File Integration End-to-End Tests', () => {
 
     it('should handle incremental steering file creation', async () => {
       const featureName = 'incremental-feature';
-      
+
       // Create requirements steering file first
       const reqResult = await steeringService.createFromRequirements(
         '# Requirements\n## User Story\nAs a user, I want incremental features.',
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'always'
+          inclusion_rule: 'always',
         }
       );
 
       expect(reqResult.created).toBe(true);
-      
+
       // Add design steering file later
       const designResult = await steeringService.createFromDesignOptions(
         '# Design\n## Architecture\nSimple incremental architecture.',
@@ -213,7 +219,7 @@ describe('Steering File Integration End-to-End Tests', () => {
           create_steering_files: true,
           feature_name: featureName,
           inclusion_rule: 'fileMatch',
-          file_match_pattern: 'design*'
+          file_match_pattern: 'design*',
         }
       );
 
@@ -226,14 +232,14 @@ describe('Steering File Integration End-to-End Tests', () => {
       // Check that design file references requirements file
       const designFile = steeringFiles.find(f => f.includes('design'));
       expect(designFile).toBeDefined();
-      
+
       const designContent = await fs.readFile(path.join(testSteeringDir, designFile!), 'utf8');
       expect(designContent).toMatch(/#\[\[file:.*requirements.*\]\]/);
     });
 
     it('should maintain consistency across multiple feature steering files', async () => {
       const features = ['auth-system', 'payment-gateway', 'notification-service'];
-      
+
       // Create steering files for multiple features
       for (const feature of features) {
         await steeringService.createFromRequirements(
@@ -242,7 +248,7 @@ describe('Steering File Integration End-to-End Tests', () => {
             create_steering_files: true,
             feature_name: feature,
             inclusion_rule: 'fileMatch',
-            file_match_pattern: `${feature}*|requirements*`
+            file_match_pattern: `${feature}*|requirements*`,
           }
         );
 
@@ -252,7 +258,7 @@ describe('Steering File Integration End-to-End Tests', () => {
             create_steering_files: true,
             feature_name: feature,
             inclusion_rule: 'fileMatch',
-            file_match_pattern: `${feature}*|design*`
+            file_match_pattern: `${feature}*|design*`,
           }
         );
       }
@@ -270,7 +276,7 @@ describe('Steering File Integration End-to-End Tests', () => {
         for (const filename of featureFiles) {
           const content = await fs.readFile(path.join(testSteeringDir, filename), 'utf8');
           const references = content.match(/#\[\[file:[^\]]+\]\]/g) || [];
-          
+
           // All references should be to files within the same feature
           references.forEach(ref => {
             expect(ref).toMatch(new RegExp(feature));
@@ -286,18 +292,18 @@ describe('Steering File Integration End-to-End Tests', () => {
         {
           type: 'requirements',
           content: '# Requirements\n## User Story\nAs a user, I want valid front-matter.',
-          expectedDocType: DocumentType.REQUIREMENTS
+          expectedDocType: DocumentType.REQUIREMENTS,
         },
         {
           type: 'design',
           content: '# Design\n## Architecture\nValid design architecture.',
-          expectedDocType: DocumentType.DESIGN
+          expectedDocType: DocumentType.DESIGN,
         },
         {
           type: 'onepager',
           content: '# Executive Summary\n## Problem\nValid executive summary.',
-          expectedDocType: DocumentType.ONEPAGER
-        }
+          expectedDocType: DocumentType.ONEPAGER,
+        },
       ];
 
       for (const testCase of testCases) {
@@ -306,19 +312,19 @@ describe('Steering File Integration End-to-End Tests', () => {
           result = await steeringService.createFromRequirements(testCase.content, {
             create_steering_files: true,
             feature_name: `format-test-${testCase.type}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         } else if (testCase.type === 'design') {
           result = await steeringService.createFromDesignOptions(testCase.content, {
             create_steering_files: true,
             feature_name: `format-test-${testCase.type}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         } else if (testCase.type === 'onepager') {
           result = await steeringService.createFromOnePager(testCase.content, {
             create_steering_files: true,
             feature_name: `format-test-${testCase.type}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           });
         } else {
           throw new Error(`Unsupported test case type: ${testCase.type}`);
@@ -350,7 +356,7 @@ describe('Steering File Integration End-to-End Tests', () => {
       const featureName = 'reference-test';
       const specsFeatureDir = path.join(testSpecsDir, featureName);
       await fs.mkdir(specsFeatureDir, { recursive: true });
-      
+
       // Create mock spec files
       await fs.writeFile(path.join(specsFeatureDir, 'requirements.md'), '# Mock Requirements');
       await fs.writeFile(path.join(specsFeatureDir, 'design.md'), '# Mock Design');
@@ -363,7 +369,7 @@ describe('Steering File Integration End-to-End Tests', () => {
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -372,11 +378,11 @@ describe('Steering File Integration End-to-End Tests', () => {
       // Verify references are correctly formatted
       const filename = result.results[0].filename;
       const content = await fs.readFile(path.join(testSteeringDir, filename), 'utf8');
-      
+
       // Should contain references to related spec files
       expect(content).toMatch(/#\[\[file:test-specs-e2e\/reference-test\/design\.md\]\]/);
       expect(content).toMatch(/#\[\[file:test-specs-e2e\/reference-test\/tasks\.md\]\]/);
-      
+
       // References should use relative paths from workspace root
       const references = content.match(/#\[\[file:[^\]]+\]\]/g) || [];
       references.forEach(ref => {
@@ -406,7 +412,7 @@ As a user with "quotes" and 'apostrophes', I want to handle:
       const result = await steeringService.createFromRequirements(edgeCaseContent, {
         create_steering_files: true,
         feature_name: 'edge-case-test',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       });
 
       expect(result.created).toBe(true);
@@ -414,7 +420,7 @@ As a user with "quotes" and 'apostrophes', I want to handle:
       // Verify special characters are preserved
       const filename = result.results[0].filename;
       const content = await fs.readFile(path.join(testSteeringDir, filename), 'utf8');
-      
+
       expect(content).toContain('"quotes"');
       expect(content).toContain("'apostrophes'");
       expect(content).toContain('**bold**');
@@ -439,10 +445,7 @@ created: 2024-01-01
 This is a manually created steering file that should coexist with PM agent generated files.
 `;
 
-      await fs.writeFile(
-        path.join(testSteeringDir, 'manual-steering.md'),
-        manualSteeringContent
-      );
+      await fs.writeFile(path.join(testSteeringDir, 'manual-steering.md'), manualSteeringContent);
 
       // Create PM agent steering file
       const result = await steeringService.createFromRequirements(
@@ -450,7 +453,7 @@ This is a manually created steering file that should coexist with PM agent gener
         {
           create_steering_files: true,
           feature_name: 'coexistence-test',
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -475,7 +478,10 @@ This is a manually created steering file that should coexist with PM agent gener
         { feature: 'feature-a', expectedPattern: /feature-a.*requirements.*\.md$/ },
         { feature: 'feature_b', expectedPattern: /feature_b.*requirements.*\.md$/ },
         { feature: 'FeatureC', expectedPattern: /FeatureC.*requirements.*\.md$/ },
-        { feature: 'feature-with-long-name', expectedPattern: /feature-with-long-name.*requirements.*\.md$/ }
+        {
+          feature: 'feature-with-long-name',
+          expectedPattern: /feature-with-long-name.*requirements.*\.md$/,
+        },
       ];
 
       for (const test of namingTests) {
@@ -484,7 +490,7 @@ This is a manually created steering file that should coexist with PM agent gener
           {
             create_steering_files: true,
             feature_name: test.feature,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           }
         );
 
@@ -499,14 +505,14 @@ This is a manually created steering file that should coexist with PM agent gener
 
     it('should handle conflicts with existing steering files gracefully', async () => {
       const featureName = 'conflict-test';
-      
+
       // Create initial steering file
       const firstResult = await steeringService.createFromRequirements(
         '# First Requirements\n## User Story\nFirst version of requirements.',
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         }
       );
 
@@ -520,14 +526,14 @@ This is a manually created steering file that should coexist with PM agent gener
           create_steering_files: true,
           feature_name: featureName,
           inclusion_rule: 'manual',
-          overwrite_existing: false
+          overwrite_existing: false,
         }
       );
 
       // Should handle conflict gracefully (either version or update)
       if (secondResult.created) {
         const steeringFiles = await fs.readdir(testSteeringDir);
-        
+
         // Should either have versioned file or updated existing
         if (steeringFiles.length === 2) {
           // Versioned approach
@@ -548,14 +554,14 @@ This is a manually created steering file that should coexist with PM agent gener
   describe('Cross-Reference Validation', () => {
     it('should create bidirectional references between related documents', async () => {
       const featureName = 'bidirectional-refs';
-      
+
       // Create requirements first
       const reqResult = await steeringService.createFromRequirements(
         '# Requirements\n## User Story\nAs a user, I want bidirectional references.',
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -565,7 +571,7 @@ This is a manually created steering file that should coexist with PM agent gener
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -575,7 +581,7 @@ This is a manually created steering file that should coexist with PM agent gener
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -616,7 +622,7 @@ This is a manually created steering file that should coexist with PM agent gener
         {
           create_steering_files: true,
           feature_name: 'reference-validation',
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -624,8 +630,8 @@ This is a manually created steering file that should coexist with PM agent gener
 
       // Check that warnings were generated for non-existent references
       if (result.warnings && result.warnings.length > 0) {
-        const hasReferenceWarning = result.warnings.some(warning => 
-          warning.includes('reference') || warning.includes('file not found')
+        const hasReferenceWarning = result.warnings.some(
+          warning => warning.includes('reference') || warning.includes('file not found')
         );
         // This is acceptable - the system should warn about missing references
       }
@@ -638,12 +644,12 @@ This is a manually created steering file that should coexist with PM agent gener
 
     it('should handle circular references gracefully', async () => {
       const featureName = 'circular-refs';
-      
+
       // Create multiple documents that could create circular references
       const documents = [
         { type: 'requirements', content: '# Requirements\nRequirements content.' },
         { type: 'design', content: '# Design\nDesign content.' },
-        { type: 'tasks', content: '# Tasks\n- [ ] Task content.' }
+        { type: 'tasks', content: '# Tasks\n- [ ] Task content.' },
       ];
 
       const results = [];
@@ -653,19 +659,19 @@ This is a manually created steering file that should coexist with PM agent gener
           result = await steeringService.createFromRequirements(doc.content, {
             create_steering_files: true,
             feature_name: featureName,
-            inclusion_rule: 'fileMatch'
+            inclusion_rule: 'fileMatch',
           });
         } else if (doc.type === 'design') {
           result = await steeringService.createFromDesignOptions(doc.content, {
             create_steering_files: true,
             feature_name: featureName,
-            inclusion_rule: 'fileMatch'
+            inclusion_rule: 'fileMatch',
           });
         } else if (doc.type === 'tasks') {
           result = await steeringService.createFromTaskPlan(doc.content, {
             create_steering_files: true,
             feature_name: featureName,
-            inclusion_rule: 'fileMatch'
+            inclusion_rule: 'fileMatch',
           });
         } else {
           throw new Error(`Unsupported document type: ${doc.type}`);
@@ -683,7 +689,7 @@ This is a manually created steering file that should coexist with PM agent gener
       for (const filename of steeringFiles) {
         const content = await fs.readFile(path.join(testSteeringDir, filename), 'utf8');
         const references = content.match(/#\[\[file:[^\]]+\]\]/g) || [];
-        
+
         // No reference should point to the same file
         references.forEach(ref => {
           expect(ref).not.toContain(filename.replace('.md', ''));

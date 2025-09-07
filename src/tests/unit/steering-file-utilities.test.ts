@@ -1,6 +1,6 @@
 /**
  * Unit Tests for Steering File Management Utilities
- * 
+ *
  * Tests the functionality for listing, organizing, cleaning up, and analyzing
  * steering files to maintain an efficient steering file system.
  */
@@ -8,12 +8,12 @@
 import { jest } from '@jest/globals';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { 
+import {
   SteeringFileUtilities,
   SteeringFileInfo,
   SteeringFileAnalytics,
   CleanupOptions,
-  CleanupResult
+  CleanupResult,
 } from '../../components/steering-file-utilities';
 import { DocumentType, InclusionRule } from '../../models/steering';
 
@@ -30,7 +30,7 @@ describe('SteeringFileUtilities', () => {
     jest.clearAllMocks();
     utilities = new SteeringFileUtilities({
       steeringDirectory: mockSteeringDir,
-      backupDirectory: mockBackupDir
+      backupDirectory: mockBackupDir,
     });
   });
 
@@ -40,13 +40,13 @@ describe('SteeringFileUtilities', () => {
         { name: 'requirements-feature-a.md', isFile: () => true },
         { name: 'design-feature-b.md', isFile: () => true },
         { name: 'not-markdown.txt', isFile: () => true },
-        { name: 'subdirectory', isFile: () => false }
+        { name: 'subdirectory', isFile: () => false },
       ];
 
       const mockStats = {
         size: 1024,
         mtime: new Date('2024-01-15'),
-        birthtime: new Date('2024-01-10')
+        birthtime: new Date('2024-01-10'),
       };
 
       const mockContent = `---
@@ -75,12 +75,12 @@ This is the content of the requirements document.`;
         fullPath: path.join(mockSteeringDir, 'requirements-feature-a.md'),
         sizeBytes: 1024,
         isValid: true,
-        validationErrors: []
+        validationErrors: [],
       });
       expect(result[0].frontMatter).toMatchObject({
         inclusion: 'fileMatch',
         featureName: 'feature-a',
-        documentType: 'requirements'
+        documentType: 'requirements',
       });
     });
 
@@ -93,14 +93,12 @@ This is the content of the requirements document.`;
     });
 
     it('should handle invalid steering files', async () => {
-      const mockFiles = [
-        { name: 'invalid-file.md', isFile: () => true }
-      ];
+      const mockFiles = [{ name: 'invalid-file.md', isFile: () => true }];
 
       const mockStats = {
         size: 512,
         mtime: new Date('2024-01-15'),
-        birthtime: new Date('2024-01-10')
+        birthtime: new Date('2024-01-10'),
       };
 
       const invalidContent = `# Invalid File
@@ -121,13 +119,13 @@ This file has no front-matter.`;
     it('should handle file processing errors gracefully', async () => {
       const mockFiles = [
         { name: 'error-file.md', isFile: () => true },
-        { name: 'good-file.md', isFile: () => true }
+        { name: 'good-file.md', isFile: () => true },
       ];
 
       const mockStats = {
         size: 1024,
         mtime: new Date('2024-01-15'),
-        birthtime: new Date('2024-01-10')
+        birthtime: new Date('2024-01-10'),
       };
 
       const goodContent = `---
@@ -165,13 +163,13 @@ documentType: design
             generatedBy: 'pm-agent',
             generatedAt: '2024-01-10T10:00:00Z',
             featureName: 'feature-a',
-            documentType: DocumentType.REQUIREMENTS
+            documentType: DocumentType.REQUIREMENTS,
           },
           sizeBytes: 1024,
           lastModified: new Date('2024-01-15'),
           created: new Date('2024-01-10'),
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         },
         {
           filename: 'design-feature-a.md',
@@ -181,13 +179,13 @@ documentType: design
             generatedBy: 'pm-agent',
             generatedAt: '2024-01-10T10:00:00Z',
             featureName: 'feature-a',
-            documentType: DocumentType.DESIGN
+            documentType: DocumentType.DESIGN,
           },
           sizeBytes: 2048,
           lastModified: new Date('2023-01-15'), // Old file
           created: new Date('2023-01-10'),
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         },
         {
           filename: 'invalid-file.md',
@@ -197,8 +195,8 @@ documentType: design
           lastModified: new Date('2024-01-15'),
           created: new Date('2024-01-10'),
           isValid: false,
-          validationErrors: ['Missing required fields']
-        }
+          validationErrors: ['Missing required fields'],
+        },
       ];
 
       // Mock the listSteeringFiles method
@@ -228,13 +226,13 @@ documentType: design
             generatedBy: 'pm-agent',
             generatedAt: '2024-01-10T10:00:00Z',
             featureName: 'feature-a',
-            documentType: DocumentType.REQUIREMENTS
+            documentType: DocumentType.REQUIREMENTS,
           },
           sizeBytes: 1024,
           lastModified: new Date('2024-01-15'),
           created: new Date('2024-01-10'),
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         },
         {
           filename: 'design-feature-a.md',
@@ -244,13 +242,13 @@ documentType: design
             generatedBy: 'pm-agent',
             generatedAt: '2024-01-10T10:00:00Z',
             featureName: 'feature-a',
-            documentType: DocumentType.DESIGN
+            documentType: DocumentType.DESIGN,
           },
           sizeBytes: 2048,
           lastModified: new Date('2023-01-15'), // Unused (old)
           created: new Date('2023-01-10'), // Outdated
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         },
         {
           filename: 'invalid-file.md',
@@ -260,12 +258,12 @@ documentType: design
           lastModified: new Date('2024-01-15'),
           created: new Date('2024-01-10'),
           isValid: false,
-          validationErrors: ['Missing required fields']
-        }
+          validationErrors: ['Missing required fields'],
+        },
       ];
 
       jest.spyOn(utilities, 'listSteeringFiles').mockResolvedValue(mockFileInfos);
-      
+
       // Mock checkBrokenReferences to return empty arrays
       jest.spyOn(utilities as any, 'checkBrokenReferences').mockResolvedValue([]);
 
@@ -293,13 +291,13 @@ documentType: design
           generatedBy: 'pm-agent',
           generatedAt: '2024-01-10T10:00:00Z',
           featureName: 'test-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         sizeBytes: 1024,
         lastModified: new Date('2024-01-15'),
         created: new Date('2024-01-10'),
         isValid: true,
-        validationErrors: []
+        validationErrors: [],
       };
 
       jest.spyOn(utilities, 'listSteeringFiles').mockResolvedValue([mockFileInfo]);
@@ -328,13 +326,13 @@ documentType: design
             generatedBy: 'pm-agent',
             generatedAt: oldDate.toISOString(),
             featureName: 'old-feature',
-            documentType: DocumentType.REQUIREMENTS
+            documentType: DocumentType.REQUIREMENTS,
           },
           sizeBytes: 1024,
           lastModified: unusedDate,
           created: oldDate,
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         },
         {
           filename: 'recent-file.md',
@@ -344,13 +342,13 @@ documentType: design
             generatedBy: 'pm-agent',
             generatedAt: now.toISOString(),
             featureName: 'recent-feature',
-            documentType: DocumentType.DESIGN
+            documentType: DocumentType.DESIGN,
           },
           sizeBytes: 2048,
           lastModified: now,
           created: now,
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         },
         {
           filename: 'invalid-file.md',
@@ -360,8 +358,8 @@ documentType: design
           lastModified: now,
           created: now,
           isValid: false,
-          validationErrors: ['Invalid']
-        }
+          validationErrors: ['Invalid'],
+        },
       ];
 
       jest.spyOn(utilities, 'listSteeringFiles').mockResolvedValue(mockFileInfos);
@@ -375,7 +373,7 @@ documentType: design
         maxUnusedDays: 30,
         removeInvalid: true,
         createBackups: true,
-        dryRun: false
+        dryRun: false,
       };
 
       const result = await utilities.cleanupSteeringFiles(options);
@@ -390,7 +388,7 @@ documentType: design
 
     it('should perform dry run without actually removing files', async () => {
       const oldDate = new Date(Date.now() - 100 * 24 * 60 * 60 * 1000);
-      
+
       const mockFileInfos: SteeringFileInfo[] = [
         {
           filename: 'old-file.md',
@@ -400,22 +398,22 @@ documentType: design
             generatedBy: 'pm-agent',
             generatedAt: oldDate.toISOString(),
             featureName: 'old-feature',
-            documentType: DocumentType.REQUIREMENTS
+            documentType: DocumentType.REQUIREMENTS,
           },
           sizeBytes: 1024,
           lastModified: oldDate,
           created: oldDate,
           isValid: true,
-          validationErrors: []
-        }
+          validationErrors: [],
+        },
       ];
 
       jest.spyOn(utilities, 'listSteeringFiles').mockResolvedValue(mockFileInfos);
       jest.spyOn(utilities as any, 'checkBrokenReferences').mockResolvedValue([]);
 
-      const result = await utilities.cleanupSteeringFiles({ 
-        maxAgeDays: 90, 
-        dryRun: true 
+      const result = await utilities.cleanupSteeringFiles({
+        maxAgeDays: 90,
+        dryRun: true,
       });
 
       expect(result.filesRemoved).toBe(1);
@@ -426,7 +424,7 @@ documentType: design
 
     it('should handle cleanup errors gracefully', async () => {
       const oldDate = new Date(Date.now() - 100 * 24 * 60 * 60 * 1000);
-      
+
       const mockFileInfos: SteeringFileInfo[] = [
         {
           filename: 'error-file.md',
@@ -436,14 +434,14 @@ documentType: design
             generatedBy: 'pm-agent',
             generatedAt: oldDate.toISOString(),
             featureName: 'error-feature',
-            documentType: DocumentType.REQUIREMENTS
+            documentType: DocumentType.REQUIREMENTS,
           },
           sizeBytes: 1024,
           lastModified: oldDate,
           created: oldDate,
           isValid: true,
-          validationErrors: []
-        }
+          validationErrors: [],
+        },
       ];
 
       jest.spyOn(utilities, 'listSteeringFiles').mockResolvedValue(mockFileInfos);
@@ -451,9 +449,9 @@ documentType: design
       jest.spyOn(utilities as any, 'createBackup').mockResolvedValue(undefined);
       mockFs.unlink.mockRejectedValue(new Error('Permission denied'));
 
-      const result = await utilities.cleanupSteeringFiles({ 
+      const result = await utilities.cleanupSteeringFiles({
         maxAgeDays: 90,
-        createBackups: false 
+        createBackups: false,
       });
 
       expect(result.filesRemoved).toBe(0); // No files actually removed due to error
@@ -470,24 +468,23 @@ documentType: design
           generatedBy: 'pm-agent',
           generatedAt: '2024-01-10T10:00:00Z',
           featureName: 'broken-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         sizeBytes: 1024,
         lastModified: new Date(),
         created: new Date(),
         isValid: true,
-        validationErrors: []
+        validationErrors: [],
       };
 
       jest.spyOn(utilities, 'listSteeringFiles').mockResolvedValue([mockFileInfo]);
-      jest.spyOn(utilities as any, 'checkBrokenReferences')
-        .mockResolvedValue(['non-existent.md']);
+      jest.spyOn(utilities as any, 'checkBrokenReferences').mockResolvedValue(['non-existent.md']);
       jest.spyOn(utilities as any, 'createBackup').mockResolvedValue(undefined);
       mockFs.unlink.mockResolvedValue(undefined);
 
-      const result = await utilities.cleanupSteeringFiles({ 
+      const result = await utilities.cleanupSteeringFiles({
         removeBrokenRefs: true,
-        createBackups: false 
+        createBackups: false,
       });
 
       expect(result.filesRemoved).toBe(1);
@@ -515,7 +512,7 @@ description: Test description`;
           generatedAt: '2024-01-10T10:00:00Z',
           featureName: 'test-feature',
           documentType: 'requirements',
-          description: 'Test description'
+          description: 'Test description',
         });
       });
 
@@ -539,7 +536,7 @@ featureName: 'test-feature'`;
           generatedBy: 'pm-agent',
           generatedAt: '2024-01-10T10:00:00Z',
           featureName: 'test-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         };
 
         const result = (utilities as any).validateFrontMatter(frontMatter);
@@ -549,7 +546,7 @@ featureName: 'test-feature'`;
       it('should reject incomplete front-matter', () => {
         const frontMatter = {
           inclusion: 'always' as InclusionRule,
-          generatedBy: 'pm-agent'
+          generatedBy: 'pm-agent',
           // Missing required fields
         };
 
@@ -568,7 +565,7 @@ featureName: 'test-feature'`;
           lastModified: new Date(),
           created: new Date(),
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         };
 
         const contentWithRefs = `# Test File
@@ -597,7 +594,7 @@ Another reference: #[[file:also-missing.md]]`;
           lastModified: new Date(),
           created: new Date(),
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         };
 
         const contentNoRefs = `# Test File
@@ -622,7 +619,7 @@ This file has no references.`;
           lastModified: new Date(),
           created: new Date(),
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         };
 
         mockFs.mkdir.mockResolvedValue(undefined as any);
@@ -633,7 +630,9 @@ This file has no references.`;
         expect(mockFs.mkdir).toHaveBeenCalledWith(mockBackupDir, { recursive: true });
         expect(mockFs.copyFile).toHaveBeenCalledWith(
           fileInfo.fullPath,
-          expect.stringMatching(/\.kiro\/steering\/\.backups\/test-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.md/)
+          expect.stringMatching(
+            /\.kiro\/steering\/\.backups\/test-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.md/
+          )
         );
       });
 
@@ -646,13 +645,15 @@ This file has no references.`;
           lastModified: new Date(),
           created: new Date(),
           isValid: true,
-          validationErrors: []
+          validationErrors: [],
         };
 
         mockFs.mkdir.mockResolvedValue(undefined as any);
         mockFs.copyFile.mockRejectedValue(new Error('Backup failed'));
 
-        await expect((utilities as any).createBackup(fileInfo)).rejects.toThrow('Failed to create backup');
+        await expect((utilities as any).createBackup(fileInfo)).rejects.toThrow(
+          'Failed to create backup'
+        );
       });
     });
   });

@@ -1,11 +1,11 @@
 // Unit tests for data models and interfaces
 
-import { 
-  ParsedIntent, 
-  TechnicalRequirement, 
-  Workflow, 
+import {
+  ParsedIntent,
+  TechnicalRequirement,
+  Workflow,
   QuotaForecast,
-  OptionalParams 
+  OptionalParams,
 } from '../../models';
 
 describe('Data Models', () => {
@@ -16,7 +16,7 @@ describe('Data Models', () => {
         technicalRequirements: [],
         dataSourcesNeeded: [],
         operationsRequired: [],
-        potentialRisks: []
+        potentialRisks: [],
       };
 
       expect(intent.businessObjective).toBeDefined();
@@ -33,7 +33,7 @@ describe('Data Models', () => {
         type: 'data_retrieval',
         description: 'Test requirement',
         complexity: 'medium',
-        quotaImpact: 'moderate'
+        quotaImpact: 'moderate',
       };
 
       expect(['data_retrieval', 'processing', 'analysis', 'output']).toContain(requirement.type);
@@ -49,9 +49,9 @@ describe('Data Models', () => {
         costConstraints: {
           maxVibes: 50,
           maxSpecs: 10,
-          maxCostDollars: 25.00
+          maxCostDollars: 25.0,
         },
-        performanceSensitivity: 'high'
+        performanceSensitivity: 'high',
       };
 
       expect(params.expectedUserVolume).toBe(100);

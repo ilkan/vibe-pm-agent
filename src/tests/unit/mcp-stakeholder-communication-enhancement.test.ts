@@ -22,7 +22,10 @@ describe('Enhanced Stakeholder Communication', () => {
         - Strategic advantage: Superior technology and customer focus
       `;
 
-      const result = (server as any).generateExecutiveOnePager(businessCaseWithCompetitive, 'executives');
+      const result = (server as any).generateExecutiveOnePager(
+        businessCaseWithCompetitive,
+        'executives'
+      );
 
       expect(result).toContain('## Competitive Positioning');
       expect(result).toContain('Market Position');
@@ -40,7 +43,10 @@ describe('Enhanced Stakeholder Communication', () => {
         - Resource requirements: Standard development team
       `;
 
-      const result = (server as any).generateExecutiveOnePager(businessCaseWithoutCompetitive, 'executives');
+      const result = (server as any).generateExecutiveOnePager(
+        businessCaseWithoutCompetitive,
+        'executives'
+      );
 
       expect(result).not.toContain('## Competitive Positioning');
       expect(result).toContain('## Strategic Value');
@@ -51,7 +57,7 @@ describe('Enhanced Stakeholder Communication', () => {
       const testCases = [
         'Analysis shows competitor weaknesses in pricing',
         'Competitive analysis reveals market gaps',
-        'Market position assessment indicates opportunity'
+        'Market position assessment indicates opportunity',
       ];
 
       testCases.forEach(businessCase => {
@@ -108,7 +114,7 @@ describe('Enhanced Stakeholder Communication', () => {
 
     test('should detect various competitive keywords', () => {
       const competitiveKeywords = ['competitor', 'competitive', 'market position'];
-      
+
       competitiveKeywords.forEach(keyword => {
         const businessCase = `Business analysis reveals ${keyword} insights`;
         const result = (server as any).generatePRFAQ(businessCase, 'executives');
@@ -127,7 +133,7 @@ describe('Enhanced Stakeholder Communication', () => {
           - Strategic positioning advantages
         `,
         communication_type: 'executive_onepager',
-        audience: 'executives'
+        audience: 'executives',
       };
 
       const result = await (server as any).handleStakeholderCommunication(args);
@@ -143,7 +149,7 @@ describe('Enhanced Stakeholder Communication', () => {
           for differentiation through superior technology and customer focus.
         `,
         communication_type: 'pr_faq',
-        audience: 'board'
+        audience: 'board',
       };
 
       const result = await (server as any).handleStakeholderCommunication(args);
@@ -154,13 +160,18 @@ describe('Enhanced Stakeholder Communication', () => {
 
     test('should work with all communication types', async () => {
       const businessCaseWithCompetitive = 'Competitive analysis shows market opportunity';
-      const communicationTypes = ['executive_onepager', 'pr_faq', 'board_presentation', 'team_announcement'];
+      const communicationTypes = [
+        'executive_onepager',
+        'pr_faq',
+        'board_presentation',
+        'team_announcement',
+      ];
 
       for (const type of communicationTypes) {
         const args = {
           business_case: businessCaseWithCompetitive,
           communication_type: type,
-          audience: 'executives'
+          audience: 'executives',
         };
 
         const result = await (server as any).handleStakeholderCommunication(args);
@@ -175,7 +186,7 @@ describe('Enhanced Stakeholder Communication', () => {
       const args = {
         business_case: '',
         communication_type: 'executive_onepager',
-        audience: 'executives'
+        audience: 'executives',
       };
 
       const result = await (server as any).handleStakeholderCommunication(args);
@@ -187,7 +198,7 @@ describe('Enhanced Stakeholder Communication', () => {
       const args = {
         business_case: null,
         communication_type: 'pr_faq',
-        audience: 'board'
+        audience: 'board',
       };
 
       const result = await (server as any).handleStakeholderCommunication(args);
@@ -199,7 +210,7 @@ describe('Enhanced Stakeholder Communication', () => {
       const testCases = [
         'COMPETITIVE analysis shows opportunity',
         'Competitor research indicates gaps',
-        'MARKET POSITION assessment reveals advantages'
+        'MARKET POSITION assessment reveals advantages',
       ];
 
       testCases.forEach(businessCase => {
@@ -210,7 +221,7 @@ describe('Enhanced Stakeholder Communication', () => {
 
     test('should handle business case with partial competitive information', () => {
       const partialCompetitive = 'Some competitor information but limited analysis';
-      
+
       const onePager = (server as any).generateExecutiveOnePager(partialCompetitive, 'executives');
       const prfaq = (server as any).generatePRFAQ(partialCompetitive, 'executives');
 
@@ -232,7 +243,7 @@ describe('Enhanced Stakeholder Communication', () => {
       // Both should mention competitive aspects
       expect(onePager).toContain('competitive');
       expect(prfaq).toContain('competitive');
-      
+
       // Both should maintain professional tone
       expect(onePager).toContain('strategic');
       expect(prfaq).toContain('strategic');

@@ -63,7 +63,8 @@ describe('QuickValidator', () => {
       });
 
       it('should fail for high complexity + quota risk combinations', async () => {
-        const idea = 'Build a real-time machine learning system that processes all user data continuously and generates insights for each user';
+        const idea =
+          'Build a real-time machine learning system that processes all user data continuously and generates insights for each user';
         const result = await validator.validateIdeaQuick(idea);
 
         expect(result.verdict).toBe('FAIL');
@@ -71,9 +72,10 @@ describe('QuickValidator', () => {
       });
 
       it('should fail for quota-intensive ideas with small budget', async () => {
-        const idea = 'I want to loop through all users and analyze each one individually to improve performance';
+        const idea =
+          'I want to loop through all users and analyze each one individually to improve performance';
         const context: QuickValidationContext = {
-          budget_range: 'small'
+          budget_range: 'small',
         };
         const result = await validator.validateIdeaQuick(idea, context);
 
@@ -86,7 +88,7 @@ describe('QuickValidator', () => {
       it('should fail complex system work with small team', async () => {
         const idea = 'Build a comprehensive platform architecture with multiple integrations';
         const context: QuickValidationContext = {
-          team_size: 1
+          team_size: 1,
         };
         const result = await validator.validateIdeaQuick(idea, context);
 
@@ -97,7 +99,7 @@ describe('QuickValidator', () => {
       it('should fail broad scope with high urgency', async () => {
         const idea = 'Create a comprehensive solution that handles all user management tasks';
         const context: QuickValidationContext = {
-          urgency: 'high'
+          urgency: 'high',
         };
         const result = await validator.validateIdeaQuick(idea, context);
 
@@ -108,13 +110,15 @@ describe('QuickValidator', () => {
       it('should adjust options based on complexity and urgency', async () => {
         const complexIdea = 'Build a complex system with multiple integrations';
         const simpleIdea = 'Create a simple user form';
-        
+
         const complexResult = await validator.validateIdeaQuick(complexIdea);
-        const simpleUrgentResult = await validator.validateIdeaQuick(simpleIdea, { urgency: 'high' });
+        const simpleUrgentResult = await validator.validateIdeaQuick(simpleIdea, {
+          urgency: 'high',
+        });
 
         // Complex ideas should get design options
         expect(complexResult.options[2].title).toBe('Design Options');
-        
+
         // Simple urgent ideas should get direct implementation
         expect(simpleUrgentResult.options[2].title).toBe('Direct Implementation');
       });
@@ -126,7 +130,7 @@ describe('QuickValidator', () => {
         const result = await validator.validateIdeaQuick(idea);
 
         expect(result.options).toHaveLength(3);
-        
+
         result.options.forEach((option, index) => {
           expect(option.id).toBe(['A', 'B', 'C'][index]);
           expect(option.title).toBeTruthy();
@@ -196,9 +200,9 @@ describe('QuickValidator', () => {
       it('should complete validation quickly', async () => {
         const idea = 'I want to automate user notifications';
         const startTime = Date.now();
-        
+
         const result = await validator.validateIdeaQuick(idea);
-        
+
         const actualTime = Date.now() - startTime;
         expect(actualTime).toBeLessThan(1000); // Should complete in under 1 second
         expect(result.processingTimeMs).toBeLessThan(1000);
@@ -223,7 +227,7 @@ describe('QuickValidator', () => {
           'Help users find information faster',
           'Create a better workflow',
           'Build a new feature',
-          'Generate reports automatically'
+          'Generate reports automatically',
         ];
 
         for (const objective of objectives) {
@@ -237,7 +241,7 @@ describe('QuickValidator', () => {
           'The system has some problems',
           'Users are complaining about things',
           'There are issues with the current setup',
-          'Something is not working right'
+          'Something is not working right',
         ];
 
         for (const nonObjective of nonObjectives) {
@@ -258,13 +262,13 @@ describe('QuickValidator', () => {
           'scan everything in the system',
           'check every single entry',
           'analyze all data points',
-          'generate multiple reports for each user'
+          'generate multiple reports for each user',
         ];
 
         for (const pattern of riskyPatterns) {
           const idea = `I want to ${pattern} to improve our system`;
           const result = await validator.validateIdeaQuick(idea, { budget_range: 'small' });
-          
+
           expect(result.verdict).toBe('FAIL');
           expect(result.reasoning).toContain('Quota-intensive approach');
         }
@@ -279,16 +283,15 @@ describe('QuickValidator', () => {
           'big data analytics',
           'stream processing',
           'complex algorithms',
-          'heavy computation'
+          'heavy computation',
         ];
 
         for (const indicator of complexIndicators) {
           const idea = `I want to build a system with ${indicator} and loop through all users to improve efficiency`;
           const context: QuickValidationContext = {
-            budget_range: 'large' // Use large budget to avoid budget-related failure
+            budget_range: 'large', // Use large budget to avoid budget-related failure
           };
           const result = await validator.validateIdeaQuick(idea, context);
-          
 
           expect(result.verdict).toBe('FAIL');
           expect(result.reasoning).toContain('High complexity + quota risks');

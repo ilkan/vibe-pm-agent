@@ -2,18 +2,18 @@
 
 const CallToolRequestSchema = {
   method: 'tools/call',
-  name: 'CallToolRequest'
+  name: 'CallToolRequest',
 };
 
 const ListToolsRequestSchema = {
   method: 'tools/list',
-  name: 'ListToolsRequest'
+  name: 'ListToolsRequest',
 };
 
 const ErrorCode = {
   MethodNotFound: -32601,
   InvalidParams: -32602,
-  InternalError: -32603
+  InternalError: -32603,
 };
 
 class McpError extends Error {
@@ -29,5 +29,5 @@ module.exports = {
   CallToolRequestSchema,
   ListToolsRequestSchema,
   ErrorCode,
-  McpError
+  McpError,
 };

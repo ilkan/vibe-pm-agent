@@ -9,7 +9,7 @@ import {
   SteeringLogger,
   SteeringFallbacks,
   ValidationError,
-  FileSystemError
+  FileSystemError,
 } from '../../utils/steering-error-handling';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -27,7 +27,7 @@ describe('Steering Error Handling Integration', () => {
   beforeEach(async () => {
     // Create a temporary directory for testing
     tempDir = path.join(tmpdir(), `steering-test-${Date.now()}`);
-    
+
     // Reset mocks
     jest.clearAllMocks();
     SteeringLogger.clearLogs();
@@ -37,7 +37,7 @@ describe('Steering Error Handling Integration', () => {
       steeringDirectory: tempDir,
       createBackups: true,
       maxVersions: 3,
-      validateContent: true
+      validateContent: true,
     });
 
     steeringService = new SteeringService({
@@ -48,8 +48,8 @@ describe('Steering Error Handling Integration', () => {
         promptForConfirmation: false,
         includeReferences: true,
         namingStrategy: 'feature-based',
-        overwriteExisting: false
-      }
+        overwriteExisting: false,
+      },
     });
   });
 
@@ -62,10 +62,10 @@ describe('Steering Error Handling Integration', () => {
           generatedBy: 'test',
           generatedAt: new Date().toISOString(),
           featureName: 'test-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       // Mock permission error
@@ -76,7 +76,7 @@ describe('Steering Error Handling Integration', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('Failed to save steering file');
-      
+
       // Check that error was logged
       const errorLogs = SteeringLogger.getLogsByLevel('error');
       expect(errorLogs.length).toBeGreaterThan(0);
@@ -90,10 +90,10 @@ describe('Steering Error Handling Integration', () => {
           generatedBy: 'test',
           generatedAt: new Date().toISOString(),
           featureName: 'test-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       // Mock directory not existing, then successful creation
@@ -108,7 +108,7 @@ describe('Steering Error Handling Integration', () => {
 
       expect(result.success).toBe(true);
       expect(mockFs.mkdir).toHaveBeenCalledWith(tempDir, { recursive: true });
-      
+
       // Check that directory creation was logged
       const infoLogs = SteeringLogger.getLogsByLevel('info');
       expect(infoLogs.some(log => log.message.includes('Created steering directory'))).toBe(true);
@@ -122,10 +122,10 @@ describe('Steering Error Handling Integration', () => {
           generatedBy: 'test',
           generatedAt: new Date().toISOString(),
           featureName: 'test-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       // Mock successful directory access but failed write, then success
@@ -139,7 +139,7 @@ describe('Steering Error Handling Integration', () => {
 
       expect(result.success).toBe(true);
       expect(mockFs.writeFile).toHaveBeenCalledTimes(2);
-      
+
       // Check retry was logged
       const logs = SteeringLogger.getLogs();
       expect(logs.some(log => log.message.includes('succeeded after'))).toBe(true);
@@ -153,10 +153,10 @@ describe('Steering Error Handling Integration', () => {
           generatedBy: '',
           generatedAt: 'invalid-date',
           featureName: '',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: '', // Empty content
-        references: []
+        references: [],
       };
 
       mockFs.access.mockResolvedValue(undefined);
@@ -166,11 +166,11 @@ describe('Steering Error Handling Integration', () => {
       const result = await steeringManager.saveSteeringFile(invalidSteeringFile);
 
       expect(result.success).toBe(true);
-      
+
       // Check that fallback was used
       const warnLogs = SteeringLogger.getLogsByLevel('warn');
       expect(warnLogs.some(log => log.message.includes('validation failed'))).toBe(true);
-      
+
       // Verify the file was written with corrected content
       expect(mockFs.writeFile).toHaveBeenCalled();
       const writeCall = mockFs.writeFile.mock.calls[0];
@@ -187,10 +187,10 @@ describe('Steering Error Handling Integration', () => {
           generatedBy: 'test',
           generatedAt: new Date().toISOString(),
           featureName: 'test-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       // Mock existing file and backup failure
@@ -202,7 +202,7 @@ describe('Steering Error Handling Integration', () => {
       const result = await steeringManager.saveSteeringFile(steeringFile);
 
       expect(result.success).toBe(true);
-      
+
       // Check that backup failure was logged but didn't prevent save
       const warnLogs = SteeringLogger.getLogsByLevel('warn');
       expect(warnLogs.some(log => log.message.includes('Failed to create backup'))).toBe(true);
@@ -215,7 +215,7 @@ describe('Steering Error Handling Integration', () => {
 
       const result = await steeringService.createFromRequirements(emptyRequirements, {
         create_steering_files: true,
-        feature_name: 'test-feature'
+        feature_name: 'test-feature',
       });
 
       expect(result.created).toBe(false);
@@ -228,7 +228,7 @@ describe('Steering Error Handling Integration', () => {
 
       const result = await steeringService.createFromRequirements(malformedRequirements, {
         create_steering_files: true,
-        feature_name: 'test-feature'
+        feature_name: 'test-feature',
       });
 
       // Should still process but with warnings
@@ -253,17 +253,17 @@ As a developer, I want to create requirements, so that I can build features.
         ...originalGenerator,
         generateFromRequirements: jest.fn().mockImplementation(() => {
           throw new Error('Content processing failed');
-        })
+        }),
       } as any;
 
       const result = await steeringService.createFromRequirements(validRequirements, {
         create_steering_files: true,
-        feature_name: 'test-feature'
+        feature_name: 'test-feature',
       });
 
       expect(result.created).toBe(false);
       expect(result.message).toContain('Failed');
-      
+
       // Check error was logged
       const errorLogs = SteeringLogger.getLogsByLevel('error');
       expect(errorLogs.length).toBeGreaterThan(0);
@@ -283,7 +283,7 @@ As a developer, I want to create requirements, so that I can build features.
         ...originalReferenceLinker,
         addFileReferences: jest.fn().mockImplementation(() => {
           throw new Error('Reference linking failed');
-        })
+        }),
       } as any;
 
       // Mock successful file operations
@@ -293,15 +293,17 @@ As a developer, I want to create requirements, so that I can build features.
 
       const result = await steeringService.createFromRequirements(validRequirements, {
         create_steering_files: true,
-        feature_name: 'test-feature'
+        feature_name: 'test-feature',
       });
 
       // Should still succeed despite reference linking failure
       expect(result.created).toBe(true);
-      
+
       // Check warning was logged
       const warnLogs = SteeringLogger.getLogsByLevel('warn');
-      expect(warnLogs.some(log => log.message.includes('Failed to add file references'))).toBe(true);
+      expect(warnLogs.some(log => log.message.includes('Failed to add file references'))).toBe(
+        true
+      );
     });
   });
 
@@ -314,10 +316,10 @@ As a developer, I want to create requirements, so that I can build features.
           generatedBy: 'test',
           generatedAt: new Date().toISOString(),
           featureName: 'recovery-test',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content for recovery',
-        references: []
+        references: [],
       };
 
       // Simulate temporary failure then success
@@ -332,7 +334,7 @@ As a developer, I want to create requirements, so that I can build features.
 
       expect(result.success).toBe(true);
       expect(mockFs.writeFile).toHaveBeenCalledTimes(3);
-      
+
       // Check retry attempts were logged
       const logs = SteeringLogger.getLogs();
       expect(logs.some(log => log.message.includes('succeeded after'))).toBe(true);
@@ -346,10 +348,10 @@ As a developer, I want to create requirements, so that I can build features.
           generatedBy: '',
           generatedAt: 'not-a-date',
           featureName: '',
-          documentType: 'invalid' as any
+          documentType: 'invalid' as any,
         },
         content: '', // Empty content
-        references: ['invalid-reference']
+        references: ['invalid-reference'],
       };
 
       mockFs.access.mockResolvedValue(undefined);
@@ -359,11 +361,11 @@ As a developer, I want to create requirements, so that I can build features.
       const result = await steeringManager.saveSteeringFile(severelyInvalidFile);
 
       expect(result.success).toBe(true);
-      
+
       // Check that fallback was used due to severe validation errors
       const infoLogs = SteeringLogger.getLogsByLevel('info');
       expect(infoLogs.some(log => log.message.includes('Using fallback steering file'))).toBe(true);
-      
+
       // Verify fallback content was written
       expect(mockFs.writeFile).toHaveBeenCalled();
       const writeCall = mockFs.writeFile.mock.calls[0];
@@ -381,10 +383,10 @@ As a developer, I want to create requirements, so that I can build features.
           generatedBy: 'test',
           generatedAt: new Date().toISOString(),
           featureName: 'logging-test',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content for logging',
-        references: []
+        references: [],
       };
 
       mockFs.access.mockResolvedValue(undefined);
@@ -394,17 +396,21 @@ As a developer, I want to create requirements, so that I can build features.
       await steeringManager.saveSteeringFile(steeringFile);
 
       const logs = SteeringLogger.getLogs();
-      
+
       // Check that operation start and success were logged
-      expect(logs.some(log => log.message.includes('Starting steering file save operation'))).toBe(true);
+      expect(logs.some(log => log.message.includes('Starting steering file save operation'))).toBe(
+        true
+      );
       expect(logs.some(log => log.message.includes('Steering file saved successfully'))).toBe(true);
-      
+
       // Check that metadata was included
-      const startLog = logs.find(log => log.message.includes('Starting steering file save operation'));
+      const startLog = logs.find(log =>
+        log.message.includes('Starting steering file save operation')
+      );
       expect(startLog?.metadata).toEqual({
         filename: 'logging-test.md',
         documentType: DocumentType.REQUIREMENTS,
-        featureName: 'logging-test'
+        featureName: 'logging-test',
       });
     });
 
@@ -413,7 +419,7 @@ As a developer, I want to create requirements, so that I can build features.
       SteeringLogger.error('Test error entry');
 
       const logFilePath = path.join(tempDir, 'test-logs.txt');
-      
+
       // Mock successful file write
       mockFs.writeFile.mockResolvedValue(undefined);
 
@@ -432,14 +438,14 @@ As a developer, I want to create requirements, so that I can build features.
       SteeringLogger.error('Error message');
 
       const logFilePath = path.join(tempDir, 'error-logs.txt');
-      
+
       mockFs.writeFile.mockResolvedValue(undefined);
 
       await SteeringLogger.exportLogs(logFilePath, 'error');
 
       const writeCall = mockFs.writeFile.mock.calls[0];
       const logContent = writeCall[1] as string;
-      
+
       expect(logContent).toContain('ERROR: Error message');
       expect(logContent).not.toContain('INFO: Info message');
       expect(logContent).not.toContain('WARN: Warning message');
@@ -455,10 +461,10 @@ As a developer, I want to create requirements, so that I can build features.
           generatedBy: 'test',
           generatedAt: new Date().toISOString(),
           featureName: 'stats-test',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       // Mock conflict scenario
@@ -484,10 +490,10 @@ As a developer, I want to create requirements, so that I can build features.
           generatedBy: 'test',
           generatedAt: new Date().toISOString(),
           featureName: 'reset-test',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       mockFs.access.mockResolvedValue(undefined);

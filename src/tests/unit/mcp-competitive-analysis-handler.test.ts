@@ -17,7 +17,7 @@ describe('MCP Competitive Analysis Handler', () => {
       sessionId: 'test-session-123',
       timestamp: Date.now(),
       requestId: 'test-request-123',
-      traceId: 'test-trace-123'
+      traceId: 'test-trace-123',
     };
   });
 
@@ -29,7 +29,7 @@ describe('MCP Competitive Analysis Handler', () => {
     it('should successfully analyze competitor landscape with minimal input', async () => {
       const args: CompetitiveAnalysisArgs = {
         feature_idea: 'AI-powered project management tool for software teams',
-        analysis_depth: 'standard'
+        analysis_depth: 'standard',
       };
 
       const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);
@@ -56,9 +56,9 @@ describe('MCP Competitive Analysis Handler', () => {
         market_context: {
           industry: 'Software',
           geography: ['US', 'EU'],
-          target_segment: 'Enterprise'
+          target_segment: 'Enterprise',
         },
-        analysis_depth: 'comprehensive'
+        analysis_depth: 'comprehensive',
       };
 
       const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);
@@ -74,7 +74,7 @@ describe('MCP Competitive Analysis Handler', () => {
     it('should handle quick analysis with reduced quota usage', async () => {
       const args: CompetitiveAnalysisArgs = {
         feature_idea: 'Simple task tracking app',
-        analysis_depth: 'quick'
+        analysis_depth: 'quick',
       };
 
       const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);
@@ -94,8 +94,8 @@ describe('MCP Competitive Analysis Handler', () => {
           create_steering_files: true,
           feature_name: 'ai-project-mgmt',
           inclusion_rule: 'fileMatch',
-          file_match_pattern: 'competitive*'
-        }
+          file_match_pattern: 'competitive*',
+        },
       };
 
       const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);
@@ -118,7 +118,7 @@ describe('MCP Competitive Analysis Handler', () => {
     it('should handle empty feature idea', async () => {
       const args: CompetitiveAnalysisArgs = {
         feature_idea: '',
-        analysis_depth: 'standard'
+        analysis_depth: 'standard',
       };
 
       const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);
@@ -130,7 +130,7 @@ describe('MCP Competitive Analysis Handler', () => {
     it('should include proper source attribution', async () => {
       const args: CompetitiveAnalysisArgs = {
         feature_idea: 'Enterprise software solution',
-        analysis_depth: 'standard'
+        analysis_depth: 'standard',
       };
 
       const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);
@@ -148,7 +148,7 @@ describe('MCP Competitive Analysis Handler', () => {
     it('should include competitive matrix with proper structure', async () => {
       const args: CompetitiveAnalysisArgs = {
         feature_idea: 'Project management software',
-        analysis_depth: 'standard'
+        analysis_depth: 'standard',
       };
 
       const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);
@@ -157,13 +157,13 @@ describe('MCP Competitive Analysis Handler', () => {
 
       const analysisData = result.content[0].json.data;
       const matrix = analysisData.competitiveMatrix;
-      
+
       expect(matrix).toHaveProperty('competitors');
       expect(matrix).toHaveProperty('evaluationCriteria');
       expect(matrix).toHaveProperty('rankings');
       expect(matrix).toHaveProperty('differentiationOpportunities');
       expect(matrix).toHaveProperty('marketContext');
-      
+
       expect(Array.isArray(matrix.competitors)).toBe(true);
       expect(Array.isArray(matrix.evaluationCriteria)).toBe(true);
       expect(Array.isArray(matrix.differentiationOpportunities)).toBe(true);
@@ -172,7 +172,7 @@ describe('MCP Competitive Analysis Handler', () => {
     it('should include strategic recommendations', async () => {
       const args: CompetitiveAnalysisArgs = {
         feature_idea: 'AI-powered analytics platform',
-        analysis_depth: 'comprehensive'
+        analysis_depth: 'comprehensive',
       };
 
       const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);
@@ -181,7 +181,7 @@ describe('MCP Competitive Analysis Handler', () => {
 
       const analysisData = result.content[0].json.data;
       expect(analysisData.strategicRecommendations).toHaveLength(1);
-      
+
       const recommendation = analysisData.strategicRecommendations[0];
       expect(recommendation).toHaveProperty('type');
       expect(recommendation).toHaveProperty('title');
@@ -195,13 +195,13 @@ describe('MCP Competitive Analysis Handler', () => {
       const testCases = [
         { depth: 'quick' as const, expectedQuota: 2, expectedConfidence: 'low' as const },
         { depth: 'standard' as const, expectedQuota: 3, expectedConfidence: 'medium' as const },
-        { depth: 'comprehensive' as const, expectedQuota: 4, expectedConfidence: 'high' as const }
+        { depth: 'comprehensive' as const, expectedQuota: 4, expectedConfidence: 'high' as const },
       ];
 
       for (const testCase of testCases) {
         const args: CompetitiveAnalysisArgs = {
           feature_idea: 'Test feature for depth analysis',
-          analysis_depth: testCase.depth
+          analysis_depth: testCase.depth,
         };
 
         const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);

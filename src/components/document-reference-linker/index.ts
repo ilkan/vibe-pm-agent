@@ -1,6 +1,6 @@
 /**
  * DocumentReferenceLinker Component
- * 
+ *
  * This component handles the detection and generation of cross-references between
  * steering files and related documents in the .kiro/specs directory structure.
  * It provides intelligent file discovery and path resolution for creating
@@ -80,7 +80,7 @@ export class DocumentReferenceLinker {
       excludePatterns: ['node_modules', '.git', 'dist', 'build'],
       maxDepth: 5,
       validateExistence: true,
-      ...config
+      ...config,
     };
   }
 
@@ -89,10 +89,10 @@ export class DocumentReferenceLinker {
    */
   addFileReferences(context: SteeringContext): SteeringContext {
     const relatedFiles = this.detectRelatedFiles(context.featureName, context.projectName);
-    
+
     return {
       ...context,
-      relatedFiles: [...context.relatedFiles, ...relatedFiles]
+      relatedFiles: [...context.relatedFiles, ...relatedFiles],
     };
   }
 
@@ -134,14 +134,16 @@ export class DocumentReferenceLinker {
     return filePaths.map(filePath => {
       const relativePath = this.toRelativePath(filePath);
       const reference = `#[[file:${relativePath}]]`;
-      const exists = this.config.validateExistence ? fs.existsSync(path.join(this.workspaceRoot, relativePath)) : true;
-      
+      const exists = this.config.validateExistence
+        ? fs.existsSync(path.join(this.workspaceRoot, relativePath))
+        : true;
+
       return {
         filePath,
         reference,
         documentType: this.detectDocumentType(filePath),
         exists,
-        relativePath
+        relativePath,
       };
     });
   }
@@ -156,11 +158,11 @@ export class DocumentReferenceLinker {
 
     for (const reference of references) {
       const filePath = this.extractFilePathFromReference(reference);
-      
+
       if (!filePath) {
         invalidReferences.push({
           reference,
-          reason: 'Invalid reference format. Expected #[[file:path]]'
+          reason: 'Invalid reference format. Expected #[[file:path]]',
         });
         continue;
       }
@@ -174,12 +176,12 @@ export class DocumentReferenceLinker {
           reference,
           documentType: this.detectDocumentType(filePath),
           exists: true,
-          relativePath: filePath
+          relativePath: filePath,
         });
       } else {
         invalidReferences.push({
           reference,
-          reason: `File does not exist: ${filePath}`
+          reason: `File does not exist: ${filePath}`,
         });
 
         // Try to find similar files and suggest alternatives
@@ -188,7 +190,7 @@ export class DocumentReferenceLinker {
           suggestions.push({
             original: reference,
             suggested: `#[[file:${suggestion}]]`,
-            reason: `File not found, but similar file exists: ${suggestion}`
+            reason: `File not found, but similar file exists: ${suggestion}`,
           });
         }
       }
@@ -198,7 +200,7 @@ export class DocumentReferenceLinker {
       isValid: invalidReferences.length === 0,
       validReferences,
       invalidReferences,
-      suggestions
+      suggestions,
     };
   }
 
@@ -217,7 +219,7 @@ export class DocumentReferenceLinker {
    */
   getFeatureFiles(featureName: string): FileReference[] {
     const featureDir = path.join(this.workspaceRoot, this.config.baseDirectory, featureName);
-    
+
     if (!fs.existsSync(featureDir)) {
       return [];
     }
@@ -236,13 +238,13 @@ export class DocumentReferenceLinker {
     }
 
     const files: string[] = [];
-    
+
     try {
       const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dirPath, entry.name);
-        
+
         if (this.shouldExclude(entry.name)) {
           continue;
         }
@@ -262,20 +264,18 @@ export class DocumentReferenceLinker {
 
   private findSimilarFiles(baseDir: string, featureName: string): string[] {
     const similarFiles: string[] = [];
-    
+
     try {
       const entries = fs.readdirSync(baseDir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         if (entry.isDirectory() && !this.shouldExclude(entry.name)) {
           const dirPath = path.join(baseDir, entry.name);
           const files = this.scanDirectory(dirPath, entry.name);
-          
+
           // Include files that might be related to the feature
-          const relatedFiles = files.filter(file => 
-            this.isFileRelated(file, featureName)
-          );
-          
+          const relatedFiles = files.filter(file => this.isFileRelated(file, featureName));
+
           similarFiles.push(...relatedFiles);
         }
       }
@@ -290,12 +290,10 @@ export class DocumentReferenceLinker {
     const fileName = path.basename(filePath, path.extname(filePath));
     const featureWords = featureName.toLowerCase().split(/[-_\s]/);
     const fileWords = fileName.toLowerCase().split(/[-_\s]/);
-    
+
     // Check if any feature words appear in the filename
-    return featureWords.some(word => 
-      fileWords.some(fileWord => 
-        fileWord.includes(word) || word.includes(fileWord)
-      )
+    return featureWords.some(word =>
+      fileWords.some(fileWord => fileWord.includes(word) || word.includes(fileWord))
     );
   }
 
@@ -305,8 +303,8 @@ export class DocumentReferenceLinker {
   }
 
   private shouldExclude(name: string): boolean {
-    return this.config.excludePatterns.some(pattern => 
-      name.includes(pattern) || name.startsWith('.')
+    return this.config.excludePatterns.some(
+      pattern => name.includes(pattern) || name.startsWith('.')
     );
   }
 
@@ -314,25 +312,26 @@ export class DocumentReferenceLinker {
     if (path.isAbsolute(filePath)) {
       return path.relative(this.workspaceRoot, filePath);
     }
-    
+
     // If it's already relative but starts with workspace root, make it relative
     const normalizedPath = path.normalize(filePath);
     if (normalizedPath.startsWith(this.workspaceRoot)) {
       return path.relative(this.workspaceRoot, normalizedPath);
     }
-    
+
     return normalizedPath;
   }
 
   private detectDocumentType(filePath: string): DocumentType | undefined {
     const fileName = path.basename(filePath, path.extname(filePath)).toLowerCase();
-    
+
     if (fileName.includes('requirement')) return DocumentType.REQUIREMENTS;
     if (fileName.includes('design')) return DocumentType.DESIGN;
     if (fileName.includes('task')) return DocumentType.TASKS;
-    if (fileName.includes('onepager') || fileName.includes('one-pager')) return DocumentType.ONEPAGER;
+    if (fileName.includes('onepager') || fileName.includes('one-pager'))
+      return DocumentType.ONEPAGER;
     if (fileName.includes('prfaq') || fileName.includes('pr-faq')) return DocumentType.PRFAQ;
-    
+
     return undefined;
   }
 
@@ -345,21 +344,21 @@ export class DocumentReferenceLinker {
     const targetDir = path.dirname(targetPath);
     const targetName = path.basename(targetPath, path.extname(targetPath));
     const targetExt = path.extname(targetPath);
-    
+
     const searchDir = path.join(this.workspaceRoot, targetDir);
-    
+
     if (!fs.existsSync(searchDir)) {
       return null;
     }
 
     try {
       const files = fs.readdirSync(searchDir);
-      
+
       // Look for files with similar names
       for (const file of files) {
         const fileName = path.basename(file, path.extname(file));
         const fileExt = path.extname(file);
-        
+
         // Check for similar name and same extension
         if (fileExt === targetExt && this.isSimilarName(fileName, targetName)) {
           return path.join(targetDir, file);
@@ -376,29 +375,31 @@ export class DocumentReferenceLinker {
     const normalize = (name: string) => name.toLowerCase().replace(/[-_\s]/g, '');
     const normalized1 = normalize(name1);
     const normalized2 = normalize(name2);
-    
+
     // Check for exact match after normalization
     if (normalized1 === normalized2) return true;
-    
+
     // Check for substring match
     if (normalized1.includes(normalized2) || normalized2.includes(normalized1)) return true;
-    
+
     // Check for similar words
     const words1 = name1.toLowerCase().split(/[-_\s]/);
     const words2 = name2.toLowerCase().split(/[-_\s]/);
-    
+
     const commonWords = words1.filter(word => words2.includes(word));
-    return commonWords.length > 0 && commonWords.length >= Math.min(words1.length, words2.length) * 0.5;
+    return (
+      commonWords.length > 0 && commonWords.length >= Math.min(words1.length, words2.length) * 0.5
+    );
   }
 
   private deduplicateAndSort(files: string[]): string[] {
     const uniqueFiles = Array.from(new Set(files.map(file => this.toRelativePath(file))));
-    
+
     return uniqueFiles.sort((a, b) => {
       // Sort by document type priority, then alphabetically
       const typeA = this.detectDocumentType(a);
       const typeB = this.detectDocumentType(b);
-      
+
       const typePriority = {
         [DocumentType.REQUIREMENTS]: 1,
         [DocumentType.DESIGN]: 2,
@@ -406,16 +407,16 @@ export class DocumentReferenceLinker {
         [DocumentType.COMPETITIVE_ANALYSIS]: 4,
         [DocumentType.MARKET_SIZING]: 5,
         [DocumentType.ONEPAGER]: 6,
-        [DocumentType.PRFAQ]: 7
+        [DocumentType.PRFAQ]: 7,
       };
-      
+
       const priorityA = typeA ? typePriority[typeA] : 999;
       const priorityB = typeB ? typePriority[typeB] : 999;
-      
+
       if (priorityA !== priorityB) {
         return priorityA - priorityB;
       }
-      
+
       return a.localeCompare(b);
     });
   }
@@ -439,7 +440,7 @@ export class DocumentReferenceLinker {
  * Factory function to create a DocumentReferenceLinker instance
  */
 export function createDocumentReferenceLinker(
-  workspaceRoot?: string, 
+  workspaceRoot?: string,
   config?: Partial<ReferenceDetectionConfig>
 ): DocumentReferenceLinker {
   return new DocumentReferenceLinker(workspaceRoot, config);
@@ -448,7 +449,10 @@ export function createDocumentReferenceLinker(
 /**
  * Utility function to validate a single file reference
  */
-export function validateFileReference(reference: string, workspaceRoot: string = process.cwd()): boolean {
+export function validateFileReference(
+  reference: string,
+  workspaceRoot: string = process.cwd()
+): boolean {
   const linker = new DocumentReferenceLinker(workspaceRoot);
   const validation = linker.validateCrossReferences([reference]);
   return validation.isValid;

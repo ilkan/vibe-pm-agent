@@ -1,13 +1,13 @@
 // Unit tests for error handling utilities
 
-import { 
-  ErrorHandler, 
+import {
+  ErrorHandler,
   RetryHandler,
   ProcessingFailureError,
   OptimizationError,
   AnalysisError,
   ForecastingError,
-  IntentParsingError
+  IntentParsingError,
 } from '../../utils/error-handling';
 import { ValidationError } from '../../utils/validation';
 
@@ -64,7 +64,7 @@ describe('Error Handling Utilities', () => {
   describe('ErrorHandler.handleIntentParsingFailure', () => {
     it('should handle ValidationError', () => {
       const validationError = new ValidationError('Invalid input');
-      
+
       expect(() => {
         ErrorHandler.handleIntentParsingFailure(validationError, 'test intent');
       }).toThrow(IntentParsingError);
@@ -72,7 +72,7 @@ describe('Error Handling Utilities', () => {
 
     it('should handle short intent', () => {
       const error = new Error('Generic error');
-      
+
       expect(() => {
         ErrorHandler.handleIntentParsingFailure(error, 'short');
       }).toThrow(IntentParsingError);
@@ -81,7 +81,7 @@ describe('Error Handling Utilities', () => {
     it('should handle long intent', () => {
       const error = new Error('Generic error');
       const longIntent = 'a'.repeat(4000);
-      
+
       expect(() => {
         ErrorHandler.handleIntentParsingFailure(error, longIntent);
       }).toThrow(IntentParsingError);
@@ -89,7 +89,7 @@ describe('Error Handling Utilities', () => {
 
     it('should handle generic parsing error', () => {
       const error = new Error('Generic error');
-      
+
       expect(() => {
         ErrorHandler.handleIntentParsingFailure(error, 'normal length intent for testing');
       }).toThrow(IntentParsingError);
@@ -115,9 +115,9 @@ describe('Error Handling Utilities', () => {
   describe('ErrorHandler.handleOptimizationFailure', () => {
     it('should return fallback optimization', () => {
       const originalWorkflow = {
-        steps: [{ id: 'step-1', description: 'test' }]
+        steps: [{ id: 'step-1', description: 'test' }],
       };
-      
+
       const result = ErrorHandler.handleOptimizationFailure(new Error('test'), originalWorkflow);
       expect(result.optimizations).toHaveLength(1);
       expect(result.optimizations[0].type).toBe('caching');
@@ -129,7 +129,7 @@ describe('Error Handling Utilities', () => {
     it('should return fallback forecast', () => {
       const workflow = { steps: [1, 2, 3] }; // 3 steps
       const result = ErrorHandler.handleForecastingFailure(new Error('test'), workflow);
-      
+
       expect(result.vibesConsumed).toBe(6); // 3 * 2
       expect(result.specsConsumed).toBe(2); // ceil(3/2)
       expect(result.confidenceLevel).toBe('low');
@@ -146,7 +146,7 @@ describe('Error Handling Utilities', () => {
   describe('ErrorHandler.handleROIAnalysisFailure', () => {
     it('should return fallback ROI analysis', () => {
       const result = ErrorHandler.handleROIAnalysisFailure(new Error('test'));
-      
+
       expect(result.scenarios).toHaveLength(2);
       expect(result.scenarios[0].name).toBe('Conservative');
       expect(result.scenarios[1].name).toBe('Balanced');
@@ -156,7 +156,7 @@ describe('Error Handling Utilities', () => {
     it('should use provided baseline forecast', () => {
       const baseline = { estimatedCost: 10 };
       const result = ErrorHandler.handleROIAnalysisFailure(new Error('test'), baseline);
-      
+
       expect(result.scenarios[0].forecast).toBe(baseline);
       expect(result.scenarios[1].forecast.estimatedCost).toBe(8); // 10 * 0.8
     });
@@ -171,7 +171,7 @@ describe('Error Handling Utilities', () => {
     it('should identify non-recoverable errors', () => {
       const nonRecoverableError = new IntentParsingError('test', 'action');
       expect(ErrorHandler.isRecoverable(nonRecoverableError)).toBe(false);
-      
+
       const validationError = new ValidationError('test');
       expect(ErrorHandler.isRecoverable(validationError)).toBe(false);
     });
@@ -184,20 +184,25 @@ describe('Error Handling Utilities', () => {
 
   describe('ErrorHandler.getFallbackStrategy', () => {
     it('should return appropriate strategies for each stage', () => {
-      expect(ErrorHandler.getFallbackStrategy(new Error('test'), 'intent'))
-        .toContain('Simplify intent description');
-      expect(ErrorHandler.getFallbackStrategy(new Error('test'), 'analysis'))
-        .toContain('basic analysis techniques');
-      expect(ErrorHandler.getFallbackStrategy(new Error('test'), 'optimization'))
-        .toContain('minimal optimization');
-      expect(ErrorHandler.getFallbackStrategy(new Error('test'), 'forecasting'))
-        .toContain('conservative estimates');
+      expect(ErrorHandler.getFallbackStrategy(new Error('test'), 'intent')).toContain(
+        'Simplify intent description'
+      );
+      expect(ErrorHandler.getFallbackStrategy(new Error('test'), 'analysis')).toContain(
+        'basic analysis techniques'
+      );
+      expect(ErrorHandler.getFallbackStrategy(new Error('test'), 'optimization')).toContain(
+        'minimal optimization'
+      );
+      expect(ErrorHandler.getFallbackStrategy(new Error('test'), 'forecasting')).toContain(
+        'conservative estimates'
+      );
     });
 
     it('should handle validation errors specially', () => {
       const validationError = new ValidationError('test');
-      expect(ErrorHandler.getFallbackStrategy(validationError, 'intent'))
-        .toContain('Fix input validation');
+      expect(ErrorHandler.getFallbackStrategy(validationError, 'intent')).toContain(
+        'Fix input validation'
+      );
     });
   });
 
@@ -205,7 +210,7 @@ describe('Error Handling Utilities', () => {
     it('should convert Error to ProcessingError', () => {
       const error = new Error('test message');
       const result = ErrorHandler.toProcessingError(error, 'analysis', 'test_type', 'test action');
-      
+
       expect(result.stage).toBe('analysis');
       expect(result.type).toBe('test_type');
       expect(result.message).toBe('test message');
@@ -214,8 +219,14 @@ describe('Error Handling Utilities', () => {
     });
 
     it('should convert non-Error to ProcessingError', () => {
-      const result = ErrorHandler.toProcessingError('string error', 'intent', 'test_type', 'test action', true);
-      
+      const result = ErrorHandler.toProcessingError(
+        'string error',
+        'intent',
+        'test_type',
+        'test action',
+        true
+      );
+
       expect(result.message).toBe('string error');
       expect(result.fallbackAvailable).toBe(true);
     });
@@ -225,13 +236,12 @@ describe('Error Handling Utilities', () => {
     it('should return operation result on success', async () => {
       const operation = jest.fn().mockResolvedValue('success');
       const fallback = 'fallback';
-      
-      const result = await ErrorHandler.safeExecute(
-        operation,
-        fallback,
-        { stage: 'analysis', operation: 'test' }
-      );
-      
+
+      const result = await ErrorHandler.safeExecute(operation, fallback, {
+        stage: 'analysis',
+        operation: 'test',
+      });
+
       expect(result).toBe('success');
       expect(operation).toHaveBeenCalled();
     });
@@ -239,13 +249,12 @@ describe('Error Handling Utilities', () => {
     it('should return fallback on recoverable error', async () => {
       const operation = jest.fn().mockRejectedValue(new OptimizationError('test', 'action'));
       const fallback = 'fallback';
-      
-      const result = await ErrorHandler.safeExecute(
-        operation,
-        fallback,
-        { stage: 'optimization', operation: 'test' }
-      );
-      
+
+      const result = await ErrorHandler.safeExecute(operation, fallback, {
+        stage: 'optimization',
+        operation: 'test',
+      });
+
       expect(result).toBe('fallback');
     });
 
@@ -253,32 +262,31 @@ describe('Error Handling Utilities', () => {
       const error = new ValidationError('test');
       const operation = jest.fn().mockRejectedValue(error);
       const fallback = 'fallback';
-      
-      await expect(ErrorHandler.safeExecute(
-        operation,
-        fallback,
-        { stage: 'intent', operation: 'test' }
-      )).rejects.toThrow(ValidationError);
+
+      await expect(
+        ErrorHandler.safeExecute(operation, fallback, { stage: 'intent', operation: 'test' })
+      ).rejects.toThrow(ValidationError);
     });
   });
 
   describe('RetryHandler.withRetry', () => {
     it('should succeed on first attempt', async () => {
       const operation = jest.fn().mockResolvedValue('success');
-      
+
       const result = await RetryHandler.withRetry(operation, 3, 100);
-      
+
       expect(result).toBe('success');
       expect(operation).toHaveBeenCalledTimes(1);
     });
 
     it('should retry on transient failures', async () => {
-      const operation = jest.fn()
+      const operation = jest
+        .fn()
         .mockRejectedValueOnce(new Error('transient'))
         .mockResolvedValue('success');
-      
+
       const result = await RetryHandler.withRetry(operation, 3, 10);
-      
+
       expect(result).toBe('success');
       expect(operation).toHaveBeenCalledTimes(2);
     });
@@ -286,30 +294,27 @@ describe('Error Handling Utilities', () => {
     it('should not retry validation errors', async () => {
       const error = new ValidationError('test');
       const operation = jest.fn().mockRejectedValue(error);
-      
-      await expect(RetryHandler.withRetry(operation, 3, 10))
-        .rejects.toThrow(ValidationError);
-      
+
+      await expect(RetryHandler.withRetry(operation, 3, 10)).rejects.toThrow(ValidationError);
+
       expect(operation).toHaveBeenCalledTimes(1);
     });
 
     it('should not retry intent parsing errors', async () => {
       const error = new IntentParsingError('test', 'action');
       const operation = jest.fn().mockRejectedValue(error);
-      
-      await expect(RetryHandler.withRetry(operation, 3, 10))
-        .rejects.toThrow(IntentParsingError);
-      
+
+      await expect(RetryHandler.withRetry(operation, 3, 10)).rejects.toThrow(IntentParsingError);
+
       expect(operation).toHaveBeenCalledTimes(1);
     });
 
     it('should throw last error after max retries', async () => {
       const error = new Error('persistent failure');
       const operation = jest.fn().mockRejectedValue(error);
-      
-      await expect(RetryHandler.withRetry(operation, 2, 10))
-        .rejects.toThrow('persistent failure');
-      
+
+      await expect(RetryHandler.withRetry(operation, 2, 10)).rejects.toThrow('persistent failure');
+
       expect(operation).toHaveBeenCalledTimes(2);
     });
   });

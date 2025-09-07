@@ -2,14 +2,14 @@
 
 import { PMAgentMCPServer } from '../../mcp/server';
 import { MCPToolRegistry } from '../../mcp/server-config';
-import { 
-  MCPServerOptions, 
+import {
+  MCPServerOptions,
   MCPToolContext,
   OptimizeIntentArgs,
   AnalyzeWorkflowArgs,
   GenerateROIArgs,
   ConsultingSummaryArgs,
-  LogLevel
+  LogLevel,
 } from '../../models/mcp';
 import { Workflow } from '../../models/workflow';
 import { ConsultingAnalysis } from '../../components/business-analyzer';
@@ -21,8 +21,8 @@ jest.mock('../../main', () => ({
     processIntent: jest.fn(),
     analyzeWorkflow: jest.fn(),
     generateROIAnalysis: jest.fn(),
-    generateConsultingSummary: jest.fn()
-  }))
+    generateConsultingSummary: jest.fn(),
+  })),
 }));
 
 describe('MCP Server Error Handling Integration', () => {
@@ -35,7 +35,7 @@ describe('MCP Server Error Handling Integration', () => {
     // Set up console spies to capture logging
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    
+
     // Create mock pipeline with proper Jest mock functions
     mockPipeline = {
       processIntent: jest.fn(),
@@ -47,19 +47,19 @@ describe('MCP Server Error Handling Integration', () => {
       generateRequirements: jest.fn(),
       generateDesignOptions: jest.fn(),
       generateTaskPlan: jest.fn(),
-      validateIdeaQuick: jest.fn()
+      validateIdeaQuick: jest.fn(),
     };
-    
+
     // Initialize server with logging enabled
     const options: MCPServerOptions = {
       enableLogging: true,
-      enableMetrics: true
+      enableMetrics: true,
     };
-    
+
     server = new PMAgentMCPServer(options);
     // Replace the pipeline with our mock
     (server as any).pipeline = mockPipeline;
-    
+
     // Set debug logging for comprehensive test coverage
     MCPLogger.setLogLevel(LogLevel.DEBUG);
   });
@@ -76,7 +76,7 @@ describe('MCP Server Error Handling Integration', () => {
       sessionId: 'test-session',
       timestamp: Date.now(),
       requestId: 'test-request',
-      traceId: 'test-trace'
+      traceId: 'test-trace',
     };
 
     it('should handle missing required parameters', async () => {
@@ -97,8 +97,8 @@ describe('MCP Server Error Handling Integration', () => {
         intent: '', // Too short based on schema
         parameters: {
           expectedUserVolume: -1, // Invalid negative value
-          performanceSensitivity: 'invalid' as any // Invalid enum value
-        }
+          performanceSensitivity: 'invalid' as any, // Invalid enum value
+        },
       };
 
       // Mock pipeline to simulate validation at the handler level
@@ -117,17 +117,17 @@ describe('MCP Server Error Handling Integration', () => {
       const invalidWorkflow = {
         // Missing required 'id' and 'steps' fields
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       } as unknown as Workflow;
 
       const args: AnalyzeWorkflowArgs = {
-        workflow: invalidWorkflow
+        workflow: invalidWorkflow,
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'analyze_workflow',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       mockPipeline.analyzeWorkflow.mockRejectedValue(
@@ -144,13 +144,13 @@ describe('MCP Server Error Handling Integration', () => {
   describe('Pipeline Error Handling', () => {
     it('should handle pipeline timeout errors', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Create a complex system with many components'
+        intent: 'Create a complex system with many components',
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       // Simulate timeout error
@@ -163,11 +163,9 @@ describe('MCP Server Error Handling Integration', () => {
       expect(result.isError).toBe(true);
       expect(result.content[0].json.error).toBe(true);
       expect(result.content[0].json.message).toContain('timeout');
-      
+
       // Verify error logging
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"level":"ERROR"')
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"ERROR"'));
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('optimize_intent handler failed')
       );
@@ -178,17 +176,24 @@ describe('MCP Server Error Handling Integration', () => {
         workflow: {
           id: 'test-workflow',
           steps: [
-            { id: 'step-1', type: 'vibe', description: 'Process', inputs: [], outputs: [], quotaCost: 10 }
+            {
+              id: 'step-1',
+              type: 'vibe',
+              description: 'Process',
+              inputs: [],
+              outputs: [],
+              quotaCost: 10,
+            },
           ],
           dataFlow: [],
-          estimatedComplexity: 1
-        }
+          estimatedComplexity: 1,
+        },
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'generate_roi_analysis',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       // Simulate resource exhaustion
@@ -207,17 +212,17 @@ describe('MCP Server Error Handling Integration', () => {
         techniquesUsed: [],
         keyFindings: [],
         totalQuotaSavings: 0,
-        implementationComplexity: 'low'
+        implementationComplexity: 'low',
       };
 
       const args: ConsultingSummaryArgs = {
-        analysis: mockAnalysis
+        analysis: mockAnalysis,
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'get_consulting_summary',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       // Simulate internal pipeline error
@@ -239,14 +244,14 @@ describe('MCP Server Error Handling Integration', () => {
         intent: 'Create a simple user registration system',
         parameters: {
           expectedUserVolume: 100,
-          performanceSensitivity: 'medium'
-        }
+          performanceSensitivity: 'medium',
+        },
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const mockResult = {
@@ -262,26 +267,66 @@ describe('MCP Server Error Handling Integration', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
         },
         efficiencySummary: {
-          naiveApproach: { vibesConsumed: 10, specsConsumed: 2, estimatedCost: 50, confidenceLevel: 'medium', scenario: 'naive', breakdown: [] },
-          optimizedApproach: { vibesConsumed: 5, specsConsumed: 4, estimatedCost: 30, confidenceLevel: 'high', scenario: 'optimized', breakdown: [] },
-          savings: { vibeReduction: 50, specReduction: -100, costSavings: 40, totalSavingsPercentage: 40 },
-          optimizationNotes: ['Applied batching']
-        }
+          naiveApproach: {
+            vibesConsumed: 10,
+            specsConsumed: 2,
+            estimatedCost: 50,
+            confidenceLevel: 'medium',
+            scenario: 'naive',
+            breakdown: [],
+          },
+          optimizedApproach: {
+            vibesConsumed: 5,
+            specsConsumed: 4,
+            estimatedCost: 30,
+            confidenceLevel: 'high',
+            scenario: 'optimized',
+            breakdown: [],
+          },
+          savings: {
+            vibeReduction: 50,
+            specReduction: -100,
+            costSavings: 40,
+            totalSavingsPercentage: 40,
+          },
+          optimizationNotes: ['Applied batching'],
+        },
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockResult);
@@ -305,30 +350,35 @@ describe('MCP Server Error Handling Integration', () => {
       const mockWorkflow: Workflow = {
         id: 'test-workflow',
         steps: [
-          { id: 'step-1', type: 'vibe', description: 'Analyze', inputs: [], outputs: [], quotaCost: 5 }
+          {
+            id: 'step-1',
+            type: 'vibe',
+            description: 'Analyze',
+            inputs: [],
+            outputs: [],
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const args: AnalyzeWorkflowArgs = {
         workflow: mockWorkflow,
-        techniques: ['MECE', 'ValueDriverTree']
+        techniques: ['MECE', 'ValueDriverTree'],
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'analyze_workflow',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const mockAnalysis: ConsultingAnalysis = {
-        techniquesUsed: [
-          { name: 'MECE', relevanceScore: 0.9, applicableScenarios: ['analysis'] }
-        ],
+        techniquesUsed: [{ name: 'MECE', relevanceScore: 0.9, applicableScenarios: ['analysis'] }],
         keyFindings: ['Optimization opportunity found'],
         totalQuotaSavings: 25,
-        implementationComplexity: 'medium'
+        implementationComplexity: 'medium',
       };
 
       mockPipeline.analyzeWorkflow.mockResolvedValue(mockAnalysis);
@@ -345,22 +395,22 @@ describe('MCP Server Error Handling Integration', () => {
     it('should include proper content type headers and metadata', async () => {
       const mockAnalysis: ConsultingAnalysis = {
         techniquesUsed: [
-          { name: 'Pyramid', relevanceScore: 0.8, applicableScenarios: ['communication'] }
+          { name: 'Pyramid', relevanceScore: 0.8, applicableScenarios: ['communication'] },
         ],
         keyFindings: ['Clear structure needed'],
         totalQuotaSavings: 15,
-        implementationComplexity: 'low'
+        implementationComplexity: 'low',
       };
 
       const args: ConsultingSummaryArgs = {
         analysis: mockAnalysis,
-        techniques: ['Pyramid']
+        techniques: ['Pyramid'],
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'get_consulting_summary',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const mockSummary = {
@@ -368,7 +418,7 @@ describe('MCP Server Error Handling Integration', () => {
         keyFindings: ['Structure improvements needed'],
         recommendations: [],
         techniquesApplied: [],
-        supportingEvidence: []
+        supportingEvidence: [],
       };
 
       mockPipeline.generateConsultingSummary.mockResolvedValue(mockSummary);
@@ -386,13 +436,13 @@ describe('MCP Server Error Handling Integration', () => {
   describe('Logging and Monitoring', () => {
     it('should log tool execution start and completion', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Test intent for logging'
+        intent: 'Test intent for logging',
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const mockResult = {
@@ -408,20 +458,41 @@ describe('MCP Server Error Handling Integration', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockResult);
@@ -429,17 +500,13 @@ describe('MCP Server Error Handling Integration', () => {
       await server.handleOptimizeIntent(args, mockContext);
 
       // Verify debug logging for processing start
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"level":"DEBUG"')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"DEBUG"'));
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('Processing intent optimization')
       );
 
       // Verify info logging for completion
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"level":"INFO"')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"INFO"'));
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('Intent optimization completed successfully')
       );
@@ -447,13 +514,13 @@ describe('MCP Server Error Handling Integration', () => {
 
     it('should log errors with proper context and stack traces', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Test intent that will fail'
+        intent: 'Test intent that will fail',
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const testError = new Error('Pipeline processing failed');
@@ -464,15 +531,11 @@ describe('MCP Server Error Handling Integration', () => {
       await server.handleOptimizeIntent(args, mockContext);
 
       // Verify error logging with context
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"level":"ERROR"')
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"ERROR"'));
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('optimize_intent handler failed')
       );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"error":{')
-      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('"error":{'));
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('Pipeline processing failed')
       );
@@ -486,32 +549,46 @@ describe('MCP Server Error Handling Integration', () => {
         workflow: {
           id: 'perf-test-workflow',
           steps: [
-            { id: 'step-1', type: 'spec', description: 'Test', inputs: [], outputs: [], quotaCost: 3 }
+            {
+              id: 'step-1',
+              type: 'spec',
+              description: 'Test',
+              inputs: [],
+              outputs: [],
+              quotaCost: 3,
+            },
           ],
           dataFlow: [],
-          estimatedComplexity: 1
-        }
+          estimatedComplexity: 1,
+        },
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'generate_roi_analysis',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const mockROIAnalysis = {
         scenarios: [
           {
             name: 'Current',
-            forecast: { vibesConsumed: 5, specsConsumed: 2, estimatedCost: 25, confidenceLevel: 'high', scenario: 'naive', breakdown: [] },
+            forecast: {
+              vibesConsumed: 5,
+              specsConsumed: 2,
+              estimatedCost: 25,
+              confidenceLevel: 'high',
+              scenario: 'naive',
+              breakdown: [],
+            },
             savingsPercentage: 0,
             implementationEffort: 'none',
-            riskLevel: 'none'
-          }
+            riskLevel: 'none',
+          },
         ],
         recommendations: ['Test recommendation'],
         bestOption: 'Current',
-        riskAssessment: 'Low risk'
+        riskAssessment: 'Low risk',
       };
 
       mockPipeline.generateROIAnalysis.mockResolvedValue(mockROIAnalysis);
@@ -522,15 +599,9 @@ describe('MCP Server Error Handling Integration', () => {
       expect(result.metadata?.quotaUsed).toBe(2);
 
       // Verify performance logging
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"level":"INFO"')
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('ROI analysis completed')
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"scenarioCount":1')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"INFO"'));
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('ROI analysis completed'));
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"scenarioCount":1'));
     });
   });
 

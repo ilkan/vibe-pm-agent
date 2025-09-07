@@ -1,11 +1,17 @@
 /**
  * SteeringUserInteraction Component
- * 
+ *
  * Handles user interaction for steering file creation including prompts,
  * customization options, preview functionality, and summary reporting.
  */
 
-import { SteeringFile, SteeringContext, DocumentType, SaveResult, InclusionRule } from '../../models/steering';
+import {
+  SteeringFile,
+  SteeringContext,
+  DocumentType,
+  SaveResult,
+  InclusionRule,
+} from '../../models/steering';
 import { SteeringFileOptions } from '../../models/mcp';
 
 /**
@@ -94,8 +100,8 @@ const DEFAULT_PREFERENCES: SteeringUserPreferences = {
   namingPreferences: {
     useTimestamp: false,
     useFeaturePrefix: true,
-    customPrefix: undefined
-  }
+    customPrefix: undefined,
+  },
 };
 
 /**
@@ -121,14 +127,14 @@ export class SteeringUserInteraction {
       return {
         createFiles: true,
         customOptions: this.buildDefaultOptions(documentType, featureName),
-        rememberPreferences: false
+        rememberPreferences: false,
       };
     }
 
     // In a real implementation, this would show an interactive prompt
     // For now, we'll simulate the prompt logic
     const response = await this.simulateUserPrompt(documentType, featureName, existingOptions);
-    
+
     return response;
   }
 
@@ -138,11 +144,11 @@ export class SteeringUserInteraction {
   generatePreview(steeringFile: SteeringFile): SteeringFilePreview {
     const fullContent = this.generateFullFileContent(steeringFile);
     const estimatedSize = Buffer.byteLength(fullContent, 'utf8');
-    
+
     // Truncate content if too long for preview
     const maxPreviewLength = 1000;
     const truncated = fullContent.length > maxPreviewLength;
-    const contentPreview = truncated 
+    const contentPreview = truncated
       ? fullContent.substring(0, maxPreviewLength) + '\n... [truncated]'
       : fullContent;
 
@@ -154,7 +160,7 @@ export class SteeringUserInteraction {
       estimatedSize,
       contentPreview,
       truncated,
-      warnings
+      warnings,
     };
   }
 
@@ -184,11 +190,11 @@ export class SteeringUserInteraction {
         filename: r.filename,
         action: r.action,
         documentType: this.extractDocumentTypeFromFilename(r.filename),
-        fullPath: r.fullPath
+        fullPath: r.fullPath,
       })),
       processingTimeMs,
       issues: results.filter(r => !r.success).map(r => r.message),
-      usageRecommendations: this.generateUsageRecommendations(results)
+      usageRecommendations: this.generateUsageRecommendations(results),
     };
 
     return summary;
@@ -265,28 +271,33 @@ export class SteeringUserInteraction {
   ): Promise<SteeringPromptResponse> {
     // Simulate user decision based on document type and preferences
     const shouldCreate = this.shouldAutoCreateForDocumentType(documentType);
-    
+
     return {
       createFiles: shouldCreate,
       customOptions: shouldCreate ? this.buildDefaultOptions(documentType, featureName) : undefined,
-      rememberPreferences: false
+      rememberPreferences: false,
     };
   }
 
   private shouldAutoCreateForDocumentType(documentType: DocumentType): boolean {
     // Auto-create for requirements, design, and onepager documents
-    return documentType === DocumentType.REQUIREMENTS || 
-           documentType === DocumentType.DESIGN || 
-           documentType === DocumentType.ONEPAGER;
+    return (
+      documentType === DocumentType.REQUIREMENTS ||
+      documentType === DocumentType.DESIGN ||
+      documentType === DocumentType.ONEPAGER
+    );
   }
 
-  private buildDefaultOptions(documentType: DocumentType, featureName: string): SteeringFileOptions {
+  private buildDefaultOptions(
+    documentType: DocumentType,
+    featureName: string
+  ): SteeringFileOptions {
     return {
       create_steering_files: true,
       feature_name: featureName,
       inclusion_rule: this.getDefaultInclusionRuleForType(documentType),
       file_match_pattern: this.getDefaultFileMatchPattern(documentType),
-      overwrite_existing: false
+      overwrite_existing: false,
     };
   }
 
@@ -319,10 +330,7 @@ export class SteeringUserInteraction {
 
   private generateFullFileContent(steeringFile: SteeringFile): string {
     // Generate front-matter
-    const frontMatter = [
-      '---',
-      `inclusion: ${steeringFile.frontMatter.inclusion}`,
-    ];
+    const frontMatter = ['---', `inclusion: ${steeringFile.frontMatter.inclusion}`];
 
     if (steeringFile.frontMatter.fileMatchPattern) {
       frontMatter.push(`fileMatchPattern: '${steeringFile.frontMatter.fileMatchPattern}'`);
@@ -355,7 +363,10 @@ export class SteeringUserInteraction {
       warnings.push('Feature name is missing from front-matter');
     }
 
-    if (steeringFile.frontMatter.inclusion === 'fileMatch' && !steeringFile.frontMatter.fileMatchPattern) {
+    if (
+      steeringFile.frontMatter.inclusion === 'fileMatch' &&
+      !steeringFile.frontMatter.fileMatchPattern
+    ) {
       warnings.push('File match pattern is required when inclusion rule is "fileMatch"');
     }
 
@@ -368,9 +379,8 @@ export class SteeringUserInteraction {
 
   private async simulatePreviewConfirmation(preview: SteeringFilePreview): Promise<boolean> {
     // Simulate user confirmation - reject if there are critical errors
-    const criticalWarnings = preview.warnings.filter(warning => 
-      warning.includes('content is empty') || 
-      warning.includes('Feature name is missing')
+    const criticalWarnings = preview.warnings.filter(
+      warning => warning.includes('content is empty') || warning.includes('Feature name is missing')
     );
     return criticalWarnings.length === 0;
   }
@@ -396,13 +406,11 @@ export class SteeringUserInteraction {
 
     const updatedFiles = results.filter(r => r.success && r.action === 'updated');
     if (updatedFiles.length > 0) {
-      recommendations.push(
-        `${updatedFiles.length} steering files updated with latest guidance.`
-      );
+      recommendations.push(`${updatedFiles.length} steering files updated with latest guidance.`);
     }
 
-    const fileMatchFiles = results.filter(r => 
-      r.success && r.filename.includes('requirements') || r.filename.includes('design')
+    const fileMatchFiles = results.filter(
+      r => (r.success && r.filename.includes('requirements')) || r.filename.includes('design')
     );
     if (fileMatchFiles.length > 0) {
       recommendations.push(
@@ -410,8 +418,8 @@ export class SteeringUserInteraction {
       );
     }
 
-    const manualFiles = results.filter(r => 
-      r.success && (r.filename.includes('onepager') || r.filename.includes('prfaq'))
+    const manualFiles = results.filter(
+      r => r.success && (r.filename.includes('onepager') || r.filename.includes('prfaq'))
     );
     if (manualFiles.length > 0) {
       recommendations.push(
@@ -429,7 +437,7 @@ export class SteeringUserInteraction {
     console.log(`- Files updated: ${summary.filesUpdated}`);
     console.log(`- Files skipped: ${summary.filesSkipped}`);
     console.log(`- Processing time: ${summary.processingTimeMs}ms`);
-    
+
     if (summary.issues.length > 0) {
       console.log('Issues encountered:');
       summary.issues.forEach(issue => console.log(`  - ${issue}`));

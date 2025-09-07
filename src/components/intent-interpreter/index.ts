@@ -1,7 +1,12 @@
 // Intent Interpreter component interface and implementation
 
 import { ParsedIntent, TechnicalRequirement, OptionalParams, Operation, Risk } from '../../models';
-import { validateRawIntent, validateOptionalParams, validateParsedIntent, ValidationError } from '../../utils/validation';
+import {
+  validateRawIntent,
+  validateOptionalParams,
+  validateParsedIntent,
+  ValidationError,
+} from '../../utils/validation';
 import { ErrorHandler, IntentParsingError } from '../../utils/error-handling';
 
 export interface IIntentInterpreter {
@@ -15,15 +20,43 @@ export class IntentInterpreter implements IIntentInterpreter {
   private readonly businessObjectivePatterns = [
     /(?:i want to|i need to|create|build|develop|implement)\s+(.+?)(?:\s+(?:with|that|for|using)|\.|$)/i,
     /(?:help me|assist me|guide me)\s+(?:to\s+)?(.+?)(?:\s+(?:with|that|for|using)|\.|$)/i,
-    /(?:make|generate|produce)\s+(?:a|an)?\s*(.+?)(?:\s+(?:with|that|for|using)|\.|$)/i
+    /(?:make|generate|produce)\s+(?:a|an)?\s*(.+?)(?:\s+(?:with|that|for|using)|\.|$)/i,
   ];
 
   private readonly featureKeywords = [
-    'authentication', 'login', 'register', 'signup', 'password', 'user management',
-    'crud', 'create', 'read', 'update', 'delete', 'database', 'api', 'rest',
-    'dashboard', 'admin', 'report', 'analytics', 'search', 'filter', 'sort',
-    'notification', 'email', 'sms', 'payment', 'billing', 'subscription',
-    'file upload', 'image', 'document', 'export', 'import', 'integration'
+    'authentication',
+    'login',
+    'register',
+    'signup',
+    'password',
+    'user management',
+    'crud',
+    'create',
+    'read',
+    'update',
+    'delete',
+    'database',
+    'api',
+    'rest',
+    'dashboard',
+    'admin',
+    'report',
+    'analytics',
+    'search',
+    'filter',
+    'sort',
+    'notification',
+    'email',
+    'sms',
+    'payment',
+    'billing',
+    'subscription',
+    'file upload',
+    'image',
+    'document',
+    'export',
+    'import',
+    'integration',
   ];
 
   async parseIntent(rawText: string, params?: OptionalParams): Promise<ParsedIntent> {
@@ -48,7 +81,7 @@ export class IntentInterpreter implements IIntentInterpreter {
       technicalRequirements,
       dataSourcesNeeded: dataSources,
       operationsRequired: operations,
-      potentialRisks: risks
+      potentialRisks: risks,
     };
 
     // Validate the parsed result
@@ -80,10 +113,10 @@ export class IntentInterpreter implements IIntentInterpreter {
       intent.dataSourcesNeeded,
       intent.businessObjective
     );
-    
+
     // Merge with original requirements, preferring enhanced analysis
     const requirementMap = new Map<string, TechnicalRequirement>();
-    
+
     // Add enhanced requirements first
     for (const req of enhancedRequirements) {
       const key = req.type; // Use just type for merging similar requirements
@@ -95,12 +128,15 @@ export class IntentInterpreter implements IIntentInterpreter {
         existing.complexity = this.getHigherComplexity(existing.complexity, req.complexity);
         existing.quotaImpact = this.getHigherQuotaImpact(existing.quotaImpact, req.quotaImpact);
         // Combine descriptions if different
-        if (!existing.description.includes(req.description) && !req.description.includes(existing.description)) {
+        if (
+          !existing.description.includes(req.description) &&
+          !req.description.includes(existing.description)
+        ) {
           existing.description = `${existing.description} and ${req.description.toLowerCase()}`;
         }
       }
     }
-    
+
     // Add original requirements if not already covered by type
     for (const req of intent.technicalRequirements) {
       const key = req.type;
@@ -113,7 +149,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         existing.quotaImpact = this.getHigherQuotaImpact(existing.quotaImpact, req.quotaImpact);
       }
     }
-    
+
     return Array.from(requirementMap.values());
   }
 
@@ -123,7 +159,7 @@ export class IntentInterpreter implements IIntentInterpreter {
 
   private extractBusinessObjectiveFromText(rawText: string): string {
     const text = rawText.toLowerCase().trim();
-    
+
     // Try to match common patterns for business objectives
     for (const pattern of this.businessObjectivePatterns) {
       const match = text.match(pattern);
@@ -134,9 +170,10 @@ export class IntentInterpreter implements IIntentInterpreter {
 
     // Fallback: extract the main concept from the text
     const words = text.split(/\s+/);
-    const importantWords = words.filter(word => 
-      word.length > 3 && 
-      !['want', 'need', 'create', 'build', 'with', 'that', 'have', 'make'].includes(word)
+    const importantWords = words.filter(
+      word =>
+        word.length > 3 &&
+        !['want', 'need', 'create', 'build', 'with', 'that', 'have', 'make'].includes(word)
     );
 
     if (importantWords.length > 0) {
@@ -164,7 +201,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         id: `op_${operationId++}`,
         type: 'processing',
         description: 'User authentication',
-        estimatedQuotaCost: 3
+        estimatedQuotaCost: 3,
       });
     }
 
@@ -173,7 +210,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         id: `op_${operationId++}`,
         type: 'processing',
         description: 'User registration',
-        estimatedQuotaCost: 3
+        estimatedQuotaCost: 3,
       });
     }
 
@@ -184,53 +221,70 @@ export class IntentInterpreter implements IIntentInterpreter {
           id: `op_${operationId++}`,
           type: 'processing',
           description: 'Create new records',
-          estimatedQuotaCost: 2
+          estimatedQuotaCost: 2,
         },
         {
           id: `op_${operationId++}`,
           type: 'data_retrieval',
           description: 'Read/Retrieve data',
-          estimatedQuotaCost: 1
+          estimatedQuotaCost: 1,
         },
         {
           id: `op_${operationId++}`,
           type: 'processing',
           description: 'Update existing records',
-          estimatedQuotaCost: 2
+          estimatedQuotaCost: 2,
         },
         {
           id: `op_${operationId++}`,
           type: 'processing',
           description: 'Delete records',
-          estimatedQuotaCost: 1
+          estimatedQuotaCost: 1,
         }
       );
     } else {
       // Individual CRUD operations
-      if (text.includes('create') || text.includes('add') || text.includes('insert') || text.includes('new')) {
+      if (
+        text.includes('create') ||
+        text.includes('add') ||
+        text.includes('insert') ||
+        text.includes('new')
+      ) {
         operations.push({
           id: `op_${operationId++}`,
           type: 'processing',
           description: 'Create/Add new records',
-          estimatedQuotaCost: 2
+          estimatedQuotaCost: 2,
         });
       }
 
-      if (text.includes('read') || text.includes('view') || text.includes('display') || text.includes('show') || text.includes('list') || text.includes('get')) {
+      if (
+        text.includes('read') ||
+        text.includes('view') ||
+        text.includes('display') ||
+        text.includes('show') ||
+        text.includes('list') ||
+        text.includes('get')
+      ) {
         operations.push({
           id: `op_${operationId++}`,
           type: 'data_retrieval',
           description: 'Read/Display data',
-          estimatedQuotaCost: 1
+          estimatedQuotaCost: 1,
         });
       }
 
-      if (text.includes('update') || text.includes('edit') || text.includes('modify') || text.includes('change')) {
+      if (
+        text.includes('update') ||
+        text.includes('edit') ||
+        text.includes('modify') ||
+        text.includes('change')
+      ) {
         operations.push({
           id: `op_${operationId++}`,
           type: 'processing',
           description: 'Update existing records',
-          estimatedQuotaCost: 2
+          estimatedQuotaCost: 2,
         });
       }
 
@@ -239,7 +293,7 @@ export class IntentInterpreter implements IIntentInterpreter {
           id: `op_${operationId++}`,
           type: 'processing',
           description: 'Delete records',
-          estimatedQuotaCost: 1
+          estimatedQuotaCost: 1,
         });
       }
     }
@@ -250,7 +304,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         id: `op_${operationId++}`,
         type: 'data_retrieval',
         description: 'Search functionality',
-        estimatedQuotaCost: 2
+        estimatedQuotaCost: 2,
       });
     }
 
@@ -259,7 +313,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         id: `op_${operationId++}`,
         type: 'processing',
         description: 'Filter and sort data',
-        estimatedQuotaCost: 1
+        estimatedQuotaCost: 1,
       });
     }
 
@@ -269,7 +323,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         id: `op_${operationId++}`,
         type: 'analysis',
         description: 'Generate analytics and reports',
-        estimatedQuotaCost: 4
+        estimatedQuotaCost: 4,
       });
     }
 
@@ -279,7 +333,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         id: `op_${operationId++}`,
         type: 'processing',
         description: 'User profile management',
-        estimatedQuotaCost: 2
+        estimatedQuotaCost: 2,
       });
     }
 
@@ -289,7 +343,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         id: `op_${operationId++}`,
         type: 'processing',
         description: 'API endpoint handling',
-        estimatedQuotaCost: 2
+        estimatedQuotaCost: 2,
       });
     }
 
@@ -299,7 +353,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         id: `op_${operationId++}`,
         type: 'processing',
         description: 'File upload and processing',
-        estimatedQuotaCost: 3
+        estimatedQuotaCost: 3,
       });
     }
 
@@ -309,7 +363,7 @@ export class IntentInterpreter implements IIntentInterpreter {
         id: `op_${operationId}`,
         type: 'processing',
         description: 'Basic application functionality',
-        estimatedQuotaCost: 2
+        estimatedQuotaCost: 2,
       });
     }
 
@@ -326,22 +380,44 @@ export class IntentInterpreter implements IIntentInterpreter {
     const dataSources: string[] = [];
 
     // User-related data (check first as it's common)
-    if (text.includes('user') || text.includes('account') || text.includes('profile') || text.includes('auth')) {
+    if (
+      text.includes('user') ||
+      text.includes('account') ||
+      text.includes('profile') ||
+      text.includes('auth')
+    ) {
       dataSources.push('user_data');
     }
 
     // Database-related keywords
-    if (text.includes('database') || text.includes('db') || text.includes('store') || text.includes('persist') || text.includes('crud')) {
+    if (
+      text.includes('database') ||
+      text.includes('db') ||
+      text.includes('store') ||
+      text.includes('persist') ||
+      text.includes('crud')
+    ) {
       dataSources.push('database');
     }
 
     // File-related data
-    if (text.includes('file') || text.includes('upload') || text.includes('document') || text.includes('image')) {
+    if (
+      text.includes('file') ||
+      text.includes('upload') ||
+      text.includes('document') ||
+      text.includes('image')
+    ) {
       dataSources.push('file_storage');
     }
 
     // API-related data
-    if (text.includes('api') || text.includes('external') || text.includes('third-party') || text.includes('integration') || text.includes('restful')) {
+    if (
+      text.includes('api') ||
+      text.includes('external') ||
+      text.includes('third-party') ||
+      text.includes('integration') ||
+      text.includes('restful')
+    ) {
       dataSources.push('external_api');
     }
 
@@ -351,7 +427,12 @@ export class IntentInterpreter implements IIntentInterpreter {
     }
 
     // Analytics data
-    if (text.includes('analytics') || text.includes('report') || text.includes('dashboard') || text.includes('metrics')) {
+    if (
+      text.includes('analytics') ||
+      text.includes('report') ||
+      text.includes('dashboard') ||
+      text.includes('metrics')
+    ) {
       dataSources.push('analytics_data');
     }
 
@@ -363,7 +444,10 @@ export class IntentInterpreter implements IIntentInterpreter {
     return dataSources;
   }
 
-  private identifyTechnicalRequirementsFromText(rawText: string, params?: OptionalParams): TechnicalRequirement[] {
+  private identifyTechnicalRequirementsFromText(
+    rawText: string,
+    params?: OptionalParams
+  ): TechnicalRequirement[] {
     const text = rawText.toLowerCase();
     const requirements: TechnicalRequirement[] = [];
     const operations = this.extractOperations(rawText);
@@ -371,10 +455,10 @@ export class IntentInterpreter implements IIntentInterpreter {
 
     // Categorize requirements based on operations and data sources
     const requirementMap = this.categorizeOperationsIntoRequirements(operations, dataSources, text);
-    
+
     // Convert map to array and deduplicate
     const uniqueRequirements = new Map<string, TechnicalRequirement>();
-    
+
     for (const requirement of requirementMap) {
       const key = `${requirement.type}-${requirement.description}`;
       if (!uniqueRequirements.has(key)) {
@@ -383,7 +467,10 @@ export class IntentInterpreter implements IIntentInterpreter {
         // Merge complexity and quota impact (take the higher one)
         const existing = uniqueRequirements.get(key)!;
         existing.complexity = this.getHigherComplexity(existing.complexity, requirement.complexity);
-        existing.quotaImpact = this.getHigherQuotaImpact(existing.quotaImpact, requirement.quotaImpact);
+        existing.quotaImpact = this.getHigherQuotaImpact(
+          existing.quotaImpact,
+          requirement.quotaImpact
+        );
       }
     }
 
@@ -398,8 +485,8 @@ export class IntentInterpreter implements IIntentInterpreter {
   }
 
   private categorizeOperationsIntoRequirements(
-    operations: Operation[], 
-    dataSources: string[], 
+    operations: Operation[],
+    dataSources: string[],
     rawText: string
   ): TechnicalRequirement[] {
     const requirements: TechnicalRequirement[] = [];
@@ -411,51 +498,81 @@ export class IntentInterpreter implements IIntentInterpreter {
     const hasAnalysis = operations.some(op => op.type === 'analysis');
 
     // Data retrieval requirements based on operations and data sources
-    if (hasDataRetrieval || text.includes('display') || text.includes('show') || text.includes('list') || text.includes('view') || text.includes('read') || text.includes('get') || text.includes('dashboard') || text.includes('pull')) {
+    if (
+      hasDataRetrieval ||
+      text.includes('display') ||
+      text.includes('show') ||
+      text.includes('list') ||
+      text.includes('view') ||
+      text.includes('read') ||
+      text.includes('get') ||
+      text.includes('dashboard') ||
+      text.includes('pull')
+    ) {
       const complexity = this.determineDataRetrievalComplexity(dataSources, text);
       const quotaImpact = this.determineDataRetrievalQuotaImpact(dataSources, operations);
-      
+
       requirements.push({
         type: 'data_retrieval',
         description: this.generateDataRetrievalDescription(dataSources, text),
         complexity,
-        quotaImpact
+        quotaImpact,
       });
     }
 
     // Processing requirements based on operations
-    if (hasProcessing || text.includes('create') || text.includes('update') || text.includes('delete') || text.includes('process') || text.includes('transform')) {
+    if (
+      hasProcessing ||
+      text.includes('create') ||
+      text.includes('update') ||
+      text.includes('delete') ||
+      text.includes('process') ||
+      text.includes('transform')
+    ) {
       const complexity = this.determineProcessingComplexity(operations, text);
       const quotaImpact = this.determineProcessingQuotaImpact(operations, text);
-      
+
       requirements.push({
         type: 'processing',
         description: this.generateProcessingDescription(operations, text),
         complexity,
-        quotaImpact
+        quotaImpact,
       });
     }
 
     // Analysis requirements for complex operations
-    if (hasAnalysis || text.includes('report') || text.includes('analytics') || text.includes('dashboard') || text.includes('insights') || text.includes('analyze')) {
+    if (
+      hasAnalysis ||
+      text.includes('report') ||
+      text.includes('analytics') ||
+      text.includes('dashboard') ||
+      text.includes('insights') ||
+      text.includes('analyze')
+    ) {
       requirements.push({
         type: 'analysis',
         description: this.generateAnalysisDescription(text),
         complexity: 'high',
-        quotaImpact: 'significant'
+        quotaImpact: 'significant',
       });
     }
 
     // Output requirements based on export/generation needs
-    if (text.includes('export') || text.includes('download') || text.includes('generate') || text.includes('output') || text.includes('file')) {
+    if (
+      text.includes('export') ||
+      text.includes('download') ||
+      text.includes('generate') ||
+      text.includes('output') ||
+      text.includes('file')
+    ) {
       const complexity = this.determineOutputComplexity(text);
       const quotaImpact = this.determineOutputQuotaImpact(text);
-      
+
       requirements.push({
         type: 'output',
         description: this.generateOutputDescription(text),
         complexity,
-        quotaImpact
+        quotaImpact,
       });
     }
 
@@ -467,14 +584,14 @@ export class IntentInterpreter implements IIntentInterpreter {
           type: 'processing',
           description: 'Basic application functionality',
           complexity: 'medium',
-          quotaImpact: 'moderate'
+          quotaImpact: 'moderate',
         });
       } else {
         requirements.push({
           type: 'processing',
           description: 'Process and transform application data',
           complexity: 'low',
-          quotaImpact: 'minimal'
+          quotaImpact: 'minimal',
         });
       }
     }
@@ -482,21 +599,37 @@ export class IntentInterpreter implements IIntentInterpreter {
     return requirements;
   }
 
-  private determineDataRetrievalComplexity(dataSources: string[], text: string): 'low' | 'medium' | 'high' {
+  private determineDataRetrievalComplexity(
+    dataSources: string[],
+    text: string
+  ): 'low' | 'medium' | 'high' {
     // Complex if multiple data sources or advanced querying
-    if (dataSources.length > 2 || text.includes('search') || text.includes('filter') || text.includes('join') || text.includes('aggregate')) {
+    if (
+      dataSources.length > 2 ||
+      text.includes('search') ||
+      text.includes('filter') ||
+      text.includes('join') ||
+      text.includes('aggregate')
+    ) {
       return 'high';
     }
-    if (dataSources.includes('external_api') || text.includes('complex') || text.includes('advanced')) {
+    if (
+      dataSources.includes('external_api') ||
+      text.includes('complex') ||
+      text.includes('advanced')
+    ) {
       return 'medium';
     }
     return 'low';
   }
 
-  private determineDataRetrievalQuotaImpact(dataSources: string[], operations: Operation[]): 'minimal' | 'moderate' | 'significant' {
+  private determineDataRetrievalQuotaImpact(
+    dataSources: string[],
+    operations: Operation[]
+  ): 'minimal' | 'moderate' | 'significant' {
     const retrievalOps = operations.filter(op => op.type === 'data_retrieval');
     const totalCost = retrievalOps.reduce((sum, op) => sum + op.estimatedQuotaCost, 0);
-    
+
     if (totalCost > 5 || dataSources.includes('external_api')) {
       return 'significant';
     }
@@ -506,63 +639,104 @@ export class IntentInterpreter implements IIntentInterpreter {
     return 'minimal';
   }
 
-  private determineProcessingComplexity(operations: Operation[], text: string): 'low' | 'medium' | 'high' {
+  private determineProcessingComplexity(
+    operations: Operation[],
+    text: string
+  ): 'low' | 'medium' | 'high' {
     const processingOps = operations.filter(op => op.type === 'processing');
-    
+
     // Check if we have the default operation
-    const hasDefaultOperation = operations.some(op => op.description === 'Basic application functionality');
+    const hasDefaultOperation = operations.some(
+      op => op.description === 'Basic application functionality'
+    );
     if (hasDefaultOperation && operations.length === 1) {
       return 'medium'; // Default complexity for vague intents
     }
-    
+
     // High complexity for authentication, complex business logic, or many operations
-    if (text.includes('auth') || text.includes('security') || text.includes('permission') || 
-        text.includes('workflow') || text.includes('business logic') || processingOps.length > 4) {
+    if (
+      text.includes('auth') ||
+      text.includes('security') ||
+      text.includes('permission') ||
+      text.includes('workflow') ||
+      text.includes('business logic') ||
+      processingOps.length > 4
+    ) {
       return 'high';
     }
-    
+
     // Medium complexity for CRUD operations or moderate processing
-    if (text.includes('crud') || text.includes('validation') || text.includes('transform') || processingOps.length > 2) {
+    if (
+      text.includes('crud') ||
+      text.includes('validation') ||
+      text.includes('transform') ||
+      processingOps.length > 2
+    ) {
       return 'medium';
     }
-    
+
     return 'low';
   }
 
-  private determineProcessingQuotaImpact(operations: Operation[], text: string): 'minimal' | 'moderate' | 'significant' {
+  private determineProcessingQuotaImpact(
+    operations: Operation[],
+    text: string
+  ): 'minimal' | 'moderate' | 'significant' {
     const processingOps = operations.filter(op => op.type === 'processing');
     const totalCost = processingOps.reduce((sum, op) => sum + op.estimatedQuotaCost, 0);
-    
+
     // Check if we have the default operation
-    const hasDefaultOperation = operations.some(op => op.description === 'Basic application functionality');
+    const hasDefaultOperation = operations.some(
+      op => op.description === 'Basic application functionality'
+    );
     if (hasDefaultOperation && operations.length === 1) {
       return 'moderate'; // Default quota impact for vague intents
     }
-    
+
     // High impact for authentication, complex workflows, or high-cost operations
-    if (text.includes('auth') || text.includes('complex') || text.includes('workflow') || totalCost > 8) {
+    if (
+      text.includes('auth') ||
+      text.includes('complex') ||
+      text.includes('workflow') ||
+      totalCost > 8
+    ) {
       return 'significant';
     }
-    
+
     if (totalCost > 4 || processingOps.length > 2) {
       return 'moderate';
     }
-    
+
     return 'minimal';
   }
 
   private determineOutputComplexity(text: string): 'low' | 'medium' | 'high' {
-    if (text.includes('report') || text.includes('dashboard') || text.includes('chart') || text.includes('visualization')) {
+    if (
+      text.includes('report') ||
+      text.includes('dashboard') ||
+      text.includes('chart') ||
+      text.includes('visualization')
+    ) {
       return 'high';
     }
-    if (text.includes('format') || text.includes('template') || text.includes('pdf') || text.includes('excel')) {
+    if (
+      text.includes('format') ||
+      text.includes('template') ||
+      text.includes('pdf') ||
+      text.includes('excel')
+    ) {
       return 'medium';
     }
     return 'low';
   }
 
   private determineOutputQuotaImpact(text: string): 'minimal' | 'moderate' | 'significant' {
-    if (text.includes('report') || text.includes('dashboard') || text.includes('analytics') || text.includes('visualization')) {
+    if (
+      text.includes('report') ||
+      text.includes('dashboard') ||
+      text.includes('analytics') ||
+      text.includes('visualization')
+    ) {
       return 'significant';
     }
     if (text.includes('export') || text.includes('format') || text.includes('generate')) {
@@ -574,32 +748,41 @@ export class IntentInterpreter implements IIntentInterpreter {
   private generateDataRetrievalDescription(dataSources: string[], text: string): string {
     const sourceDescriptions = dataSources.map(source => {
       switch (source) {
-        case 'user_data': return 'user information';
-        case 'database': return 'database records';
-        case 'file_storage': return 'file data';
-        case 'external_api': return 'external API data';
-        case 'analytics_data': return 'analytics information';
-        case 'configuration': return 'configuration settings';
-        default: return 'application data';
+        case 'user_data':
+          return 'user information';
+        case 'database':
+          return 'database records';
+        case 'file_storage':
+          return 'file data';
+        case 'external_api':
+          return 'external API data';
+        case 'analytics_data':
+          return 'analytics information';
+        case 'configuration':
+          return 'configuration settings';
+        default:
+          return 'application data';
       }
     });
 
     if (text.includes('search') || text.includes('filter')) {
       return `Search and retrieve ${sourceDescriptions.join(', ')}`;
     }
-    
+
     return `Retrieve and access ${sourceDescriptions.join(', ')}`;
   }
 
   private generateProcessingDescription(operations: Operation[], text: string): string {
     const processingTypes = new Set<string>();
-    
+
     // Check if we have the default operation
-    const hasDefaultOperation = operations.some(op => op.description === 'Basic application functionality');
+    const hasDefaultOperation = operations.some(
+      op => op.description === 'Basic application functionality'
+    );
     if (hasDefaultOperation) {
       return 'Basic application functionality';
     }
-    
+
     operations.forEach(op => {
       if (op.description.includes('Create') || op.description.includes('Add')) {
         processingTypes.add('create');
@@ -618,16 +801,16 @@ export class IntentInterpreter implements IIntentInterpreter {
     if (text.includes('auth') || processingTypes.has('authentication')) {
       return 'Handle user authentication and authorization';
     }
-    
+
     if (processingTypes.size > 2) {
       return 'Process and manage data operations (CRUD)';
     }
-    
+
     const types = Array.from(processingTypes);
     if (types.length > 0) {
       return `Process data operations: ${types.join(', ')}`;
     }
-    
+
     return 'Process and transform application data';
   }
 
@@ -657,12 +840,18 @@ export class IntentInterpreter implements IIntentInterpreter {
     return 'Generate and format output data';
   }
 
-  private getHigherComplexity(a: 'low' | 'medium' | 'high', b: 'low' | 'medium' | 'high'): 'low' | 'medium' | 'high' {
+  private getHigherComplexity(
+    a: 'low' | 'medium' | 'high',
+    b: 'low' | 'medium' | 'high'
+  ): 'low' | 'medium' | 'high' {
     const order = { low: 0, medium: 1, high: 2 };
     return order[a] > order[b] ? a : b;
   }
 
-  private getHigherQuotaImpact(a: 'minimal' | 'moderate' | 'significant', b: 'minimal' | 'moderate' | 'significant'): 'minimal' | 'moderate' | 'significant' {
+  private getHigherQuotaImpact(
+    a: 'minimal' | 'moderate' | 'significant',
+    b: 'minimal' | 'moderate' | 'significant'
+  ): 'minimal' | 'moderate' | 'significant' {
     const order = { minimal: 0, moderate: 1, significant: 2 };
     return order[a] > order[b] ? a : b;
   }
@@ -672,42 +861,62 @@ export class IntentInterpreter implements IIntentInterpreter {
     const risks: Risk[] = [];
 
     // Loop-related risks
-    if (text.includes('all') || text.includes('every') || text.includes('each') || text.includes('batch')) {
+    if (
+      text.includes('all') ||
+      text.includes('every') ||
+      text.includes('each') ||
+      text.includes('batch')
+    ) {
       risks.push({
         type: 'excessive_loops',
         severity: 'high',
         description: 'Potential for excessive loops when processing multiple items',
-        likelihood: 0.7
+        likelihood: 0.7,
       });
     }
 
     // Query-related risks
-    if (text.includes('search') || text.includes('find') || text.includes('query') || text.includes('filter')) {
+    if (
+      text.includes('search') ||
+      text.includes('find') ||
+      text.includes('query') ||
+      text.includes('filter')
+    ) {
       risks.push({
         type: 'redundant_query',
         severity: 'medium',
         description: 'Risk of redundant database queries without proper caching',
-        likelihood: 0.6
+        likelihood: 0.6,
       });
     }
 
     // Vibe overuse risks
-    if (text.includes('generate') || text.includes('create') || text.includes('analyze') || text.includes('intelligent')) {
+    if (
+      text.includes('generate') ||
+      text.includes('create') ||
+      text.includes('analyze') ||
+      text.includes('intelligent')
+    ) {
       risks.push({
         type: 'unnecessary_vibes',
         severity: 'medium',
         description: 'Potential overuse of vibes for tasks that could use structured specs',
-        likelihood: 0.5
+        likelihood: 0.5,
       });
     }
 
     // Caching risks
-    if (text.includes('frequent') || text.includes('often') || text.includes('regular') || text.includes('repeated')) {
+    if (
+      text.includes('frequent') ||
+      text.includes('often') ||
+      text.includes('regular') ||
+      text.includes('repeated')
+    ) {
       risks.push({
         type: 'missing_cache',
         severity: 'medium',
         description: 'Missing caching opportunities for frequently accessed data',
-        likelihood: 0.6
+        likelihood: 0.6,
       });
     }
 
@@ -719,7 +928,10 @@ export class IntentInterpreter implements IIntentInterpreter {
     return risks;
   }
 
-  private adjustOperationCostsForParameters(operations: Operation[], params: OptionalParams): Operation[] {
+  private adjustOperationCostsForParameters(
+    operations: Operation[],
+    params: OptionalParams
+  ): Operation[] {
     return operations.map(operation => {
       let adjustedCost = operation.estimatedQuotaCost;
 
@@ -745,12 +957,15 @@ export class IntentInterpreter implements IIntentInterpreter {
 
       return {
         ...operation,
-        estimatedQuotaCost: adjustedCost
+        estimatedQuotaCost: adjustedCost,
       };
     });
   }
 
-  private adjustRequirementsForParameters(requirements: TechnicalRequirement[], params: OptionalParams): TechnicalRequirement[] {
+  private adjustRequirementsForParameters(
+    requirements: TechnicalRequirement[],
+    params: OptionalParams
+  ): TechnicalRequirement[] {
     return requirements.map(requirement => {
       let adjustedComplexity = requirement.complexity;
       let adjustedQuotaImpact = requirement.quotaImpact;
@@ -767,12 +982,13 @@ export class IntentInterpreter implements IIntentInterpreter {
       // Adjust based on cost constraints
       if (params.costConstraints) {
         const { maxVibes, maxSpecs, maxCostDollars } = params.costConstraints;
-        
+
         // If there are tight cost constraints, try to reduce quota impact
-        if ((maxVibes !== undefined && maxVibes < 20) || 
-            (maxSpecs !== undefined && maxSpecs < 5) ||
-            (maxCostDollars !== undefined && maxCostDollars < 10)) {
-          
+        if (
+          (maxVibes !== undefined && maxVibes < 20) ||
+          (maxSpecs !== undefined && maxSpecs < 5) ||
+          (maxCostDollars !== undefined && maxCostDollars < 10)
+        ) {
           // Try to reduce quota impact for cost-sensitive scenarios
           if (adjustedQuotaImpact === 'significant') {
             adjustedQuotaImpact = 'moderate';
@@ -791,7 +1007,7 @@ export class IntentInterpreter implements IIntentInterpreter {
       return {
         ...requirement,
         complexity: adjustedComplexity,
-        quotaImpact: adjustedQuotaImpact
+        quotaImpact: adjustedQuotaImpact,
       };
     });
   }
@@ -806,7 +1022,7 @@ export class IntentInterpreter implements IIntentInterpreter {
           type: 'excessive_loops',
           severity: 'high',
           description: 'High user volume may lead to excessive quota consumption during peak usage',
-          likelihood: 0.8
+          likelihood: 0.8,
         });
       }
     }
@@ -814,16 +1030,18 @@ export class IntentInterpreter implements IIntentInterpreter {
     // Add cost constraint risks
     if (params.costConstraints) {
       const { maxVibes, maxSpecs, maxCostDollars } = params.costConstraints;
-      
-      if ((maxVibes !== undefined && maxVibes < 10) || 
-          (maxSpecs !== undefined && maxSpecs < 3) ||
-          (maxCostDollars !== undefined && maxCostDollars < 5)) {
-        
+
+      if (
+        (maxVibes !== undefined && maxVibes < 10) ||
+        (maxSpecs !== undefined && maxSpecs < 3) ||
+        (maxCostDollars !== undefined && maxCostDollars < 5)
+      ) {
         adjustedRisks.push({
           type: 'unnecessary_vibes',
           severity: 'high',
-          description: 'Tight cost constraints may require aggressive optimization to stay within budget',
-          likelihood: 0.9
+          description:
+            'Tight cost constraints may require aggressive optimization to stay within budget',
+          likelihood: 0.9,
         });
       }
     }
@@ -832,12 +1050,12 @@ export class IntentInterpreter implements IIntentInterpreter {
     if (params.performanceSensitivity === 'high') {
       return adjustedRisks.map(risk => ({
         ...risk,
-        likelihood: Math.min(1.0, risk.likelihood * 1.2) // Increase likelihood for high performance sensitivity
+        likelihood: Math.min(1.0, risk.likelihood * 1.2), // Increase likelihood for high performance sensitivity
       }));
     } else if (params.performanceSensitivity === 'low') {
       return adjustedRisks.map(risk => ({
         ...risk,
-        likelihood: Math.max(0.1, risk.likelihood * 0.8) // Decrease likelihood for low performance sensitivity
+        likelihood: Math.max(0.1, risk.likelihood * 0.8), // Decrease likelihood for low performance sensitivity
       }));
     }
 

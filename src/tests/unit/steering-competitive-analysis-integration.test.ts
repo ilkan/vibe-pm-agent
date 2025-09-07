@@ -18,7 +18,7 @@ jest.mock('../../components/steering-file-preview');
 const mockPromptForSteeringFileCreation = jest.fn().mockResolvedValue({
   createFiles: true,
   customOptions: {},
-  rememberPreferences: false
+  rememberPreferences: false,
 });
 
 const mockGeneratePreview = jest.fn().mockReturnValue({
@@ -26,7 +26,7 @@ const mockGeneratePreview = jest.fn().mockReturnValue({
   estimatedSize: 1000,
   contentPreview: 'Mock preview content',
   truncated: false,
-  warnings: []
+  warnings: [],
 });
 
 const mockShowPreviewAndConfirm = jest.fn().mockResolvedValue(true);
@@ -38,10 +38,10 @@ const mockGenerateSummary = jest.fn().mockReturnValue({
   fileDetails: [],
   processingTimeMs: 100,
   issues: [],
-  usageRecommendations: []
+  usageRecommendations: [],
 });
 const mockDisplaySummary = jest.fn().mockResolvedValue(undefined);
-const mockCustomizeSteeringOptions = jest.fn().mockImplementation((options) => options);
+const mockCustomizeSteeringOptions = jest.fn().mockImplementation(options => options);
 
 // Mock the steering file manager to return successful save results
 const mockSaveSteeringFile = jest.fn().mockResolvedValue({
@@ -49,11 +49,11 @@ const mockSaveSteeringFile = jest.fn().mockResolvedValue({
   filename: 'test-steering-file.md',
   action: 'created',
   message: 'Steering file created successfully',
-  fullPath: '.kiro/steering/test-steering-file.md'
+  fullPath: '.kiro/steering/test-steering-file.md',
 });
 
 // Mock the document reference linker
-const mockAddFileReferences = jest.fn().mockImplementation((context) => context);
+const mockAddFileReferences = jest.fn().mockImplementation(context => context);
 const mockGenerateFileReferences = jest.fn().mockReturnValue([]);
 
 jest.mock('../../components/steering-user-interaction', () => ({
@@ -63,26 +63,26 @@ jest.mock('../../components/steering-user-interaction', () => ({
     showPreviewAndConfirm: mockShowPreviewAndConfirm,
     generateSummary: mockGenerateSummary,
     displaySummary: mockDisplaySummary,
-    customizeSteeringOptions: mockCustomizeSteeringOptions
-  }))
+    customizeSteeringOptions: mockCustomizeSteeringOptions,
+  })),
 }));
 
 jest.mock('../../components/steering-file-manager', () => ({
   SteeringFileManager: jest.fn().mockImplementation(() => ({
     saveSteeringFile: mockSaveSteeringFile,
-    getStats: jest.fn().mockReturnValue({})
-  }))
+    getStats: jest.fn().mockReturnValue({}),
+  })),
 }));
 
 jest.mock('../../components/document-reference-linker', () => ({
   DocumentReferenceLinker: jest.fn().mockImplementation(() => ({
     addFileReferences: mockAddFileReferences,
-    generateFileReferences: mockGenerateFileReferences
-  }))
+    generateFileReferences: mockGenerateFileReferences,
+  })),
 }));
 
 jest.mock('../../components/steering-file-preview', () => ({
-  SteeringFilePreview: jest.fn().mockImplementation(() => ({}))
+  SteeringFilePreview: jest.fn().mockImplementation(() => ({})),
 }));
 
 describe('SteeringService - Competitive Analysis Integration', () => {
@@ -97,8 +97,8 @@ describe('SteeringService - Competitive Analysis Integration', () => {
       userPreferences: {
         autoCreate: true,
         showPreview: false,
-        showSummary: false
-      }
+        showSummary: false,
+      },
     });
 
     // Mock competitive analysis result
@@ -115,7 +115,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
               model: 'subscription',
               startingPrice: 99,
               currency: 'USD',
-              valueProposition: 'Enterprise-grade solution with comprehensive features'
+              valueProposition: 'Enterprise-grade solution with comprehensive features',
             },
             targetMarket: ['Enterprise', 'Mid-market'],
             recentMoves: [
@@ -124,18 +124,18 @@ describe('SteeringService - Competitive Analysis Integration', () => {
                 type: 'product-launch',
                 description: 'Launched new AI features',
                 impact: 'medium',
-                strategicImplication: 'Strengthened competitive position in AI space'
-              }
-            ]
-          }
+                strategicImplication: 'Strengthened competitive position in AI space',
+              },
+            ],
+          },
         ],
         evaluationCriteria: [
           {
             name: 'Market Share',
             weight: 0.3,
             description: 'Current market position',
-            measurementType: 'quantitative'
-          }
+            measurementType: 'quantitative',
+          },
         ],
         rankings: [
           {
@@ -143,21 +143,18 @@ describe('SteeringService - Competitive Analysis Integration', () => {
             overallScore: 85,
             criteriaScores: { 'Market Share': 90 },
             rank: 1,
-            competitiveAdvantage: ['Market leadership', 'Brand recognition']
-          }
+            competitiveAdvantage: ['Market leadership', 'Brand recognition'],
+          },
         ],
-        differentiationOpportunities: [
-          'Lower pricing strategy',
-          'Better user experience'
-        ],
+        differentiationOpportunities: ['Lower pricing strategy', 'Better user experience'],
         marketContext: {
           industry: 'Technology',
           geography: ['North America', 'Europe'],
           targetSegment: 'Enterprise',
           marketMaturity: 'growth',
           regulatoryEnvironment: ['GDPR', 'SOX'],
-          technologyTrends: ['AI/ML', 'Cloud-first']
-        }
+          technologyTrends: ['AI/ML', 'Cloud-first'],
+        },
       },
       swotAnalysis: [
         {
@@ -166,52 +163,52 @@ describe('SteeringService - Competitive Analysis Integration', () => {
             {
               description: 'Market leader',
               impact: 'high',
-              confidence: 0.9
+              confidence: 0.9,
             },
             {
               description: 'Strong brand',
               impact: 'high',
-              confidence: 0.8
-            }
+              confidence: 0.8,
+            },
           ],
           weaknesses: [
             {
               description: 'High pricing',
               impact: 'medium',
-              confidence: 0.7
+              confidence: 0.7,
             },
             {
               description: 'Complex UI',
               impact: 'medium',
-              confidence: 0.6
-            }
+              confidence: 0.6,
+            },
           ],
           opportunities: [
             {
               description: 'Emerging markets',
               impact: 'high',
-              confidence: 0.6
+              confidence: 0.6,
             },
             {
               description: 'SMB segment',
               impact: 'medium',
-              confidence: 0.7
-            }
+              confidence: 0.7,
+            },
           ],
           threats: [
             {
               description: 'New entrants',
               impact: 'medium',
-              confidence: 0.8
+              confidence: 0.8,
             },
             {
               description: 'Price competition',
               impact: 'high',
-              confidence: 0.9
-            }
+              confidence: 0.9,
+            },
           ],
-          strategicImplications: ['Focus on cost optimization', 'Improve user experience']
-        }
+          strategicImplications: ['Focus on cost optimization', 'Improve user experience'],
+        },
       ],
       marketPositioning: {
         positioningMap: [
@@ -219,15 +216,15 @@ describe('SteeringService - Competitive Analysis Integration', () => {
             name: 'Price',
             lowEnd: 'Low cost',
             highEnd: 'Premium',
-            importance: 0.8
-          }
+            importance: 0.8,
+          },
         ],
         competitorPositions: [
           {
             competitorName: 'Competitor A',
-            coordinates: { 'Price': 0.8 },
-            marketSegment: 'Enterprise'
-          }
+            coordinates: { Price: 0.8 },
+            marketSegment: 'Enterprise',
+          },
         ],
         marketGaps: [
           {
@@ -235,10 +232,10 @@ describe('SteeringService - Competitive Analysis Integration', () => {
             size: 'large',
             difficulty: 'moderate',
             timeToMarket: '6-12 months',
-            potentialValue: 50000000
-          }
+            potentialValue: 50000000,
+          },
         ],
-        recommendedPositioning: ['Focus on underserved segments', 'Competitive pricing']
+        recommendedPositioning: ['Focus on underserved segments', 'Competitive pricing'],
       },
       strategicRecommendations: [
         {
@@ -252,14 +249,14 @@ describe('SteeringService - Competitive Analysis Integration', () => {
               action: 'Analyze cost structure',
               timeline: '1 month',
               dependencies: ['Financial analysis'],
-              successMetrics: ['Cost breakdown completed']
-            }
+              successMetrics: ['Cost breakdown completed'],
+            },
           ],
           expectedOutcome: 'Capture price-sensitive customers',
           riskLevel: 'medium',
           timeframe: '3-6 months',
-          resourceRequirements: ['Product team', 'Pricing analyst']
-        }
+          resourceRequirements: ['Product team', 'Pricing analyst'],
+        },
       ],
       sourceAttribution: [
         {
@@ -275,12 +272,12 @@ describe('SteeringService - Competitive Analysis Integration', () => {
             status: 'recent',
             ageInDays: 30,
             recommendedUpdateFrequency: 90,
-            lastValidated: '2024-02-01'
+            lastValidated: '2024-02-01',
           },
           citationFormat: 'Gartner. (2024). Market Analysis Report.',
           keyFindings: ['Market size', 'Competitive landscape'],
-          limitations: ['Limited geographic scope']
-        }
+          limitations: ['Limited geographic scope'],
+        },
       ],
       confidenceLevel: 'high',
       lastUpdated: '2024-02-01T10:00:00Z',
@@ -294,11 +291,11 @@ describe('SteeringService - Competitive Analysis Integration', () => {
             metric: 'Source credibility',
             score: 0.9,
             description: 'High-quality sources used',
-            impact: 'important'
-          }
+            impact: 'important',
+          },
         ],
-        recommendations: ['Update data quarterly', 'Expand geographic coverage']
-      }
+        recommendations: ['Update data quarterly', 'Expand geographic coverage'],
+      },
     };
 
     // Mock market sizing result
@@ -312,7 +309,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
         dataQuality: 'high',
         calculationDate: '2024-02-01T10:00:00Z',
         geographicScope: ['North America', 'Europe'],
-        marketSegments: ['Enterprise', 'Mid-market']
+        marketSegments: ['Enterprise', 'Mid-market'],
       },
       sam: {
         value: 5000000000,
@@ -323,7 +320,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
         dataQuality: 'high',
         calculationDate: '2024-02-01T10:00:00Z',
         geographicScope: ['North America', 'Europe'],
-        marketSegments: ['Enterprise', 'Mid-market']
+        marketSegments: ['Enterprise', 'Mid-market'],
       },
       som: {
         value: 500000000,
@@ -334,7 +331,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
         dataQuality: 'high',
         calculationDate: '2024-02-01T10:00:00Z',
         geographicScope: ['North America', 'Europe'],
-        marketSegments: ['Enterprise', 'Mid-market']
+        marketSegments: ['Enterprise', 'Mid-market'],
       },
       methodology: [
         {
@@ -349,12 +346,12 @@ describe('SteeringService - Competitive Analysis Integration', () => {
               formula: 'Industry Size × Geographic Scope',
               inputs: { industrySize: 'Market research data', geographicScope: 'Target regions' },
               output: 50000000000,
-              assumptions: ['Industry growth continues', 'Geographic data is accurate']
-            }
+              assumptions: ['Industry growth continues', 'Geographic data is accurate'],
+            },
           ],
           limitations: ['Relies on industry averages', 'May not reflect specific market dynamics'],
-          confidence: 0.7
-        }
+          confidence: 0.7,
+        },
       ],
       scenarios: [
         {
@@ -365,8 +362,8 @@ describe('SteeringService - Competitive Analysis Integration', () => {
           som: 250000000,
           probability: 0.3,
           keyAssumptions: ['Slower market adoption', 'Increased competition', 'Economic headwinds'],
-          riskFactors: ['Market saturation', 'Regulatory changes', 'Economic downturn']
-        }
+          riskFactors: ['Market saturation', 'Regulatory changes', 'Economic downturn'],
+        },
       ],
       confidenceIntervals: [
         {
@@ -374,8 +371,8 @@ describe('SteeringService - Competitive Analysis Integration', () => {
           lowerBound: 35000000000,
           upperBound: 65000000000,
           confidenceLevel: 0.8,
-          methodology: 'top-down'
-        }
+          methodology: 'top-down',
+        },
       ],
       sourceAttribution: [
         {
@@ -391,12 +388,12 @@ describe('SteeringService - Competitive Analysis Integration', () => {
             status: 'recent',
             ageInDays: 30,
             recommendedUpdateFrequency: 90,
-            lastValidated: '2024-02-01'
+            lastValidated: '2024-02-01',
           },
           citationFormat: 'Industry Research Institute. (2024). Market Analysis Report.',
           keyFindings: ['Market size estimates', 'Growth projections', 'Competitive landscape'],
-          limitations: ['Limited geographic coverage', 'Methodology assumptions']
-        }
+          limitations: ['Limited geographic coverage', 'Methodology assumptions'],
+        },
       ],
       assumptions: [
         {
@@ -405,8 +402,8 @@ describe('SteeringService - Competitive Analysis Integration', () => {
           value: '7-15%',
           confidence: 0.7,
           impact: 'high',
-          sourceReference: 'Industry analysis'
-        }
+          sourceReference: 'Industry analysis',
+        },
       ],
       marketDynamics: {
         growthDrivers: ['Digital transformation', 'Market expansion'],
@@ -415,12 +412,12 @@ describe('SteeringService - Competitive Analysis Integration', () => {
           {
             period: 'Q4',
             impact: 1.2,
-            description: 'Higher spending in Q4'
-          }
+            description: 'Higher spending in Q4',
+          },
         ],
         cyclicalFactors: ['Economic cycles'],
-        disruptiveForces: ['AI/ML', 'New business models']
-      }
+        disruptiveForces: ['AI/ML', 'New business models'],
+      },
     };
   });
 
@@ -429,7 +426,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
       const competitiveAnalysisText = JSON.stringify(mockCompetitiveAnalysis, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'test-feature'
+        feature_name: 'test-feature',
       };
 
       const result = await steeringService.createFromCompetitiveAnalysis(
@@ -449,7 +446,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'custom-feature',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       };
 
       const result = await steeringService.createFromCompetitiveAnalysis(
@@ -459,7 +456,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
 
       expect(result.created).toBe(true);
       expect(result.results[0].filename).toContain('test-steering-file');
-      
+
       // Check that the steering file uses manual inclusion
       const steeringFile = result.results[0];
       expect(steeringFile.action).toBe('created');
@@ -471,7 +468,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
         create_steering_files: true,
         feature_name: 'pattern-feature',
         inclusion_rule: 'fileMatch',
-        file_match_pattern: 'competitive*|analysis*'
+        file_match_pattern: 'competitive*|analysis*',
       };
 
       const result = await steeringService.createFromCompetitiveAnalysis(
@@ -501,7 +498,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
                 model: 'freemium',
                 startingPrice: 0,
                 currency: 'USD',
-                valueProposition: 'Freemium model with advanced analytics'
+                valueProposition: 'Freemium model with advanced analytics',
               },
               targetMarket: ['SMB', 'Startups'],
               recentMoves: [
@@ -510,18 +507,18 @@ describe('SteeringService - Competitive Analysis Integration', () => {
                   type: 'acquisition',
                   description: 'Acquired analytics startup',
                   impact: 'high',
-                  strategicImplication: 'Enhanced analytics capabilities'
-                }
-              ]
-            }
-          ]
-        }
+                  strategicImplication: 'Enhanced analytics capabilities',
+                },
+              ],
+            },
+          ],
+        },
       };
 
       const competitiveAnalysisText = JSON.stringify(comprehensiveAnalysis, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'comprehensive-analysis'
+        feature_name: 'comprehensive-analysis',
       };
 
       const result = await steeringService.createFromCompetitiveAnalysis(
@@ -538,7 +535,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
       const competitiveAnalysisText = JSON.stringify(mockCompetitiveAnalysis, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: false,
-        feature_name: 'skip-feature'
+        feature_name: 'skip-feature',
       };
 
       const result = await steeringService.createFromCompetitiveAnalysis(
@@ -554,7 +551,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
       const emptyAnalysis = JSON.stringify({}, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'empty-analysis'
+        feature_name: 'empty-analysis',
       };
 
       const result = await steeringService.createFromCompetitiveAnalysis(
@@ -571,7 +568,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
       const malformedJson = '{ invalid json content }';
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'malformed-input'
+        feature_name: 'malformed-input',
       };
 
       const result = await steeringService.createFromCompetitiveAnalysis(
@@ -586,12 +583,11 @@ describe('SteeringService - Competitive Analysis Integration', () => {
   });
 
   describe('createFromMarketSizing', () => {
-
     it('should create steering file from market sizing with minimal options', async () => {
       const marketSizingText = JSON.stringify(mockMarketSizing, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'market-test'
+        feature_name: 'market-test',
       };
 
       const result = await steeringService.createFromMarketSizing(
@@ -610,7 +606,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
       const marketSizingText = JSON.stringify(mockMarketSizing, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'tam-sam-som-feature'
+        feature_name: 'tam-sam-som-feature',
       };
 
       const result = await steeringService.createFromMarketSizing(
@@ -639,19 +635,22 @@ describe('SteeringService - Competitive Analysis Integration', () => {
                 formula: 'Σ(Segment Size × Average Spending)',
                 inputs: { segmentSize: 'Customer counts', averageSpending: 'Pricing analysis' },
                 output: 45000000000,
-                assumptions: ['Segment data is representative', 'Spending patterns remain stable']
-              }
+                assumptions: ['Segment data is representative', 'Spending patterns remain stable'],
+              },
             ],
-            limitations: ['Requires detailed customer data', 'May miss market expansion opportunities'],
-            confidence: 0.8
-          }
-        ]
+            limitations: [
+              'Requires detailed customer data',
+              'May miss market expansion opportunities',
+            ],
+            confidence: 0.8,
+          },
+        ],
       };
 
       const marketSizingText = JSON.stringify(multiMethodologyMarketSizing, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'multi-methodology'
+        feature_name: 'multi-methodology',
       };
 
       const result = await steeringService.createFromMarketSizing(
@@ -676,15 +675,15 @@ describe('SteeringService - Competitive Analysis Integration', () => {
             som: 900000000,
             probability: 0.2,
             keyAssumptions: ['Rapid market expansion', 'First-mover advantage', 'Strong execution'],
-            riskFactors: ['Execution challenges', 'Market overestimation', 'Resource constraints']
-          }
-        ]
+            riskFactors: ['Execution challenges', 'Market overestimation', 'Resource constraints'],
+          },
+        ],
       };
 
       const marketSizingText = JSON.stringify(scenarioMarketSizing, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'scenario-analysis'
+        feature_name: 'scenario-analysis',
       };
 
       const result = await steeringService.createFromMarketSizing(
@@ -700,7 +699,7 @@ describe('SteeringService - Competitive Analysis Integration', () => {
       const marketSizingText = JSON.stringify(mockMarketSizing, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: false,
-        feature_name: 'skip-market-sizing'
+        feature_name: 'skip-market-sizing',
       };
 
       const result = await steeringService.createFromMarketSizing(
@@ -717,15 +716,18 @@ describe('SteeringService - Competitive Analysis Integration', () => {
     it('should use competitive analysis template correctly', async () => {
       const generator = new SteeringFileGenerator();
       const competitiveAnalysisText = JSON.stringify(mockCompetitiveAnalysis, null, 2);
-      
+
       const context = {
         featureName: 'test-competitive-feature',
         relatedFiles: [],
         inclusionRule: 'fileMatch' as const,
-        fileMatchPattern: 'competitive*|analysis*'
+        fileMatchPattern: 'competitive*|analysis*',
       };
 
-      const steeringFile = generator.generateFromCompetitiveAnalysis(competitiveAnalysisText, context);
+      const steeringFile = generator.generateFromCompetitiveAnalysis(
+        competitiveAnalysisText,
+        context
+      );
 
       expect(steeringFile.filename).toContain('test-competitive-feature');
       expect(steeringFile.filename).toContain('competitive_analysis');
@@ -739,12 +741,12 @@ describe('SteeringService - Competitive Analysis Integration', () => {
     it('should use market sizing template correctly', async () => {
       const generator = new SteeringFileGenerator();
       const marketSizingText = JSON.stringify(mockMarketSizing, null, 2);
-      
+
       const context = {
         featureName: 'test-market-feature',
         relatedFiles: [],
         inclusionRule: 'fileMatch' as const,
-        fileMatchPattern: 'market*|sizing*'
+        fileMatchPattern: 'market*|sizing*',
       };
 
       const steeringFile = generator.generateFromMarketSizing(marketSizingText, context);
@@ -763,13 +765,13 @@ describe('SteeringService - Competitive Analysis Integration', () => {
     it('should handle service errors gracefully for competitive analysis', async () => {
       // Mock service to throw error
       const errorService = new SteeringService({
-        enabled: false // This will cause creation to be skipped
+        enabled: false, // This will cause creation to be skipped
       });
 
       const competitiveAnalysisText = JSON.stringify(mockCompetitiveAnalysis, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'error-test'
+        feature_name: 'error-test',
       };
 
       const result = await errorService.createFromCompetitiveAnalysis(
@@ -784,19 +786,16 @@ describe('SteeringService - Competitive Analysis Integration', () => {
     it('should handle service errors gracefully for market sizing', async () => {
       // Mock service to throw error
       const errorService = new SteeringService({
-        enabled: false // This will cause creation to be skipped
+        enabled: false, // This will cause creation to be skipped
       });
 
       const marketSizingText = JSON.stringify(mockMarketSizing, null, 2);
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'error-test'
+        feature_name: 'error-test',
       };
 
-      const result = await errorService.createFromMarketSizing(
-        marketSizingText,
-        steeringOptions
-      );
+      const result = await errorService.createFromMarketSizing(marketSizingText, steeringOptions);
 
       expect(result.created).toBe(false);
       expect(result.message).toContain('Steering file creation disabled');

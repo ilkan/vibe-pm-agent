@@ -1,6 +1,6 @@
 /**
  * Unit tests for Kiro policy hooks (gates)
- * 
+ *
  * Tests the pre-codegen gate and post-spec validation hooks
  * to ensure proper spec validation and traceability.
  */
@@ -9,7 +9,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { validateSpecSections, preCodegenGate } from '../../../.kiro/hooks/pre_codegen_gate';
-import { validateAcceptanceCriteriaMapping, postSpecValidate } from '../../../.kiro/hooks/post_spec_validate';
+import {
+  validateAcceptanceCriteriaMapping,
+  postSpecValidate,
+} from '../../../.kiro/hooks/post_spec_validate';
 
 describe('Policy Hooks Validation', () => {
   let tempDir: string;

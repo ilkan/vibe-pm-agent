@@ -1,12 +1,12 @@
 /**
  * Comprehensive integration test suite for steering file integration
- * 
+ *
  * This test suite covers all aspects of the steering file integration feature:
  * - End-to-end PM agent output to steering file workflow
  * - Performance testing for large documents and file operations
  * - Integration with existing Kiro steering system
  * - Validation of steering file format compliance and cross-references
- * 
+ *
  * Requirements covered: 1.1, 2.1, 3.1, 5.1
  */
 
@@ -17,14 +17,14 @@ import { SteeringFileManager } from '../../components/steering-file-manager';
 import { SteeringFileGenerator } from '../../components/steering-file-generator';
 import { DocumentReferenceLinker } from '../../components/document-reference-linker';
 import { FrontMatterProcessor } from '../../components/front-matter-processor';
-import { 
-  RequirementsArgs, 
-  DesignOptionsArgs, 
-  ManagementOnePagerArgs, 
-  PRFAQArgs, 
+import {
+  RequirementsArgs,
+  DesignOptionsArgs,
+  ManagementOnePagerArgs,
+  PRFAQArgs,
   TaskPlanArgs,
   MCPToolContext,
-  SteeringFileOptions
+  SteeringFileOptions,
 } from '../../models/mcp';
 import { DocumentType, SteeringFile, InclusionRule } from '../../models/steering';
 import { OptionalParams } from '../../models/intent';
@@ -45,7 +45,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
     // Setup test directories
     testSteeringDir = path.join(process.cwd(), 'test-comprehensive-steering');
     testSpecsDir = path.join(process.cwd(), 'test-comprehensive-specs');
-    
+
     await fs.mkdir(testSteeringDir, { recursive: true });
     await fs.mkdir(testSpecsDir, { recursive: true });
   });
@@ -58,7 +58,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
     } catch (error) {
       // Ignore if directories don't exist
     }
-    
+
     await fs.mkdir(testSteeringDir, { recursive: true });
     await fs.mkdir(testSpecsDir, { recursive: true });
 
@@ -67,11 +67,11 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
     mcpServer = new PMAgentMCPServer();
     steeringService = new SteeringService({
       steeringDirectory: testSteeringDir,
-      userPreferences: { autoCreate: true, showPreview: false }
+      userPreferences: { autoCreate: true, showPreview: false },
     });
     steeringManager = new SteeringFileManager({
       steeringDirectory: testSteeringDir,
-      validateContent: true
+      validateContent: true,
     });
 
     mockContext = {
@@ -79,7 +79,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       sessionId: 'comprehensive-test-session',
       timestamp: Date.now(),
       requestId: 'comprehensive-test-request',
-      traceId: 'comprehensive-test-trace'
+      traceId: 'comprehensive-test-trace',
     };
   });
 
@@ -96,7 +96,8 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
   describe('Requirement 1.1: PM Agent Output to Steering File Workflow', () => {
     it('should create steering files from all PM document types automatically', async () => {
       const featureName = 'comprehensive-workflow-test';
-      const baseIntent = 'Create a user management system with authentication, authorization, and user profiles';
+      const baseIntent =
+        'Create a user management system with authentication, authorization, and user profiles';
 
       // Test complete workflow through pipeline
       const params: OptionalParams = {
@@ -110,9 +111,9 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
             create_steering_files: true,
             feature_name: featureName,
             inclusion_rule: 'fileMatch',
-            file_match_pattern: 'user*|auth*|management*'
-          }
-        }
+            file_match_pattern: 'user*|auth*|management*',
+          },
+        },
       };
 
       const result = await pipeline.processIntent(baseIntent, params);
@@ -130,13 +131,13 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       // Verify each file has proper structure
       for (const filename of steeringFiles) {
         const content = await fs.readFile(path.join(testSteeringDir, filename), 'utf8');
-        
+
         // Should have front-matter
         expect(content).toMatch(/^---\n[\s\S]*?\n---\n/);
-        
+
         // Should have content
         expect(content).toMatch(/\n---\n\n# /);
-        
+
         // Should contain feature name
         expect(content).toContain(featureName);
       }
@@ -144,7 +145,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
 
     it('should handle individual MCP tool calls with steering options', async () => {
       const featureName = 'individual-mcp-test';
-      
+
       // Test each MCP tool individually
       const tools = [
         {
@@ -154,9 +155,9 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
             steering_options: {
               create_steering_files: true,
               feature_name: featureName,
-              inclusion_rule: 'fileMatch'
-            }
-          } as RequirementsArgs
+              inclusion_rule: 'fileMatch',
+            },
+          } as RequirementsArgs,
         },
         {
           name: 'generateDesignOptions',
@@ -165,22 +166,28 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
             steering_options: {
               create_steering_files: true,
               feature_name: featureName,
-              inclusion_rule: 'fileMatch'
-            }
-          } as DesignOptionsArgs
-        }
+              inclusion_rule: 'fileMatch',
+            },
+          } as DesignOptionsArgs,
+        },
       ];
 
       for (const tool of tools) {
         let result;
         if (tool.name === 'generateRequirements') {
-          result = await mcpServer.handleGenerateRequirements(tool.args as RequirementsArgs, mockContext);
+          result = await mcpServer.handleGenerateRequirements(
+            tool.args as RequirementsArgs,
+            mockContext
+          );
         } else if (tool.name === 'generateDesignOptions') {
-          result = await mcpServer.handleGenerateDesignOptions(tool.args as DesignOptionsArgs, mockContext);
+          result = await mcpServer.handleGenerateDesignOptions(
+            tool.args as DesignOptionsArgs,
+            mockContext
+          );
         } else {
           throw new Error(`Unsupported tool: ${tool.name}`);
         }
-        
+
         expect(result.isError).toBe(false);
         expect(result.metadata?.steeringFileCreated).toBe(true);
       }
@@ -192,7 +199,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
 
     it('should maintain consistency across multiple feature workflows', async () => {
       const features = ['auth-system', 'payment-gateway', 'notification-service'];
-      
+
       for (const feature of features) {
         const params: OptionalParams = {
           generatePMDocuments: {
@@ -201,9 +208,9 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
             steeringOptions: {
               create_steering_files: true,
               feature_name: feature,
-              inclusion_rule: 'fileMatch'
-            }
-          }
+              inclusion_rule: 'fileMatch',
+            },
+          },
         };
 
         const result = await pipeline.processIntent(
@@ -232,7 +239,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       const testCases = [
         { feature: 'user-authentication', expectedInName: 'user-authentication' },
         { feature: 'payment_processing', expectedInName: 'payment_processing' },
-        { feature: 'DataAnalytics', expectedInName: 'DataAnalytics' }
+        { feature: 'DataAnalytics', expectedInName: 'DataAnalytics' },
       ];
 
       for (const testCase of testCases) {
@@ -241,7 +248,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
           {
             create_steering_files: true,
             feature_name: testCase.feature,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           }
         );
 
@@ -252,14 +259,14 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
 
     it('should handle naming conflicts with versioning or updates', async () => {
       const featureName = 'conflict-test-feature';
-      
+
       // Create initial steering file
       const firstResult = await steeringService.createFromRequirements(
         '# First Version\n## User Story\nFirst version of requirements.',
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         }
       );
 
@@ -273,13 +280,13 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
           create_steering_files: true,
           feature_name: featureName,
           inclusion_rule: 'manual',
-          overwrite_existing: false
+          overwrite_existing: false,
         }
       );
 
       // Should handle conflict gracefully
       const steeringFiles = await fs.readdir(testSteeringDir);
-      
+
       if (secondResult.created) {
         // Either versioned or updated
         if (steeringFiles.length === 2) {
@@ -299,7 +306,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       const inclusionTests = [
         { rule: 'always' as InclusionRule, pattern: undefined },
         { rule: 'fileMatch' as InclusionRule, pattern: 'test*|spec*' },
-        { rule: 'manual' as InclusionRule, pattern: undefined }
+        { rule: 'manual' as InclusionRule, pattern: undefined },
       ];
 
       for (const test of inclusionTests) {
@@ -309,7 +316,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
             create_steering_files: true,
             feature_name: `inclusion-${test.rule}`,
             inclusion_rule: test.rule,
-            file_match_pattern: test.pattern
+            file_match_pattern: test.pattern,
           }
         );
 
@@ -334,7 +341,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       const featureName = 'cross-ref-test';
       const specsFeatureDir = path.join(testSpecsDir, featureName);
       await fs.mkdir(specsFeatureDir, { recursive: true });
-      
+
       await fs.writeFile(path.join(specsFeatureDir, 'requirements.md'), '# Mock Requirements');
       await fs.writeFile(path.join(specsFeatureDir, 'design.md'), '# Mock Design');
       await fs.writeFile(path.join(specsFeatureDir, 'tasks.md'), '# Mock Tasks');
@@ -344,7 +351,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -366,13 +373,13 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
 
     it('should use relative paths from workspace root', async () => {
       const featureName = 'relative-path-test';
-      
+
       const result = await steeringService.createFromRequirements(
         '# Requirements\n## User Story\nTesting relative paths.',
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -385,11 +392,11 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       references.forEach(ref => {
         const filePath = ref.match(/#\[\[file:([^\]]+)\]\]/)?.[1];
         expect(filePath).toBeDefined();
-        
+
         // Should be relative paths
         expect(filePath).not.toMatch(/^[A-Z]:/); // No Windows drive letters
         expect(filePath).not.toMatch(/^\//); // No absolute Unix paths
-        
+
         // Should use forward slashes
         expect(filePath).not.toMatch(/\\/);
       });
@@ -397,14 +404,14 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
 
     it('should create bidirectional references between related documents', async () => {
       const featureName = 'bidirectional-test';
-      
+
       // Create multiple related documents
       const reqResult = await steeringService.createFromRequirements(
         '# Requirements\n## User Story\nTesting bidirectional references.',
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -413,7 +420,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
         {
           create_steering_files: true,
           feature_name: featureName,
-          inclusion_rule: 'fileMatch'
+          inclusion_rule: 'fileMatch',
         }
       );
 
@@ -427,7 +434,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       for (const filename of steeringFiles) {
         const content = await fs.readFile(path.join(testSteeringDir, filename), 'utf8');
         const references = content.match(/#\[\[file:[^\]]+\]\]/g) || [];
-        
+
         // Each file should reference the other
         expect(references.length).toBeGreaterThan(0);
       }
@@ -442,7 +449,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
           create_steering_files: true,
           feature_name: 'compliance-test',
           inclusion_rule: 'fileMatch',
-          file_match_pattern: 'requirements*|spec*'
+          file_match_pattern: 'requirements*|spec*',
         }
       );
 
@@ -468,7 +475,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
         {
           create_steering_files: true,
           feature_name: 'formatting-test',
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         }
       );
 
@@ -489,7 +496,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
         {
           create_steering_files: true,
           feature_name: 'location-test',
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         }
       );
 
@@ -497,22 +504,25 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
 
       const filename = result.results[0].filename;
       expect(filename).toMatch(/\.md$/);
-      
+
       // Verify file exists in steering directory
       const filePath = path.join(testSteeringDir, filename);
-      const fileExists = await fs.access(filePath).then(() => true).catch(() => false);
+      const fileExists = await fs
+        .access(filePath)
+        .then(() => true)
+        .catch(() => false);
       expect(fileExists).toBe(true);
     });
 
     it('should include metadata about generation source and timing', async () => {
       const beforeTime = new Date().toISOString();
-      
+
       const result = await steeringService.createFromRequirements(
         '# Requirements\n## User Story\nTesting metadata inclusion.',
         {
           create_steering_files: true,
           feature_name: 'metadata-test',
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         }
       );
 
@@ -527,7 +537,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       expect(frontMatter.generatedBy).toBe('vibe-pm-agent');
       expect(frontMatter.featureName).toBe('metadata-test');
       expect(frontMatter.documentType).toBe(DocumentType.REQUIREMENTS);
-      
+
       // Verify timestamp is reasonable
       const generatedAt = new Date(frontMatter.generatedAt);
       expect(generatedAt.getTime()).toBeGreaterThanOrEqual(new Date(beforeTime).getTime());
@@ -543,7 +553,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       const result = await steeringService.createFromRequirements(largeContent, {
         create_steering_files: true,
         feature_name: 'large-document-perf-test',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       });
 
       const processingTime = Date.now() - startTime;
@@ -561,13 +571,13 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       const concurrentCount = 10;
       const startTime = Date.now();
 
-      const promises = Array.from({ length: concurrentCount }, (_, i) => 
+      const promises = Array.from({ length: concurrentCount }, (_, i) =>
         steeringService.createFromRequirements(
           `# Requirements ${i}\n## User Story\nConcurrent test ${i}.`,
           {
             create_steering_files: true,
             feature_name: `concurrent-${i}`,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           }
         )
       );
@@ -595,7 +605,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       const result = await steeringService.createFromRequirements(malformedContent, {
         create_steering_files: true,
         feature_name: 'malformed-test',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       });
 
       // Should either succeed with warnings or fail gracefully
@@ -610,7 +620,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       // Create service with invalid directory
       const invalidService = new SteeringService({
         steeringDirectory: '/invalid/path/that/cannot/exist',
-        userPreferences: { autoCreate: true }
+        userPreferences: { autoCreate: true },
       });
 
       const result = await invalidService.createFromRequirements(
@@ -618,7 +628,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
         {
           create_steering_files: true,
           feature_name: 'error-test',
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         }
       );
 
@@ -632,7 +642,7 @@ describe('Comprehensive Steering File Integration Test Suite', () => {
       const result = await steeringService.createFromRequirements(minimalContent, {
         create_steering_files: true,
         feature_name: 'minimal-test',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       });
 
       // Should handle gracefully
@@ -667,7 +677,7 @@ This is a manually created steering file.
         {
           create_steering_files: true,
           feature_name: 'coexistence-test',
-          inclusion_rule: 'manual'
+          inclusion_rule: 'manual',
         }
       );
 
@@ -691,7 +701,7 @@ This is a manually created steering file.
       const conventions = [
         { name: 'kebab-case-feature.md', featureName: 'kebab-case-feature' },
         { name: 'snake_case_feature.md', featureName: 'snake_case_feature' },
-        { name: 'CamelCaseFeature.md', featureName: 'CamelCaseFeature' }
+        { name: 'CamelCaseFeature.md', featureName: 'CamelCaseFeature' },
       ];
 
       for (const convention of conventions) {
@@ -700,7 +710,7 @@ This is a manually created steering file.
           {
             create_steering_files: true,
             feature_name: convention.featureName,
-            inclusion_rule: 'manual'
+            inclusion_rule: 'manual',
           }
         );
 
@@ -714,7 +724,7 @@ This is a manually created steering file.
 // Helper function to generate large test documents
 function generateLargeDocument(requirementCount: number): string {
   const requirements = [];
-  
+
   for (let i = 1; i <= requirementCount; i++) {
     requirements.push(`
 ### Requirement ${i}

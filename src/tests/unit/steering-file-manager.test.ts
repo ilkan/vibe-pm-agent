@@ -13,7 +13,7 @@ jest.mock('fs/promises', () => ({
   readdir: jest.fn(),
   stat: jest.fn(),
   writeFile: jest.fn(),
-  copyFile: jest.fn()
+  copyFile: jest.fn(),
 }));
 
 const mockedFs = fs as jest.Mocked<typeof fs>;
@@ -24,12 +24,12 @@ describe('SteeringFileManager', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     manager = new SteeringFileManager({
       steeringDirectory: '.kiro/steering',
       createBackups: true,
       maxVersions: 5,
-      validateContent: true
+      validateContent: true,
     });
 
     mockSteeringFile = {
@@ -41,10 +41,10 @@ describe('SteeringFileManager', () => {
         generatedAt: '2024-01-01T00:00:00.000Z',
         featureName: 'test-feature',
         documentType: DocumentType.REQUIREMENTS,
-        description: 'Test requirements steering file'
+        description: 'Test requirements steering file',
       },
       content: '\n# Requirements Guidance: Test Feature\n\nThis is test content.\n',
-      references: ['#[[file:.kiro/specs/test-feature/design.md]]']
+      references: ['#[[file:.kiro/specs/test-feature/design.md]]'],
     };
   });
 
@@ -52,7 +52,7 @@ describe('SteeringFileManager', () => {
     it('should initialize with default configuration', () => {
       const defaultManager = new SteeringFileManager();
       const stats = defaultManager.getStats();
-      
+
       expect(stats.filesCreated).toBe(0);
       expect(stats.filesUpdated).toBe(0);
       expect(stats.conflictsEncountered).toBe(0);
@@ -62,9 +62,9 @@ describe('SteeringFileManager', () => {
     it('should merge custom configuration with defaults', () => {
       const customManager = new SteeringFileManager({
         steeringDirectory: 'custom/steering',
-        createBackups: false
+        createBackups: false,
       });
-      
+
       expect(customManager).toBeDefined();
     });
   });
@@ -80,9 +80,9 @@ describe('SteeringFileManager', () => {
       mockedFs.access
         .mockResolvedValueOnce(undefined) // directory exists
         .mockRejectedValueOnce(new Error('File not found')); // file doesn't exist
-      
+
       const result = await manager.saveSteeringFile(mockSteeringFile);
-      
+
       expect(result.success).toBe(true);
       expect(result.action).toBe('created');
       expect(result.filename).toBe('test-feature-requirements.md');
@@ -96,11 +96,11 @@ describe('SteeringFileManager', () => {
     it('should update an existing steering file', async () => {
       // Mock existing file (old)
       mockedFs.stat.mockResolvedValue({
-        mtime: new Date(Date.now() - 48 * 60 * 60 * 1000) // 48 hours ago
+        mtime: new Date(Date.now() - 48 * 60 * 60 * 1000), // 48 hours ago
       } as any);
-      
+
       const result = await manager.saveSteeringFile(mockSteeringFile);
-      
+
       expect(result.success).toBe(true);
       expect(result.action).toBe('updated');
     });
@@ -110,9 +110,9 @@ describe('SteeringFileManager', () => {
         ...mockSteeringFile,
         content: '', // Empty content should fail validation
       };
-      
+
       const result = await manager.saveSteeringFile(invalidFile);
-      
+
       expect(result.success).toBe(false);
       expect(result.action).toBe('skipped');
       expect(result.message).toContain('validation failed');
@@ -120,9 +120,9 @@ describe('SteeringFileManager', () => {
 
     it('should handle file system errors gracefully', async () => {
       mockedFs.writeFile.mockRejectedValue(new Error('Permission denied'));
-      
+
       const result = await manager.saveSteeringFile(mockSteeringFile);
-      
+
       expect(result.success).toBe(false);
       expect(result.action).toBe('skipped');
       expect(result.message).toContain('Permission denied');
@@ -132,9 +132,9 @@ describe('SteeringFileManager', () => {
   describe('checkConflicts', () => {
     it('should return no conflict for non-existent file', async () => {
       mockedFs.access.mockRejectedValue(new Error('File not found'));
-      
+
       const conflict = await manager.checkConflicts('new-file.md');
-      
+
       expect(conflict.exists).toBe(false);
       expect(conflict.suggestedAction).toBe('update');
     });
@@ -142,25 +142,27 @@ describe('SteeringFileManager', () => {
     it('should suggest versioning for recently modified files', async () => {
       mockedFs.access.mockResolvedValue(undefined);
       mockedFs.stat.mockResolvedValue({
-        mtime: new Date(Date.now() - 1 * 60 * 60 * 1000) // 1 hour ago
+        mtime: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
       } as any);
-      
+
       const conflict = await manager.checkConflicts('existing-file.md');
-      
+
       expect(conflict.exists).toBe(true);
       expect(conflict.suggestedAction).toBe('version');
       expect(conflict.reason).toContain('modified recently');
-      expect(conflict.suggestedFilename).toMatch(/existing-file-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.md/);
+      expect(conflict.suggestedFilename).toMatch(
+        /existing-file-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.md/
+      );
     });
 
     it('should suggest updating for older files', async () => {
       mockedFs.access.mockResolvedValue(undefined);
       mockedFs.stat.mockResolvedValue({
-        mtime: new Date(Date.now() - 48 * 60 * 60 * 1000) // 48 hours ago
+        mtime: new Date(Date.now() - 48 * 60 * 60 * 1000), // 48 hours ago
       } as any);
-      
+
       const conflict = await manager.checkConflicts('old-file.md');
-      
+
       expect(conflict.exists).toBe(true);
       expect(conflict.suggestedAction).toBe('update');
       expect(conflict.reason).toContain('older, safe to update');
@@ -196,24 +198,20 @@ describe('SteeringFileManager', () => {
         'requirements-feature1.md',
         'design-feature2.md',
         'other-file.txt',
-        'another-file.md'
+        'another-file.md',
       ] as any);
-      
+
       const files = await manager.listExistingSteeringFiles();
-      
-      expect(files).toEqual([
-        'requirements-feature1.md',
-        'design-feature2.md',
-        'another-file.md'
-      ]);
+
+      expect(files).toEqual(['requirements-feature1.md', 'design-feature2.md', 'another-file.md']);
     });
 
     it('should return empty array on directory access error', async () => {
       mockedFs.access.mockRejectedValue(new Error('Directory not found'));
       mockedFs.readdir.mockRejectedValue(new Error('Directory not found'));
-      
+
       const files = await manager.listExistingSteeringFiles();
-      
+
       expect(files).toEqual([]);
     });
 
@@ -221,9 +219,9 @@ describe('SteeringFileManager', () => {
       mockedFs.access.mockRejectedValueOnce(new Error('Directory not found'));
       mockedFs.mkdir.mockResolvedValue(undefined);
       mockedFs.readdir.mockResolvedValue([] as any);
-      
+
       await manager.listExistingSteeringFiles();
-      
+
       expect(mockedFs.mkdir).toHaveBeenCalledWith('.kiro/steering', { recursive: true });
     });
   });
@@ -238,9 +236,9 @@ describe('SteeringFileManager', () => {
       mockedFs.access
         .mockResolvedValueOnce(undefined) // directory exists
         .mockRejectedValueOnce(new Error('File not found')); // file doesn't exist
-      
+
       await manager.saveSteeringFile(mockSteeringFile);
-      
+
       const stats = manager.getStats();
       expect(stats.filesCreated).toBe(1);
       expect(stats.filesUpdated).toBe(0);
@@ -249,11 +247,11 @@ describe('SteeringFileManager', () => {
 
     it('should track updated files', async () => {
       mockedFs.stat.mockResolvedValue({
-        mtime: new Date(Date.now() - 48 * 60 * 60 * 1000)
+        mtime: new Date(Date.now() - 48 * 60 * 60 * 1000),
       } as any);
-      
+
       await manager.saveSteeringFile(mockSteeringFile);
-      
+
       const stats = manager.getStats();
       expect(stats.filesCreated).toBe(0);
       expect(stats.filesUpdated).toBe(1);
@@ -261,7 +259,7 @@ describe('SteeringFileManager', () => {
 
     it('should reset statistics', () => {
       manager.resetStats();
-      
+
       const stats = manager.getStats();
       expect(stats.filesCreated).toBe(0);
       expect(stats.filesUpdated).toBe(0);
@@ -275,11 +273,11 @@ describe('SteeringFileManager', () => {
     it('should handle missing front-matter gracefully', async () => {
       const invalidFile = {
         ...mockSteeringFile,
-        frontMatter: undefined as any
+        frontMatter: undefined as any,
       };
-      
+
       const result = await manager.saveSteeringFile(invalidFile);
-      
+
       expect(result.success).toBe(false);
       expect(result.message).toContain('validation failed');
     });
@@ -287,11 +285,11 @@ describe('SteeringFileManager', () => {
     it('should handle missing filename gracefully', async () => {
       const invalidFile = {
         ...mockSteeringFile,
-        filename: ''
+        filename: '',
       };
-      
+
       const result = await manager.saveSteeringFile(invalidFile);
-      
+
       expect(result.success).toBe(false);
       expect(result.message).toContain('validation failed');
     });

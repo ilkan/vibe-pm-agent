@@ -1,17 +1,12 @@
 /**
  * FrontMatterProcessor Component
- * 
+ *
  * Handles the generation of front-matter metadata for steering files based on
  * document type and context. Determines appropriate inclusion rules and formats
  * metadata according to Kiro steering file conventions.
  */
 
-import {
-  FrontMatter,
-  SteeringContext,
-  DocumentType,
-  InclusionRule
-} from '../../models/steering';
+import { FrontMatter, SteeringContext, DocumentType, InclusionRule } from '../../models/steering';
 
 /**
  * Configuration for front-matter generation
@@ -37,7 +32,7 @@ const DEFAULT_FILE_MATCH_PATTERNS: Record<DocumentType, string> = {
   [DocumentType.PRFAQ]: '', // Manual inclusion by default
   [DocumentType.TASKS]: 'tasks*|todo*|*tasks*|implementation*',
   [DocumentType.COMPETITIVE_ANALYSIS]: 'competitive*|competitor*|market*|analysis*',
-  [DocumentType.MARKET_SIZING]: 'market*|sizing*|tam*|sam*|som*|opportunity*'
+  [DocumentType.MARKET_SIZING]: 'market*|sizing*|tam*|sam*|som*|opportunity*',
 };
 
 /**
@@ -50,7 +45,7 @@ const DEFAULT_INCLUSION_RULES: Record<DocumentType, InclusionRule> = {
   [DocumentType.PRFAQ]: 'manual',
   [DocumentType.TASKS]: 'fileMatch',
   [DocumentType.COMPETITIVE_ANALYSIS]: 'fileMatch',
-  [DocumentType.MARKET_SIZING]: 'fileMatch'
+  [DocumentType.MARKET_SIZING]: 'fileMatch',
 };
 
 /**
@@ -64,17 +59,14 @@ export class FrontMatterProcessor {
       generatorId: 'vibe-pm-agent',
       includeDescription: true,
       timestampFormat: 'iso',
-      ...config
+      ...config,
     };
   }
 
   /**
    * Generates front-matter for a steering file based on context and document type
    */
-  generateFrontMatter(
-    documentType: DocumentType,
-    context: SteeringContext
-  ): FrontMatter {
+  generateFrontMatter(documentType: DocumentType, context: SteeringContext): FrontMatter {
     const inclusionRule = this.determineInclusionRule(documentType, context);
     const fileMatchPattern = this.determineFileMatchPattern(documentType, context, inclusionRule);
     const timestamp = this.generateTimestamp();
@@ -84,7 +76,7 @@ export class FrontMatterProcessor {
       generatedBy: this.config.generatorId,
       generatedAt: timestamp,
       featureName: context.featureName,
-      documentType
+      documentType,
     };
 
     // Add file match pattern if needed
@@ -222,7 +214,7 @@ export class FrontMatterProcessor {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 

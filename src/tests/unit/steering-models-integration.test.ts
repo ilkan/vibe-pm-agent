@@ -10,7 +10,7 @@ import {
   SaveResult,
   ConflictInfo,
   SteeringFileTemplate,
-  SteeringFileGenerationOptions
+  SteeringFileGenerationOptions,
 } from '../../models/steering';
 
 describe('Steering File Models Integration', () => {
@@ -22,10 +22,10 @@ describe('Steering File Models Integration', () => {
         projectName: 'auth-system',
         relatedFiles: [
           '.kiro/specs/user-authentication/design.md',
-          '.kiro/specs/user-authentication/tasks.md'
+          '.kiro/specs/user-authentication/tasks.md',
         ],
         inclusionRule: 'fileMatch',
-        fileMatchPattern: 'auth*|user*|login*'
+        fileMatchPattern: 'auth*|user*|login*',
       };
 
       // Step 2: Create front matter
@@ -36,7 +36,7 @@ describe('Steering File Models Integration', () => {
         generatedAt: new Date().toISOString(),
         featureName: context.featureName,
         documentType: DocumentType.REQUIREMENTS,
-        description: 'Requirements guidance for user authentication feature'
+        description: 'Requirements guidance for user authentication feature',
       };
 
       // Step 3: Create steering file
@@ -45,7 +45,7 @@ describe('Steering File Models Integration', () => {
         frontMatter,
         content: `# Requirements Guidance: ${context.featureName}\n\nThis guidance contains requirements analysis...`,
         references: context.relatedFiles.map(file => `#[[file:${file}]]`),
-        fullPath: `.kiro/steering/${context.featureName}-requirements.md`
+        fullPath: `.kiro/steering/${context.featureName}-requirements.md`,
       };
 
       // Step 4: Simulate save result
@@ -54,13 +54,15 @@ describe('Steering File Models Integration', () => {
         filename: steeringFile.filename,
         action: 'created',
         message: 'Steering file created successfully',
-        fullPath: steeringFile.fullPath
+        fullPath: steeringFile.fullPath,
       };
 
       // Verify the complete workflow
       expect(steeringFile.frontMatter.featureName).toBe(context.featureName);
       expect(steeringFile.references).toHaveLength(2);
-      expect(steeringFile.references[0]).toBe('#[[file:.kiro/specs/user-authentication/design.md]]');
+      expect(steeringFile.references[0]).toBe(
+        '#[[file:.kiro/specs/user-authentication/design.md]]'
+      );
       expect(saveResult.success).toBe(true);
       expect(saveResult.action).toBe('created');
     });
@@ -72,7 +74,7 @@ describe('Steering File Models Integration', () => {
         existingFile: '.kiro/steering/user-auth-requirements.md',
         suggestedAction: 'version',
         reason: 'File exists with different content',
-        suggestedFilename: 'user-auth-requirements-v2.md'
+        suggestedFilename: 'user-auth-requirements-v2.md',
       };
 
       // Create new steering file with versioned name
@@ -84,17 +86,17 @@ describe('Steering File Models Integration', () => {
           generatedBy: 'vibe-pm-agent',
           generatedAt: new Date().toISOString(),
           featureName: 'user-auth',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: '# Updated Requirements',
-        references: []
+        references: [],
       };
 
       const saveResult: SaveResult = {
         success: true,
         filename: versionedFile.filename,
         action: 'versioned',
-        message: 'Created versioned file to avoid conflict'
+        message: 'Created versioned file to avoid conflict',
       };
 
       expect(conflictInfo.suggestedAction).toBe('version');
@@ -124,15 +126,15 @@ documentType: {documentType}
 {references}`,
         requiredPlaceholders: [
           'inclusion',
-          'fileMatchPattern', 
+          'fileMatchPattern',
           'generatedBy',
           'generatedAt',
           'featureName',
           'documentType',
           'content',
-          'references'
+          'references',
         ],
-        validateContent: (content: string) => content.includes('Design') && content.length > 10
+        validateContent: (content: string) => content.includes('Design') && content.length > 10,
       };
 
       // Test template validation
@@ -154,12 +156,12 @@ documentType: {documentType}
         includeReferences: true,
         namingStrategy: 'feature-based',
         filenamePrefix: 'pm-',
-        overwriteExisting: false
+        overwriteExisting: false,
       };
 
       // Simulate using options in generation
       const baseFilename = 'user-auth-design';
-      const finalFilename = options.filenamePrefix 
+      const finalFilename = options.filenamePrefix
         ? `${options.filenamePrefix}${baseFilename}.md`
         : `${baseFilename}.md`;
 
@@ -174,12 +176,12 @@ documentType: {documentType}
       const validDocumentTypes = Object.values(DocumentType);
       expect(validDocumentTypes).toEqual([
         'requirements',
-        'design', 
+        'design',
         'onepager',
         'prfaq',
         'tasks',
         'competitive_analysis',
-        'market_sizing'
+        'market_sizing',
       ]);
 
       // Test that enum values are strings
@@ -195,13 +197,13 @@ documentType: {documentType}
         generatedBy: 'test',
         generatedAt: '2024-01-01T00:00:00Z',
         featureName: 'test',
-        documentType: DocumentType.REQUIREMENTS
+        documentType: DocumentType.REQUIREMENTS,
       };
 
       const minimalContext: SteeringContext = {
         featureName: 'test',
         relatedFiles: [],
-        inclusionRule: 'always'
+        inclusionRule: 'always',
       };
 
       expect(minimalFrontMatter.fileMatchPattern).toBeUndefined();
@@ -217,7 +219,7 @@ documentType: {documentType}
         generatedBy: 'test',
         generatedAt: '2024-01-01T00:00:00Z',
         featureName: 'test',
-        documentType: DocumentType.DESIGN
+        documentType: DocumentType.DESIGN,
       };
 
       expect(fileMatchFrontMatter.inclusion).toBe('fileMatch');
@@ -229,7 +231,7 @@ documentType: {documentType}
         generatedBy: 'test',
         generatedAt: '2024-01-01T00:00:00Z',
         featureName: 'test',
-        documentType: DocumentType.TASKS
+        documentType: DocumentType.TASKS,
       };
 
       expect(alwaysFrontMatter.inclusion).toBe('always');

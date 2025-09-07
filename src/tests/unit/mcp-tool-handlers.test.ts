@@ -1,12 +1,12 @@
 // Unit tests for MCP tool handlers
 
 import { PMAgentMCPServer } from '../../mcp/server';
-import { 
-  OptimizeIntentArgs, 
-  AnalyzeWorkflowArgs, 
-  GenerateROIArgs, 
+import {
+  OptimizeIntentArgs,
+  AnalyzeWorkflowArgs,
+  GenerateROIArgs,
   ConsultingSummaryArgs,
-  MCPToolContext
+  MCPToolContext,
 } from '../../models/mcp';
 import { Workflow, OptimizedWorkflow } from '../../models/workflow';
 import { ConsultingAnalysis } from '../../components/business-analyzer';
@@ -22,8 +22,8 @@ jest.mock('../../pipeline', () => ({
     processIntent: mockProcessIntent,
     analyzeWorkflow: mockAnalyzeWorkflow,
     generateROIAnalysis: mockGenerateROIAnalysis,
-    generateConsultingSummary: mockGenerateConsultingSummary
-  }))
+    generateConsultingSummary: mockGenerateConsultingSummary,
+  })),
 }));
 
 describe('MCP Tool Handlers', () => {
@@ -41,7 +41,7 @@ describe('MCP Tool Handlers', () => {
     const mockContext: MCPToolContext = {
       toolName: 'optimize_intent',
       sessionId: 'test-session',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     it('should handle successful intent optimization', async () => {
@@ -49,8 +49,8 @@ describe('MCP Tool Handlers', () => {
         intent: 'Create a user authentication system with JWT tokens',
         parameters: {
           expectedUserVolume: 1000,
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const mockResult = {
@@ -66,13 +66,13 @@ describe('MCP Tool Handlers', () => {
             keyFindings: ['Finding 1'],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low risk'
+            riskAssessment: 'Low risk',
           },
           alternativeOptions: {
             conservative: {
@@ -81,7 +81,7 @@ describe('MCP Tool Handlers', () => {
               quotaSavings: 10,
               implementationEffort: 'low',
               riskLevel: 'low',
-              estimatedROI: 1.5
+              estimatedROI: 1.5,
             },
             balanced: {
               name: 'Balanced',
@@ -89,7 +89,7 @@ describe('MCP Tool Handlers', () => {
               quotaSavings: 25,
               implementationEffort: 'medium',
               riskLevel: 'low',
-              estimatedROI: 2.5
+              estimatedROI: 2.5,
             },
             bold: {
               name: 'Bold',
@@ -97,9 +97,9 @@ describe('MCP Tool Handlers', () => {
               quotaSavings: 50,
               implementationEffort: 'high',
               riskLevel: 'medium',
-              estimatedROI: 4.0
-            }
-          }
+              estimatedROI: 4.0,
+            },
+          },
         },
         efficiencySummary: {
           naiveApproach: {
@@ -108,7 +108,7 @@ describe('MCP Tool Handlers', () => {
             estimatedCost: 100,
             confidenceLevel: 'medium',
             scenario: 'naive',
-            breakdown: []
+            breakdown: [],
           },
           optimizedApproach: {
             vibesConsumed: 10,
@@ -116,16 +116,16 @@ describe('MCP Tool Handlers', () => {
             estimatedCost: 60,
             confidenceLevel: 'high',
             scenario: 'optimized',
-            breakdown: []
+            breakdown: [],
           },
           savings: {
             vibeReduction: 50,
             specReduction: -60,
             costSavings: 40,
-            totalSavingsPercentage: 40
+            totalSavingsPercentage: 40,
           },
-          optimizationNotes: ['Applied batching optimization']
-        }
+          optimizationNotes: ['Applied batching optimization'],
+        },
       };
 
       mockProcessIntent.mockResolvedValue(mockResult);
@@ -136,7 +136,7 @@ describe('MCP Tool Handlers', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
-      
+
       const responseData = result.content[0].json;
       expect(responseData.success).toBe(true);
       expect(responseData.data.enhancedKiroSpec).toBeDefined();
@@ -145,7 +145,7 @@ describe('MCP Tool Handlers', () => {
 
     it('should handle pipeline failure gracefully', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Invalid intent'
+        intent: 'Invalid intent',
       };
 
       const mockResult = {
@@ -155,8 +155,8 @@ describe('MCP Tool Handlers', () => {
           type: 'validation_failed',
           message: 'Intent too short',
           suggestedAction: 'Provide more detailed intent',
-          fallbackAvailable: false
-        }
+          fallbackAvailable: false,
+        },
       };
 
       mockProcessIntent.mockResolvedValue(mockResult);
@@ -166,7 +166,7 @@ describe('MCP Tool Handlers', () => {
       expect(result.isError).toBe(true);
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
-      
+
       const responseData = result.content[0].json;
       expect(responseData.error).toBe(true);
       expect(responseData.message).toBeDefined();
@@ -174,7 +174,7 @@ describe('MCP Tool Handlers', () => {
 
     it('should handle pipeline exceptions', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Test intent'
+        intent: 'Test intent',
       };
 
       mockProcessIntent.mockRejectedValue(new Error('Pipeline crashed'));
@@ -184,7 +184,7 @@ describe('MCP Tool Handlers', () => {
       expect(result.isError).toBe(true);
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
-      
+
       const responseData = result.content[0].json;
       expect(responseData.error).toBe(true);
       expect(responseData.message).toContain('Pipeline crashed');
@@ -192,7 +192,7 @@ describe('MCP Tool Handlers', () => {
 
     it('should handle intent without parameters', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Simple intent without parameters'
+        intent: 'Simple intent without parameters',
       };
 
       const mockResult = {
@@ -208,20 +208,41 @@ describe('MCP Tool Handlers', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       mockProcessIntent.mockResolvedValue(mockResult);
@@ -238,7 +259,7 @@ describe('MCP Tool Handlers', () => {
     const mockContext: MCPToolContext = {
       toolName: 'analyze_workflow',
       sessionId: 'test-session',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     const mockWorkflow: Workflow = {
@@ -250,7 +271,7 @@ describe('MCP Tool Handlers', () => {
           description: 'Analyze user input',
           inputs: [],
           outputs: ['analysis'],
-          quotaCost: 5
+          quotaCost: 5,
         },
         {
           id: 'step-2',
@@ -258,28 +279,29 @@ describe('MCP Tool Handlers', () => {
           description: 'Generate response',
           inputs: ['analysis'],
           outputs: ['response'],
-          quotaCost: 3
-        }
+          quotaCost: 3,
+        },
       ],
       dataFlow: [],
-      estimatedComplexity: 2
+      estimatedComplexity: 2,
     };
 
     it('should analyze workflow successfully', async () => {
       const args: AnalyzeWorkflowArgs = {
         workflow: mockWorkflow,
-        techniques: ['MECE', 'ValueDriverTree']
+        techniques: ['MECE', 'ValueDriverTree'],
       };
 
       const mockAnalysis: ConsultingAnalysis = {
         techniquesUsed: [
           { name: 'MECE', relevanceScore: 0.9, applicableScenarios: ['workflow analysis'] },
-          { name: 'ValueDriverTree', relevanceScore: 0.8, applicableScenarios: ['cost optimization'] }
+          {
+            name: 'ValueDriverTree',
+            relevanceScore: 0.8,
+            applicableScenarios: ['cost optimization'],
+          },
         ],
-        keyFindings: [
-          'Workflow has redundant vibe calls',
-          'Batching opportunity identified'
-        ],
+        keyFindings: ['Workflow has redundant vibe calls', 'Batching opportunity identified'],
         totalQuotaSavings: 35,
         implementationComplexity: 'medium',
         meceAnalysis: {
@@ -288,19 +310,19 @@ describe('MCP Tool Handlers', () => {
               name: 'Processing Steps',
               drivers: ['vibe calls', 'spec executions'],
               quotaImpact: 8,
-              optimizationPotential: 40
-            }
+              optimizationPotential: 40,
+            },
           ],
           totalCoverage: 100,
-          overlaps: []
+          overlaps: [],
         },
         valueDriverAnalysis: {
           primaryDrivers: [
-            { name: 'Vibe Usage', currentCost: 5, optimizedCost: 2, savingsPotential: 60 }
+            { name: 'Vibe Usage', currentCost: 5, optimizedCost: 2, savingsPotential: 60 },
           ],
           secondaryDrivers: [],
-          rootCauses: ['Inefficient processing']
-        }
+          rootCauses: ['Inefficient processing'],
+        },
       };
 
       mockAnalyzeWorkflow.mockResolvedValue(mockAnalysis);
@@ -311,23 +333,23 @@ describe('MCP Tool Handlers', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('markdown');
-      
+
       expect(result.content[0].markdown).toBeDefined();
       expect(result.content[0].markdown).toContain('35'); // totalQuotaSavings
     });
 
     it('should handle workflow analysis without specific techniques', async () => {
       const args: AnalyzeWorkflowArgs = {
-        workflow: mockWorkflow
+        workflow: mockWorkflow,
       };
 
       const mockAnalysis: ConsultingAnalysis = {
         techniquesUsed: [
-          { name: 'MECE', relevanceScore: 0.7, applicableScenarios: ['general analysis'] }
+          { name: 'MECE', relevanceScore: 0.7, applicableScenarios: ['general analysis'] },
         ],
         keyFindings: ['General optimization opportunities found'],
         totalQuotaSavings: 20,
-        implementationComplexity: 'low'
+        implementationComplexity: 'low',
       };
 
       mockAnalyzeWorkflow.mockResolvedValue(mockAnalysis);
@@ -341,7 +363,7 @@ describe('MCP Tool Handlers', () => {
 
     it('should handle analysis errors', async () => {
       const args: AnalyzeWorkflowArgs = {
-        workflow: mockWorkflow
+        workflow: mockWorkflow,
       };
 
       mockAnalyzeWorkflow.mockRejectedValue(new Error('Analysis failed'));
@@ -351,7 +373,7 @@ describe('MCP Tool Handlers', () => {
       expect(result.isError).toBe(true);
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
-      
+
       const responseData = result.content[0].json;
       expect(responseData.error).toBe(true);
       expect(responseData.message).toContain('Analysis failed');
@@ -362,21 +384,28 @@ describe('MCP Tool Handlers', () => {
     const mockContext: MCPToolContext = {
       toolName: 'generate_roi_analysis',
       sessionId: 'test-session',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     const mockWorkflow: Workflow = {
       id: 'test-workflow',
       steps: [
-        { id: 'step-1', type: 'vibe', description: 'Process', inputs: [], outputs: [], quotaCost: 10 }
+        {
+          id: 'step-1',
+          type: 'vibe',
+          description: 'Process',
+          inputs: [],
+          outputs: [],
+          quotaCost: 10,
+        },
       ],
       dataFlow: [],
-      estimatedComplexity: 1
+      estimatedComplexity: 1,
     };
 
     it('should generate ROI analysis successfully', async () => {
       const args: GenerateROIArgs = {
-        workflow: mockWorkflow
+        workflow: mockWorkflow,
       };
 
       const mockROIAnalysis = {
@@ -389,11 +418,11 @@ describe('MCP Tool Handlers', () => {
               estimatedCost: 50,
               confidenceLevel: 'high',
               scenario: 'naive',
-              breakdown: []
+              breakdown: [],
             },
             savingsPercentage: 0,
             implementationEffort: 'none',
-            riskLevel: 'none'
+            riskLevel: 'none',
           },
           {
             name: 'Optimized',
@@ -403,16 +432,16 @@ describe('MCP Tool Handlers', () => {
               estimatedCost: 30,
               confidenceLevel: 'high',
               scenario: 'optimized',
-              breakdown: []
+              breakdown: [],
             },
             savingsPercentage: 40,
             implementationEffort: 'medium',
-            riskLevel: 'low'
-          }
+            riskLevel: 'low',
+          },
         ],
         recommendations: ['Apply batching optimization'],
         bestOption: 'Optimized',
-        riskAssessment: 'Low risk with high reward'
+        riskAssessment: 'Low risk with high reward',
       };
 
       mockGenerateROIAnalysis.mockResolvedValue(mockROIAnalysis);
@@ -423,7 +452,7 @@ describe('MCP Tool Handlers', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
-      
+
       const responseData = result.content[0].json;
       expect(responseData.success).toBe(true);
       expect(responseData.data.roiAnalysis).toBeDefined();
@@ -438,57 +467,75 @@ describe('MCP Tool Handlers', () => {
             type: 'batching',
             description: 'Batch similar operations',
             stepsAffected: ['step-1'],
-            estimatedSavings: { vibes: 5, specs: 0, percentage: 50 }
-          }
+            estimatedSavings: { vibes: 5, specs: 0, percentage: 50 },
+          },
         ],
         originalWorkflow: mockWorkflow,
         efficiencyGains: {
           totalSavingsPercentage: 50,
           vibeReduction: 50,
           specReduction: 0,
-          costSavings: 25
-        }
+          costSavings: 25,
+        },
       };
 
       const args: GenerateROIArgs = {
         workflow: mockWorkflow,
-        optimizedWorkflow
+        optimizedWorkflow,
       };
 
       const mockROIAnalysis = {
         scenarios: [
           {
             name: 'Current',
-            forecast: { vibesConsumed: 10, specsConsumed: 0, estimatedCost: 50, confidenceLevel: 'high', scenario: 'naive', breakdown: [] },
+            forecast: {
+              vibesConsumed: 10,
+              specsConsumed: 0,
+              estimatedCost: 50,
+              confidenceLevel: 'high',
+              scenario: 'naive',
+              breakdown: [],
+            },
             savingsPercentage: 0,
             implementationEffort: 'none',
-            riskLevel: 'none'
+            riskLevel: 'none',
           },
           {
             name: 'Optimized',
-            forecast: { vibesConsumed: 5, specsConsumed: 2, estimatedCost: 25, confidenceLevel: 'high', scenario: 'optimized', breakdown: [] },
+            forecast: {
+              vibesConsumed: 5,
+              specsConsumed: 2,
+              estimatedCost: 25,
+              confidenceLevel: 'high',
+              scenario: 'optimized',
+              breakdown: [],
+            },
             savingsPercentage: 50,
             implementationEffort: 'medium',
-            riskLevel: 'low'
-          }
+            riskLevel: 'low',
+          },
         ],
         recommendations: ['Implement batching for 50% savings'],
         bestOption: 'Optimized',
-        riskAssessment: 'Low risk, high reward'
+        riskAssessment: 'Low risk, high reward',
       };
 
       mockGenerateROIAnalysis.mockResolvedValue(mockROIAnalysis);
 
       const result = await server.handleGenerateROI(args, mockContext);
 
-      expect(mockGenerateROIAnalysis).toHaveBeenCalledWith(mockWorkflow, optimizedWorkflow, undefined);
+      expect(mockGenerateROIAnalysis).toHaveBeenCalledWith(
+        mockWorkflow,
+        optimizedWorkflow,
+        undefined
+      );
       expect(result.isError).toBeFalsy();
       expect(result.content[0].type).toBe('json');
     });
 
     it('should handle ROI analysis errors', async () => {
       const args: GenerateROIArgs = {
-        workflow: mockWorkflow
+        workflow: mockWorkflow,
       };
 
       mockGenerateROIAnalysis.mockRejectedValue(new Error('ROI calculation failed'));
@@ -498,7 +545,7 @@ describe('MCP Tool Handlers', () => {
       expect(result.isError).toBe(true);
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
-      
+
       const responseData = result.content[0].json;
       expect(responseData.error).toBe(true);
       expect(responseData.message).toContain('ROI calculation failed');
@@ -509,34 +556,32 @@ describe('MCP Tool Handlers', () => {
     const mockContext: MCPToolContext = {
       toolName: 'get_consulting_summary',
       sessionId: 'test-session',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     const mockAnalysis: ConsultingAnalysis = {
       techniquesUsed: [
         { name: 'MECE', relevanceScore: 0.9, applicableScenarios: ['analysis'] },
-        { name: 'Pyramid', relevanceScore: 0.8, applicableScenarios: ['communication'] }
+        { name: 'Pyramid', relevanceScore: 0.8, applicableScenarios: ['communication'] },
       ],
       keyFindings: [
         'Significant optimization opportunities identified',
-        'Current workflow has 40% waste'
+        'Current workflow has 40% waste',
       ],
       totalQuotaSavings: 40,
-      implementationComplexity: 'medium'
+      implementationComplexity: 'medium',
     };
 
     it('should generate consulting summary successfully', async () => {
       const args: ConsultingSummaryArgs = {
         analysis: mockAnalysis,
-        techniques: ['MECE', 'Pyramid']
+        techniques: ['MECE', 'Pyramid'],
       };
 
       const mockSummary = {
-        executiveSummary: 'Analysis reveals 40% optimization potential through systematic improvements.',
-        keyFindings: [
-          'Workflow inefficiencies identified',
-          'Batching opportunities available'
-        ],
+        executiveSummary:
+          'Analysis reveals 40% optimization potential through systematic improvements.',
+        keyFindings: ['Workflow inefficiencies identified', 'Batching opportunities available'],
         recommendations: [
           {
             mainRecommendation: 'Implement batching optimization',
@@ -546,28 +591,28 @@ describe('MCP Tool Handlers', () => {
                 type: 'quantitative',
                 description: '40% quota reduction possible',
                 source: 'MECE analysis',
-                confidence: 'high'
-              }
+                confidence: 'high',
+              },
             ],
-            expectedOutcome: '40% cost reduction'
-          }
+            expectedOutcome: '40% cost reduction',
+          },
         ],
         techniquesApplied: [
           {
             techniqueName: 'MECE',
             keyInsight: 'Workflow categories are mutually exclusive',
             supportingData: { categories: 2, coverage: 100 },
-            actionableRecommendation: 'Apply batching to processing category'
-          }
+            actionableRecommendation: 'Apply batching to processing category',
+          },
         ],
         supportingEvidence: [
           {
             type: 'quantitative',
             description: 'Current quota usage analysis',
             source: 'Workflow analysis',
-            confidence: 'high'
-          }
-        ]
+            confidence: 'high',
+          },
+        ],
       };
 
       mockGenerateConsultingSummary.mockResolvedValue(mockSummary);
@@ -578,14 +623,14 @@ describe('MCP Tool Handlers', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('markdown');
-      
+
       expect(result.content[0].markdown).toBeDefined();
       expect(result.content[0].markdown).toContain('40%');
     });
 
     it('should handle consulting summary without specific techniques', async () => {
       const args: ConsultingSummaryArgs = {
-        analysis: mockAnalysis
+        analysis: mockAnalysis,
       };
 
       const mockSummary = {
@@ -593,7 +638,7 @@ describe('MCP Tool Handlers', () => {
         keyFindings: ['Optimization opportunities found'],
         recommendations: [],
         techniquesApplied: [],
-        supportingEvidence: []
+        supportingEvidence: [],
       };
 
       mockGenerateConsultingSummary.mockResolvedValue(mockSummary);
@@ -607,7 +652,7 @@ describe('MCP Tool Handlers', () => {
 
     it('should handle consulting summary errors', async () => {
       const args: ConsultingSummaryArgs = {
-        analysis: mockAnalysis
+        analysis: mockAnalysis,
       };
 
       mockGenerateConsultingSummary.mockRejectedValue(new Error('Summary generation failed'));
@@ -617,7 +662,7 @@ describe('MCP Tool Handlers', () => {
       expect(result.isError).toBe(true);
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
-      
+
       const responseData = result.content[0].json;
       expect(responseData.error).toBe(true);
       expect(responseData.message).toContain('Summary generation failed');
