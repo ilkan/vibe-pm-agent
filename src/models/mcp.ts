@@ -67,7 +67,7 @@ export interface MCPToolResult {
  * MCP content types for different response formats
  */
 export interface MCPContent {
-  type: "text" | "resource" | "image" | "json" | "markdown";
+  type: 'text' | 'resource' | 'image' | 'json' | 'markdown';
   text?: string;
   resource?: MCPResource;
   image?: MCPImage;
@@ -118,7 +118,7 @@ export enum MCPErrorCode {
   METHOD_NOT_FOUND = -32601,
   INVALID_PARAMS = -32602,
   INTERNAL_ERROR = -32603,
-  
+
   // MCP-specific error codes
   TOOL_NOT_FOUND = -32000,
   TOOL_EXECUTION_FAILED = -32001,
@@ -126,7 +126,7 @@ export enum MCPErrorCode {
   TIMEOUT = -32003,
   RATE_LIMITED = -32004,
   INSUFFICIENT_RESOURCES = -32005,
-  PIPELINE_ERROR = -32006
+  PIPELINE_ERROR = -32006,
 }
 
 /**
@@ -136,7 +136,7 @@ export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 /**
@@ -295,7 +295,12 @@ export interface OptimizeResourceAllocationArgs {
     timeline?: string;
     technical_debt?: string;
   };
-  optimization_goals?: ('cost_reduction' | 'speed_improvement' | 'quality_increase' | 'risk_mitigation')[];
+  optimization_goals?: (
+    | 'cost_reduction'
+    | 'speed_improvement'
+    | 'quality_increase'
+    | 'risk_mitigation'
+  )[];
   citation_options?: CitationOptions;
 }
 
@@ -349,7 +354,7 @@ export enum LogLevel {
   INFO = 'INFO',
   WARN = 'WARN',
   ERROR = 'ERROR',
-  FATAL = 'FATAL'
+  FATAL = 'FATAL',
 }
 
 /**

@@ -13,16 +13,16 @@ export enum CitationSourceType {
   BENCHMARK_STUDY = 'benchmark_study',
   CASE_STUDY = 'case_study',
   WHITE_PAPER = 'white_paper',
-  RESEARCH_PUBLICATION = 'research_publication'
+  RESEARCH_PUBLICATION = 'research_publication',
 }
 
 /**
  * Citation confidence levels based on source credibility
  */
 export enum CitationConfidence {
-  HIGH = 'high',      // Peer-reviewed, established institutions
-  MEDIUM = 'medium',  // Industry reports, reputable companies
-  LOW = 'low'         // Blog posts, unverified sources
+  HIGH = 'high', // Peer-reviewed, established institutions
+  MEDIUM = 'medium', // Industry reports, reputable companies
+  LOW = 'low', // Blog posts, unverified sources
 }
 
 /**

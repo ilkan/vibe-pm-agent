@@ -1,16 +1,16 @@
 // MCP Server error handling utilities
 
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
-import { 
-  MCPError, 
-  MCPErrorCode, 
-  ErrorSeverity, 
-  ErrorDetails, 
+import {
+  MCPError,
+  MCPErrorCode,
+  ErrorSeverity,
+  ErrorDetails,
   MCPToolResult,
   MCPContent,
   LogLevel,
   LogEntry,
-  MCPToolContext
+  MCPToolContext,
 } from '../models/mcp';
 
 /**
@@ -36,12 +36,12 @@ export class MCPErrorHandler {
       timestamp: Date.now(),
       context: data,
       retryable: this.isRetryable(code),
-      suggestedAction: this.getSuggestedAction(code)
+      suggestedAction: this.getSuggestedAction(code),
     };
 
     // Map MCP error codes to standard JSON-RPC error codes
     const jsonRpcCode = this.mapToJsonRpcCode(code);
-    
+
     return new McpError(jsonRpcCode, message, errorDetails);
   }
 
@@ -57,12 +57,12 @@ export class MCPErrorHandler {
 
     if (error instanceof McpError) {
       message = error.message;
-      errorDetails = error.data as ErrorDetails || {
+      errorDetails = (error.data as ErrorDetails) || {
         code: this.mapFromJsonRpcCode(error.code),
         message: error.message,
         severity: ErrorSeverity.HIGH,
         timestamp: Date.now(),
-        retryable: false
+        retryable: false,
       };
     } else if ('code' in error && typeof error.code === 'number') {
       // Handle MCPError interface
@@ -74,7 +74,7 @@ export class MCPErrorHandler {
         severity: this.getSeverityForCode(mcpError.code),
         timestamp: Date.now(),
         retryable: this.isRetryable(mcpError.code),
-        context: mcpError.data
+        context: mcpError.data,
       };
     } else {
       // Handle generic Error
@@ -85,7 +85,7 @@ export class MCPErrorHandler {
         severity: ErrorSeverity.HIGH,
         timestamp: Date.now(),
         stack: error.stack,
-        retryable: false
+        retryable: false,
       };
     }
 
@@ -96,7 +96,7 @@ export class MCPErrorHandler {
     }
 
     const errorContent: MCPContent = {
-      type: "json",
+      type: 'json',
       json: {
         error: true,
         code: errorDetails.code,
@@ -105,16 +105,16 @@ export class MCPErrorHandler {
         timestamp: errorDetails.timestamp,
         retryable: errorDetails.retryable,
         suggestedAction: errorDetails.suggestedAction,
-        context: errorDetails.context
-      }
+        context: errorDetails.context,
+      },
     };
 
     return {
       content: [errorContent],
       isError: true,
       metadata: {
-        executionTime: context ? Date.now() - context.timestamp : undefined
-      }
+        executionTime: context ? Date.now() - context.timestamp : undefined,
+      },
     };
   }
 
@@ -127,21 +127,21 @@ export class MCPErrorHandler {
       case MCPErrorCode.INTERNAL_ERROR:
       case MCPErrorCode.PIPELINE_ERROR:
         return ErrorSeverity.CRITICAL;
-      
+
       case MCPErrorCode.TOOL_NOT_FOUND:
       case MCPErrorCode.METHOD_NOT_FOUND:
       case MCPErrorCode.TOOL_EXECUTION_FAILED:
         return ErrorSeverity.HIGH;
-      
+
       case MCPErrorCode.INVALID_PARAMS:
       case MCPErrorCode.VALIDATION_FAILED:
         return ErrorSeverity.MEDIUM;
-      
+
       case MCPErrorCode.TIMEOUT:
       case MCPErrorCode.RATE_LIMITED:
       case MCPErrorCode.INSUFFICIENT_RESOURCES:
         return ErrorSeverity.LOW;
-      
+
       default:
         return ErrorSeverity.MEDIUM;
     }
@@ -157,7 +157,7 @@ export class MCPErrorHandler {
       case MCPErrorCode.INSUFFICIENT_RESOURCES:
       case MCPErrorCode.INTERNAL_ERROR:
         return true;
-      
+
       case MCPErrorCode.PARSE_ERROR:
       case MCPErrorCode.INVALID_REQUEST:
       case MCPErrorCode.METHOD_NOT_FOUND:
@@ -165,7 +165,7 @@ export class MCPErrorHandler {
       case MCPErrorCode.TOOL_NOT_FOUND:
       case MCPErrorCode.VALIDATION_FAILED:
         return false;
-      
+
       default:
         return false;
     }
@@ -178,31 +178,31 @@ export class MCPErrorHandler {
     switch (code) {
       case MCPErrorCode.PARSE_ERROR:
         return 'Check request format and JSON syntax';
-      
+
       case MCPErrorCode.INVALID_REQUEST:
         return 'Verify request structure and required fields';
-      
+
       case MCPErrorCode.METHOD_NOT_FOUND:
       case MCPErrorCode.TOOL_NOT_FOUND:
         return 'Check available tools and method names';
-      
+
       case MCPErrorCode.INVALID_PARAMS:
       case MCPErrorCode.VALIDATION_FAILED:
         return 'Validate input parameters against schema';
-      
+
       case MCPErrorCode.TIMEOUT:
         return 'Retry with simpler request or increase timeout';
-      
+
       case MCPErrorCode.RATE_LIMITED:
         return 'Wait before retrying or reduce request frequency';
-      
+
       case MCPErrorCode.INSUFFICIENT_RESOURCES:
         return 'Simplify request or try again later';
-      
+
       case MCPErrorCode.INTERNAL_ERROR:
       case MCPErrorCode.PIPELINE_ERROR:
         return 'Contact support if problem persists';
-      
+
       default:
         return 'Review request and try again';
     }
@@ -272,7 +272,7 @@ export class MCPResponseFormatter {
       case 'text':
         content.push({
           type: 'text',
-          text: typeof data === 'string' ? data : JSON.stringify(data, null, 2)
+          text: typeof data === 'string' ? data : JSON.stringify(data, null, 2),
         });
         break;
 
@@ -282,15 +282,15 @@ export class MCPResponseFormatter {
           json: {
             success: true,
             data,
-            timestamp: new Date().toISOString()
-          }
+            timestamp: new Date().toISOString(),
+          },
         });
         break;
 
       case 'markdown':
         content.push({
           type: 'markdown',
-          markdown: typeof data === 'string' ? data : this.formatAsMarkdown(data)
+          markdown: typeof data === 'string' ? data : this.formatAsMarkdown(data),
         });
         break;
 
@@ -298,13 +298,13 @@ export class MCPResponseFormatter {
         if (data.uri && data.mimeType) {
           content.push({
             type: 'resource',
-            resource: data
+            resource: data,
           });
         } else {
           // Fallback to JSON if not a proper resource
           content.push({
             type: 'json',
-            json: { success: true, data }
+            json: { success: true, data },
           });
         }
         break;
@@ -313,7 +313,7 @@ export class MCPResponseFormatter {
     return {
       content,
       isError: false,
-      metadata
+      metadata,
     };
   }
 
@@ -327,7 +327,7 @@ export class MCPResponseFormatter {
 
     if (typeof data === 'object' && data !== null) {
       let markdown = '';
-      
+
       if (data.title || data.name) {
         markdown += `# ${data.title || data.name}\n\n`;
       }
@@ -416,7 +416,12 @@ export class MCPLogger {
   /**
    * Log an error message
    */
-  static error(message: string, error?: Error, context?: MCPToolContext, metadata?: Record<string, any>): void {
+  static error(
+    message: string,
+    error?: Error,
+    context?: MCPToolContext,
+    metadata?: Record<string, any>
+  ): void {
     this.log(LogLevel.ERROR, message, context, error, metadata);
   }
 
@@ -430,7 +435,12 @@ export class MCPLogger {
   /**
    * Log a fatal error message
    */
-  static fatal(message: string, error?: Error, context?: MCPToolContext, metadata?: Record<string, any>): void {
+  static fatal(
+    message: string,
+    error?: Error,
+    context?: MCPToolContext,
+    metadata?: Record<string, any>
+  ): void {
     this.log(LogLevel.FATAL, message, context, error, metadata);
   }
 
@@ -456,18 +466,19 @@ export class MCPLogger {
       message,
       context,
       metadata,
-      duration
+      duration,
     };
 
     if (error) {
       logEntry.error = {
         message: error.message,
         stack: error.stack,
-        type: error.constructor.name
+        type: error.constructor.name,
       };
     }
 
-    const output = level === LogLevel.ERROR || level === LogLevel.FATAL ? console.error : console.log;
+    const output =
+      level === LogLevel.ERROR || level === LogLevel.FATAL ? console.error : console.log;
     output(JSON.stringify(logEntry));
   }
 
@@ -478,7 +489,7 @@ export class MCPLogger {
     const levels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR, LogLevel.FATAL];
     const currentLevelIndex = levels.indexOf(this.logLevel);
     const messageLevelIndex = levels.indexOf(level);
-    
+
     return messageLevelIndex >= currentLevelIndex;
   }
 
@@ -495,13 +506,13 @@ export class MCPLogger {
   ): void {
     const duration = Date.now() - startTime;
     const message = `Tool ${toolName} ${success ? 'completed' : 'failed'}`;
-    
+
     const logMetadata = {
       ...metadata,
       success,
       duration,
       toolName,
-      sessionId: context.sessionId
+      sessionId: context.sessionId,
     };
 
     if (success) {

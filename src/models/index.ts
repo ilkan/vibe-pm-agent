@@ -18,5 +18,5 @@ export {
   CompetitiveIntelligenceMatrix,
   MarketOpportunityScore,
   ConfidenceIntervals as PMConfidenceIntervals,
-  ConfidenceInterval as PMConfidenceInterval
+  ConfidenceInterval as PMConfidenceInterval,
 } from './proprietary-frameworks';

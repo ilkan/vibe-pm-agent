@@ -64,6 +64,10 @@ jobs:
         env:
           CI: true
 
+      - name: Cleanup test artifacts
+        if: always()
+        run: npm run cleanup
+
       - name: Check coverage threshold
         run: |
           COVERAGE=$(node -e "
@@ -174,6 +178,10 @@ jobs:
         env:
           CI: true
           NODE_ENV: test
+
+      - name: Cleanup test artifacts
+        if: always()
+        run: npm run cleanup
 
       - name: Test MCP server startup
         run: |

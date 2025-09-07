@@ -1,6 +1,6 @@
 /**
  * Competitive Analysis Data Models
- * 
+ *
  * This module defines TypeScript interfaces for competitive analysis data structures,
  * market sizing models with TAM/SAM/SOM types, and source reference validation models.
  */
@@ -218,7 +218,14 @@ export interface SeasonalityPattern {
 
 export interface SourceReference {
   id: string;
-  type: 'mckinsey' | 'gartner' | 'wef' | 'industry-report' | 'market-research' | 'company-filing' | 'news-article';
+  type:
+    | 'mckinsey'
+    | 'gartner'
+    | 'wef'
+    | 'industry-report'
+    | 'market-research'
+    | 'company-filing'
+    | 'news-article';
   title: string;
   author?: string;
   organization: string;
@@ -305,7 +312,13 @@ export interface PricingTier {
 
 export interface CompetitiveMove {
   date: string;
-  type: 'product-launch' | 'acquisition' | 'partnership' | 'funding' | 'expansion' | 'pricing-change';
+  type:
+    | 'product-launch'
+    | 'acquisition'
+    | 'partnership'
+    | 'funding'
+    | 'expansion'
+    | 'pricing-change';
   description: string;
   impact: 'high' | 'medium' | 'low';
   strategicImplication: string;
@@ -366,7 +379,12 @@ export interface EnhancedBusinessOpportunityArgs {
 export class CompetitiveAnalysisError extends Error {
   constructor(
     message: string,
-    public code: 'INSUFFICIENT_DATA' | 'STALE_DATA' | 'SOURCE_UNAVAILABLE' | 'VALIDATION_FAILED' | 'ANALYSIS_TIMEOUT',
+    public code:
+      | 'INSUFFICIENT_DATA'
+      | 'STALE_DATA'
+      | 'SOURCE_UNAVAILABLE'
+      | 'VALIDATION_FAILED'
+      | 'ANALYSIS_TIMEOUT',
     public suggestions: string[],
     public context?: any
   ) {
@@ -378,7 +396,11 @@ export class CompetitiveAnalysisError extends Error {
 export class MarketSizingError extends Error {
   constructor(
     message: string,
-    public code: 'INVALID_MARKET_DEFINITION' | 'INSUFFICIENT_DATA' | 'CALCULATION_ERROR' | 'METHODOLOGY_UNSUPPORTED',
+    public code:
+      | 'INVALID_MARKET_DEFINITION'
+      | 'INSUFFICIENT_DATA'
+      | 'CALCULATION_ERROR'
+      | 'METHODOLOGY_UNSUPPORTED',
     public suggestions: string[],
     public context?: any
   ) {

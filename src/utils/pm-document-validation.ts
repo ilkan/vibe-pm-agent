@@ -7,7 +7,11 @@ import { ROIInputs, RequirementsContext, TaskLimits } from '../components/pm-doc
  * Validation utilities for PM document generation inputs
  */
 export class PMDocumentValidationError extends ValidationError {
-  constructor(message: string, public documentType?: string, field?: string) {
+  constructor(
+    message: string,
+    public documentType?: string,
+    field?: string
+  ) {
     super(message, field);
     this.name = 'PMDocumentValidationError';
   }
@@ -249,7 +253,7 @@ export function validateRequirementsGenerationInputs(
     /^\s*hi\s*$/i,
     /^\s*[a-z]\s*$/i,
     /^\s*example\s*$/i,
-    /^\s*sample\s*$/i
+    /^\s*sample\s*$/i,
   ];
 
   if (suspiciousPatterns.some(pattern => pattern.test(rawIntent))) {
@@ -338,11 +342,7 @@ export function validateTaskPlanInputs(design: string, limits?: TaskLimits): voi
  */
 function validateROIInputs(roiInputs: ROIInputs, documentType: string): void {
   if (typeof roiInputs !== 'object' || roiInputs === null) {
-    throw new PMDocumentValidationError(
-      'ROI inputs must be an object',
-      documentType,
-      'roiInputs'
-    );
+    throw new PMDocumentValidationError('ROI inputs must be an object', documentType, 'roiInputs');
   }
 
   // Validate cost values
@@ -355,7 +355,8 @@ function validateROIInputs(roiInputs: ROIInputs, documentType: string): void {
       );
     }
 
-    if (roiInputs.cost_naive > 10000000) { // $10M max
+    if (roiInputs.cost_naive > 10000000) {
+      // $10M max
       throw new PMDocumentValidationError(
         'Naive cost seems unreasonably high (max $10M)',
         documentType,
@@ -373,7 +374,8 @@ function validateROIInputs(roiInputs: ROIInputs, documentType: string): void {
       );
     }
 
-    if (roiInputs.cost_balanced > 10000000) { // $10M max
+    if (roiInputs.cost_balanced > 10000000) {
+      // $10M max
       throw new PMDocumentValidationError(
         'Balanced cost seems unreasonably high (max $10M)',
         documentType,
@@ -391,7 +393,8 @@ function validateROIInputs(roiInputs: ROIInputs, documentType: string): void {
       );
     }
 
-    if (roiInputs.cost_bold > 10000000) { // $10M max
+    if (roiInputs.cost_bold > 10000000) {
+      // $10M max
       throw new PMDocumentValidationError(
         'Bold cost seems unreasonably high (max $10M)',
         documentType,
@@ -461,7 +464,8 @@ function validateRequirementsContext(context: RequirementsContext): void {
       );
     }
 
-    if (context.budget > 100000000) { // $100M max
+    if (context.budget > 100000000) {
+      // $100M max
       throw new PMDocumentValidationError(
         'Budget seems unreasonably high (max $100M)',
         'requirements_generation',
@@ -540,11 +544,7 @@ function validateRequirementsContext(context: RequirementsContext): void {
  */
 function validateTaskLimits(limits: TaskLimits): void {
   if (typeof limits !== 'object' || limits === null) {
-    throw new PMDocumentValidationError(
-      'Task limits must be an object',
-      'task_plan',
-      'limits'
-    );
+    throw new PMDocumentValidationError('Task limits must be an object', 'task_plan', 'limits');
   }
 
   if (limits.maxVibes !== undefined) {
@@ -592,7 +592,8 @@ function validateTaskLimits(limits: TaskLimits): void {
       );
     }
 
-    if (limits.budgetUSD > 100000000) { // $100M max
+    if (limits.budgetUSD > 100000000) {
+      // $100M max
       throw new PMDocumentValidationError(
         'Budget USD limit seems unreasonably high (max $100M)',
         'task_plan',
@@ -609,9 +610,18 @@ function validateRequirementsContent(requirements: string, documentType: string)
   const content = requirements.toLowerCase();
 
   // Check for basic requirement elements
-  const hasUserStory = content.includes('user') || content.includes('customer') || content.includes('stakeholder');
-  const hasFunctionality = content.includes('function') || content.includes('feature') || content.includes('capability') || content.includes('requirement');
-  const hasObjective = content.includes('goal') || content.includes('objective') || content.includes('purpose') || content.includes('need');
+  const hasUserStory =
+    content.includes('user') || content.includes('customer') || content.includes('stakeholder');
+  const hasFunctionality =
+    content.includes('function') ||
+    content.includes('feature') ||
+    content.includes('capability') ||
+    content.includes('requirement');
+  const hasObjective =
+    content.includes('goal') ||
+    content.includes('objective') ||
+    content.includes('purpose') ||
+    content.includes('need');
 
   if (!hasUserStory && !hasFunctionality && !hasObjective) {
     throw new PMDocumentValidationError(
@@ -626,12 +636,14 @@ function validateRequirementsContent(requirements: string, documentType: string)
     /build\s+a\s+system/i,
     /create\s+an?\s+app/i,
     /make\s+something/i,
-    /develop\s+software/i
+    /develop\s+software/i,
   ];
 
   if (genericPatterns.some(pattern => pattern.test(requirements))) {
     // This is a warning, not an error - we can still process generic requirements
-    console.warn(`Warning: Requirements document for ${documentType} appears to be generic. More specific requirements will produce better results.`);
+    console.warn(
+      `Warning: Requirements document for ${documentType} appears to be generic. More specific requirements will produce better results.`
+    );
   }
 }
 
@@ -642,9 +654,14 @@ function validateDesignContent(design: string, documentType: string): void {
   const content = design.toLowerCase();
 
   // Check for basic design elements
-  const hasArchitecture = content.includes('architecture') || content.includes('component') || content.includes('system');
-  const hasImplementation = content.includes('implement') || content.includes('build') || content.includes('develop');
-  const hasTechnical = content.includes('technical') || content.includes('technology') || content.includes('framework');
+  const hasArchitecture =
+    content.includes('architecture') || content.includes('component') || content.includes('system');
+  const hasImplementation =
+    content.includes('implement') || content.includes('build') || content.includes('develop');
+  const hasTechnical =
+    content.includes('technical') ||
+    content.includes('technology') ||
+    content.includes('framework');
 
   if (!hasArchitecture && !hasImplementation && !hasTechnical) {
     throw new PMDocumentValidationError(
@@ -659,19 +676,25 @@ function validateDesignContent(design: string, documentType: string): void {
     /standard\s+architecture/i,
     /typical\s+design/i,
     /basic\s+implementation/i,
-    /simple\s+system/i
+    /simple\s+system/i,
   ];
 
   if (genericPatterns.some(pattern => pattern.test(design))) {
     // This is a warning, not an error - we can still process generic designs
-    console.warn(`Warning: Design document for ${documentType} appears to be generic. More specific design details will produce better results.`);
+    console.warn(
+      `Warning: Design document for ${documentType} appears to be generic. More specific design details will produce better results.`
+    );
   }
 }
 
 /**
  * Validate that a document contains structured content (not just plain text)
  */
-export function validateStructuredDocument(document: string, documentType: string, fieldName: string): void {
+export function validateStructuredDocument(
+  document: string,
+  documentType: string,
+  fieldName: string
+): void {
   if (!document || typeof document !== 'string') {
     throw new PMDocumentValidationError(
       `${fieldName} must be a non-empty string`,
@@ -681,7 +704,7 @@ export function validateStructuredDocument(document: string, documentType: strin
   }
 
   const content = document.trim();
-  
+
   if (content.length < 10) {
     throw new PMDocumentValidationError(
       `${fieldName} is too short for meaningful analysis`,
@@ -692,8 +715,10 @@ export function validateStructuredDocument(document: string, documentType: strin
 
   // Check for some structure indicators (headers, lists, etc.)
   const hasStructure = /^#|\n#|\*|\-|\d+\.|\n\n/.test(content);
-  
+
   if (!hasStructure && content.length > 500) {
-    console.warn(`Warning: ${fieldName} for ${documentType} appears to lack structure. Consider using headers, lists, or paragraphs for better results.`);
+    console.warn(
+      `Warning: ${fieldName} for ${documentType} appears to lack structure. Consider using headers, lists, or paragraphs for better results.`
+    );
   }
 }

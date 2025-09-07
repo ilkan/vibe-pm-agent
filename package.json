@@ -36,6 +36,9 @@
     "test:all": "node scripts/test-runner.mjs",
     "ci:test": "node scripts/test-runner.mjs",
     "clean": "rm -rf dist",
+    "cleanup": "node scripts/cleanup.mjs",
+    "cleanup:verbose": "node scripts/cleanup.mjs --verbose",
+    "cleanup:dry-run": "node scripts/cleanup.mjs --dry-run",
     "prebuild": "npm run clean",
     "prepublishOnly": "npm run build && npm run test",
     "postinstall": "npm run build"

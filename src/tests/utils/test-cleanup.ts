@@ -34,17 +34,35 @@ const TEST_STEERING_PATTERNS = [
   /^product-launch-.*\.(md)$/,
   /^implementation-plan-.*\.(md)$/,
   
+  // AI-generated test files (from recent cleanup)
+  /^ai-analytics-.*\.(md)$/,
+  /^ai-business-platform-.*\.(md)$/,
+  /^ai-customer-service-.*\.(md)$/,
+  /^ai-project-management-.*\.(md)$/,
+  /^ai-project-mgmt-.*\.(md)$/,
+  
   // Files with timestamps (likely test-generated)
   /.*-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.md$/,
+  /.*-\d{13}\.md$/, // Unix timestamp
   
   // Backup files
   /.*\.backup$/,
+  /.*\.bak$/,
+  /.*\.tmp$/,
   
   // Common test naming patterns
   /^test\d+-.*\.(md)$/,
   /^sample-.*\.(md)$/,
   /^demo-.*\.(md)$/,
   /^example-.*\.(md)$/,
+  /^validation-.*\.(md)$/,
+  /^benchmark-.*\.(md)$/,
+  /^performance-.*\.(md)$/,
+  
+  // MCP tool test artifacts
+  /^mcp-test-.*\.(md)$/,
+  /^tool-test-.*\.(md)$/,
+  /^handler-test-.*\.(md)$/,
 ];
 
 /**
@@ -52,9 +70,21 @@ const TEST_STEERING_PATTERNS = [
  */
 const PROTECTED_FILES = [
   'product.md',
-  'structure.md',
+  'structure.md', 
   'tech.md',
-  '.DS_Store'
+  'Hackathon Rules.md',
+  '.DS_Store',
+  '.gitkeep',
+  'README.md'
+];
+
+/**
+ * Protected directories that should never be deleted entirely
+ */
+const PROTECTED_DIRECTORIES = [
+  '.kiro/steering/prompts',
+  '.kiro/specs/vibe-pm-agent',
+  '.kiro/specs/competitive-market-analysis'
 ];
 
 /**
@@ -156,16 +186,146 @@ export async function cleanupTestDirectories(): Promise<{
 }
 
 /**
- * Complete test cleanup - files and directories
+ * Clean up memory leaks and open handles
+ */
+export async function cleanupMemoryLeaks(): Promise<void> {
+  // Clear all timers
+  if (typeof jest !== 'undefined') {
+    jest.clearAllTimers();
+    jest.clearAllMocks();
+  }
+  
+  // Force garbage collection if available
+  if (global.gc) {
+    global.gc();
+  }
+  
+  // Clear any remaining intervals/timeouts
+  const highestTimeoutId = setTimeout(() => {}, 0);
+  for (let i = 0; i < highestTimeoutId; i++) {
+    clearTimeout(i);
+    clearInterval(i);
+  }
+}
+
+/**
+ * Clean up test evidence and temporary files
+ */
+export async function cleanupTestEvidence(): Promise<{
+  cleaned: string[];
+  errors: string[];
+}> {
+  const cleaned: string[] = [];
+  const errors: string[] = [];
+  
+  const evidencePatterns = [
+    '.evidence/test-*.json',
+    '.evidence/perf-test-*.json',
+    '.evidence/benchmark-*.json',
+    'coverage/tmp-*',
+    'temp-*',
+    '*.tmp',
+    '*.log'
+  ];
+  
+  for (const pattern of evidencePatterns) {
+    try {
+      const glob = await import('glob');
+      const files = glob.globSync(pattern);
+      
+      for (const file of files) {
+        try {
+          await fs.unlink(file);
+          cleaned.push(file);
+        } catch (error) {
+          errors.push(`Failed to delete ${file}: ${error}`);
+        }
+      }
+    } catch (error) {
+      // Glob not available, skip pattern-based cleanup
+    }
+  }
+  
+  return { cleaned, errors };
+}
+
+/**
+ * Validate steering directory integrity after cleanup
+ */
+export async function validateSteeringIntegrity(): Promise<{
+  valid: boolean;
+  missing: string[];
+  unexpected: string[];
+}> {
+  const missing: string[] = [];
+  const unexpected: string[] = [];
+  
+  try {
+    const steeringDir = '.kiro/steering';
+    const files = await fs.readdir(steeringDir);
+    
+    // Check for required files
+    const requiredFiles = ['product.md', 'structure.md', 'tech.md'];
+    for (const required of requiredFiles) {
+      if (!files.includes(required)) {
+        missing.push(required);
+      }
+    }
+    
+    // Check for unexpected test files that weren't cleaned
+    for (const file of files) {
+      if (isTestGeneratedFile(file)) {
+        unexpected.push(file);
+      }
+    }
+    
+    return {
+      valid: missing.length === 0 && unexpected.length === 0,
+      missing,
+      unexpected
+    };
+  } catch (error) {
+    return {
+      valid: false,
+      missing: ['Error accessing steering directory'],
+      unexpected: []
+    };
+  }
+}
+
+/**
+ * Complete test cleanup - files, directories, memory, and validation
  */
 export async function cleanupAllTestArtifacts(): Promise<{
   filesCleanup: { cleaned: string[]; errors: string[] };
   dirsCleanup: { cleaned: string[]; errors: string[] };
+  evidenceCleanup: { cleaned: string[]; errors: string[] };
+  memoryCleanup: boolean;
+  validation: { valid: boolean; missing: string[]; unexpected: string[] };
 }> {
   const filesCleanup = await cleanupTestSteeringFiles();
   const dirsCleanup = await cleanupTestDirectories();
+  const evidenceCleanup = await cleanupTestEvidence();
   
-  return { filesCleanup, dirsCleanup };
+  // Clean up memory leaks
+  let memoryCleanup = false;
+  try {
+    await cleanupMemoryLeaks();
+    memoryCleanup = true;
+  } catch (error) {
+    console.warn('Memory cleanup failed:', error);
+  }
+  
+  // Validate integrity
+  const validation = await validateSteeringIntegrity();
+  
+  return { 
+    filesCleanup, 
+    dirsCleanup, 
+    evidenceCleanup,
+    memoryCleanup,
+    validation
+  };
 }
 
 /**
@@ -176,17 +336,41 @@ export async function globalTeardown(): Promise<void> {
   
   const result = await cleanupAllTestArtifacts();
   
-  const totalCleaned = result.filesCleanup.cleaned.length + result.dirsCleanup.cleaned.length;
-  const totalErrors = result.filesCleanup.errors.length + result.dirsCleanup.errors.length;
+  const totalCleaned = result.filesCleanup.cleaned.length + 
+                      result.dirsCleanup.cleaned.length + 
+                      result.evidenceCleanup.cleaned.length;
+  const totalErrors = result.filesCleanup.errors.length + 
+                     result.dirsCleanup.errors.length + 
+                     result.evidenceCleanup.errors.length;
   
   if (totalCleaned > 0) {
     console.log(`✅ Cleaned up ${totalCleaned} test artifacts`);
+    console.log(`   Files: ${result.filesCleanup.cleaned.length}`);
+    console.log(`   Directories: ${result.dirsCleanup.cleaned.length}`);
+    console.log(`   Evidence: ${result.evidenceCleanup.cleaned.length}`);
+  }
+  
+  if (result.memoryCleanup) {
+    console.log('✅ Memory cleanup completed');
+  }
+  
+  // Report validation results
+  if (result.validation.valid) {
+    console.log('✅ Steering directory integrity validated');
+  } else {
+    if (result.validation.missing.length > 0) {
+      console.warn(`⚠️  Missing required files: ${result.validation.missing.join(', ')}`);
+    }
+    if (result.validation.unexpected.length > 0) {
+      console.warn(`⚠️  Unexpected test files remain: ${result.validation.unexpected.join(', ')}`);
+    }
   }
   
   if (totalErrors > 0) {
     console.warn(`⚠️  ${totalErrors} cleanup errors occurred`);
-    result.filesCleanup.errors.forEach(error => console.warn(`   ${error}`));
-    result.dirsCleanup.errors.forEach(error => console.warn(`   ${error}`));
+    result.filesCleanup.errors.forEach(error => console.warn(`   Files: ${error}`));
+    result.dirsCleanup.errors.forEach(error => console.warn(`   Dirs: ${error}`));
+    result.evidenceCleanup.errors.forEach(error => console.warn(`   Evidence: ${error}`));
   }
 }
 

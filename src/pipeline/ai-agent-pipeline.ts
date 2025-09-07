@@ -7,22 +7,22 @@ import {
   QuotaForecaster,
   SpecGenerator,
   ConsultingSummaryGenerator,
-  QuickValidator
+  QuickValidator,
 } from '../components';
 import { MarketDataIntegrator } from '../components/market-data-integrator';
 import { ProprietaryPMFrameworks } from '../components/proprietary-pm-frameworks';
-import { 
-  PMDocumentGenerator, 
-  ManagementOnePager, 
-  PRFAQ, 
-  PMRequirements, 
-  DesignOptions, 
-  TaskPlan 
+import {
+  PMDocumentGenerator,
+  ManagementOnePager,
+  PRFAQ,
+  PMRequirements,
+  DesignOptions,
+  TaskPlan,
 } from '../components/pm-document-generator';
 import { SteeringService, SteeringCreationResult } from '../components/steering-service';
-import { 
-  OptionalParams, 
-  KiroSpec, 
+import {
+  OptionalParams,
+  KiroSpec,
   ProcessingError,
   ParsedIntent,
   Workflow,
@@ -32,23 +32,23 @@ import {
   ROIAnalysis,
   QuotaForecast,
   QuickValidationResult,
-  QuickValidationContext
+  QuickValidationContext,
 } from '../models';
-import { 
+import {
   PMDocumentConsistencyValidator,
   ConsistencyValidationResult,
-  validatePMDocumentConsistency
+  validatePMDocumentConsistency,
 } from '../utils/pm-document-consistency-validation';
 import { ConsultingAnalysis } from '../components/business-analyzer';
 import { validateRawIntent, validateOptionalParams, ValidationError } from '../utils/validation';
 import { ErrorHandler, RetryHandler, ProcessingFailureError } from '../utils/error-handling';
-import { 
-  PipelineCache, 
-  ParallelProcessor, 
-  PerformanceMonitor, 
+import {
+  PipelineCache,
+  ParallelProcessor,
+  PerformanceMonitor,
   CacheKeyGenerator,
   ParallelOperationFactory,
-  PerformanceMetrics
+  PerformanceMetrics,
 } from './performance-optimizer';
 import { SteeringFileOptions } from '../models/mcp';
 
@@ -100,7 +100,7 @@ export class AIAgentPipeline {
   private steeringService: SteeringService;
   private marketDataIntegrator: MarketDataIntegrator;
   private proprietaryFrameworks: ProprietaryPMFrameworks;
-  
+
   // Performance optimization components
   private cache: PipelineCache;
   private parallelProcessor: ParallelProcessor;
@@ -118,12 +118,12 @@ export class AIAgentPipeline {
     this.steeringService = new SteeringService();
     this.marketDataIntegrator = new MarketDataIntegrator();
     this.proprietaryFrameworks = new ProprietaryPMFrameworks();
-    
+
     // Initialize performance optimization components
     this.cache = new PipelineCache({
       maxSize: 500,
       defaultTTL: 300000, // 5 minutes
-      cleanupInterval: 60000 // 1 minute
+      cleanupInterval: 60000, // 1 minute
     });
     this.parallelProcessor = new ParallelProcessor(4); // Max 4 concurrent operations
     this.performanceMonitor = new PerformanceMonitor();
@@ -138,7 +138,7 @@ export class AIAgentPipeline {
       if (this.cache) {
         this.cache.destroy();
       }
-      
+
       // Reset performance monitor
       if (this.performanceMonitor) {
         this.performanceMonitor.reset();
@@ -159,30 +159,34 @@ export class AIAgentPipeline {
     let quotaUsed = 0;
     let cacheHit = false;
     let parallelOperationsCount = 0;
-    
+
     try {
-      this.logInfo('Starting AI Agent Pipeline execution', { sessionId, intentLength: rawIntent.length, hasParams: !!params });
-      
+      this.logInfo('Starting AI Agent Pipeline execution', {
+        sessionId,
+        intentLength: rawIntent.length,
+        hasParams: !!params,
+      });
+
       // Check cache for complete pipeline result
       const cacheKey = CacheKeyGenerator.forIntentParsing(rawIntent, params);
       const cachedResult = this.cache.get<PipelineResult>(cacheKey);
-      
+
       if (cachedResult) {
         cacheHit = true;
         const executionTime = Date.now() - startTime;
         this.performanceMonitor.recordExecution(executionTime, true, 0);
         this.logInfo('Pipeline result served from cache', { sessionId, executionTime, cacheKey });
-        
+
         return {
           ...cachedResult,
           metadata: {
             ...cachedResult.metadata!,
             executionTime,
-            sessionId
-          }
+            sessionId,
+          },
         };
       }
-      
+
       // Comprehensive input validation
       try {
         validateRawIntent(rawIntent);
@@ -194,97 +198,151 @@ export class AIAgentPipeline {
         if (error instanceof ValidationError) {
           throw this.createStageError('intent', 'validation_failed', error, error.message);
         }
-        throw this.createStageError('intent', 'validation_error', error, 'Please check your input and try again');
+        throw this.createStageError(
+          'intent',
+          'validation_error',
+          error,
+          'Please check your input and try again'
+        );
       }
-      
+
       // Stage 1: Intent Interpretation with parallel validation
-      this.logInfo('Stage 1: Parsing intent and extracting requirements', { sessionId, stage: 'intent' });
+      this.logInfo('Stage 1: Parsing intent and extracting requirements', {
+        sessionId,
+        stage: 'intent',
+      });
       const parsedIntent = await this.parseIntentWithErrorHandling(rawIntent, params, sessionId);
       quotaUsed += 1; // Intent parsing uses 1 quota unit
-      
+
       // Parallel validation and risk assessment
-      const parallelOps = ParallelOperationFactory.createForIntentProcessing(rawIntent, parsedIntent);
+      const parallelOps = ParallelOperationFactory.createForIntentProcessing(
+        rawIntent,
+        parsedIntent
+      );
       const operations: Array<() => Promise<any>> = [];
-      
+
       if (parallelOps.intentValidation) {
         operations.push(parallelOps.intentValidation);
       }
       if (parallelOps.riskAssessment) {
         operations.push(parallelOps.riskAssessment);
       }
-      
-      const parallelResults = operations.length > 0 
-        ? await this.parallelProcessor.executeParallel(operations)
-        : [true, []];
-      
+
+      const parallelResults =
+        operations.length > 0
+          ? await this.parallelProcessor.executeParallel(operations)
+          : [true, []];
+
       const validationResult = parallelResults[0] || true;
       const riskAssessmentResult = parallelResults[1] || [];
       parallelOperationsCount += operations.length;
-      
-      this.logInfo('Intent parsing completed', { 
-        sessionId, 
-        operationsCount: parsedIntent.operationsRequired.length, 
+
+      this.logInfo('Intent parsing completed', {
+        sessionId,
+        operationsCount: parsedIntent.operationsRequired.length,
         risksCount: parsedIntent.potentialRisks.length,
         parallelValidation: validationResult,
-        additionalRisks: Array.isArray(riskAssessmentResult) ? riskAssessmentResult.length : 0
+        additionalRisks: Array.isArray(riskAssessmentResult) ? riskAssessmentResult.length : 0,
       });
-      
+
       // Stage 2: Business Analysis with Consulting Techniques and parallel processing
-      this.logInfo('Stage 2: Applying consulting techniques for business analysis', { sessionId, stage: 'analysis' });
-      
+      this.logInfo('Stage 2: Applying consulting techniques for business analysis', {
+        sessionId,
+        stage: 'analysis',
+      });
+
       // Check cache for business analysis
       const analysisKey = CacheKeyGenerator.forBusinessAnalysis(parsedIntent);
       let consultingAnalysis = this.cache.get<ConsultingAnalysis>(analysisKey);
-      
+
       if (!consultingAnalysis) {
         // Parallel technique selection and quota estimation
         const analysisOps = ParallelOperationFactory.createForAnalysisProcessing(parsedIntent);
         const analysisParallelResults = await this.parallelProcessor.executeParallel([
           analysisOps.techniqueSelection || (() => Promise.resolve([])),
-          analysisOps.quotaEstimation || (() => Promise.resolve({ naive: 0, optimized: 0, zeroBased: 0 }))
+          analysisOps.quotaEstimation ||
+            (() => Promise.resolve({ naive: 0, optimized: 0, zeroBased: 0 })),
         ]);
         parallelOperationsCount += 2;
-        
-        consultingAnalysis = await this.performBusinessAnalysisWithErrorHandling(parsedIntent, sessionId);
+
+        consultingAnalysis = await this.performBusinessAnalysisWithErrorHandling(
+          parsedIntent,
+          sessionId
+        );
         this.cache.set(analysisKey, consultingAnalysis, 600000); // Cache for 10 minutes
       } else {
         this.logInfo('Business analysis served from cache', { sessionId, cacheKey: analysisKey });
       }
-      
+
       quotaUsed += 2; // Business analysis uses 2 quota units
-      this.logInfo('Business analysis completed', { sessionId, techniquesUsed: consultingAnalysis.techniquesUsed.length, totalSavings: consultingAnalysis.totalQuotaSavings });
-      
+      this.logInfo('Business analysis completed', {
+        sessionId,
+        techniquesUsed: consultingAnalysis.techniquesUsed.length,
+        totalSavings: consultingAnalysis.totalQuotaSavings,
+      });
+
       // Stage 3: Workflow Optimization
-      this.logInfo('Stage 3: Optimizing workflow for efficiency', { sessionId, stage: 'optimization' });
-      const optimizedWorkflow = await this.optimizeWorkflowWithErrorHandling(parsedIntent, consultingAnalysis, sessionId);
+      this.logInfo('Stage 3: Optimizing workflow for efficiency', {
+        sessionId,
+        stage: 'optimization',
+      });
+      const optimizedWorkflow = await this.optimizeWorkflowWithErrorHandling(
+        parsedIntent,
+        consultingAnalysis,
+        sessionId
+      );
       quotaUsed += 1; // Optimization uses 1 quota unit
-      this.logInfo('Workflow optimization completed', { sessionId, optimizationsApplied: optimizedWorkflow.optimizations.length, efficiencyGain: optimizedWorkflow.efficiencyGains.totalSavingsPercentage });
-      
+      this.logInfo('Workflow optimization completed', {
+        sessionId,
+        optimizationsApplied: optimizedWorkflow.optimizations.length,
+        efficiencyGain: optimizedWorkflow.efficiencyGains.totalSavingsPercentage,
+      });
+
       // Stage 4: Quota Forecasting and ROI Analysis
-      this.logInfo('Stage 4: Generating comprehensive ROI analysis', { sessionId, stage: 'forecasting' });
-      const roiAnalysis = await this.generateROIAnalysisWithErrorHandling(optimizedWorkflow, consultingAnalysis, sessionId);
+      this.logInfo('Stage 4: Generating comprehensive ROI analysis', {
+        sessionId,
+        stage: 'forecasting',
+      });
+      const roiAnalysis = await this.generateROIAnalysisWithErrorHandling(
+        optimizedWorkflow,
+        consultingAnalysis,
+        sessionId
+      );
       quotaUsed += 2; // ROI analysis uses 2 quota units
-      this.logInfo('ROI analysis completed', { sessionId, scenariosGenerated: roiAnalysis.scenarios.length, bestOption: roiAnalysis.bestOption });
-      
+      this.logInfo('ROI analysis completed', {
+        sessionId,
+        scenariosGenerated: roiAnalysis.scenarios.length,
+        bestOption: roiAnalysis.bestOption,
+      });
+
       // Stage 5: Consulting Summary Generation
       this.logInfo('Stage 5: Creating consulting-style summary', { sessionId, stage: 'summary' });
-      const consultingSummary = await this.generateConsultingSummaryWithErrorHandling(consultingAnalysis, sessionId);
+      const consultingSummary = await this.generateConsultingSummaryWithErrorHandling(
+        consultingAnalysis,
+        sessionId
+      );
       quotaUsed += 1; // Summary generation uses 1 quota unit
-      this.logInfo('Consulting summary completed', { sessionId, recommendationsCount: consultingSummary.recommendations.length });
-      
+      this.logInfo('Consulting summary completed', {
+        sessionId,
+        recommendationsCount: consultingSummary.recommendations.length,
+      });
+
       // Stage 6: Enhanced Spec Generation
       this.logInfo('Stage 6: Generating enhanced Kiro specification', { sessionId, stage: 'spec' });
       const enhancedSpec = await this.generateEnhancedSpecWithErrorHandling(
-        optimizedWorkflow, 
-        consultingSummary, 
+        optimizedWorkflow,
+        consultingSummary,
         roiAnalysis,
         parsedIntent,
         params,
         sessionId
       );
       quotaUsed += 1; // Spec generation uses 1 quota unit
-      this.logInfo('Enhanced spec generation completed', { sessionId, tasksGenerated: enhancedSpec.tasks.length });
-      
+      this.logInfo('Enhanced spec generation completed', {
+        sessionId,
+        tasksGenerated: enhancedSpec.tasks.length,
+      });
+
       // Stage 7: Optional PM Document Generation
       let pmDocuments: PipelineResult['pmDocuments'] = undefined;
       if (params?.generatePMDocuments) {
@@ -298,52 +356,72 @@ export class AIAgentPipeline {
           sessionId
         );
         quotaUsed += Object.keys(pmDocuments || {}).length; // Each PM document uses 1 quota unit
-        this.logInfo('PM documents generation completed', { 
-          sessionId, 
-          documentsGenerated: Object.keys(pmDocuments || {}).length 
+        this.logInfo('PM documents generation completed', {
+          sessionId,
+          documentsGenerated: Object.keys(pmDocuments || {}).length,
         });
       }
 
       // Stage 8: Optional Steering File Creation
       let steeringFiles: PipelineResult['steeringFiles'] = undefined;
       if (pmDocuments && params?.generatePMDocuments?.steeringOptions?.create_steering_files) {
-        this.logInfo('Stage 8: Creating steering files from PM documents', { sessionId, stage: 'steering_files' });
+        this.logInfo('Stage 8: Creating steering files from PM documents', {
+          sessionId,
+          stage: 'steering_files',
+        });
         const steeringResult = await this.createSteeringFilesFromDocuments(
           pmDocuments,
           params.generatePMDocuments.steeringOptions,
           sessionId
         );
         steeringFiles = steeringResult;
-        this.logInfo('Steering file creation completed', { 
-          sessionId, 
+        this.logInfo('Steering file creation completed', {
+          sessionId,
           filesCreated: steeringResult.created ? steeringResult.results.length : 0,
-          summary: steeringResult.summary
+          summary: steeringResult.summary,
         });
       }
-      
+
       const executionTime = Date.now() - startTime;
-      
+
       // Record performance metrics
       this.performanceMonitor.recordExecution(executionTime, cacheHit, parallelOperationsCount);
-      
+
       // Create efficiency summary from available data
       const efficiencySummary = {
         naiveApproach: {
-          vibesConsumed: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))?.forecast.vibesConsumed || 0,
-          specsConsumed: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))?.forecast.specsConsumed || 0,
-          estimatedCost: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))?.forecast.estimatedCost || 0
+          vibesConsumed:
+            roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))?.forecast
+              .vibesConsumed || 0,
+          specsConsumed:
+            roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))?.forecast
+              .specsConsumed || 0,
+          estimatedCost:
+            roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))?.forecast
+              .estimatedCost || 0,
         },
         optimizedApproach: {
-          vibesConsumed: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast.vibesConsumed || 0,
-          specsConsumed: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast.specsConsumed || 0,
-          estimatedCost: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast.estimatedCost || 0
+          vibesConsumed:
+            roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast
+              .vibesConsumed || 0,
+          specsConsumed:
+            roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast
+              .specsConsumed || 0,
+          estimatedCost:
+            roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast
+              .estimatedCost || 0,
         },
         savings: {
-          totalSavingsPercentage: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.savingsPercentage || 0,
-          costSavings: (roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))?.forecast.estimatedCost || 0) - 
-                      (roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast.estimatedCost || 0)
+          totalSavingsPercentage:
+            roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))
+              ?.savingsPercentage || 0,
+          costSavings:
+            (roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))
+              ?.forecast.estimatedCost || 0) -
+            (roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast
+              .estimatedCost || 0),
         },
-        optimizationNotes: optimizedWorkflow.optimizations.map(opt => opt.description)
+        optimizationNotes: optimizedWorkflow.optimizations.map(opt => opt.description),
       };
 
       const result: PipelineResult = {
@@ -358,32 +436,38 @@ export class AIAgentPipeline {
           executionTime,
           sessionId,
           quotaUsed,
-          optimizationsApplied: optimizedWorkflow.optimizations.length
-        }
+          optimizationsApplied: optimizedWorkflow.optimizations.length,
+        },
       };
-      
+
       // Cache the complete result for future requests
       if (!cacheHit) {
         this.cache.set(cacheKey, result, 300000); // Cache for 5 minutes
       }
-      
-      this.logInfo('AI Agent Pipeline execution completed successfully', { 
-        sessionId, 
-        executionTime, 
+
+      this.logInfo('AI Agent Pipeline execution completed successfully', {
+        sessionId,
+        executionTime,
         totalSavings: optimizedWorkflow.efficiencyGains.totalSavingsPercentage,
         performance: this.categorizePerformance(executionTime),
         quotaUsed,
         cacheHit,
-        parallelOperationsCount
+        parallelOperationsCount,
       });
-      
+
       return result;
-      
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.performanceMonitor.recordError();
       this.performanceMonitor.recordExecution(executionTime, cacheHit, parallelOperationsCount);
-      this.logError('Pipeline execution failed', error, { sessionId, executionTime, stage: this.getErrorStage(error), quotaUsed, cacheHit, parallelOperationsCount });
+      this.logError('Pipeline execution failed', error, {
+        sessionId,
+        executionTime,
+        stage: this.getErrorStage(error),
+        quotaUsed,
+        cacheHit,
+        parallelOperationsCount,
+      });
       return this.handlePipelineError(error, sessionId, executionTime, quotaUsed);
     }
   }
@@ -394,61 +478,74 @@ export class AIAgentPipeline {
   async analyzeWorkflow(workflow: Workflow, techniques?: string[]): Promise<ConsultingAnalysis> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting workflow analysis', { sessionId, workflowId: workflow.id, techniques });
-      
+      this.logInfo('Starting workflow analysis', {
+        sessionId,
+        workflowId: workflow.id,
+        techniques,
+      });
+
       // Check cache first
       const cacheKey = `workflow-analysis:${CacheKeyGenerator.forBusinessAnalysis(workflow as any, techniques)}`;
       const cachedAnalysis = this.cache.get<ConsultingAnalysis>(cacheKey);
-      
+
       if (cachedAnalysis) {
         const executionTime = Date.now() - startTime;
         this.performanceMonitor.recordExecution(executionTime, true, 0);
         this.logInfo('Workflow analysis served from cache', { sessionId, executionTime, cacheKey });
         return cachedAnalysis;
       }
-      
+
       // Convert workflow to parsed intent format for analysis
       const mockIntent: ParsedIntent = {
         businessObjective: `Optimize existing workflow: ${workflow.id}`,
         technicalRequirements: workflow.steps.map(step => ({
-          type: step.type === 'vibe' ? 'analysis' : step.type as any,
+          type: step.type === 'vibe' ? 'analysis' : (step.type as any),
           description: step.description,
           complexity: step.quotaCost > 10 ? 'high' : step.quotaCost > 5 ? 'medium' : 'low',
-          quotaImpact: step.quotaCost > 10 ? 'significant' : step.quotaCost > 5 ? 'moderate' : 'minimal'
+          quotaImpact:
+            step.quotaCost > 10 ? 'significant' : step.quotaCost > 5 ? 'moderate' : 'minimal',
         })),
-        dataSourcesNeeded: workflow.steps.filter(s => s.type === 'data_retrieval').map(s => s.description),
+        dataSourcesNeeded: workflow.steps
+          .filter(s => s.type === 'data_retrieval')
+          .map(s => s.description),
         operationsRequired: workflow.steps.map(step => ({
           id: step.id,
           type: step.type,
           description: step.description,
-          estimatedQuotaCost: step.quotaCost
+          estimatedQuotaCost: step.quotaCost,
         })),
-        potentialRisks: []
+        potentialRisks: [],
       };
 
       const analysis = await this.businessAnalyzer.analyzeWithTechniques(mockIntent, techniques);
-      
+
       // Cache the result
       this.cache.set(cacheKey, analysis, 600000); // Cache for 10 minutes
-      
+
       const executionTime = Date.now() - startTime;
       this.performanceMonitor.recordExecution(executionTime, false, 0);
-      this.logInfo('Workflow analysis completed', { 
-        sessionId, 
-        executionTime, 
+      this.logInfo('Workflow analysis completed', {
+        sessionId,
+        executionTime,
         techniquesUsed: analysis.techniquesUsed.length,
-        quotaSavings: analysis.totalQuotaSavings 
+        quotaSavings: analysis.totalQuotaSavings,
       });
-      
+
       return analysis;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.performanceMonitor.recordError();
       this.performanceMonitor.recordExecution(executionTime, false, 0);
-      this.logError('Workflow analysis failed', error, { sessionId, executionTime, workflowId: workflow.id });
-      throw new Error(`Workflow analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logError('Workflow analysis failed', error, {
+        sessionId,
+        executionTime,
+        workflowId: workflow.id,
+      });
+      throw new Error(
+        `Workflow analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -456,35 +553,35 @@ export class AIAgentPipeline {
    * Individual method for ROI analysis generation (used by MCP tools)
    */
   async generateROIAnalysis(
-    workflow: Workflow, 
-    optimizedWorkflow?: OptimizedWorkflow, 
+    workflow: Workflow,
+    optimizedWorkflow?: OptimizedWorkflow,
     zeroBasedSolution?: any
   ): Promise<ROIAnalysis> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting ROI analysis generation', { 
-        sessionId, 
-        workflowId: workflow.id, 
+      this.logInfo('Starting ROI analysis generation', {
+        sessionId,
+        workflowId: workflow.id,
         hasOptimized: !!optimizedWorkflow,
-        hasZeroBased: !!zeroBasedSolution 
+        hasZeroBased: !!zeroBasedSolution,
       });
-      
+
       // Check cache first
       const cacheKey = CacheKeyGenerator.forROIAnalysis(workflow, optimizedWorkflow);
       const cachedROI = this.cache.get<ROIAnalysis>(cacheKey);
-      
+
       if (cachedROI) {
         const executionTime = Date.now() - startTime;
         this.performanceMonitor.recordExecution(executionTime, true, 0);
         this.logInfo('ROI analysis served from cache', { sessionId, executionTime, cacheKey });
         return cachedROI;
       }
-      
+
       // Execute forecasting operations
       const naiveForecast = await this.quotaForecaster.estimateNaiveConsumption(workflow);
-      const optimizedForecast = optimizedWorkflow 
+      const optimizedForecast = optimizedWorkflow
         ? await this.quotaForecaster.estimateOptimizedConsumption(optimizedWorkflow)
         : naiveForecast;
       const zeroBasedForecast = zeroBasedSolution
@@ -492,66 +589,98 @@ export class AIAgentPipeline {
         : optimizedForecast;
 
       const roiAnalysis = await this.quotaForecaster.generateROITable([
-        { name: 'Conservative', forecast: naiveForecast, savingsPercentage: 0, implementationEffort: 'none', riskLevel: 'none' },
-        { name: 'Balanced', forecast: optimizedForecast, savingsPercentage: this.calculateSavingsPercentage(naiveForecast, optimizedForecast), implementationEffort: 'medium', riskLevel: 'low' },
-        { name: 'Bold', forecast: zeroBasedForecast, savingsPercentage: this.calculateSavingsPercentage(naiveForecast, zeroBasedForecast), implementationEffort: 'high', riskLevel: 'medium' }
+        {
+          name: 'Conservative',
+          forecast: naiveForecast,
+          savingsPercentage: 0,
+          implementationEffort: 'none',
+          riskLevel: 'none',
+        },
+        {
+          name: 'Balanced',
+          forecast: optimizedForecast,
+          savingsPercentage: this.calculateSavingsPercentage(naiveForecast, optimizedForecast),
+          implementationEffort: 'medium',
+          riskLevel: 'low',
+        },
+        {
+          name: 'Bold',
+          forecast: zeroBasedForecast,
+          savingsPercentage: this.calculateSavingsPercentage(naiveForecast, zeroBasedForecast),
+          implementationEffort: 'high',
+          riskLevel: 'medium',
+        },
       ]);
-      
+
       // Cache the result
       this.cache.set(cacheKey, roiAnalysis, 300000); // Cache for 5 minutes
-      
+
       const executionTime = Date.now() - startTime;
       this.performanceMonitor.recordExecution(executionTime, false, 0);
-      this.logInfo('ROI analysis completed', { 
-        sessionId, 
-        executionTime, 
+      this.logInfo('ROI analysis completed', {
+        sessionId,
+        executionTime,
         scenariosGenerated: roiAnalysis.scenarios.length,
-        bestOption: roiAnalysis.bestOption
+        bestOption: roiAnalysis.bestOption,
       });
-      
+
       return roiAnalysis;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.performanceMonitor.recordError();
       this.performanceMonitor.recordExecution(executionTime, false, 0);
-      this.logError('ROI analysis generation failed', error, { sessionId, executionTime, workflowId: workflow.id });
-      throw new Error(`ROI analysis generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logError('ROI analysis generation failed', error, {
+        sessionId,
+        executionTime,
+        workflowId: workflow.id,
+      });
+      throw new Error(
+        `ROI analysis generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   /**
    * Individual method for consulting summary generation (used by MCP tools)
    */
-  async generateConsultingSummary(analysis: ConsultingAnalysis, techniques?: string[]): Promise<ConsultingSummary> {
+  async generateConsultingSummary(
+    analysis: ConsultingAnalysis,
+    techniques?: string[]
+  ): Promise<ConsultingSummary> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting consulting summary generation', { 
-        sessionId, 
+      this.logInfo('Starting consulting summary generation', {
+        sessionId,
         techniquesUsed: analysis.techniquesUsed.length,
-        requestedTechniques: techniques?.length || 0 
+        requestedTechniques: techniques?.length || 0,
       });
-      
-      const selectedTechniques = techniques 
+
+      const selectedTechniques = techniques
         ? analysis.techniquesUsed.filter(t => techniques.includes(t.name))
         : analysis.techniquesUsed;
-      
-      const summary = this.consultingSummaryGenerator.generateConsultingSummary(analysis, selectedTechniques);
-      
+
+      const summary = this.consultingSummaryGenerator.generateConsultingSummary(
+        analysis,
+        selectedTechniques
+      );
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Consulting summary completed', { 
-        sessionId, 
-        executionTime, 
+      this.logInfo('Consulting summary completed', {
+        sessionId,
+        executionTime,
         recommendationsCount: summary.recommendations.length,
-        evidenceCount: summary.supportingEvidence.length 
+        evidenceCount: summary.supportingEvidence.length,
       });
-      
+
       return summary;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Consulting summary generation failed', error, { sessionId, executionTime });
-      throw new Error(`Consulting summary generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Consulting summary generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -559,64 +688,76 @@ export class AIAgentPipeline {
    * Fast idea validation method (used by MCP tools)
    * Provides PASS/FAIL verdict with 3 structured options for next steps
    */
-  async validateIdeaQuick(idea: string, context?: QuickValidationContext): Promise<QuickValidationResult> {
+  async validateIdeaQuick(
+    idea: string,
+    context?: QuickValidationContext
+  ): Promise<QuickValidationResult> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting quick idea validation', { 
-        sessionId, 
+      this.logInfo('Starting quick idea validation', {
+        sessionId,
         ideaLength: idea.length,
-        hasContext: !!context 
+        hasContext: !!context,
       });
-      
+
       const result = await this.quickValidator.validateIdeaQuick(idea, context);
-      
+
       const executionTime = Date.now() - startTime;
       this.performanceMonitor.recordExecution(executionTime, false, 0);
-      this.logInfo('Quick validation completed', { 
-        sessionId, 
-        executionTime, 
+      this.logInfo('Quick validation completed', {
+        sessionId,
+        executionTime,
         verdict: result.verdict,
-        processingTime: result.processingTimeMs
+        processingTime: result.processingTimeMs,
       });
-      
+
       return result;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.performanceMonitor.recordError();
       this.performanceMonitor.recordExecution(executionTime, false, 0);
       this.logError('Quick validation failed', error, { sessionId, executionTime });
-      throw new Error(`Quick validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Quick validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   // Private methods for error handling in each stage
 
-  private async parseIntentWithErrorHandling(rawIntent: string, params?: OptionalParams, sessionId?: string): Promise<ParsedIntent> {
+  private async parseIntentWithErrorHandling(
+    rawIntent: string,
+    params?: OptionalParams,
+    sessionId?: string
+  ): Promise<ParsedIntent> {
     try {
       const result = await RetryHandler.withRetry(
         () => this.intentInterpreter.parseIntent(rawIntent, params),
         2, // max retries
         500 // delay ms
       );
-      
+
       // Validate parsed intent
       if (!result.businessObjective || result.businessObjective.trim().length === 0) {
         throw new Error('Failed to extract business objective from intent');
       }
-      
+
       if (result.operationsRequired.length === 0) {
-        this.logWarning('No operations identified in intent', { sessionId, intent: rawIntent.substring(0, 100) });
+        this.logWarning('No operations identified in intent', {
+          sessionId,
+          intent: rawIntent.substring(0, 100),
+        });
         // Add a default operation to prevent pipeline failure
         result.operationsRequired.push({
           id: 'default-op-1',
           type: 'analysis',
           description: 'Analyze and process user requirements',
-          estimatedQuotaCost: 5
+          estimatedQuotaCost: 5,
         });
       }
-      
+
       return result;
     } catch (error) {
       ErrorHandler.logError(error, { sessionId, intentLength: rawIntent.length, stage: 'intent' });
@@ -624,45 +765,60 @@ export class AIAgentPipeline {
     }
   }
 
-  private async performBusinessAnalysisWithErrorHandling(parsedIntent: ParsedIntent, sessionId?: string): Promise<ConsultingAnalysis> {
+  private async performBusinessAnalysisWithErrorHandling(
+    parsedIntent: ParsedIntent,
+    sessionId?: string
+  ): Promise<ConsultingAnalysis> {
     try {
       const result = await ErrorHandler.safeExecute(
         () => this.businessAnalyzer.analyzeWithTechniques(parsedIntent),
         ErrorHandler.handleAnalysisFailure(new Error('Analysis failed'), undefined),
         { stage: 'analysis', operation: 'business_analysis' }
       );
-      
+
       // Validate analysis results
       if (!result.techniquesUsed || result.techniquesUsed.length === 0) {
         this.logWarning('No consulting techniques were applied', { sessionId });
         // Provide fallback analysis
         result.techniquesUsed = [
-          { name: 'MECE', relevanceScore: 0.5, applicableScenarios: ['general analysis'] }
+          { name: 'MECE', relevanceScore: 0.5, applicableScenarios: ['general analysis'] },
         ];
         result.keyFindings = ['General workflow analysis completed'];
         result.totalQuotaSavings = 15; // Conservative estimate
       }
-      
+
       if (result.totalQuotaSavings < 0) {
-        this.logWarning('Negative savings detected, adjusting to minimum', { sessionId, originalSavings: result.totalQuotaSavings });
+        this.logWarning('Negative savings detected, adjusting to minimum', {
+          sessionId,
+          originalSavings: result.totalQuotaSavings,
+        });
         result.totalQuotaSavings = 5; // Minimum positive savings
       }
-      
+
       return result;
     } catch (error) {
-      ErrorHandler.logError(error, { sessionId, operationsCount: parsedIntent.operationsRequired.length, stage: 'analysis' });
-      
+      ErrorHandler.logError(error, {
+        sessionId,
+        operationsCount: parsedIntent.operationsRequired.length,
+        stage: 'analysis',
+      });
+
       // Use fallback analysis if available
       if (ErrorHandler.isRecoverable(error)) {
         return ErrorHandler.handleAnalysisFailure(error);
       }
-      
-      throw this.createStageError('analysis', 'business_analysis_failed', error, ErrorHandler.getFallbackStrategy(error, 'analysis'));
+
+      throw this.createStageError(
+        'analysis',
+        'business_analysis_failed',
+        error,
+        ErrorHandler.getFallbackStrategy(error, 'analysis')
+      );
     }
   }
 
   private async optimizeWorkflowWithErrorHandling(
-    parsedIntent: ParsedIntent, 
+    parsedIntent: ParsedIntent,
     analysis: ConsultingAnalysis,
     sessionId?: string
   ): Promise<OptimizedWorkflow> {
@@ -675,10 +831,10 @@ export class AIAgentPipeline {
         description: op.description,
         inputs: [],
         outputs: [],
-        quotaCost: op.estimatedQuotaCost
+        quotaCost: op.estimatedQuotaCost,
       })),
       dataFlow: [],
-      estimatedComplexity: parsedIntent.technicalRequirements.length
+      estimatedComplexity: parsedIntent.technicalRequirements.length,
     };
 
     try {
@@ -687,30 +843,44 @@ export class AIAgentPipeline {
         ErrorHandler.handleOptimizationFailure(new Error('Optimization failed'), initialWorkflow),
         { stage: 'optimization', operation: 'workflow_optimization' }
       );
-      
+
       // Validate optimization results
       if (!result.optimizations || result.optimizations.length === 0) {
-        this.logWarning('No optimizations were applied', { sessionId, workflowSteps: initialWorkflow.steps.length });
+        this.logWarning('No optimizations were applied', {
+          sessionId,
+          workflowSteps: initialWorkflow.steps.length,
+        });
         // Create minimal optimization to ensure pipeline continues
-        result.optimizations = [{
-          type: 'caching',
-          description: 'Basic caching optimization applied',
-          stepsAffected: [initialWorkflow.steps[0]?.id || 'default'],
-          estimatedSavings: { vibes: 0, specs: 0, percentage: 10 }
-        }];
+        result.optimizations = [
+          {
+            type: 'caching',
+            description: 'Basic caching optimization applied',
+            stepsAffected: [initialWorkflow.steps[0]?.id || 'default'],
+            estimatedSavings: { vibes: 0, specs: 0, percentage: 10 },
+          },
+        ];
         result.efficiencyGains.totalSavingsPercentage = 10;
       }
-      
+
       return result;
     } catch (error) {
-      ErrorHandler.logError(error, { sessionId, stepsCount: parsedIntent.operationsRequired.length, stage: 'optimization' });
-      
+      ErrorHandler.logError(error, {
+        sessionId,
+        stepsCount: parsedIntent.operationsRequired.length,
+        stage: 'optimization',
+      });
+
       // Use fallback optimization if available
       if (ErrorHandler.isRecoverable(error)) {
         return ErrorHandler.handleOptimizationFailure(error, initialWorkflow);
       }
-      
-      throw this.createStageError('optimization', 'workflow_optimization_failed', error, ErrorHandler.getFallbackStrategy(error, 'optimization'));
+
+      throw this.createStageError(
+        'optimization',
+        'workflow_optimization_failed',
+        error,
+        ErrorHandler.getFallbackStrategy(error, 'optimization')
+      );
     }
   }
 
@@ -722,17 +892,23 @@ export class AIAgentPipeline {
     try {
       const naiveForecast = await ErrorHandler.safeExecute(
         () => this.quotaForecaster.estimateNaiveConsumption(optimizedWorkflow.originalWorkflow),
-        ErrorHandler.handleForecastingFailure(new Error('Naive forecast failed'), optimizedWorkflow.originalWorkflow),
+        ErrorHandler.handleForecastingFailure(
+          new Error('Naive forecast failed'),
+          optimizedWorkflow.originalWorkflow
+        ),
         { stage: 'forecasting', operation: 'naive_forecast' }
       );
 
       const optimizedForecast = await ErrorHandler.safeExecute(
         () => this.quotaForecaster.estimateOptimizedConsumption(optimizedWorkflow),
-        ErrorHandler.handleForecastingFailure(new Error('Optimized forecast failed'), optimizedWorkflow),
+        ErrorHandler.handleForecastingFailure(
+          new Error('Optimized forecast failed'),
+          optimizedWorkflow
+        ),
         { stage: 'forecasting', operation: 'optimized_forecast' }
       );
 
-      const zeroBasedForecast = analysis.zeroBasedSolution 
+      const zeroBasedForecast = analysis.zeroBasedSolution
         ? await ErrorHandler.safeExecute(
             () => this.quotaForecaster.estimateZeroBasedConsumption(analysis.zeroBasedSolution!),
             optimizedForecast,
@@ -741,83 +917,114 @@ export class AIAgentPipeline {
         : optimizedForecast;
 
       const result = await ErrorHandler.safeExecute(
-        () => this.quotaForecaster.generateROITable([
-          { 
-            name: 'Conservative', 
-            forecast: naiveForecast, 
-            savingsPercentage: 0, 
-            implementationEffort: 'none', 
-            riskLevel: 'none' 
-          },
-          { 
-            name: 'Balanced', 
-            forecast: optimizedForecast, 
-            savingsPercentage: this.calculateSavingsPercentage(naiveForecast, optimizedForecast), 
-            implementationEffort: 'medium', 
-            riskLevel: 'low' 
-          },
-          { 
-            name: 'Bold', 
-            forecast: zeroBasedForecast, 
-            savingsPercentage: this.calculateSavingsPercentage(naiveForecast, zeroBasedForecast), 
-            implementationEffort: 'high', 
-            riskLevel: 'medium' 
-          }
-        ]),
+        () =>
+          this.quotaForecaster.generateROITable([
+            {
+              name: 'Conservative',
+              forecast: naiveForecast,
+              savingsPercentage: 0,
+              implementationEffort: 'none',
+              riskLevel: 'none',
+            },
+            {
+              name: 'Balanced',
+              forecast: optimizedForecast,
+              savingsPercentage: this.calculateSavingsPercentage(naiveForecast, optimizedForecast),
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+            },
+            {
+              name: 'Bold',
+              forecast: zeroBasedForecast,
+              savingsPercentage: this.calculateSavingsPercentage(naiveForecast, zeroBasedForecast),
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+            },
+          ]),
         ErrorHandler.handleROIAnalysisFailure(new Error('ROI analysis failed'), naiveForecast),
         { stage: 'forecasting', operation: 'roi_analysis' }
       );
-      
+
       // Validate ROI analysis
       if (!result.scenarios || result.scenarios.length === 0) {
         this.logWarning('No ROI scenarios generated, creating fallback', { sessionId });
-        result.scenarios = [{
-          name: 'Balanced',
-          forecast: optimizedForecast,
-          savingsPercentage: 20,
-          implementationEffort: 'medium',
-          riskLevel: 'low'
-        }];
+        result.scenarios = [
+          {
+            name: 'Balanced',
+            forecast: optimizedForecast,
+            savingsPercentage: 20,
+            implementationEffort: 'medium',
+            riskLevel: 'low',
+          },
+        ];
         result.bestOption = 'Balanced';
         result.recommendations = ['Apply moderate optimization for balanced risk-reward'];
       }
-      
+
       return result;
     } catch (error) {
-      ErrorHandler.logError(error, { sessionId, optimizationsCount: optimizedWorkflow.optimizations.length, stage: 'forecasting' });
-      
+      ErrorHandler.logError(error, {
+        sessionId,
+        optimizationsCount: optimizedWorkflow.optimizations.length,
+        stage: 'forecasting',
+      });
+
       // Use fallback ROI analysis if available
       if (ErrorHandler.isRecoverable(error)) {
         return ErrorHandler.handleROIAnalysisFailure(error);
       }
-      
-      throw this.createStageError('forecasting', 'roi_analysis_failed', error, ErrorHandler.getFallbackStrategy(error, 'forecasting'));
+
+      throw this.createStageError(
+        'forecasting',
+        'roi_analysis_failed',
+        error,
+        ErrorHandler.getFallbackStrategy(error, 'forecasting')
+      );
     }
   }
 
-  private async generateConsultingSummaryWithErrorHandling(analysis: ConsultingAnalysis, sessionId?: string): Promise<ConsultingSummary> {
+  private async generateConsultingSummaryWithErrorHandling(
+    analysis: ConsultingAnalysis,
+    sessionId?: string
+  ): Promise<ConsultingSummary> {
     try {
-      const result = this.consultingSummaryGenerator.generateConsultingSummary(analysis, analysis.techniquesUsed);
-      
+      const result = this.consultingSummaryGenerator.generateConsultingSummary(
+        analysis,
+        analysis.techniquesUsed
+      );
+
       // Validate consulting summary
       if (!result.recommendations || result.recommendations.length === 0) {
         this.logWarning('No recommendations generated, creating fallback', { sessionId });
-        result.recommendations = [{
-          mainRecommendation: 'Apply identified optimizations to improve efficiency',
-          supportingReasons: ['Analysis indicates potential for improvement', 'Current workflow has optimization opportunities'],
-          evidence: [],
-          expectedOutcome: `Expected ${analysis.totalQuotaSavings}% improvement in quota efficiency`
-        }];
+        result.recommendations = [
+          {
+            mainRecommendation: 'Apply identified optimizations to improve efficiency',
+            supportingReasons: [
+              'Analysis indicates potential for improvement',
+              'Current workflow has optimization opportunities',
+            ],
+            evidence: [],
+            expectedOutcome: `Expected ${analysis.totalQuotaSavings}% improvement in quota efficiency`,
+          },
+        ];
       }
-      
+
       if (!result.executiveSummary || result.executiveSummary.trim().length === 0) {
         result.executiveSummary = `Analysis using ${analysis.techniquesUsed.length} consulting techniques reveals ${analysis.totalQuotaSavings}% potential quota savings through systematic optimization.`;
       }
-      
+
       return result;
     } catch (error) {
-      this.logError('Consulting summary generation failed', error, { sessionId, techniquesCount: analysis.techniquesUsed.length });
-      throw this.createStageError('analysis', 'consulting_summary_failed', error, 'Review analysis results and try again. Consider reducing the complexity of the analysis.');
+      this.logError('Consulting summary generation failed', error, {
+        sessionId,
+        techniquesCount: analysis.techniquesUsed.length,
+      });
+      throw this.createStageError(
+        'analysis',
+        'consulting_summary_failed',
+        error,
+        'Review analysis results and try again. Consider reducing the complexity of the analysis.'
+      );
     }
   }
 
@@ -830,19 +1037,24 @@ export class AIAgentPipeline {
     sessionId?: string
   ): Promise<EnhancedKiroSpec> {
     try {
-      const baseSpec = await this.specGenerator.generateKiroSpec(optimizedWorkflow, parsedIntent.businessObjective);
-      
+      const baseSpec = await this.specGenerator.generateKiroSpec(
+        optimizedWorkflow,
+        parsedIntent.businessObjective
+      );
+
       // Validate base spec
       if (!baseSpec.tasks || baseSpec.tasks.length === 0) {
         this.logWarning('No tasks generated in spec, creating fallback', { sessionId });
-        baseSpec.tasks = [{
-          id: 'task-1',
-          description: 'Implement optimized workflow based on analysis',
-          requirements: [],
-          estimatedEffort: 'medium'
-        }];
+        baseSpec.tasks = [
+          {
+            id: 'task-1',
+            description: 'Implement optimized workflow based on analysis',
+            requirements: [],
+            estimatedEffort: 'medium',
+          },
+        ];
       }
-      
+
       // Create alternative options from ROI analysis
       const alternativeOptions = {
         conservative: {
@@ -851,15 +1063,16 @@ export class AIAgentPipeline {
           quotaSavings: 0,
           implementationEffort: 'low' as const,
           riskLevel: 'low' as const,
-          estimatedROI: 1.0
+          estimatedROI: 1.0,
         },
         balanced: {
           name: 'Balanced',
           description: 'Moderate optimization with balanced risk-reward',
-          quotaSavings: roiAnalysis.scenarios.find(s => s.name === 'Balanced')?.savingsPercentage || 25,
+          quotaSavings:
+            roiAnalysis.scenarios.find(s => s.name === 'Balanced')?.savingsPercentage || 25,
           implementationEffort: 'medium' as const,
           riskLevel: 'low' as const,
-          estimatedROI: 2.5
+          estimatedROI: 2.5,
         },
         bold: {
           name: 'Bold',
@@ -867,26 +1080,34 @@ export class AIAgentPipeline {
           quotaSavings: roiAnalysis.scenarios.find(s => s.name === 'Bold')?.savingsPercentage || 50,
           implementationEffort: 'high' as const,
           riskLevel: 'medium' as const,
-          estimatedROI: 4.0
-        }
+          estimatedROI: 4.0,
+        },
       };
 
       const enhancedSpec = {
         ...baseSpec,
         consultingSummary,
         roiAnalysis,
-        alternativeOptions
+        alternativeOptions,
       };
-      
+
       // Final validation
       if (!enhancedSpec.name || enhancedSpec.name.trim().length === 0) {
         enhancedSpec.name = `Optimized ${parsedIntent.businessObjective}`;
       }
-      
+
       return enhancedSpec;
     } catch (error) {
-      this.logError('Enhanced spec generation failed', error, { sessionId, workflowSteps: optimizedWorkflow.steps.length });
-      throw this.createStageError('analysis', 'spec_generation_failed', error, 'Review optimization results and try again. Consider simplifying the workflow structure.');
+      this.logError('Enhanced spec generation failed', error, {
+        sessionId,
+        workflowSteps: optimizedWorkflow.steps.length,
+      });
+      throw this.createStageError(
+        'analysis',
+        'spec_generation_failed',
+        error,
+        'Review optimization results and try again. Consider simplifying the workflow structure.'
+      );
     }
   }
 
@@ -899,7 +1120,7 @@ export class AIAgentPipeline {
     sessionId?: string
   ): Promise<PipelineResult['pmDocuments']> {
     const pmDocuments: PipelineResult['pmDocuments'] = {};
-    
+
     try {
       // Generate requirements document if requested
       if (pmOptions.requirements) {
@@ -925,11 +1146,17 @@ export class AIAgentPipeline {
         this.logInfo('Generating task plan document', { sessionId });
         const taskPlan = await this.pmDocumentGenerator.generateTaskPlan(
           JSON.stringify(pmDocuments.designOptions),
-          pmOptions.context ? {
-            maxVibes: pmOptions.context.budget ? Math.floor(pmOptions.context.budget * 0.7) : undefined,
-            maxSpecs: pmOptions.context.budget ? Math.floor(pmOptions.context.budget * 0.3) : undefined,
-            budgetUSD: pmOptions.context.budget
-          } : undefined
+          pmOptions.context
+            ? {
+                maxVibes: pmOptions.context.budget
+                  ? Math.floor(pmOptions.context.budget * 0.7)
+                  : undefined,
+                maxSpecs: pmOptions.context.budget
+                  ? Math.floor(pmOptions.context.budget * 0.3)
+                  : undefined,
+                budgetUSD: pmOptions.context.budget,
+              }
+            : undefined
         );
         pmDocuments.taskPlan = taskPlan;
       }
@@ -942,9 +1169,14 @@ export class AIAgentPipeline {
           JSON.stringify(pmDocuments.designOptions),
           pmDocuments.taskPlan ? JSON.stringify(pmDocuments.taskPlan) : undefined,
           {
-            cost_naive: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('conservative'))?.forecast.estimatedCost,
-            cost_balanced: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('balanced'))?.forecast.estimatedCost,
-            cost_bold: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('bold'))?.forecast.estimatedCost
+            cost_naive: roiAnalysis.scenarios.find(s =>
+              s.name.toLowerCase().includes('conservative')
+            )?.forecast.estimatedCost,
+            cost_balanced: roiAnalysis.scenarios.find(s =>
+              s.name.toLowerCase().includes('balanced')
+            )?.forecast.estimatedCost,
+            cost_bold: roiAnalysis.scenarios.find(s => s.name.toLowerCase().includes('bold'))
+              ?.forecast.estimatedCost,
           }
         );
         pmDocuments.managementOnePager = this.formatManagementOnePager(onePager);
@@ -961,80 +1193,105 @@ export class AIAgentPipeline {
         pmDocuments.prfaq = {
           pressRelease: this.formatPressRelease(prfaq.pressRelease),
           faq: this.formatFAQ(prfaq.faq),
-          launchChecklist: this.formatLaunchChecklist(prfaq.launchChecklist)
+          launchChecklist: this.formatLaunchChecklist(prfaq.launchChecklist),
         };
       }
 
       // Validate cross-document consistency
       const validationResult = this.validatePMDocumentConsistency(pmDocuments);
-      
+
       if (!validationResult.isValid) {
         this.logWarning('PM document consistency issues detected', {
           sessionId,
           issues: validationResult.issues,
-          warnings: validationResult.warnings
+          warnings: validationResult.warnings,
         });
-        
+
         // Log issues but don't fail the pipeline - return documents with warnings
         validationResult.issues.forEach(issue => {
           this.logWarning(`PM Document Consistency Issue: ${issue}`, { sessionId });
         });
       }
-      
+
       if (validationResult.warnings.length > 0) {
         this.logInfo('PM document consistency warnings', {
           sessionId,
-          warnings: validationResult.warnings
+          warnings: validationResult.warnings,
         });
       }
 
       return pmDocuments;
     } catch (error) {
-      this.logError('PM documents generation failed', error, { sessionId, requestedDocs: Object.keys(pmOptions) });
-      
+      this.logError('PM documents generation failed', error, {
+        sessionId,
+        requestedDocs: Object.keys(pmOptions),
+      });
+
       // Return partial results if some documents were generated successfully
       if (Object.keys(pmDocuments).length > 0) {
-        this.logWarning('Returning partial PM documents due to error', { 
-          sessionId, 
+        this.logWarning('Returning partial PM documents due to error', {
+          sessionId,
           generatedDocs: Object.keys(pmDocuments),
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
-        
+
         // Still validate partial documents for consistency
         const validationResult = this.validatePMDocumentConsistency(pmDocuments);
         if (validationResult.warnings.length > 0) {
           this.logWarning('Partial PM documents have consistency warnings', {
             sessionId,
-            warnings: validationResult.warnings
+            warnings: validationResult.warnings,
           });
         }
-        
+
         return pmDocuments;
       }
-      
-      throw this.createStageError('analysis', 'pm_documents_failed', error, 'Review input parameters and try again. Consider generating documents individually.');
+
+      throw this.createStageError(
+        'analysis',
+        'pm_documents_failed',
+        error,
+        'Review input parameters and try again. Consider generating documents individually.'
+      );
     }
   }
 
   private calculateSavingsPercentage(baseline: QuotaForecast, optimized: QuotaForecast): number {
     if (baseline.estimatedCost === 0) return 0;
-    return Math.round(((baseline.estimatedCost - optimized.estimatedCost) / baseline.estimatedCost) * 100);
+    return Math.round(
+      ((baseline.estimatedCost - optimized.estimatedCost) / baseline.estimatedCost) * 100
+    );
   }
 
-  private createStageError(stage: ProcessingError['stage'], type: string, error: unknown, suggestedAction: string): ProcessingError {
+  private createStageError(
+    stage: ProcessingError['stage'],
+    type: string,
+    error: unknown,
+    suggestedAction: string
+  ): ProcessingError {
     return {
       stage,
       type,
       message: error instanceof Error ? error.message : 'Unknown error occurred',
       suggestedAction,
-      fallbackAvailable: false
+      fallbackAvailable: false,
     };
   }
 
-  private handlePipelineError(error: unknown, sessionId: string, executionTime: number, quotaUsed: number): PipelineResult {
+  private handlePipelineError(
+    error: unknown,
+    sessionId: string,
+    executionTime: number,
+    quotaUsed: number
+  ): PipelineResult {
     if (error && typeof error === 'object' && 'stage' in error) {
       const processingError = error as ProcessingError;
-      this.logError('Pipeline error handled', processingError, { sessionId, errorStage: processingError.stage, executionTime, quotaUsed });
+      this.logError('Pipeline error handled', processingError, {
+        sessionId,
+        errorStage: processingError.stage,
+        executionTime,
+        quotaUsed,
+      });
       return {
         success: false,
         error: processingError,
@@ -1042,21 +1299,26 @@ export class AIAgentPipeline {
           executionTime,
           sessionId,
           quotaUsed,
-          optimizationsApplied: 0
-        }
+          optimizationsApplied: 0,
+        },
       };
     }
-    
+
     const fallbackError = {
       stage: 'intent' as const,
       type: 'pipeline_error',
       message: error instanceof Error ? error.message : 'Unknown pipeline error',
       suggestedAction: 'Check input format and try again',
-      fallbackAvailable: false
+      fallbackAvailable: false,
     };
-    
-    this.logError('Unhandled pipeline error', error, { sessionId, errorType: 'unhandled', executionTime, quotaUsed });
-    
+
+    this.logError('Unhandled pipeline error', error, {
+      sessionId,
+      errorType: 'unhandled',
+      executionTime,
+      quotaUsed,
+    });
+
     return {
       success: false,
       error: fallbackError,
@@ -1064,8 +1326,8 @@ export class AIAgentPipeline {
         executionTime,
         sessionId,
         quotaUsed,
-        optimizationsApplied: 0
-      }
+        optimizationsApplied: 0,
+      },
     };
   }
 
@@ -1077,7 +1339,7 @@ export class AIAgentPipeline {
       timestamp,
       message,
       component: 'AIAgentPipeline',
-      ...context
+      ...context,
     };
     console.log(JSON.stringify(logEntry));
   }
@@ -1089,7 +1351,7 @@ export class AIAgentPipeline {
       timestamp,
       message,
       component: 'AIAgentPipeline',
-      ...context
+      ...context,
     };
     console.warn(JSON.stringify(logEntry));
   }
@@ -1104,9 +1366,9 @@ export class AIAgentPipeline {
       error: {
         message: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        type: error instanceof Error ? error.constructor.name : typeof error
+        type: error instanceof Error ? error.constructor.name : typeof error,
       },
-      ...context
+      ...context,
     };
     console.error(JSON.stringify(logEntry));
   }
@@ -1148,10 +1410,10 @@ export class AIAgentPipeline {
   } {
     const summary = this.performanceMonitor.getPerformanceSummary();
     const cacheStats = this.cache.getStats();
-    
+
     return {
       ...summary,
-      cacheStats
+      cacheStats,
     };
   }
 
@@ -1183,89 +1445,96 @@ export class AIAgentPipeline {
    * Generate management one-pager with Pyramid Principle structure
    */
   async generateManagementOnePager(
-    requirements: string, 
-    design: string, 
-    tasks?: string, 
+    requirements: string,
+    design: string,
+    tasks?: string,
     roiInputs?: { cost_naive?: number; cost_balanced?: number; cost_bold?: number }
   ): Promise<{ one_pager_markdown: string; validation_result?: ConsistencyValidationResult }> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting management one-pager generation', { 
-        sessionId, 
+      this.logInfo('Starting management one-pager generation', {
+        sessionId,
         requirementsLength: requirements.length,
         designLength: design.length,
         hasTasks: !!tasks,
-        hasROIInputs: !!roiInputs
+        hasROIInputs: !!roiInputs,
       });
-      
+
       const onePager = await this.pmDocumentGenerator.generateManagementOnePager(
-        requirements, 
-        design, 
-        tasks, 
+        requirements,
+        design,
+        tasks,
         roiInputs
       );
-      
+
       // Perform consistency validation
       let validationResult: ConsistencyValidationResult | undefined;
       try {
         const parsedRequirements = this.parseRequirementsFromString(requirements);
         const parsedDesign = this.parseDesignFromString(design);
-        
+
         const validator = new PMDocumentConsistencyValidator();
         validationResult = validator.validateManagementOnePagerConsistency(
-          onePager, 
-          parsedRequirements, 
+          onePager,
+          parsedRequirements,
           parsedDesign
         );
-        
+
         this.logInfo('Management one-pager consistency validation completed', {
           sessionId,
           isValid: validationResult.isValid,
           errorsCount: validationResult.errors.length,
-          warningsCount: validationResult.warnings.length
+          warningsCount: validationResult.warnings.length,
         });
-        
+
         // Log validation issues if any
         if (validationResult.errors.length > 0) {
           this.logWarning('Management one-pager validation errors found', {
             sessionId,
-            errors: validationResult.errors.map(e => ({ type: e.type, severity: e.severity, message: e.message }))
+            errors: validationResult.errors.map(e => ({
+              type: e.type,
+              severity: e.severity,
+              message: e.message,
+            })),
           });
         }
-        
+
         if (validationResult.warnings.length > 0) {
           this.logInfo('Management one-pager validation warnings found', {
             sessionId,
-            warnings: validationResult.warnings.map(w => ({ type: w.type, message: w.message }))
+            warnings: validationResult.warnings.map(w => ({ type: w.type, message: w.message })),
           });
         }
       } catch (validationError) {
         this.logWarning('Management one-pager consistency validation failed', {
           sessionId,
-          error: validationError instanceof Error ? validationError.message : 'Unknown validation error'
+          error:
+            validationError instanceof Error ? validationError.message : 'Unknown validation error',
         });
       }
-      
+
       const markdown = this.formatManagementOnePager(onePager);
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Management one-pager generation completed', { 
-        sessionId, 
+      this.logInfo('Management one-pager generation completed', {
+        sessionId,
         executionTime,
         markdownLength: markdown.length,
-        validationPassed: validationResult?.isValid
+        validationPassed: validationResult?.isValid,
       });
-      
-      return { 
+
+      return {
         one_pager_markdown: markdown,
-        validation_result: validationResult
+        validation_result: validationResult,
       };
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Management one-pager generation failed', error, { sessionId, executionTime });
-      throw new Error(`Management one-pager generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Management one-pager generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -1273,88 +1542,100 @@ export class AIAgentPipeline {
    * Generate Amazon-style PR-FAQ document
    */
   async generatePRFAQ(
-    requirements: string, 
-    design: string, 
+    requirements: string,
+    design: string,
     targetDate?: string
-  ): Promise<{ press_release_markdown: string; faq_markdown: string; launch_checklist_markdown: string; validation_result?: ConsistencyValidationResult }> {
+  ): Promise<{
+    press_release_markdown: string;
+    faq_markdown: string;
+    launch_checklist_markdown: string;
+    validation_result?: ConsistencyValidationResult;
+  }> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting PR-FAQ generation', { 
-        sessionId, 
+      this.logInfo('Starting PR-FAQ generation', {
+        sessionId,
         requirementsLength: requirements.length,
         designLength: design.length,
-        targetDate
+        targetDate,
       });
-      
+
       const prfaq = await this.pmDocumentGenerator.generatePRFAQ(requirements, design, targetDate);
-      
+
       // Perform consistency validation
       let validationResult: ConsistencyValidationResult | undefined;
       try {
         const parsedRequirements = this.parseRequirementsFromString(requirements);
         const parsedDesign = this.parseDesignFromString(design);
-        
+
         const validator = new PMDocumentConsistencyValidator();
         validationResult = validator.validatePRFAQConsistency(
-          prfaq, 
-          parsedRequirements, 
+          prfaq,
+          parsedRequirements,
           parsedDesign
         );
-        
+
         this.logInfo('PR-FAQ consistency validation completed', {
           sessionId,
           isValid: validationResult.isValid,
           errorsCount: validationResult.errors.length,
-          warningsCount: validationResult.warnings.length
+          warningsCount: validationResult.warnings.length,
         });
-        
+
         // Log validation issues if any
         if (validationResult.errors.length > 0) {
           this.logWarning('PR-FAQ validation errors found', {
             sessionId,
-            errors: validationResult.errors.map(e => ({ type: e.type, severity: e.severity, message: e.message }))
+            errors: validationResult.errors.map(e => ({
+              type: e.type,
+              severity: e.severity,
+              message: e.message,
+            })),
           });
         }
-        
+
         if (validationResult.warnings.length > 0) {
           this.logInfo('PR-FAQ validation warnings found', {
             sessionId,
-            warnings: validationResult.warnings.map(w => ({ type: w.type, message: w.message }))
+            warnings: validationResult.warnings.map(w => ({ type: w.type, message: w.message })),
           });
         }
       } catch (validationError) {
         this.logWarning('PR-FAQ consistency validation failed', {
           sessionId,
-          error: validationError instanceof Error ? validationError.message : 'Unknown validation error'
+          error:
+            validationError instanceof Error ? validationError.message : 'Unknown validation error',
         });
       }
-      
+
       const pressReleaseMarkdown = this.formatPressRelease(prfaq.pressRelease);
       const faqMarkdown = this.formatFAQ(prfaq.faq);
       const launchChecklistMarkdown = this.formatLaunchChecklist(prfaq.launchChecklist);
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('PR-FAQ generation completed', { 
-        sessionId, 
+      this.logInfo('PR-FAQ generation completed', {
+        sessionId,
         executionTime,
         pressReleaseLength: pressReleaseMarkdown.length,
         faqCount: prfaq.faq.length,
         checklistItems: prfaq.launchChecklist.length,
-        validationPassed: validationResult?.isValid
+        validationPassed: validationResult?.isValid,
       });
-      
-      return { 
+
+      return {
         press_release_markdown: pressReleaseMarkdown,
         faq_markdown: faqMarkdown,
         launch_checklist_markdown: launchChecklistMarkdown,
-        validation_result: validationResult
+        validation_result: validationResult,
       };
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('PR-FAQ generation failed', error, { sessionId, executionTime });
-      throw new Error(`PR-FAQ generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `PR-FAQ generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -1362,35 +1643,42 @@ export class AIAgentPipeline {
    * Generate structured requirements with MoSCoW prioritization
    */
   async generateRequirements(
-    rawIntent: string, 
-    context?: { roadmap_theme?: string; budget?: number; quotas?: { maxVibes?: number; maxSpecs?: number }; deadlines?: string }
+    rawIntent: string,
+    context?: {
+      roadmap_theme?: string;
+      budget?: number;
+      quotas?: { maxVibes?: number; maxSpecs?: number };
+      deadlines?: string;
+    }
   ) {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting requirements generation', { 
-        sessionId, 
+      this.logInfo('Starting requirements generation', {
+        sessionId,
         intentLength: rawIntent.length,
-        hasContext: !!context
+        hasContext: !!context,
       });
-      
+
       const requirements = await this.pmDocumentGenerator.generateRequirements(rawIntent, context);
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Requirements generation completed', { 
-        sessionId, 
+      this.logInfo('Requirements generation completed', {
+        sessionId,
         executionTime,
         functionalRequirementsCount: requirements.functionalRequirements.length,
         mustHaveCount: requirements.priority.must.length,
-        rightTimeDecision: requirements.rightTimeVerdict.decision
+        rightTimeDecision: requirements.rightTimeVerdict.decision,
       });
-      
+
       return requirements;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Requirements generation failed', error, { sessionId, executionTime });
-      throw new Error(`Requirements generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Requirements generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -1400,28 +1688,30 @@ export class AIAgentPipeline {
   async generateDesignOptions(requirements: string) {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting design options generation', { 
-        sessionId, 
-        requirementsLength: requirements.length
+      this.logInfo('Starting design options generation', {
+        sessionId,
+        requirementsLength: requirements.length,
       });
-      
+
       const designOptions = await this.pmDocumentGenerator.generateDesignOptions(requirements);
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Design options generation completed', { 
-        sessionId, 
+      this.logInfo('Design options generation completed', {
+        sessionId,
         executionTime,
         optionsCount: 3,
-        matrixQuadrants: Object.keys(designOptions.impactEffortMatrix).length
+        matrixQuadrants: Object.keys(designOptions.impactEffortMatrix).length,
       });
-      
+
       return designOptions;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Design options generation failed', error, { sessionId, executionTime });
-      throw new Error(`Design options generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Design options generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -1429,85 +1719,91 @@ export class AIAgentPipeline {
    * Generate phased task plan with guardrails
    */
   async generateTaskPlan(
-    design: string, 
+    design: string,
     limits?: { max_vibes?: number; max_specs?: number; budget_usd?: number }
   ): Promise<{ task_plan: TaskPlan; validation_result?: ConsistencyValidationResult }> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting task plan generation', { 
-        sessionId, 
+      this.logInfo('Starting task plan generation', {
+        sessionId,
         designLength: design.length,
-        hasLimits: !!limits
+        hasLimits: !!limits,
       });
-      
+
       // Convert MCP format to TaskLimits format
-      const taskLimits = limits ? {
-        maxVibes: limits.max_vibes,
-        maxSpecs: limits.max_specs,
-        budgetUSD: limits.budget_usd
-      } : undefined;
-      
+      const taskLimits = limits
+        ? {
+            maxVibes: limits.max_vibes,
+            maxSpecs: limits.max_specs,
+            budgetUSD: limits.budget_usd,
+          }
+        : undefined;
+
       const taskPlan = await this.pmDocumentGenerator.generateTaskPlan(design, taskLimits);
-      
+
       // Perform consistency validation
       let validationResult: ConsistencyValidationResult | undefined;
       try {
         const parsedDesign = this.parseDesignFromString(design);
-        
+
         const validator = new PMDocumentConsistencyValidator();
-        validationResult = validator.validateTaskPlanConsistency(
-          taskPlan, 
-          parsedDesign
-        );
-        
+        validationResult = validator.validateTaskPlanConsistency(taskPlan, parsedDesign);
+
         this.logInfo('Task plan consistency validation completed', {
           sessionId,
           isValid: validationResult.isValid,
           errorsCount: validationResult.errors.length,
-          warningsCount: validationResult.warnings.length
+          warningsCount: validationResult.warnings.length,
         });
-        
+
         // Log validation issues if any
         if (validationResult.errors.length > 0) {
           this.logWarning('Task plan validation errors found', {
             sessionId,
-            errors: validationResult.errors.map(e => ({ type: e.type, severity: e.severity, message: e.message }))
+            errors: validationResult.errors.map(e => ({
+              type: e.type,
+              severity: e.severity,
+              message: e.message,
+            })),
           });
         }
-        
+
         if (validationResult.warnings.length > 0) {
           this.logInfo('Task plan validation warnings found', {
             sessionId,
-            warnings: validationResult.warnings.map(w => ({ type: w.type, message: w.message }))
+            warnings: validationResult.warnings.map(w => ({ type: w.type, message: w.message })),
           });
         }
       } catch (validationError) {
         this.logWarning('Task plan consistency validation failed', {
           sessionId,
-          error: validationError instanceof Error ? validationError.message : 'Unknown validation error'
+          error:
+            validationError instanceof Error ? validationError.message : 'Unknown validation error',
         });
       }
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Task plan generation completed', { 
-        sessionId, 
+      this.logInfo('Task plan generation completed', {
+        sessionId,
         executionTime,
         immediateWinsCount: taskPlan.immediateWins.length,
         shortTermCount: taskPlan.shortTerm.length,
         longTermCount: taskPlan.longTerm.length,
-        validationPassed: validationResult?.isValid
+        validationPassed: validationResult?.isValid,
       });
-      
-      return { 
+
+      return {
         task_plan: taskPlan,
-        validation_result: validationResult
+        validation_result: validationResult,
       };
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Task plan generation failed', error, { sessionId, executionTime });
-      throw new Error(`Task plan generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Task plan generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -1562,14 +1858,18 @@ ${pr.body}`;
    * Format FAQ as markdown
    */
   private formatFAQ(faq: any[]): string {
-    return faq.map((item, index) => `**Q${index + 1}: ${item.question}**\n\n${item.answer}`).join('\n\n');
+    return faq
+      .map((item, index) => `**Q${index + 1}: ${item.question}**\n\n${item.answer}`)
+      .join('\n\n');
   }
 
   /**
    * Format launch checklist as markdown
    */
   private formatLaunchChecklist(checklist: any[]): string {
-    return checklist.map(item => `- [ ] ${item.task} (Owner: ${item.owner}, Due: ${item.dueDate})`).join('\n');
+    return checklist
+      .map(item => `- [ ] ${item.task} (Owner: ${item.owner}, Due: ${item.dueDate})`)
+      .join('\n');
   }
 
   /**
@@ -1642,7 +1942,7 @@ ${pr.body}`;
     return {
       isValid: issues.length === 0,
       issues,
-      warnings
+      warnings,
     };
   }
 
@@ -1661,11 +1961,12 @@ ${pr.body}`;
       if (requirements.businessGoal && designOptions.problemFraming) {
         const businessGoalKeywords = this.extractKeywords(requirements.businessGoal);
         const problemFramingKeywords = this.extractKeywords(designOptions.problemFraming);
-        
-        const overlap = businessGoalKeywords.filter(keyword => 
-          problemFramingKeywords.some(pfKeyword => 
-            pfKeyword.toLowerCase().includes(keyword.toLowerCase()) ||
-            keyword.toLowerCase().includes(pfKeyword.toLowerCase())
+
+        const overlap = businessGoalKeywords.filter(keyword =>
+          problemFramingKeywords.some(
+            pfKeyword =>
+              pfKeyword.toLowerCase().includes(keyword.toLowerCase()) ||
+              keyword.toLowerCase().includes(pfKeyword.toLowerCase())
           )
         );
 
@@ -1676,16 +1977,18 @@ ${pr.body}`;
 
       // Check if functional requirements are addressed in design options
       if (requirements.functionalRequirements && designOptions.options) {
-        const functionalReqKeywords = requirements.functionalRequirements
-          .flatMap((req: string) => this.extractKeywords(req));
-        
+        const functionalReqKeywords = requirements.functionalRequirements.flatMap((req: string) =>
+          this.extractKeywords(req)
+        );
+
         const designOptionsText = JSON.stringify(designOptions.options);
         const designKeywords = this.extractKeywords(designOptionsText);
-        
+
         const coverage = functionalReqKeywords.filter((keyword: string) =>
-          designKeywords.some(dKeyword =>
-            dKeyword.toLowerCase().includes(keyword.toLowerCase()) ||
-            keyword.toLowerCase().includes(dKeyword.toLowerCase())
+          designKeywords.some(
+            dKeyword =>
+              dKeyword.toLowerCase().includes(keyword.toLowerCase()) ||
+              keyword.toLowerCase().includes(dKeyword.toLowerCase())
           )
         );
 
@@ -1698,16 +2001,17 @@ ${pr.body}`;
       if (requirements.priority && designOptions.options) {
         const mustHaveCount = requirements.priority.must?.length || 0;
         const shouldHaveCount = requirements.priority.should?.length || 0;
-        
+
         if (mustHaveCount > 5 && designOptions.options.conservative?.effort === 'High') {
-          warnings.push('High number of must-have requirements may not align with high-effort conservative option');
+          warnings.push(
+            'High number of must-have requirements may not align with high-effort conservative option'
+          );
         }
-        
+
         if (mustHaveCount === 0 && shouldHaveCount === 0) {
           issues.push('No prioritized requirements found to validate against design options');
         }
       }
-
     } catch (error) {
       warnings.push('Error during requirements-design consistency validation');
     }
@@ -1731,26 +2035,30 @@ ${pr.body}`;
       if (balancedOption && taskPlan.shortTerm) {
         const shortTermTaskCount = taskPlan.shortTerm.length;
         const longTermTaskCount = taskPlan.longTerm?.length || 0;
-        
-        if (balancedOption.effort === 'Low' && (shortTermTaskCount + longTermTaskCount) > 8) {
+
+        if (balancedOption.effort === 'Low' && shortTermTaskCount + longTermTaskCount > 8) {
           warnings.push('Low-effort balanced option may not align with high number of tasks');
         }
-        
-        if (balancedOption.effort === 'High' && (shortTermTaskCount + longTermTaskCount) < 4) {
+
+        if (balancedOption.effort === 'High' && shortTermTaskCount + longTermTaskCount < 4) {
           warnings.push('High-effort balanced option may not align with low number of tasks');
         }
       }
 
       // Check if high-impact design options have corresponding high-impact tasks
       if (designOptions.options && taskPlan.immediateWins) {
-        const highImpactOptions = Object.values(designOptions.options)
-          .filter((option: any) => option.impact === 'High');
-        
-        const highImpactTasks = taskPlan.immediateWins
-          .filter((task: any) => task.impact === 'High');
-        
+        const highImpactOptions = Object.values(designOptions.options).filter(
+          (option: any) => option.impact === 'High'
+        );
+
+        const highImpactTasks = taskPlan.immediateWins.filter(
+          (task: any) => task.impact === 'High'
+        );
+
         if (highImpactOptions.length > 0 && highImpactTasks.length === 0) {
-          warnings.push('High-impact design options should have corresponding high-impact immediate win tasks');
+          warnings.push(
+            'High-impact design options should have corresponding high-impact immediate win tasks'
+          );
         }
       }
 
@@ -1758,14 +2066,13 @@ ${pr.body}`;
       if (taskPlan.guardrailsCheck && designOptions.options) {
         const guardrailsLimits = taskPlan.guardrailsCheck.limits;
         const boldOption = designOptions.options.bold;
-        
+
         if (guardrailsLimits?.budgetUSD && boldOption?.effort === 'High') {
           // This is expected alignment, no warning needed
         } else if (!guardrailsLimits?.budgetUSD && boldOption?.effort === 'High') {
           warnings.push('High-effort bold option should have corresponding budget guardrails');
         }
       }
-
     } catch (error) {
       warnings.push('Error during design-task consistency validation');
     }
@@ -1789,11 +2096,11 @@ ${pr.body}`;
       if (!managementOnePager.includes('## Answer')) {
         issues.push('Management one-pager missing Answer section');
       }
-      
+
       if (!managementOnePager.includes('## Because')) {
         issues.push('Management one-pager missing Because section');
       }
-      
+
       if (!managementOnePager.includes('## ROI Snapshot')) {
         issues.push('Management one-pager missing ROI Snapshot section');
       }
@@ -1802,15 +2109,13 @@ ${pr.body}`;
       if (requirements?.businessGoal) {
         const businessGoalKeywords = this.extractKeywords(requirements.businessGoal);
         const answerSection = this.extractSection(managementOnePager, '## Answer');
-        
+
         if (answerSection) {
           const answerKeywords = this.extractKeywords(answerSection);
           const overlap = businessGoalKeywords.filter(keyword =>
-            answerKeywords.some(aKeyword =>
-              aKeyword.toLowerCase().includes(keyword.toLowerCase())
-            )
+            answerKeywords.some(aKeyword => aKeyword.toLowerCase().includes(keyword.toLowerCase()))
           );
-          
+
           if (overlap.length === 0) {
             warnings.push('Management one-pager answer may not reflect business goal');
           }
@@ -1821,10 +2126,14 @@ ${pr.body}`;
       if (designOptions?.options) {
         const optionsSection = this.extractSection(managementOnePager, '## Options');
         if (optionsSection) {
-          if (!optionsSection.includes('Conservative') || 
-              !optionsSection.includes('Balanced') || 
-              !optionsSection.includes('Bold')) {
-            warnings.push('Management one-pager options section may not include all design alternatives');
+          if (
+            !optionsSection.includes('Conservative') ||
+            !optionsSection.includes('Balanced') ||
+            !optionsSection.includes('Bold')
+          ) {
+            warnings.push(
+              'Management one-pager options section may not include all design alternatives'
+            );
           }
         }
       }
@@ -1832,9 +2141,10 @@ ${pr.body}`;
       // Validate length constraint (should be under 120 lines equivalent)
       const lineCount = managementOnePager.split('\n').length;
       if (lineCount > 120) {
-        warnings.push(`Management one-pager is ${lineCount} lines, should be under 120 for one-page format`);
+        warnings.push(
+          `Management one-pager is ${lineCount} lines, should be under 120 for one-page format`
+        );
       }
-
     } catch (error) {
       warnings.push('Error during management one-pager consistency validation');
     }
@@ -1875,26 +2185,28 @@ ${pr.body}`;
         'What are the top 3 risks',
         'What is not included',
         'How does this compare to alternatives',
-        'What\'s the estimated cost',
-        'What are the next 2 releases'
+        "What's the estimated cost",
+        'What are the next 2 releases',
       ];
 
       const faqQuestionCount = (prfaq.faq.match(/\*\*Q\d+:/g) || []).length;
       if (faqQuestionCount < 10) {
-        warnings.push(`FAQ has ${faqQuestionCount} questions, should have at least 10 required questions`);
+        warnings.push(
+          `FAQ has ${faqQuestionCount} questions, should have at least 10 required questions`
+        );
       }
 
       // Check if business goal is reflected in press release
       if (requirements?.businessGoal) {
         const businessGoalKeywords = this.extractKeywords(requirements.businessGoal);
         const pressReleaseKeywords = this.extractKeywords(prfaq.pressRelease);
-        
+
         const overlap = businessGoalKeywords.filter(keyword =>
           pressReleaseKeywords.some(prKeyword =>
             prKeyword.toLowerCase().includes(keyword.toLowerCase())
           )
         );
-        
+
         if (overlap.length === 0) {
           warnings.push('Press release may not reflect business goal');
         }
@@ -1904,7 +2216,6 @@ ${pr.body}`;
       if (!prfaq.launchChecklist.includes('- [ ]')) {
         issues.push('Launch checklist missing proper checkbox format');
       }
-
     } catch (error) {
       warnings.push('Error during PR-FAQ consistency validation');
     }
@@ -1925,13 +2236,14 @@ ${pr.body}`;
     try {
       // Extract key information from both documents
       const onePagerKeywords = this.extractKeywords(managementOnePager);
-      const prfaqKeywords = this.extractKeywords(prfaq.pressRelease + ' ' + prfaq.faq);
-      
+      const prfaqKeywords = this.extractKeywords(`${prfaq.pressRelease} ${prfaq.faq}`);
+
       // Check for reasonable overlap in key concepts
       const overlap = onePagerKeywords.filter(keyword =>
-        prfaqKeywords.some(prKeyword =>
-          prKeyword.toLowerCase().includes(keyword.toLowerCase()) ||
-          keyword.toLowerCase().includes(prKeyword.toLowerCase())
+        prfaqKeywords.some(
+          prKeyword =>
+            prKeyword.toLowerCase().includes(keyword.toLowerCase()) ||
+            keyword.toLowerCase().includes(prKeyword.toLowerCase())
         )
       );
 
@@ -1940,15 +2252,22 @@ ${pr.body}`;
       }
 
       // Check if timing recommendations are consistent
-      const rightTimeSection = this.extractSection(managementOnePager, '## Right-Time Recommendation');
+      const rightTimeSection = this.extractSection(
+        managementOnePager,
+        '## Right-Time Recommendation'
+      );
       if (rightTimeSection && prfaq.pressRelease) {
-        const onePagerHasUrgency = rightTimeSection.toLowerCase().includes('now') || 
-                                   rightTimeSection.toLowerCase().includes('immediate');
-        const prfaqHasUrgency = prfaq.pressRelease.toLowerCase().includes('now') ||
-                               prfaq.pressRelease.toLowerCase().includes('immediate');
-        
+        const onePagerHasUrgency =
+          rightTimeSection.toLowerCase().includes('now') ||
+          rightTimeSection.toLowerCase().includes('immediate');
+        const prfaqHasUrgency =
+          prfaq.pressRelease.toLowerCase().includes('now') ||
+          prfaq.pressRelease.toLowerCase().includes('immediate');
+
         if (onePagerHasUrgency !== prfaqHasUrgency) {
-          warnings.push('Timing urgency may not be consistent between management one-pager and PR-FAQ');
+          warnings.push(
+            'Timing urgency may not be consistent between management one-pager and PR-FAQ'
+          );
         }
       }
 
@@ -1957,12 +2276,13 @@ ${pr.body}`;
       if (risksSection && prfaq.faq.includes('risks')) {
         const onePagerRiskCount = (risksSection.match(/\*\*Risk:\*\*/g) || []).length;
         const faqMentionsRisks = prfaq.faq.toLowerCase().includes('risk');
-        
+
         if (onePagerRiskCount > 0 && !faqMentionsRisks) {
-          warnings.push('Management one-pager identifies risks but PR-FAQ may not address them adequately');
+          warnings.push(
+            'Management one-pager identifies risks but PR-FAQ may not address them adequately'
+          );
         }
       }
-
     } catch (error) {
       warnings.push('Error during management one-pager and PR-FAQ cross-validation');
     }
@@ -1975,14 +2295,68 @@ ${pr.body}`;
    */
   private extractKeywords(text: string): string[] {
     if (!text) return [];
-    
+
     // Remove common words and extract meaningful terms
     const commonWords = new Set([
-      'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
-      'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did',
-      'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall',
-      'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they',
-      'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their'
+      'the',
+      'a',
+      'an',
+      'and',
+      'or',
+      'but',
+      'in',
+      'on',
+      'at',
+      'to',
+      'for',
+      'of',
+      'with',
+      'by',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'being',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+      'will',
+      'would',
+      'could',
+      'should',
+      'may',
+      'might',
+      'can',
+      'must',
+      'shall',
+      'this',
+      'that',
+      'these',
+      'those',
+      'i',
+      'you',
+      'he',
+      'she',
+      'it',
+      'we',
+      'they',
+      'me',
+      'him',
+      'her',
+      'us',
+      'them',
+      'my',
+      'your',
+      'his',
+      'her',
+      'its',
+      'our',
+      'their',
     ]);
 
     return text
@@ -2000,17 +2374,14 @@ ${pr.body}`;
   private extractSection(text: string, sectionHeader: string): string | null {
     const lines = text.split('\n');
     const startIndex = lines.findIndex(line => line.trim() === sectionHeader);
-    
+
     if (startIndex === -1) return null;
-    
-    const endIndex = lines.findIndex((line, index) => 
-      index > startIndex && line.startsWith('##')
-    );
-    
-    const sectionLines = endIndex === -1 
-      ? lines.slice(startIndex + 1)
-      : lines.slice(startIndex + 1, endIndex);
-    
+
+    const endIndex = lines.findIndex((line, index) => index > startIndex && line.startsWith('##'));
+
+    const sectionLines =
+      endIndex === -1 ? lines.slice(startIndex + 1) : lines.slice(startIndex + 1, endIndex);
+
     return sectionLines.join('\n').trim();
   }
 
@@ -2019,13 +2390,19 @@ ${pr.body}`;
    */
   async warmupCache(commonIntents: string[]): Promise<void> {
     this.logInfo('Starting cache warmup', { intentsCount: commonIntents.length });
-    
+
     const warmupPromises = commonIntents.map(async (intent, index) => {
       try {
         await this.processIntent(intent);
-        this.logInfo('Cache warmup completed for intent', { index: index + 1, total: commonIntents.length });
+        this.logInfo('Cache warmup completed for intent', {
+          index: index + 1,
+          total: commonIntents.length,
+        });
       } catch (error) {
-        this.logWarning('Cache warmup failed for intent', { index: index + 1, error: error instanceof Error ? error.message : 'Unknown error' });
+        this.logWarning('Cache warmup failed for intent', {
+          index: index + 1,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
       }
     });
 
@@ -2033,7 +2410,7 @@ ${pr.body}`;
       warmupPromises.map(promise => () => promise),
       2 // Process 2 warmup intents at a time
     );
-    
+
     this.logInfo('Cache warmup completed', { cacheSize: this.cache.getStats().size });
   }
 
@@ -2088,12 +2465,19 @@ ${pr.body}`;
     try {
       // Simple extraction - in a real implementation, this would be more sophisticated
       const businessGoalMatch = markdown.match(/## Business Goal\s*\n(.*?)(?=\n##|\n$)/s);
-      const businessGoal = businessGoalMatch ? businessGoalMatch[1].trim() : 'Extracted from markdown';
+      const businessGoal = businessGoalMatch
+        ? businessGoalMatch[1].trim()
+        : 'Extracted from markdown';
 
       // Extract functional requirements
-      const functionalReqMatch = markdown.match(/## Functional Requirements\s*\n(.*?)(?=\n##|\n$)/s);
-      const functionalRequirements = functionalReqMatch 
-        ? functionalReqMatch[1].split('\n').filter(line => line.trim().startsWith('-')).map(line => line.replace(/^-\s*/, ''))
+      const functionalReqMatch = markdown.match(
+        /## Functional Requirements\s*\n(.*?)(?=\n##|\n$)/s
+      );
+      const functionalRequirements = functionalReqMatch
+        ? functionalReqMatch[1]
+            .split('\n')
+            .filter(line => line.trim().startsWith('-'))
+            .map(line => line.replace(/^-\s*/, ''))
         : [];
 
       // Create a basic structure
@@ -2102,7 +2486,7 @@ ${pr.body}`;
         userNeeds: {
           jobs: ['Extracted from markdown'],
           pains: ['Extracted from markdown'],
-          gains: ['Extracted from markdown']
+          gains: ['Extracted from markdown'],
         },
         functionalRequirements,
         constraintsRisks: [],
@@ -2110,12 +2494,12 @@ ${pr.body}`;
           must: [],
           should: [],
           could: [],
-          wont: []
+          wont: [],
         },
         rightTimeVerdict: {
           decision: 'do_now',
-          reasoning: 'Extracted from markdown'
-        }
+          reasoning: 'Extracted from markdown',
+        },
       };
     } catch {
       return undefined;
@@ -2129,7 +2513,9 @@ ${pr.body}`;
     try {
       // Simple extraction - in a real implementation, this would be more sophisticated
       const problemFramingMatch = markdown.match(/## Problem Framing\s*\n(.*?)(?=\n##|\n$)/s);
-      const problemFraming = problemFramingMatch ? problemFramingMatch[1].trim() : 'Extracted from markdown';
+      const problemFraming = problemFramingMatch
+        ? problemFramingMatch[1].trim()
+        : 'Extracted from markdown';
 
       // Create a basic structure
       return {
@@ -2141,7 +2527,7 @@ ${pr.body}`;
             keyTradeoffs: [],
             impact: 'Medium',
             effort: 'Low',
-            majorRisks: []
+            majorRisks: [],
           },
           balanced: {
             name: 'Balanced',
@@ -2149,7 +2535,7 @@ ${pr.body}`;
             keyTradeoffs: [],
             impact: 'High',
             effort: 'Medium',
-            majorRisks: []
+            majorRisks: [],
           },
           bold: {
             name: 'Bold',
@@ -2157,16 +2543,16 @@ ${pr.body}`;
             keyTradeoffs: [],
             impact: 'High',
             effort: 'High',
-            majorRisks: []
-          }
+            majorRisks: [],
+          },
         },
         impactEffortMatrix: {
           highImpactLowEffort: [],
           highImpactHighEffort: [],
           lowImpactLowEffort: [],
-          lowImpactHighEffort: []
+          lowImpactHighEffort: [],
         },
-        rightTimeRecommendation: 'Extracted from markdown'
+        rightTimeRecommendation: 'Extracted from markdown',
       };
     } catch {
       return undefined;
@@ -2186,7 +2572,7 @@ ${pr.body}`;
       return {
         created: false,
         results: [],
-        summary: 'Steering file creation not requested or no documents available'
+        summary: 'Steering file creation not requested or no documents available',
       };
     }
 
@@ -2195,20 +2581,24 @@ ${pr.body}`;
     let totalCreated = 0;
 
     try {
-      this.logInfo('Starting steering file creation from PM documents', { 
-        sessionId, 
+      this.logInfo('Starting steering file creation from PM documents', {
+        sessionId,
         documentsAvailable: Object.keys(pmDocuments).length,
-        featureName: steeringOptions.feature_name 
+        featureName: steeringOptions.feature_name,
       });
 
       // Create steering files for each available document type
       if (pmDocuments.requirements) {
         try {
-          const requirementsContent = typeof pmDocuments.requirements === 'string' 
-            ? pmDocuments.requirements 
-            : this.formatRequirementsAsMarkdown(pmDocuments.requirements);
-          
-          const result = await this.steeringService.createFromRequirements(requirementsContent, steeringOptions);
+          const requirementsContent =
+            typeof pmDocuments.requirements === 'string'
+              ? pmDocuments.requirements
+              : this.formatRequirementsAsMarkdown(pmDocuments.requirements);
+
+          const result = await this.steeringService.createFromRequirements(
+            requirementsContent,
+            steeringOptions
+          );
           results.push(result);
           if (result.created) totalCreated++;
         } catch (error) {
@@ -2218,18 +2608,22 @@ ${pr.body}`;
             results: [],
             message: `Failed to create requirements steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
             warnings: [error instanceof Error ? error.message : 'Unknown error'],
-            userInteractionRequired: false
+            userInteractionRequired: false,
           });
         }
       }
 
       if (pmDocuments.designOptions) {
         try {
-          const designContent = typeof pmDocuments.designOptions === 'string' 
-            ? pmDocuments.designOptions 
-            : this.formatDesignOptionsAsMarkdown(pmDocuments.designOptions);
-          
-          const result = await this.steeringService.createFromDesignOptions(designContent, steeringOptions);
+          const designContent =
+            typeof pmDocuments.designOptions === 'string'
+              ? pmDocuments.designOptions
+              : this.formatDesignOptionsAsMarkdown(pmDocuments.designOptions);
+
+          const result = await this.steeringService.createFromDesignOptions(
+            designContent,
+            steeringOptions
+          );
           results.push(result);
           if (result.created) totalCreated++;
         } catch (error) {
@@ -2239,14 +2633,17 @@ ${pr.body}`;
             results: [],
             message: `Failed to create design steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
             warnings: [error instanceof Error ? error.message : 'Unknown error'],
-            userInteractionRequired: false
+            userInteractionRequired: false,
           });
         }
       }
 
       if (pmDocuments.managementOnePager) {
         try {
-          const result = await this.steeringService.createFromOnePager(pmDocuments.managementOnePager, steeringOptions);
+          const result = await this.steeringService.createFromOnePager(
+            pmDocuments.managementOnePager,
+            steeringOptions
+          );
           results.push(result);
           if (result.created) totalCreated++;
         } catch (error) {
@@ -2256,17 +2653,18 @@ ${pr.body}`;
             results: [],
             message: `Failed to create one-pager steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
             warnings: [error instanceof Error ? error.message : 'Unknown error'],
-            userInteractionRequired: false
+            userInteractionRequired: false,
           });
         }
       }
 
       if (pmDocuments.prfaq) {
         try {
-          const prfaqContent = typeof pmDocuments.prfaq === 'string' 
-            ? pmDocuments.prfaq 
-            : this.formatPRFAQAsMarkdown(pmDocuments.prfaq);
-          
+          const prfaqContent =
+            typeof pmDocuments.prfaq === 'string'
+              ? pmDocuments.prfaq
+              : this.formatPRFAQAsMarkdown(pmDocuments.prfaq);
+
           const result = await this.steeringService.createFromPRFAQ(prfaqContent, steeringOptions);
           results.push(result);
           if (result.created) totalCreated++;
@@ -2277,18 +2675,22 @@ ${pr.body}`;
             results: [],
             message: `Failed to create PR-FAQ steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
             warnings: [error instanceof Error ? error.message : 'Unknown error'],
-            userInteractionRequired: false
+            userInteractionRequired: false,
           });
         }
       }
 
       if (pmDocuments.taskPlan) {
         try {
-          const taskContent = typeof pmDocuments.taskPlan === 'string' 
-            ? pmDocuments.taskPlan 
-            : this.formatTaskPlanAsMarkdown(pmDocuments.taskPlan);
-          
-          const result = await this.steeringService.createFromTaskPlan(taskContent, steeringOptions);
+          const taskContent =
+            typeof pmDocuments.taskPlan === 'string'
+              ? pmDocuments.taskPlan
+              : this.formatTaskPlanAsMarkdown(pmDocuments.taskPlan);
+
+          const result = await this.steeringService.createFromTaskPlan(
+            taskContent,
+            steeringOptions
+          );
           results.push(result);
           if (result.created) totalCreated++;
         } catch (error) {
@@ -2298,43 +2700,48 @@ ${pr.body}`;
             results: [],
             message: `Failed to create task plan steering file: ${error instanceof Error ? error.message : 'Unknown error'}`,
             warnings: [error instanceof Error ? error.message : 'Unknown error'],
-            userInteractionRequired: false
+            userInteractionRequired: false,
           });
         }
       }
 
       const executionTime = Date.now() - startTime;
-      const summary = totalCreated > 0 
-        ? `Successfully created ${totalCreated} steering file(s) from PM documents`
-        : 'No steering files were created';
+      const summary =
+        totalCreated > 0
+          ? `Successfully created ${totalCreated} steering file(s) from PM documents`
+          : 'No steering files were created';
 
-      this.logInfo('Steering file creation completed', { 
-        sessionId, 
-        executionTime, 
-        totalCreated, 
-        totalAttempted: results.length 
+      this.logInfo('Steering file creation completed', {
+        sessionId,
+        executionTime,
+        totalCreated,
+        totalAttempted: results.length,
       });
 
       return {
         created: totalCreated > 0,
         results,
-        summary
+        summary,
       };
-
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Steering file creation process failed', error, { sessionId, executionTime });
-      
+
       return {
         created: false,
-        results: results.length > 0 ? results : [{
-          created: false,
-          results: [],
-          message: `Steering file creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          warnings: [],
-          userInteractionRequired: false
-        }],
-        summary: 'Steering file creation process failed'
+        results:
+          results.length > 0
+            ? results
+            : [
+                {
+                  created: false,
+                  results: [],
+                  message: `Steering file creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                  warnings: [],
+                  userInteractionRequired: false,
+                },
+              ],
+        summary: 'Steering file creation process failed',
       };
     }
   }
@@ -2350,11 +2757,11 @@ ${pr.body}`;
   ): Promise<SteeringFileOptions | undefined> {
     // In a real implementation, this would integrate with the user interface
     // For now, we'll return default preferences based on the document types
-    
-    this.logInfo('Generating default steering file preferences', { 
-      sessionId, 
-      documentTypes, 
-      featureName 
+
+    this.logInfo('Generating default steering file preferences', {
+      sessionId,
+      documentTypes,
+      featureName,
     });
 
     if (documentTypes.length === 0) {
@@ -2366,7 +2773,7 @@ ${pr.body}`;
       create_steering_files: true,
       feature_name: featureName || 'unnamed-feature',
       inclusion_rule: 'fileMatch',
-      overwrite_existing: false
+      overwrite_existing: false,
     };
   }
 
@@ -2379,11 +2786,11 @@ ${pr.body}`;
 
     // Format PMRequirements object as markdown
     let markdown = '# Requirements Document\n\n';
-    
+
     if (requirements.businessGoal) {
       markdown += `## Business Goal\n\n${requirements.businessGoal}\n\n`;
     }
-    
+
     if (requirements.requirements && Array.isArray(requirements.requirements)) {
       markdown += '## Requirements\n\n';
       requirements.requirements.forEach((req: any, index: number) => {
@@ -2410,11 +2817,11 @@ ${pr.body}`;
     }
 
     let markdown = '# Design Options\n\n';
-    
+
     if (design.problemFraming) {
       markdown += `## Problem Framing\n\n${design.problemFraming}\n\n`;
     }
-    
+
     if (design.options) {
       markdown += '## Design Options\n\n';
       Object.entries(design.options).forEach(([key, option]: [string, any]) => {
@@ -2434,17 +2841,17 @@ ${pr.body}`;
     }
 
     let markdown = '# Press Release and FAQ\n\n';
-    
+
     if (prfaq.pressRelease) {
       markdown += '## Press Release\n\n';
       markdown += `${prfaq.pressRelease}\n\n`;
     }
-    
+
     if (prfaq.faq) {
       markdown += '## Frequently Asked Questions\n\n';
       markdown += `${prfaq.faq}\n\n`;
     }
-    
+
     if (prfaq.launchChecklist) {
       markdown += '## Launch Checklist\n\n';
       markdown += `${prfaq.launchChecklist}\n\n`;
@@ -2459,7 +2866,7 @@ ${pr.body}`;
     }
 
     let markdown = '# Implementation Plan\n\n';
-    
+
     if (taskPlan.phases && Array.isArray(taskPlan.phases)) {
       taskPlan.phases.forEach((phase: any, index: number) => {
         markdown += `## Phase ${index + 1}: ${phase.name || 'Unnamed Phase'}\n\n`;
@@ -2490,98 +2897,99 @@ ${pr.body}`;
   ): Promise<any> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
       const depth = analysisDepth || 'standard';
-      this.logInfo('Starting competitor landscape analysis', { 
-        sessionId, 
+      this.logInfo('Starting competitor landscape analysis', {
+        sessionId,
         featureIdeaLength: featureIdea.length,
         hasMarketContext: !!marketContext,
-        analysisDepth: depth
+        analysisDepth: depth,
       });
-      
+
       // For now, return a mock structure that matches the expected interface
       // This will be replaced with actual implementation from the competitor analyzer component
       const mockAnalysis = {
         competitiveMatrix: {
           competitors: [
             {
-              name: "Competitor A",
+              name: 'Competitor A',
               marketShare: 25,
-              strengths: ["Strong brand recognition", "Large user base"],
-              weaknesses: ["High pricing", "Limited feature set"],
-              keyFeatures: ["Feature 1", "Feature 2"],
+              strengths: ['Strong brand recognition', 'Large user base'],
+              weaknesses: ['High pricing', 'Limited feature set'],
+              keyFeatures: ['Feature 1', 'Feature 2'],
               pricing: {
-                model: "subscription",
+                model: 'subscription',
                 startingPrice: 99,
-                currency: "USD",
-                valueProposition: "Enterprise-grade solution"
+                currency: 'USD',
+                valueProposition: 'Enterprise-grade solution',
               },
-              targetMarket: ["Enterprise", "Mid-market"],
-              recentMoves: []
-            }
+              targetMarket: ['Enterprise', 'Mid-market'],
+              recentMoves: [],
+            },
           ],
           evaluationCriteria: [
             {
-              name: "Market Share",
+              name: 'Market Share',
               weight: 0.3,
-              description: "Current market position",
-              measurementType: "quantitative"
-            }
+              description: 'Current market position',
+              measurementType: 'quantitative',
+            },
           ],
           rankings: [],
-          differentiationOpportunities: ["Lower pricing", "Better UX"],
+          differentiationOpportunities: ['Lower pricing', 'Better UX'],
           marketContext: marketContext || {
-            industry: "Technology",
-            geography: ["US"],
-            targetSegment: "SMB",
-            marketMaturity: "growth",
+            industry: 'Technology',
+            geography: ['US'],
+            targetSegment: 'SMB',
+            marketMaturity: 'growth',
             regulatoryEnvironment: [],
-            technologyTrends: []
-          }
+            technologyTrends: [],
+          },
         },
         swotAnalysis: [],
         marketPositioning: {
           positioningMap: [],
           competitorPositions: [],
           marketGaps: [],
-          recommendedPositioning: []
+          recommendedPositioning: [],
         },
         strategicRecommendations: [
           {
-            type: "differentiation",
-            title: "Focus on ease of use",
-            description: "Differentiate through superior user experience",
-            rationale: ["Market gap identified", "User feedback indicates demand"],
+            type: 'differentiation',
+            title: 'Focus on ease of use',
+            description: 'Differentiate through superior user experience',
+            rationale: ['Market gap identified', 'User feedback indicates demand'],
             implementation: [],
-            expectedOutcome: "Increased market share",
-            riskLevel: "medium",
-            timeframe: "6-12 months",
-            resourceRequirements: ["UX team", "Development resources"]
-          }
+            expectedOutcome: 'Increased market share',
+            riskLevel: 'medium',
+            timeframe: '6-12 months',
+            resourceRequirements: ['UX team', 'Development resources'],
+          },
         ],
         sourceAttribution: [
           {
-            id: "source-1",
-            type: "industry-report",
-            title: "Market Analysis Report 2024",
-            organization: "Industry Research Corp",
-            publishDate: "2024-01-01",
+            id: 'source-1',
+            type: 'industry-report',
+            title: 'Market Analysis Report 2024',
+            organization: 'Industry Research Corp',
+            publishDate: '2024-01-01',
             accessDate: new Date().toISOString(),
             reliability: 0.8,
             relevance: 0.9,
             dataFreshness: {
-              status: "recent",
+              status: 'recent',
               ageInDays: 30,
               recommendedUpdateFrequency: 90,
-              lastValidated: new Date().toISOString()
+              lastValidated: new Date().toISOString(),
             },
-            citationFormat: "Industry Research Corp. (2024). Market Analysis Report 2024.",
-            keyFindings: ["Market growing at 15% CAGR"],
-            limitations: ["Limited geographic scope"]
-          }
+            citationFormat: 'Industry Research Corp. (2024). Market Analysis Report 2024.',
+            keyFindings: ['Market growing at 15% CAGR'],
+            limitations: ['Limited geographic scope'],
+          },
         ],
-        confidenceLevel: depth === 'comprehensive' ? 'high' : depth === 'standard' ? 'medium' : 'low',
+        confidenceLevel:
+          depth === 'comprehensive' ? 'high' : depth === 'standard' ? 'medium' : 'low',
         lastUpdated: new Date().toISOString(),
         dataQuality: {
           sourceReliability: 0.8,
@@ -2589,25 +2997,25 @@ ${pr.body}`;
           methodologyRigor: 0.7,
           overallConfidence: 0.8,
           qualityIndicators: [],
-          recommendations: []
-        }
+          recommendations: [],
+        },
       };
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Competitor landscape analysis completed', { 
-        sessionId, 
+      this.logInfo('Competitor landscape analysis completed', {
+        sessionId,
         executionTime,
         competitorsFound: mockAnalysis.competitiveMatrix.competitors.length,
-        confidenceLevel: mockAnalysis.confidenceLevel
+        confidenceLevel: mockAnalysis.confidenceLevel,
       });
-      
+
       return mockAnalysis;
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      this.logError('Competitor landscape analysis failed', error as Error, { 
-        sessionId, 
+      this.logError('Competitor landscape analysis failed', error as Error, {
+        sessionId,
         executionTime,
-        stage: 'competitive_analysis'
+        stage: 'competitive_analysis',
       });
       throw error;
     }
@@ -2619,199 +3027,207 @@ ${pr.body}`;
   async calculateMarketSizing(
     featureIdea: string,
     marketDefinition: { industry: string; geography?: string[]; customer_segments?: string[] },
-    sizingMethods: readonly ('top-down' | 'bottom-up' | 'value-theory')[] = ['top-down', 'bottom-up']
+    sizingMethods: readonly ('top-down' | 'bottom-up' | 'value-theory')[] = [
+      'top-down',
+      'bottom-up',
+    ]
   ): Promise<any> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting market sizing calculation', { 
-        sessionId, 
+      this.logInfo('Starting market sizing calculation', {
+        sessionId,
         featureIdeaLength: featureIdea.length,
         industry: marketDefinition.industry,
         geographyCount: marketDefinition.geography?.length || 0,
-        sizingMethods
+        sizingMethods,
       });
-      
+
       // For now, return a mock structure that matches the expected interface
       // This will be replaced with actual implementation from the market analyzer component
       const mockMarketSizing = {
         tam: {
           value: 50000000000, // $50B
-          currency: "USD",
-          timeframe: "2024",
+          currency: 'USD',
+          timeframe: '2024',
           growthRate: 0.15,
-          methodology: "top-down",
-          dataQuality: "high",
+          methodology: 'top-down',
+          dataQuality: 'high',
           calculationDate: new Date().toISOString(),
-          geographicScope: marketDefinition.geography || ["Global"],
-          marketSegments: marketDefinition.customer_segments || ["All segments"]
+          geographicScope: marketDefinition.geography || ['Global'],
+          marketSegments: marketDefinition.customer_segments || ['All segments'],
         },
         sam: {
           value: 5000000000, // $5B
-          currency: "USD",
-          timeframe: "2024",
+          currency: 'USD',
+          timeframe: '2024',
           growthRate: 0.18,
-          methodology: "bottom-up",
-          dataQuality: "high",
+          methodology: 'bottom-up',
+          dataQuality: 'high',
           calculationDate: new Date().toISOString(),
-          geographicScope: marketDefinition.geography || ["US", "EU"],
-          marketSegments: marketDefinition.customer_segments || ["SMB", "Enterprise"]
+          geographicScope: marketDefinition.geography || ['US', 'EU'],
+          marketSegments: marketDefinition.customer_segments || ['SMB', 'Enterprise'],
         },
         som: {
           value: 500000000, // $500M
-          currency: "USD",
-          timeframe: "2024-2029",
+          currency: 'USD',
+          timeframe: '2024-2029',
           growthRate: 0.25,
-          methodology: "value-theory",
-          dataQuality: "medium",
+          methodology: 'value-theory',
+          dataQuality: 'medium',
           calculationDate: new Date().toISOString(),
-          geographicScope: marketDefinition.geography || ["US"],
-          marketSegments: marketDefinition.customer_segments || ["SMB"]
+          geographicScope: marketDefinition.geography || ['US'],
+          marketSegments: marketDefinition.customer_segments || ['SMB'],
         },
         methodology: sizingMethods.map(method => ({
           type: method,
           description: `${method} market sizing approach`,
-          dataSource: "Industry reports and market research",
+          dataSource: 'Industry reports and market research',
           reliability: 0.8,
           calculationSteps: [
             {
               step: 1,
               description: `Apply ${method} methodology`,
-              formula: "Market Size = Population × Penetration Rate × Average Revenue",
+              formula: 'Market Size = Population × Penetration Rate × Average Revenue',
               inputs: { population: 1000000, penetration: 0.1, revenue: 100 },
-              output: method === 'top-down' ? 50000000000 : method === 'bottom-up' ? 5000000000 : 500000000,
-              assumptions: [`${method} assumptions apply`]
-            }
+              output:
+                method === 'top-down'
+                  ? 50000000000
+                  : method === 'bottom-up'
+                    ? 5000000000
+                    : 500000000,
+              assumptions: [`${method} assumptions apply`],
+            },
           ],
           limitations: [`Limited to ${method} data availability`],
-          confidence: 0.8
+          confidence: 0.8,
         })),
         scenarios: [
           {
-            name: "conservative",
-            description: "Conservative growth assumptions",
+            name: 'conservative',
+            description: 'Conservative growth assumptions',
             tam: 40000000000,
             sam: 4000000000,
             som: 400000000,
             probability: 0.3,
-            keyAssumptions: ["Lower growth rates", "Higher competition"],
-            riskFactors: ["Economic downturn", "Regulatory changes"]
+            keyAssumptions: ['Lower growth rates', 'Higher competition'],
+            riskFactors: ['Economic downturn', 'Regulatory changes'],
           },
           {
-            name: "balanced",
-            description: "Balanced growth scenario",
+            name: 'balanced',
+            description: 'Balanced growth scenario',
             tam: 50000000000,
             sam: 5000000000,
             som: 500000000,
             probability: 0.5,
-            keyAssumptions: ["Current growth trends continue"],
-            riskFactors: ["Market saturation"]
+            keyAssumptions: ['Current growth trends continue'],
+            riskFactors: ['Market saturation'],
           },
           {
-            name: "aggressive",
-            description: "Optimistic growth scenario",
+            name: 'aggressive',
+            description: 'Optimistic growth scenario',
             tam: 60000000000,
             sam: 6000000000,
             som: 600000000,
             probability: 0.2,
-            keyAssumptions: ["Accelerated adoption", "Market expansion"],
-            riskFactors: ["Technology disruption"]
-          }
+            keyAssumptions: ['Accelerated adoption', 'Market expansion'],
+            riskFactors: ['Technology disruption'],
+          },
         ],
         confidenceIntervals: [
           {
-            marketType: "tam",
+            marketType: 'tam',
             lowerBound: 45000000000,
             upperBound: 55000000000,
             confidenceLevel: 0.95,
-            methodology: "statistical analysis"
+            methodology: 'statistical analysis',
           },
           {
-            marketType: "sam",
+            marketType: 'sam',
             lowerBound: 4500000000,
             upperBound: 5500000000,
             confidenceLevel: 0.95,
-            methodology: "statistical analysis"
+            methodology: 'statistical analysis',
           },
           {
-            marketType: "som",
+            marketType: 'som',
             lowerBound: 450000000,
             upperBound: 550000000,
-            confidenceLevel: 0.90,
-            methodology: "monte carlo simulation"
-          }
+            confidenceLevel: 0.9,
+            methodology: 'monte carlo simulation',
+          },
         ],
         sourceAttribution: [
           {
-            id: "market-source-1",
-            type: "gartner",
-            title: "Market Forecast Report 2024",
-            organization: "Gartner Inc.",
-            publishDate: "2024-01-15",
+            id: 'market-source-1',
+            type: 'gartner',
+            title: 'Market Forecast Report 2024',
+            organization: 'Gartner Inc.',
+            publishDate: '2024-01-15',
             accessDate: new Date().toISOString(),
             reliability: 0.9,
             relevance: 0.95,
             dataFreshness: {
-              status: "fresh",
+              status: 'fresh',
               ageInDays: 15,
               recommendedUpdateFrequency: 90,
-              lastValidated: new Date().toISOString()
+              lastValidated: new Date().toISOString(),
             },
-            citationFormat: "Gartner Inc. (2024). Market Forecast Report 2024.",
-            keyFindings: ["Market expected to grow 15% annually"],
-            limitations: ["Forecast uncertainty beyond 3 years"]
-          }
+            citationFormat: 'Gartner Inc. (2024). Market Forecast Report 2024.',
+            keyFindings: ['Market expected to grow 15% annually'],
+            limitations: ['Forecast uncertainty beyond 3 years'],
+          },
         ],
         assumptions: [
           {
-            category: "market-growth",
-            description: "Annual market growth rate",
+            category: 'market-growth',
+            description: 'Annual market growth rate',
             value: 0.15,
             confidence: 0.8,
-            impact: "high",
-            sourceReference: "market-source-1"
+            impact: 'high',
+            sourceReference: 'market-source-1',
           },
           {
-            category: "penetration-rate",
-            description: "Market penetration achievable",
+            category: 'penetration-rate',
+            description: 'Market penetration achievable',
             value: 0.1,
             confidence: 0.7,
-            impact: "medium"
-          }
+            impact: 'medium',
+          },
         ],
         marketDynamics: {
-          growthDrivers: ["Digital transformation", "Remote work trends"],
-          marketBarriers: ["High switching costs", "Regulatory compliance"],
+          growthDrivers: ['Digital transformation', 'Remote work trends'],
+          marketBarriers: ['High switching costs', 'Regulatory compliance'],
           seasonality: [
             {
-              period: "Q4",
+              period: 'Q4',
               impact: 1.2,
-              description: "Holiday season boost"
-            }
+              description: 'Holiday season boost',
+            },
           ],
-          cyclicalFactors: ["Economic cycles", "Technology refresh cycles"],
-          disruptiveForces: ["AI automation", "New market entrants"]
-        }
+          cyclicalFactors: ['Economic cycles', 'Technology refresh cycles'],
+          disruptiveForces: ['AI automation', 'New market entrants'],
+        },
       };
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Market sizing calculation completed', { 
-        sessionId, 
+      this.logInfo('Market sizing calculation completed', {
+        sessionId,
         executionTime,
         tamValue: mockMarketSizing.tam.value,
         samValue: mockMarketSizing.sam.value,
         somValue: mockMarketSizing.som.value,
-        methodologiesUsed: mockMarketSizing.methodology.length
+        methodologiesUsed: mockMarketSizing.methodology.length,
       });
-      
+
       return mockMarketSizing;
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      this.logError('Market sizing calculation failed', error as Error, { 
-        sessionId, 
+      this.logError('Market sizing calculation failed', error as Error, {
+        sessionId,
         executionTime,
-        stage: 'market_sizing'
+        stage: 'market_sizing',
       });
       throw error;
     }
@@ -2829,23 +3245,23 @@ ${pr.body}`;
   ): Promise<any> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting enhanced business opportunity analysis', { 
-        sessionId, 
+      this.logInfo('Starting enhanced business opportunity analysis', {
+        sessionId,
         featureIdeaLength: featureIdea.length,
         hasMarketContext: !!marketContext,
         includeCompetitive,
         includeMarketSizing,
-        analysisDepth
+        analysisDepth,
       });
-      
+
       // Base business opportunity analysis
       const baseOpportunity = {
         featureIdea,
         marketContext,
         analysisDepth,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       // Add competitive analysis if requested
@@ -2864,14 +3280,15 @@ ${pr.body}`;
         const marketDefinition = {
           industry: marketContext.industry,
           geography: marketContext.geography,
-          customer_segments: marketContext.target_segment ? [marketContext.target_segment] : undefined
+          customer_segments: marketContext.target_segment
+            ? [marketContext.target_segment]
+            : undefined,
         };
-        
-        marketSizing = await this.calculateMarketSizing(
-          featureIdea,
-          marketDefinition,
-          ['top-down', 'bottom-up']
-        );
+
+        marketSizing = await this.calculateMarketSizing(featureIdea, marketDefinition, [
+          'top-down',
+          'bottom-up',
+        ]);
       }
 
       // Generate strategic fit assessment
@@ -2879,21 +3296,18 @@ ${pr.body}`;
         alignmentScore: 0.8,
         competitiveAdvantage: [
           'Market gap identified through competitive analysis',
-          'Strong market opportunity validated through sizing'
+          'Strong market opportunity validated through sizing',
         ],
         marketGaps: [
           'Underserved customer segment identified',
-          'Technology differentiation opportunity'
+          'Technology differentiation opportunity',
         ],
-        entryBarriers: [
-          'Established competitors with market share',
-          'Customer switching costs'
-        ],
+        entryBarriers: ['Established competitors with market share', 'Customer switching costs'],
         successFactors: [
           'Superior user experience',
           'Competitive pricing strategy',
-          'Strong go-to-market execution'
-        ]
+          'Strong go-to-market execution',
+        ],
       };
 
       // Generate market timing analysis
@@ -2902,13 +3316,10 @@ ${pr.body}`;
         factors: [
           'Market conditions favorable for new entrants',
           'Technology trends support feature adoption',
-          'Customer demand validated through research'
+          'Customer demand validated through research',
         ],
-        risks: [
-          'Competitive response to market entry',
-          'Economic conditions affecting spending'
-        ],
-        recommendation: 'Proceed with development - market timing is favorable'
+        risks: ['Competitive response to market entry', 'Economic conditions affecting spending'],
+        recommendation: 'Proceed with development - market timing is favorable',
       };
 
       const enhancedOpportunity = {
@@ -2919,37 +3330,38 @@ ${pr.body}`;
         marketTiming,
         overallAssessment: {
           opportunityScore: 0.85,
-          confidence: analysisDepth === 'comprehensive' ? 'high' : analysisDepth === 'standard' ? 'medium' : 'low',
+          confidence:
+            analysisDepth === 'comprehensive'
+              ? 'high'
+              : analysisDepth === 'standard'
+                ? 'medium'
+                : 'low',
           recommendation: 'Strong business opportunity with favorable market conditions',
-          keyRisks: [
-            'Competitive response',
-            'Market adoption rate',
-            'Execution challenges'
-          ],
+          keyRisks: ['Competitive response', 'Market adoption rate', 'Execution challenges'],
           nextSteps: [
             'Develop minimum viable product',
             'Conduct customer validation',
-            'Refine go-to-market strategy'
-          ]
-        }
+            'Refine go-to-market strategy',
+          ],
+        },
       };
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Enhanced business opportunity analysis completed', { 
-        sessionId, 
+      this.logInfo('Enhanced business opportunity analysis completed', {
+        sessionId,
         executionTime,
         hasCompetitive: !!competitiveAnalysis,
         hasMarketSizing: !!marketSizing,
-        opportunityScore: enhancedOpportunity.overallAssessment.opportunityScore
+        opportunityScore: enhancedOpportunity.overallAssessment.opportunityScore,
       });
-      
+
       return enhancedOpportunity;
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      this.logError('Enhanced business opportunity analysis failed', error as Error, { 
-        sessionId, 
+      this.logError('Enhanced business opportunity analysis failed', error as Error, {
+        sessionId,
         executionTime,
-        stage: 'enhanced_business_opportunity'
+        stage: 'enhanced_business_opportunity',
       });
       throw error;
     }
@@ -2969,79 +3381,94 @@ ${pr.body}`;
   ): Promise<any> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting business case generation', { 
-        sessionId, 
+      this.logInfo('Starting business case generation', {
+        sessionId,
         analysisLength: opportunityAnalysis.length,
-        hasFinancialInputs: !!financialInputs 
+        hasFinancialInputs: !!financialInputs,
       });
-      
+
       // Create mock business case based on opportunity analysis
       const businessCase = {
-        executiveSummary: "APPROVE INVESTMENT - Strong ROI with manageable risk profile (Confidence: 91%)",
+        executiveSummary:
+          'APPROVE INVESTMENT - Strong ROI with manageable risk profile (Confidence: 91%)',
         financialAnalysis: {
           scenarios: [
             {
-              name: "Conservative",
+              name: 'Conservative',
               investment: financialInputs?.development_cost || 200000,
               timeline: financialInputs?.time_to_market || 12,
               revenue: financialInputs?.expected_revenue || 600000,
-              roi: "200%",
-              riskLevel: "Low"
+              roi: '200%',
+              riskLevel: 'Low',
             },
             {
-              name: "Balanced",
+              name: 'Balanced',
               investment: financialInputs?.development_cost || 250000,
               timeline: (financialInputs?.time_to_market || 12) * 0.75,
               revenue: (financialInputs?.expected_revenue || 600000) * 1.5,
-              roi: "260%",
-              riskLevel: "Medium"
+              roi: '260%',
+              riskLevel: 'Medium',
             },
             {
-              name: "Aggressive",
+              name: 'Aggressive',
               investment: financialInputs?.development_cost || 350000,
               timeline: (financialInputs?.time_to_market || 12) * 0.5,
               revenue: (financialInputs?.expected_revenue || 600000) * 2.2,
-              roi: "271%",
-              riskLevel: "High"
-            }
-          ]
+              roi: '271%',
+              riskLevel: 'High',
+            },
+          ],
         },
         riskAssessment: {
-          technicalRisk: { probability: 15, impact: "Medium", mitigation: "Proven technology stack" },
-          marketRisk: { probability: 25, impact: "Medium", mitigation: "Pilot program with 3 customers" },
-          executionRisk: { probability: 20, impact: "Medium", mitigation: "Experienced team, phased approach" }
+          technicalRisk: {
+            probability: 15,
+            impact: 'Medium',
+            mitigation: 'Proven technology stack',
+          },
+          marketRisk: {
+            probability: 25,
+            impact: 'Medium',
+            mitigation: 'Pilot program with 3 customers',
+          },
+          executionRisk: {
+            probability: 20,
+            impact: 'Medium',
+            mitigation: 'Experienced team, phased approach',
+          },
         },
         strategicBenefits: [
-          "Revenue Growth: Direct revenue stream with recurring model",
-          "Market Position: First-mover advantage in emerging segment",
-          "Customer Retention: Increased stickiness and reduced churn"
+          'Revenue Growth: Direct revenue stream with recurring model',
+          'Market Position: First-mover advantage in emerging segment',
+          'Customer Retention: Increased stickiness and reduced churn',
         ],
         implementationTimeline: {
-          phase1: "Months 1-3: MVP development and pilot program",
-          phase2: "Months 4-6: Market launch and customer acquisition",
-          phase3: "Months 7-12: Scale and optimization"
+          phase1: 'Months 1-3: MVP development and pilot program',
+          phase2: 'Months 4-6: Market launch and customer acquisition',
+          phase3: 'Months 7-12: Scale and optimization',
         },
         successMetrics: {
-          revenue: "$500K ARR by Month 12",
-          customers: "50 paying customers by Month 12",
-          marketShare: "5% of addressable segment by Month 18"
-        }
+          revenue: '$500K ARR by Month 12',
+          customers: '50 paying customers by Month 12',
+          marketShare: '5% of addressable segment by Month 18',
+        },
       };
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Business case generation completed', { 
-        sessionId, 
+      this.logInfo('Business case generation completed', {
+        sessionId,
         executionTime,
-        scenariosGenerated: businessCase.financialAnalysis.scenarios.length
+        scenariosGenerated: businessCase.financialAnalysis.scenarios.length,
       });
-      
+
       return businessCase;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Business case generation failed', error, { sessionId, executionTime });
-      throw new Error(`Business case generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Business case generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -3055,17 +3482,17 @@ ${pr.body}`;
   ): Promise<any> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting stakeholder communication creation', { 
-        sessionId, 
+      this.logInfo('Starting stakeholder communication creation', {
+        sessionId,
         communicationType,
         audience,
-        businessCaseLength: businessCase.length
+        businessCaseLength: businessCase.length,
       });
-      
+
       let communication;
-      
+
       switch (communicationType) {
         case 'executive_onepager':
           communication = {
@@ -3075,57 +3502,82 @@ ${pr.body}`;
             keyReasons: [
               'Market Opportunity: $2.8B market growing at 19.1% CAGR with limited competition',
               'Customer Demand: 87% of target customers express urgent need',
-              'Strategic Timing: 18-month competitive window before major players enter'
+              'Strategic Timing: 18-month competitive window before major players enter',
             ],
             scope: {
               mvpLaunch: 'Q2 2025 with core functionality',
               target: '50 customers, $500K ARR by end of year',
-              investment: '$250K over 9 months with balanced risk profile'
+              investment: '$250K over 9 months with balanced risk profile',
             },
             risks: [
-              { risk: 'Market Adoption (25% probability)', mitigation: 'Pilot program with 3 anchor customers' },
-              { risk: 'Technical Complexity (15% probability)', mitigation: 'Phased development approach' },
-              { risk: 'Competitive Response (30% probability)', mitigation: 'First-mover advantage and IP protection' }
-            ]
+              {
+                risk: 'Market Adoption (25% probability)',
+                mitigation: 'Pilot program with 3 anchor customers',
+              },
+              {
+                risk: 'Technical Complexity (15% probability)',
+                mitigation: 'Phased development approach',
+              },
+              {
+                risk: 'Competitive Response (30% probability)',
+                mitigation: 'First-mover advantage and IP protection',
+              },
+            ],
           };
           break;
-          
+
         case 'pr_faq':
           communication = {
             type: 'pr_faq',
             pressRelease: {
-              headline: 'Company Announces Revolutionary Solution That Transforms Customer Experience',
-              body: 'New platform addresses critical market need with 87% customer satisfaction in pilot program'
+              headline:
+                'Company Announces Revolutionary Solution That Transforms Customer Experience',
+              body: 'New platform addresses critical market need with 87% customer satisfaction in pilot program',
             },
             faq: [
-              { question: 'Who is the target customer?', answer: 'Mid-market to enterprise companies with specific operational needs' },
-              { question: 'What problem does this solve?', answer: 'Addresses inefficiencies that affect 73% of organizations in the industry' },
-              { question: 'Why launch now?', answer: 'Market research shows 18-month window before major competitors enter space' }
-            ]
+              {
+                question: 'Who is the target customer?',
+                answer: 'Mid-market to enterprise companies with specific operational needs',
+              },
+              {
+                question: 'What problem does this solve?',
+                answer: 'Addresses inefficiencies that affect 73% of organizations in the industry',
+              },
+              {
+                question: 'Why launch now?',
+                answer:
+                  'Market research shows 18-month window before major competitors enter space',
+              },
+            ],
           };
           break;
-          
+
         default:
           communication = {
             type: communicationType,
             content: `Stakeholder communication for ${audience} regarding business case analysis`,
-            summary: businessCase.substring(0, 500) + '...'
+            summary: `${businessCase.substring(0, 500)}...`,
           };
       }
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Stakeholder communication creation completed', { 
-        sessionId, 
+      this.logInfo('Stakeholder communication creation completed', {
+        sessionId,
         executionTime,
         communicationType,
-        audience
+        audience,
       });
-      
+
       return communication;
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      this.logError('Stakeholder communication creation failed', error, { sessionId, executionTime });
-      throw new Error(`Stakeholder communication creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logError('Stakeholder communication creation failed', error, {
+        sessionId,
+        executionTime,
+      });
+      throw new Error(
+        `Stakeholder communication creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -3143,21 +3595,21 @@ ${pr.body}`;
   ): Promise<any> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting strategic alignment assessment', { 
-        sessionId, 
+      this.logInfo('Starting strategic alignment assessment', {
+        sessionId,
         conceptLength: featureConcept.length,
-        hasCompanyContext: !!companyContext
+        hasCompanyContext: !!companyContext,
       });
-      
+
       const alignment = {
         overallScore: 92,
         verdict: 'STRONG STRATEGIC FIT - Aligns with core objectives and market position',
         missionAlignment: {
           score: 95,
           assessment: 'Directly supports company mission and value proposition',
-          details: 'Enhances customer value delivery in key market segment'
+          details: 'Enhances customer value delivery in key market segment',
         },
         okrAlignment: {
           score: 90,
@@ -3165,54 +3617,74 @@ ${pr.body}`;
           contributions: [
             'Revenue Growth: Contributes $500K+ ARR toward annual revenue target',
             'Market Expansion: Opens new customer segment worth $2.8B TAM',
-            'Product Innovation: Advances technology leadership in core competency'
-          ]
+            'Product Innovation: Advances technology leadership in core competency',
+          ],
         },
         strategicPriorities: {
           score: 88,
           assessment: 'Aligns with key strategic priorities',
           priorities: [
-            { priority: 'Customer Success', alignment: 'High', impact: 'Directly improves customer outcomes' },
-            { priority: 'Market Leadership', alignment: 'High', impact: 'Establishes first-mover advantage' },
-            { priority: 'Profitable Growth', alignment: 'High', impact: 'Strong ROI profile with recurring revenue' }
-          ]
+            {
+              priority: 'Customer Success',
+              alignment: 'High',
+              impact: 'Directly improves customer outcomes',
+            },
+            {
+              priority: 'Market Leadership',
+              alignment: 'High',
+              impact: 'Establishes first-mover advantage',
+            },
+            {
+              priority: 'Profitable Growth',
+              alignment: 'High',
+              impact: 'Strong ROI profile with recurring revenue',
+            },
+          ],
         },
         competitivePositioning: {
           strengthens: [
             'Differentiation: Creates unique value proposition vs. competitors',
             'Market Share: Potential to capture 5-8% of addressable market',
-            'Innovation Leadership: Reinforces reputation as market innovator'
+            'Innovation Leadership: Reinforces reputation as market innovator',
           ],
           advantages: [
             'First-Mover: 18-month head start over major competitors',
             'Technology: Proprietary approach with patent potential',
-            'Customer Base: Existing relationships provide distribution advantage'
-          ]
+            'Customer Base: Existing relationships provide distribution advantage',
+          ],
         },
         resourceFit: {
           budget: 'Within annual innovation budget ($250K investment)',
           team: 'Acceptable capacity allocation (15% engineering)',
           timeline: '9-month development fits product roadmap',
-          risk: 'Medium risk profile aligns with company appetite'
+          risk: 'Medium risk profile aligns with company appetite',
         },
         strategicRisks: [
-          { risk: 'Resource Dilution (20% probability)', mitigation: 'Dedicated team, clear scope boundaries' },
-          { risk: 'Strategic Drift (15% probability)', mitigation: 'Regular strategy reviews, success metrics alignment' }
-        ]
+          {
+            risk: 'Resource Dilution (20% probability)',
+            mitigation: 'Dedicated team, clear scope boundaries',
+          },
+          {
+            risk: 'Strategic Drift (15% probability)',
+            mitigation: 'Regular strategy reviews, success metrics alignment',
+          },
+        ],
       };
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Strategic alignment assessment completed', { 
-        sessionId, 
+      this.logInfo('Strategic alignment assessment completed', {
+        sessionId,
         executionTime,
-        overallScore: alignment.overallScore
+        overallScore: alignment.overallScore,
       });
-      
+
       return alignment;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Strategic alignment assessment failed', error, { sessionId, executionTime });
-      throw new Error(`Strategic alignment assessment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Strategic alignment assessment failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -3227,18 +3699,23 @@ ${pr.body}`;
       timeline?: string;
       technical_debt?: string;
     },
-    optimizationGoals?: ('cost_reduction' | 'speed_improvement' | 'quality_increase' | 'risk_mitigation')[]
+    optimizationGoals?: (
+      | 'cost_reduction'
+      | 'speed_improvement'
+      | 'quality_increase'
+      | 'risk_mitigation'
+    )[]
   ): Promise<any> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting resource allocation optimization', { 
-        sessionId, 
+      this.logInfo('Starting resource allocation optimization', {
+        sessionId,
         hasConstraints: !!resourceConstraints,
-        goals: optimizationGoals?.length || 0
+        goals: optimizationGoals?.length || 0,
       });
-      
+
       const optimization = {
         optimizationScore: 78,
         verdict: 'SIGNIFICANT EFFICIENCY GAINS POSSIBLE - Recommended optimizations identified',
@@ -3247,14 +3724,14 @@ ${pr.body}`;
             engineering: '85% capacity (5% over optimal)',
             product: '70% capacity (opportunity for expansion)',
             design: '90% capacity (near maximum)',
-            qa: '60% capacity (underutilized)'
+            qa: '60% capacity (underutilized)',
           },
           budgetAllocation: {
             development: '65% of budget (appropriate)',
             infrastructure: '20% of budget (slightly high)',
             tools: '10% of budget (optimizable)',
-            contingency: '5% of budget (adequate)'
-          }
+            contingency: '5% of budget (adequate)',
+          },
         },
         recommendations: {
           highImpact: [
@@ -3264,16 +3741,16 @@ ${pr.body}`;
               effort: 'Medium',
               description: 'Create dedicated feature team with balanced skill mix',
               benefits: 'Reduce handoffs and communication overhead by 30%',
-              timeSavings: '15-20% faster delivery'
+              timeSavings: '15-20% faster delivery',
             },
             {
               name: 'Automated Testing Pipeline',
-              impact: 'High', 
+              impact: 'High',
               effort: 'Medium',
               description: 'Implement CI/CD with automated testing',
               benefits: 'Reduce QA bottlenecks and improve quality',
-              costSavings: '$25K annually in manual testing'
-            }
+              costSavings: '$25K annually in manual testing',
+            },
           ],
           quickWins: [
             {
@@ -3281,16 +3758,16 @@ ${pr.body}`;
               impact: 'Medium',
               effort: 'Low',
               description: 'Audit and consolidate development tools',
-              savings: '$5K annually'
+              savings: '$5K annually',
             },
             {
               name: 'Knowledge Sharing Sessions',
               impact: 'Medium',
               effort: 'Low',
               description: 'Weekly tech talks and code reviews',
-              improvement: '10-15% productivity increase'
-            }
-          ]
+              improvement: '10-15% productivity increase',
+            },
+          ],
         },
         resourceStrategy: {
           recommendedTeam: {
@@ -3299,40 +3776,42 @@ ${pr.body}`;
             seniorEngineers: '2.0 FTE - Core development',
             juniorEngineers: '1.0 FTE - Support development and learning',
             designer: '0.5 FTE - UX/UI design and user research',
-            qaEngineer: '0.5 FTE - Testing and quality assurance'
+            qaEngineer: '0.5 FTE - Testing and quality assurance',
           },
           budgetOptimization: {
             current: resourceConstraints?.budget || 237000,
             optimized: (resourceConstraints?.budget || 237000) * 0.86,
-            savings: (resourceConstraints?.budget || 237000) * 0.14
-          }
+            savings: (resourceConstraints?.budget || 237000) * 0.14,
+          },
         },
         performanceImprovements: {
           developmentVelocity: {
             current: '15 story points per sprint',
             optimized: '20-22 story points per sprint (+33-47%)',
-            timeToMarket: '9 months → 6.5-7 months'
+            timeToMarket: '9 months → 6.5-7 months',
           },
           qualityMetrics: {
             bugRate: 'Reduce from 2.1 to 1.2 bugs per feature',
             customerSatisfaction: 'Improve from 7.2 to 8.5+ (NPS)',
-            technicalDebt: 'Reduce by 40% through better practices'
-          }
-        }
+            technicalDebt: 'Reduce by 40% through better practices',
+          },
+        },
       };
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Resource allocation optimization completed', { 
-        sessionId, 
+      this.logInfo('Resource allocation optimization completed', {
+        sessionId,
         executionTime,
-        optimizationScore: optimization.optimizationScore
+        optimizationScore: optimization.optimizationScore,
       });
-      
+
       return optimization;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Resource allocation optimization failed', error, { sessionId, executionTime });
-      throw new Error(`Resource allocation optimization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Resource allocation optimization failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -3350,14 +3829,14 @@ ${pr.body}`;
   ): Promise<any> {
     const sessionId = this.generateSessionId();
     const startTime = Date.now();
-    
+
     try {
-      this.logInfo('Starting market timing validation', { 
-        sessionId, 
+      this.logInfo('Starting market timing validation', {
+        sessionId,
         ideaLength: featureIdea.length,
-        hasMarketSignals: !!marketSignals
+        hasMarketSignals: !!marketSignals,
       });
-      
+
       const timing = {
         verdict: 'GO NOW',
         confidence: 85,
@@ -3367,69 +3846,72 @@ ${pr.body}`;
             'Customer Demand: High (87% of surveyed customers express urgent need)',
             'Market Maturity: Sweet spot - problem recognized, solutions immature',
             'Technology Readiness: Core technologies proven and accessible',
-            'Economic Climate: Favorable for B2B software investments'
+            'Economic Climate: Favorable for B2B software investments',
           ],
           caution: [
             'Competitive Pressure: Medium (2-3 players exploring similar solutions)',
             'Regulatory Environment: Stable but evolving (monitor for changes)',
-            'Resource Availability: Tight talent market for specialized skills'
+            'Resource Availability: Tight talent market for specialized skills',
           ],
           risks: [
             'Market Saturation: Low risk - early stage market',
-            'Economic Headwinds: Minimal impact on target segment'
-          ]
+            'Economic Headwinds: Minimal impact on target segment',
+          ],
         },
         competitiveWindow: {
           advantage: '18-Month First-Mover Advantage',
           analysis: 'Major players (Company A, Company B) in early research phase',
           opportunity: 'No dominant solution exists in market',
-          urgency: 'Customer switching costs currently low'
+          urgency: 'Customer switching costs currently low',
         },
         recommendations: {
           immediate: [
             'Begin customer validation interviews',
             'Secure initial development resources',
-            'File provisional patents for key innovations'
+            'File provisional patents for key innovations',
           ],
           shortTerm: [
             'Launch pilot program with anchor customers',
             'Build MVP with core functionality',
-            'Establish market positioning and messaging'
+            'Establish market positioning and messaging',
           ],
           mediumTerm: [
             'Scale customer acquisition',
             'Expand feature set based on market feedback',
-            'Build competitive moats (data, network effects)'
-          ]
+            'Build competitive moats (data, network effects)',
+          ],
         },
         riskMitigation: {
           delayImpact: {
             sixMonths: '40% reduction in first-mover advantage',
             twelveMonths: '70% reduction, face established competition',
-            eighteenMonths: 'Market likely saturated, significantly higher customer acquisition costs'
-          }
+            eighteenMonths:
+              'Market likely saturated, significantly higher customer acquisition costs',
+          },
         },
         marketIntelligence: [
           'Industry analyst reports (Gartner, Forrester)',
           'Customer interview data (n=25)',
           'Competitive intelligence monitoring',
-          'Technology trend analysis'
-        ]
+          'Technology trend analysis',
+        ],
       };
-      
+
       const executionTime = Date.now() - startTime;
-      this.logInfo('Market timing validation completed', { 
-        sessionId, 
+      this.logInfo('Market timing validation completed', {
+        sessionId,
         executionTime,
         verdict: timing.verdict,
-        confidence: timing.confidence
+        confidence: timing.confidence,
       });
-      
+
       return timing;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       this.logError('Market timing validation failed', error, { sessionId, executionTime });
-      throw new Error(`Market timing validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Market timing validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 }

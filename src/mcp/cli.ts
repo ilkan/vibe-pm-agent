@@ -16,14 +16,14 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
  */
 async function main() {
   const args = process.argv.slice(2);
-  
+
   // Handle health check command
   if (args.includes('--health') || args.includes('-h')) {
     const server = new PMAgentMCPServer({
       enableLogging: false,
-      enableMetrics: true
+      enableMetrics: true,
     });
-    
+
     try {
       const health = await server.healthCheck();
       console.log(JSON.stringify(health, null, 2));
@@ -33,7 +33,7 @@ async function main() {
       process.exit(1);
     }
   }
-  
+
   // Handle version command
   if (args.includes('--version') || args.includes('-v')) {
     console.log('vibe-pm-agent MCP Server v2.0.0');
@@ -41,7 +41,7 @@ async function main() {
     console.log('Spec ID: vibe_pm_agent_v2_hackathon');
     process.exit(0);
   }
-  
+
   // Handle help command
   if (args.includes('--help')) {
     console.log(`
@@ -66,18 +66,18 @@ For more information, visit: https://github.com/your-org/vibe-pm-agent
 `);
     process.exit(0);
   }
-  
+
   // Start the MCP server
   console.error('Starting vibe-pm-agent MCP Server...');
-  
+
   const server = new PMAgentMCPServer({
     enableLogging: true,
-    enableMetrics: true
+    enableMetrics: true,
   });
-  
+
   // Create transport and connect
   const transport = new StdioServerTransport();
-  
+
   // Handle graceful shutdown
   process.on('SIGINT', async () => {
     console.error('Received SIGINT, shutting down gracefully...');
@@ -89,7 +89,7 @@ For more information, visit: https://github.com/your-org/vibe-pm-agent
       process.exit(1);
     }
   });
-  
+
   process.on('SIGTERM', async () => {
     console.error('Received SIGTERM, shutting down gracefully...');
     try {
@@ -100,18 +100,19 @@ For more information, visit: https://github.com/your-org/vibe-pm-agent
       process.exit(1);
     }
   });
-  
+
   try {
     // Connect and run the server
     await server.connect(transport);
     console.error('MCP Server started successfully');
-    
+
     // Log health status
     const health = await server.healthCheck();
     console.error(`Server Status: ${health.status}`);
     console.error(`Tools Available: ${health.toolsAvailable.length}`);
-    console.error('Clean tools: generate_requirements, generate_design_options, generate_task_plan, generate_management_onepager, generate_pr_faq');
-    
+    console.error(
+      'Clean tools: generate_requirements, generate_design_options, generate_task_plan, generate_management_onepager, generate_pr_faq'
+    );
   } catch (error) {
     console.error('Failed to start MCP server:', error);
     process.exit(1);
@@ -120,7 +121,7 @@ For more information, visit: https://github.com/your-org/vibe-pm-agent
 
 // Run the CLI
 if (require.main === module) {
-  main().catch((error) => {
+  main().catch(error => {
     console.error('Unhandled error:', error);
     process.exit(1);
   });

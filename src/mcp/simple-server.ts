@@ -3,10 +3,7 @@
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { SteeringService } from '../components/steering-service';
 import { DocumentType } from '../models/steering';
 
@@ -21,8 +18,8 @@ export class SimplePMAgentMCPServer {
   constructor() {
     this.server = new Server(
       {
-        name: "vibe-pm-agent",
-        version: "2.0.0",
+        name: 'vibe-pm-agent',
+        version: '2.0.0',
       },
       {
         capabilities: {
@@ -38,8 +35,8 @@ export class SimplePMAgentMCPServer {
         promptForConfirmation: false,
         includeReferences: true,
         namingStrategy: 'feature-based',
-        overwriteExisting: false
-      }
+        overwriteExisting: false,
+      },
     });
 
     this.setupHandlers();
@@ -51,187 +48,216 @@ export class SimplePMAgentMCPServer {
         tools: [
           // PURE PM MODE TOOLS - Focus on "WHY to build"
           {
-            name: "analyze_business_opportunity",
-            description: "Analyzes market opportunity, timing, and business justification for a feature idea",
+            name: 'analyze_business_opportunity',
+            description:
+              'Analyzes market opportunity, timing, and business justification for a feature idea',
             inputSchema: {
-              type: "object",
+              type: 'object',
               properties: {
                 idea: {
-                  type: "string",
-                  description: "Raw feature idea or business need"
+                  type: 'string',
+                  description: 'Raw feature idea or business need',
                 },
                 market_context: {
-                  type: "object",
+                  type: 'object',
                   properties: {
-                    industry: { type: "string" },
-                    competition: { type: "string" },
-                    budget_range: { type: "string", enum: ["small", "medium", "large"] },
-                    timeline: { type: "string" }
+                    industry: { type: 'string' },
+                    competition: { type: 'string' },
+                    budget_range: { type: 'string', enum: ['small', 'medium', 'large'] },
+                    timeline: { type: 'string' },
                   },
-                  description: "Market and business context"
+                  description: 'Market and business context',
                 },
                 steering_options: {
-                  type: "object",
+                  type: 'object',
                   properties: {
-                    create_steering_files: { type: "boolean", default: true },
-                    feature_name: { type: "string" },
-                    inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"], default: "manual" }
-                  }
-                }
+                    create_steering_files: { type: 'boolean', default: true },
+                    feature_name: { type: 'string' },
+                    inclusion_rule: {
+                      type: 'string',
+                      enum: ['always', 'fileMatch', 'manual'],
+                      default: 'manual',
+                    },
+                  },
+                },
               },
-              required: ["idea"]
-            }
+              required: ['idea'],
+            },
           },
           {
-            name: "generate_business_case",
-            description: "Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment",
+            name: 'generate_business_case',
+            description:
+              'Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment',
             inputSchema: {
-              type: "object",
+              type: 'object',
               properties: {
                 opportunity_analysis: {
-                  type: "string",
-                  description: "Business opportunity analysis from analyze_business_opportunity"
+                  type: 'string',
+                  description: 'Business opportunity analysis from analyze_business_opportunity',
                 },
                 financial_inputs: {
-                  type: "object",
+                  type: 'object',
                   properties: {
-                    development_cost: { type: "number" },
-                    operational_cost: { type: "number" },
-                    expected_revenue: { type: "number" },
-                    time_to_market: { type: "number" }
-                  }
+                    development_cost: { type: 'number' },
+                    operational_cost: { type: 'number' },
+                    expected_revenue: { type: 'number' },
+                    time_to_market: { type: 'number' },
+                  },
                 },
                 steering_options: {
-                  type: "object",
+                  type: 'object',
                   properties: {
-                    create_steering_files: { type: "boolean", default: true },
-                    feature_name: { type: "string" },
-                    inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"], default: "manual" }
-                  }
-                }
+                    create_steering_files: { type: 'boolean', default: true },
+                    feature_name: { type: 'string' },
+                    inclusion_rule: {
+                      type: 'string',
+                      enum: ['always', 'fileMatch', 'manual'],
+                      default: 'manual',
+                    },
+                  },
+                },
               },
-              required: ["opportunity_analysis"]
-            }
+              required: ['opportunity_analysis'],
+            },
           },
           {
-            name: "create_stakeholder_communication",
-            description: "Generates executive one-pagers, PR-FAQs, and stakeholder presentations",
+            name: 'create_stakeholder_communication',
+            description: 'Generates executive one-pagers, PR-FAQs, and stakeholder presentations',
             inputSchema: {
-              type: "object",
+              type: 'object',
               properties: {
                 business_case: {
-                  type: "string",
-                  description: "Business case analysis"
+                  type: 'string',
+                  description: 'Business case analysis',
                 },
                 communication_type: {
-                  type: "string",
-                  enum: ["executive_onepager", "pr_faq", "board_presentation", "team_announcement"],
-                  description: "Type of communication to generate"
+                  type: 'string',
+                  enum: ['executive_onepager', 'pr_faq', 'board_presentation', 'team_announcement'],
+                  description: 'Type of communication to generate',
                 },
                 audience: {
-                  type: "string",
-                  enum: ["executives", "board", "engineering_team", "customers", "investors"],
-                  description: "Target audience for the communication"
+                  type: 'string',
+                  enum: ['executives', 'board', 'engineering_team', 'customers', 'investors'],
+                  description: 'Target audience for the communication',
                 },
                 steering_options: {
-                  type: "object",
+                  type: 'object',
                   properties: {
-                    create_steering_files: { type: "boolean", default: true },
-                    feature_name: { type: "string" },
-                    inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"], default: "manual" }
-                  }
-                }
+                    create_steering_files: { type: 'boolean', default: true },
+                    feature_name: { type: 'string' },
+                    inclusion_rule: {
+                      type: 'string',
+                      enum: ['always', 'fileMatch', 'manual'],
+                      default: 'manual',
+                    },
+                  },
+                },
               },
-              required: ["business_case", "communication_type", "audience"]
-            }
+              required: ['business_case', 'communication_type', 'audience'],
+            },
           },
           {
-            name: "assess_strategic_alignment",
-            description: "Evaluates how a feature aligns with company strategy, OKRs, and long-term vision",
+            name: 'assess_strategic_alignment',
+            description:
+              'Evaluates how a feature aligns with company strategy, OKRs, and long-term vision',
             inputSchema: {
-              type: "object",
+              type: 'object',
               properties: {
                 feature_concept: {
-                  type: "string",
-                  description: "Feature concept or business case"
+                  type: 'string',
+                  description: 'Feature concept or business case',
                 },
                 company_context: {
-                  type: "object",
+                  type: 'object',
                   properties: {
-                    mission: { type: "string" },
-                    current_okrs: { type: "array", items: { type: "string" } },
-                    strategic_priorities: { type: "array", items: { type: "string" } },
-                    competitive_position: { type: "string" }
-                  }
+                    mission: { type: 'string' },
+                    current_okrs: { type: 'array', items: { type: 'string' } },
+                    strategic_priorities: { type: 'array', items: { type: 'string' } },
+                    competitive_position: { type: 'string' },
+                  },
                 },
                 steering_options: {
-                  type: "object",
+                  type: 'object',
                   properties: {
-                    create_steering_files: { type: "boolean", default: true },
-                    feature_name: { type: "string" },
-                    inclusion_rule: { type: "string", enum: ["always", "fileMatch", "manual"], default: "manual" }
-                  }
-                }
+                    create_steering_files: { type: 'boolean', default: true },
+                    feature_name: { type: 'string' },
+                    inclusion_rule: {
+                      type: 'string',
+                      enum: ['always', 'fileMatch', 'manual'],
+                      default: 'manual',
+                    },
+                  },
+                },
               },
-              required: ["feature_concept"]
-            }
+              required: ['feature_concept'],
+            },
           },
           {
-            name: "optimize_resource_allocation",
-            description: "Analyzes resource requirements and provides optimization recommendations for development efficiency",
+            name: 'optimize_resource_allocation',
+            description:
+              'Analyzes resource requirements and provides optimization recommendations for development efficiency',
             inputSchema: {
-              type: "object",
+              type: 'object',
               properties: {
                 current_workflow: {
-                  type: "object",
-                  description: "Current development workflow or process"
+                  type: 'object',
+                  description: 'Current development workflow or process',
                 },
                 resource_constraints: {
-                  type: "object",
+                  type: 'object',
                   properties: {
-                    team_size: { type: "number" },
-                    budget: { type: "number" },
-                    timeline: { type: "string" },
-                    technical_debt: { type: "string" }
-                  }
+                    team_size: { type: 'number' },
+                    budget: { type: 'number' },
+                    timeline: { type: 'string' },
+                    technical_debt: { type: 'string' },
+                  },
                 },
                 optimization_goals: {
-                  type: "array",
-                  items: { type: "string", enum: ["cost_reduction", "speed_improvement", "quality_increase", "risk_mitigation"] }
-                }
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                    enum: [
+                      'cost_reduction',
+                      'speed_improvement',
+                      'quality_increase',
+                      'risk_mitigation',
+                    ],
+                  },
+                },
               },
-              required: ["current_workflow"]
-            }
+              required: ['current_workflow'],
+            },
           },
           {
-            name: "validate_market_timing",
-            description: "Fast validation of whether now is the right time to build a feature based on market conditions",
+            name: 'validate_market_timing',
+            description:
+              'Fast validation of whether now is the right time to build a feature based on market conditions',
             inputSchema: {
-              type: "object",
+              type: 'object',
               properties: {
                 feature_idea: {
-                  type: "string",
-                  description: "Feature idea to validate timing for"
+                  type: 'string',
+                  description: 'Feature idea to validate timing for',
                 },
                 market_signals: {
-                  type: "object",
+                  type: 'object',
                   properties: {
-                    customer_demand: { type: "string", enum: ["low", "medium", "high"] },
-                    competitive_pressure: { type: "string", enum: ["low", "medium", "high"] },
-                    technical_readiness: { type: "string", enum: ["low", "medium", "high"] },
-                    resource_availability: { type: "string", enum: ["low", "medium", "high"] }
-                  }
-                }
+                    customer_demand: { type: 'string', enum: ['low', 'medium', 'high'] },
+                    competitive_pressure: { type: 'string', enum: ['low', 'medium', 'high'] },
+                    technical_readiness: { type: 'string', enum: ['low', 'medium', 'high'] },
+                    resource_availability: { type: 'string', enum: ['low', 'medium', 'high'] },
+                  },
+                },
               },
-              required: ["feature_idea"]
-            }
-          }
-        ]
+              required: ['feature_idea'],
+            },
+          },
+        ],
       };
     });
 
     // Handle tool calls
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    this.server.setRequestHandler(CallToolRequestSchema, async request => {
       const { name, arguments: args } = request.params;
 
       try {
@@ -253,11 +279,13 @@ export class SimplePMAgentMCPServer {
         }
       } catch (error) {
         return {
-          content: [{
-            type: "text",
-            text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
-          }],
-          isError: true
+          content: [
+            {
+              type: 'text',
+              text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            },
+          ],
+          isError: true,
         };
       }
     });
@@ -266,7 +294,7 @@ export class SimplePMAgentMCPServer {
   // PM MODE HANDLERS - Focus on "WHY to build"
 
   private async handleBusinessOpportunityAnalysis(args: any) {
-    const idea = args.idea || "No idea provided";
+    const idea = args.idea || 'No idea provided';
     const marketContext = args.market_context || {};
     const steeringOptions = args.steering_options || {};
 
@@ -326,16 +354,18 @@ ${this.assessBusinessRisks(idea, marketContext)}
     }
 
     const response = {
-      content: [{
-        type: "text",
-        text: analysis
-      }]
+      content: [
+        {
+          type: 'text',
+          text: analysis,
+        },
+      ],
     };
 
     if (steeringResult?.created) {
       response.content.push({
-        type: "text",
-        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis business analysis is now available as AI context for strategic decisions.`
+        type: 'text',
+        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis business analysis is now available as AI context for strategic decisions.`,
       });
     }
 
@@ -343,7 +373,7 @@ ${this.assessBusinessRisks(idea, marketContext)}
   }
 
   private async handleBusinessCaseGeneration(args: any) {
-    const opportunityAnalysis = args.opportunity_analysis || "No analysis provided";
+    const opportunityAnalysis = args.opportunity_analysis || 'No analysis provided';
     const financialInputs = args.financial_inputs || {};
     const steeringOptions = args.steering_options || {};
 
@@ -400,23 +430,28 @@ ${this.defineImplementationPhases(financialInputs)}
     let steeringResult = null;
     if (steeringOptions.create_steering_files !== false) {
       try {
-        steeringResult = await this.steeringService.createFromOnePager(businessCase, steeringOptions);
+        steeringResult = await this.steeringService.createFromOnePager(
+          businessCase,
+          steeringOptions
+        );
       } catch (error) {
         console.warn('Failed to create steering file:', error);
       }
     }
 
     const response = {
-      content: [{
-        type: "text",
-        text: businessCase
-      }]
+      content: [
+        {
+          type: 'text',
+          text: businessCase,
+        },
+      ],
     };
 
     if (steeringResult?.created) {
       response.content.push({
-        type: "text",
-        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis business case is now available as AI context for project decisions.`
+        type: 'text',
+        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis business case is now available as AI context for project decisions.`,
       });
     }
 
@@ -424,24 +459,24 @@ ${this.defineImplementationPhases(financialInputs)}
   }
 
   private async handleStakeholderCommunication(args: any) {
-    const businessCase = args.business_case || "No business case provided";
-    const communicationType = args.communication_type || "executive_onepager";
-    const audience = args.audience || "executives";
+    const businessCase = args.business_case || 'No business case provided';
+    const communicationType = args.communication_type || 'executive_onepager';
+    const audience = args.audience || 'executives';
     const steeringOptions = args.steering_options || {};
 
-    let communication = "";
+    let communication = '';
 
     switch (communicationType) {
-      case "executive_onepager":
+      case 'executive_onepager':
         communication = this.generateExecutiveOnePager(businessCase, audience);
         break;
-      case "pr_faq":
+      case 'pr_faq':
         communication = this.generatePRFAQ(businessCase, audience);
         break;
-      case "board_presentation":
+      case 'board_presentation':
         communication = this.generateBoardPresentation(businessCase, audience);
         break;
-      case "team_announcement":
+      case 'team_announcement':
         communication = this.generateTeamAnnouncement(businessCase, audience);
         break;
       default:
@@ -452,10 +487,16 @@ ${this.defineImplementationPhases(financialInputs)}
     let steeringResult = null;
     if (steeringOptions.create_steering_files !== false) {
       try {
-        if (communicationType === "pr_faq") {
-          steeringResult = await this.steeringService.createFromPRFAQ(communication, steeringOptions);
+        if (communicationType === 'pr_faq') {
+          steeringResult = await this.steeringService.createFromPRFAQ(
+            communication,
+            steeringOptions
+          );
         } else {
-          steeringResult = await this.steeringService.createFromOnePager(communication, steeringOptions);
+          steeringResult = await this.steeringService.createFromOnePager(
+            communication,
+            steeringOptions
+          );
         }
       } catch (error) {
         console.warn('Failed to create steering file:', error);
@@ -463,16 +504,18 @@ ${this.defineImplementationPhases(financialInputs)}
     }
 
     const response = {
-      content: [{
-        type: "text",
-        text: communication
-      }]
+      content: [
+        {
+          type: 'text',
+          text: communication,
+        },
+      ],
     };
 
     if (steeringResult?.created) {
       response.content.push({
-        type: "text",
-        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis ${communicationType} is now available as AI context for stakeholder communications.`
+        type: 'text',
+        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis ${communicationType} is now available as AI context for stakeholder communications.`,
       });
     }
 
@@ -480,7 +523,7 @@ ${this.defineImplementationPhases(financialInputs)}
   }
 
   private async handleStrategicAlignment(args: any) {
-    const featureConcept = args.feature_concept || "No concept provided";
+    const featureConcept = args.feature_concept || 'No concept provided';
     const companyContext = args.company_context || {};
     const steeringOptions = args.steering_options || {};
 
@@ -489,7 +532,7 @@ ${this.defineImplementationPhases(financialInputs)}
 ## Alignment Score: ${this.calculateAlignmentScore(featureConcept, companyContext)}/10
 
 ## Mission Alignment
-**Company Mission:** ${companyContext.mission || "Not provided"}
+**Company Mission:** ${companyContext.mission || 'Not provided'}
 **Feature Alignment:** ${this.assessMissionAlignment(featureConcept, companyContext)}
 
 ## OKR Impact Analysis
@@ -521,16 +564,18 @@ ${this.makeStrategicRecommendation(featureConcept, companyContext)}`;
     }
 
     const response = {
-      content: [{
-        type: "text",
-        text: alignment
-      }]
+      content: [
+        {
+          type: 'text',
+          text: alignment,
+        },
+      ],
     };
 
     if (steeringResult?.created) {
       response.content.push({
-        type: "text",
-        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis strategic alignment assessment is now available as AI context.`
+        type: 'text',
+        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis strategic alignment assessment is now available as AI context.`,
       });
     }
 
@@ -540,15 +585,15 @@ ${this.makeStrategicRecommendation(featureConcept, companyContext)}`;
   private async handleResourceOptimization(args: any) {
     const currentWorkflow = args.current_workflow || {};
     const resourceConstraints = args.resource_constraints || {};
-    const optimizationGoals = args.optimization_goals || ["cost_reduction"];
+    const optimizationGoals = args.optimization_goals || ['cost_reduction'];
 
     const optimization = `# Resource Optimization Analysis
 
 ## Current State Assessment
-**Team Size:** ${resourceConstraints.team_size || "Not specified"}
+**Team Size:** ${resourceConstraints.team_size || 'Not specified'}
 **Budget:** $${(resourceConstraints.budget || 0).toLocaleString()}
-**Timeline:** ${resourceConstraints.timeline || "Not specified"}
-**Technical Debt Level:** ${resourceConstraints.technical_debt || "Unknown"}
+**Timeline:** ${resourceConstraints.timeline || 'Not specified'}
+**Technical Debt Level:** ${resourceConstraints.technical_debt || 'Unknown'}
 
 ## Optimization Opportunities
 ${this.identifyOptimizationOpportunities(currentWorkflow, resourceConstraints, optimizationGoals)}
@@ -566,15 +611,17 @@ ${this.createOptimizationRoadmap(currentWorkflow, resourceConstraints, optimizat
 ${this.defineOptimizationMetrics(optimizationGoals)}`;
 
     return {
-      content: [{
-        type: "text",
-        text: optimization
-      }]
+      content: [
+        {
+          type: 'text',
+          text: optimization,
+        },
+      ],
     };
   }
 
   private async handleMarketTimingValidation(args: any) {
-    const featureIdea = args.feature_idea || "No idea provided";
+    const featureIdea = args.feature_idea || 'No idea provided';
     const marketSignals = args.market_signals || {};
 
     const validation = `# Market Timing Validation
@@ -599,10 +646,12 @@ ${this.identifyTimingRisks(marketSignals)}
 ${this.createTimingActionPlan(featureIdea, marketSignals)}`;
 
     return {
-      content: [{
-        type: "text",
-        text: validation
-      }]
+      content: [
+        {
+          type: 'text',
+          text: validation,
+        },
+      ],
     };
   }
 
@@ -612,11 +661,15 @@ ${this.createTimingActionPlan(featureIdea, marketSignals)}`;
   }
 
   private assessMarketTiming(context: any): string {
-    return context.timeline ? `Optimal timing based on ${context.timeline} market window` : "Market timing requires further analysis";
+    return context.timeline
+      ? `Optimal timing based on ${context.timeline} market window`
+      : 'Market timing requires further analysis';
   }
 
   private evaluateStrategicFit(idea: string, context: any): string {
-    return context.industry ? `Strong alignment with ${context.industry} industry trends` : "Strategic fit assessment pending industry context";
+    return context.industry
+      ? `Strong alignment with ${context.industry} industry trends`
+      : 'Strategic fit assessment pending industry context';
   }
 
   private analyzeProblemSpace(idea: string): string {
@@ -624,37 +677,41 @@ ${this.createTimingActionPlan(featureIdea, marketSignals)}`;
   }
 
   private estimateMarketSize(idea: string, context: any): string {
-    const budgetMultiplier = context.budget_range === "large" ? 10 : context.budget_range === "medium" ? 5 : 2;
+    const budgetMultiplier =
+      context.budget_range === 'large' ? 10 : context.budget_range === 'medium' ? 5 : 2;
     return `$${(budgetMultiplier * 10).toLocaleString()}M estimated market opportunity`;
   }
 
   private estimateServiceableMarket(idea: string, context: any): string {
-    const budgetMultiplier = context.budget_range === "large" ? 10 : context.budget_range === "medium" ? 5 : 2;
+    const budgetMultiplier =
+      context.budget_range === 'large' ? 10 : context.budget_range === 'medium' ? 5 : 2;
     return `$${(budgetMultiplier * 2).toLocaleString()}M serviceable market within 3 years`;
   }
 
   private analyzeCompetition(context: any): string {
-    return context.competition ? `Competitive analysis: ${context.competition}` : "Limited direct competition identified, representing first-mover advantage opportunity";
+    return context.competition
+      ? `Competitive analysis: ${context.competition}`
+      : 'Limited direct competition identified, representing first-mover advantage opportunity';
   }
 
   private identifyCustomerSegments(idea: string): string {
-    return "Primary segments include enterprise customers seeking efficiency improvements and SMBs requiring cost-effective automation solutions.";
+    return 'Primary segments include enterprise customers seeking efficiency improvements and SMBs requiring cost-effective automation solutions.';
   }
 
   private justifyTiming(idea: string, context: any): string {
-    return "Market conditions are optimal with increasing demand for automation, rising operational costs, and technological readiness converging to create ideal implementation window.";
+    return 'Market conditions are optimal with increasing demand for automation, rising operational costs, and technological readiness converging to create ideal implementation window.';
   }
 
   private assessRevenueImpact(idea: string, context: any): string {
-    return "Projected 15-25% revenue increase through improved efficiency and new market opportunities.";
+    return 'Projected 15-25% revenue increase through improved efficiency and new market opportunities.';
   }
 
   private assessCostSavings(idea: string, context: any): string {
-    return "Estimated 30-40% operational cost reduction through automation and process optimization.";
+    return 'Estimated 30-40% operational cost reduction through automation and process optimization.';
   }
 
   private assessStrategicValue(idea: string, context: any): string {
-    return "High strategic value through market differentiation, customer retention improvement, and competitive moat creation.";
+    return 'High strategic value through market differentiation, customer retention improvement, and competitive moat creation.';
   }
 
   private assessBusinessRisks(idea: string, context: any): string {
@@ -666,11 +723,11 @@ ${this.createTimingActionPlan(featureIdea, marketSignals)}`;
   }
 
   private makeGoNoGoRecommendation(idea: string, context: any): string {
-    return "**GO** - Proceed with development based on strong market opportunity and strategic alignment.";
+    return '**GO** - Proceed with development based on strong market opportunity and strategic alignment.';
   }
 
   private provideRecommendationRationale(idea: string, context: any): string {
-    return "Market timing is optimal, technical feasibility is confirmed, and strategic value significantly outweighs implementation risks.";
+    return 'Market timing is optimal, technical feasibility is confirmed, and strategic value significantly outweighs implementation risks.';
   }
 
   // Financial calculation helpers
@@ -690,26 +747,26 @@ ${this.createTimingActionPlan(featureIdea, marketSignals)}`;
     const cost = inputs.development_cost || 100000;
     const annualRevenue = inputs.expected_revenue || 200000;
     const discountRate = 0.1;
-    
+
     let npv = -cost;
     for (let year = 1; year <= 3; year++) {
       const revenue = annualRevenue * Math.pow(1.2, year - 1);
       npv += revenue / Math.pow(1 + discountRate, year);
     }
-    
+
     return Math.round(npv);
   }
 
   private analyzeFinancialRisks(inputs: any): string {
-    return "Financial risks are manageable with conservative revenue projections and phased investment approach.";
+    return 'Financial risks are manageable with conservative revenue projections and phased investment approach.';
   }
 
   private analyzeMarketRisks(analysis: string): string {
-    return "Market risks mitigated through validated customer demand and differentiated value proposition.";
+    return 'Market risks mitigated through validated customer demand and differentiated value proposition.';
   }
 
   private analyzeTechnicalRisks(analysis: string): string {
-    return "Technical risks are low given proven technology stack and experienced development team.";
+    return 'Technical risks are low given proven technology stack and experienced development team.';
   }
 
   private defineSuccessMetrics(inputs: any): string {
@@ -738,9 +795,10 @@ ${this.createTimingActionPlan(featureIdea, marketSignals)}`;
   // Communication generation methods
   private generateExecutiveOnePager(businessCase: string, audience: string): string {
     // Extract competitive insights from business case if available
-    const hasCompetitiveAnalysis = businessCase.toLowerCase().includes('competitor') || 
-                                  businessCase.toLowerCase().includes('competitive') ||
-                                  businessCase.toLowerCase().includes('market position');
+    const hasCompetitiveAnalysis =
+      businessCase.toLowerCase().includes('competitor') ||
+      businessCase.toLowerCase().includes('competitive') ||
+      businessCase.toLowerCase().includes('market position');
 
     let competitiveSection = '';
     if (hasCompetitiveAnalysis) {
@@ -785,9 +843,10 @@ Market opportunity window is optimal with validated customer demand, technical r
 
   private generatePRFAQ(businessCase: string, audience: string): string {
     // Extract competitive insights from business case if available
-    const hasCompetitiveAnalysis = businessCase.toLowerCase().includes('competitor') || 
-                                  businessCase.toLowerCase().includes('competitive') ||
-                                  businessCase.toLowerCase().includes('market position');
+    const hasCompetitiveAnalysis =
+      businessCase.toLowerCase().includes('competitor') ||
+      businessCase.toLowerCase().includes('competitive') ||
+      businessCase.toLowerCase().includes('market position');
 
     let competitiveFAQ = '';
     if (hasCompetitiveAnalysis) {
@@ -894,53 +953,65 @@ Development teams will receive detailed specifications through Kiro Spec Mode, w
   }
 
   private assessMissionAlignment(concept: string, context: any): string {
-    return context.mission 
+    return context.mission
       ? `Strong alignment with mission to ${context.mission}. Feature directly supports core mission objectives.`
-      : "Mission alignment requires further analysis with company mission statement.";
+      : 'Mission alignment requires further analysis with company mission statement.';
   }
 
   private analyzeOKRImpact(concept: string, context: any): string {
     if (context.current_okrs?.length > 0) {
-      return `**OKR Impact Analysis:**\n${context.current_okrs.map((okr: string, i: number) => 
-        `- **OKR ${i + 1}:** ${okr} - Direct positive impact through feature capabilities`
-      ).join('\n')}`;
+      return `**OKR Impact Analysis:**\n${context.current_okrs
+        .map(
+          (okr: string, i: number) =>
+            `- **OKR ${i + 1}:** ${okr} - Direct positive impact through feature capabilities`
+        )
+        .join('\n')}`;
     }
-    return "OKR impact analysis requires current company OKRs for detailed assessment.";
+    return 'OKR impact analysis requires current company OKRs for detailed assessment.';
   }
 
   private mapStrategicPriorities(concept: string, context: any): string {
     if (context.strategic_priorities?.length > 0) {
-      return `**Strategic Priority Mapping:**\n${context.strategic_priorities.map((priority: string, i: number) => 
-        `- **Priority ${i + 1}:** ${priority} - Feature supports through enhanced capabilities`
-      ).join('\n')}`;
+      return `**Strategic Priority Mapping:**\n${context.strategic_priorities
+        .map(
+          (priority: string, i: number) =>
+            `- **Priority ${i + 1}:** ${priority} - Feature supports through enhanced capabilities`
+        )
+        .join('\n')}`;
     }
-    return "Strategic priority mapping requires current company priorities for detailed analysis.";
+    return 'Strategic priority mapping requires current company priorities for detailed analysis.';
   }
 
   private assessCompetitiveImpact(concept: string, context: any): string {
-    return context.competitive_position 
+    return context.competitive_position
       ? `Current position: ${context.competitive_position}. Feature strengthens competitive advantage through differentiated capabilities.`
-      : "Competitive impact analysis requires current market position context.";
+      : 'Competitive impact analysis requires current market position context.';
   }
 
   private assessVisionContribution(concept: string, context: any): string {
-    return "Feature contributes to long-term vision through strategic capability building and market position strengthening.";
+    return 'Feature contributes to long-term vision through strategic capability building and market position strengthening.';
   }
 
   private justifyResourceAllocation(concept: string, context: any): string {
-    return "Resource allocation justified by strategic value, market opportunity, and alignment with company priorities.";
+    return 'Resource allocation justified by strategic value, market opportunity, and alignment with company priorities.';
   }
 
   private makeStrategicRecommendation(concept: string, context: any): string {
     const score = this.calculateAlignmentScore(concept, context);
-    if (score >= 8) return "**STRONGLY RECOMMEND** - Excellent strategic alignment with high value potential.";
-    if (score >= 6) return "**RECOMMEND** - Good strategic alignment with clear value creation.";
-    if (score >= 4) return "**CONDITIONAL** - Moderate alignment, requires additional strategic context.";
-    return "**REQUIRES ANALYSIS** - Limited strategic context available for comprehensive assessment.";
+    if (score >= 8)
+      return '**STRONGLY RECOMMEND** - Excellent strategic alignment with high value potential.';
+    if (score >= 6) return '**RECOMMEND** - Good strategic alignment with clear value creation.';
+    if (score >= 4)
+      return '**CONDITIONAL** - Moderate alignment, requires additional strategic context.';
+    return '**REQUIRES ANALYSIS** - Limited strategic context available for comprehensive assessment.';
   }
 
   // Optimization analysis helpers
-  private identifyOptimizationOpportunities(workflow: any, constraints: any, goals: string[]): string {
+  private identifyOptimizationOpportunities(
+    workflow: any,
+    constraints: any,
+    goals: string[]
+  ): string {
     return `**Key Opportunities:**
 - Process automation to reduce manual effort
 - Resource allocation optimization for better efficiency
@@ -949,15 +1020,22 @@ Development teams will receive detailed specifications through Kiro Spec Mode, w
   }
 
   private recommendOptimizations(workflow: any, constraints: any, goals: string[]): string {
-    return goals.map(goal => {
-      switch (goal) {
-        case "cost_reduction": return "- **Cost Reduction:** Automate repetitive tasks, optimize resource usage";
-        case "speed_improvement": return "- **Speed Improvement:** Parallel processing, eliminate bottlenecks";
-        case "quality_increase": return "- **Quality Increase:** Automated testing, code review processes";
-        case "risk_mitigation": return "- **Risk Mitigation:** Backup systems, monitoring, documentation";
-        default: return `- **${goal}:** Optimization strategies tailored to specific goal`;
-      }
-    }).join('\n');
+    return goals
+      .map(goal => {
+        switch (goal) {
+          case 'cost_reduction':
+            return '- **Cost Reduction:** Automate repetitive tasks, optimize resource usage';
+          case 'speed_improvement':
+            return '- **Speed Improvement:** Parallel processing, eliminate bottlenecks';
+          case 'quality_increase':
+            return '- **Quality Increase:** Automated testing, code review processes';
+          case 'risk_mitigation':
+            return '- **Risk Mitigation:** Backup systems, monitoring, documentation';
+          default:
+            return `- **${goal}:** Optimization strategies tailored to specific goal`;
+        }
+      })
+      .join('\n');
   }
 
   private analyzeOptimizationImpact(workflow: any, constraints: any, goals: string[]): string {
@@ -995,25 +1073,26 @@ Development teams will receive detailed specifications through Kiro Spec Mode, w
 
   private calculateTimingScore(signals: any): number {
     const signalValues = {
-      'high': 3,
-      'medium': 2,
-      'low': 1
+      high: 3,
+      medium: 2,
+      low: 1,
     };
-    
+
     const demand = signalValues[signals.customer_demand as keyof typeof signalValues] || 2;
-    const competitive = signalValues[signals.competitive_pressure as keyof typeof signalValues] || 2;
+    const competitive =
+      signalValues[signals.competitive_pressure as keyof typeof signalValues] || 2;
     const technical = signalValues[signals.technical_readiness as keyof typeof signalValues] || 2;
     const resource = signalValues[signals.resource_availability as keyof typeof signalValues] || 2;
-    
+
     return Math.round(((demand + competitive + technical + resource) / 12) * 10);
   }
 
   private makeTimingRecommendation(signals: any): string {
     const score = this.calculateTimingScore(signals);
-    if (score >= 8) return "**OPTIMAL TIMING** - All signals indicate ideal market conditions";
-    if (score >= 6) return "**GOOD TIMING** - Favorable conditions with minor considerations";
-    if (score >= 4) return "**MODERATE TIMING** - Mixed signals, proceed with caution";
-    return "**POOR TIMING** - Consider delaying until conditions improve";
+    if (score >= 8) return '**OPTIMAL TIMING** - All signals indicate ideal market conditions';
+    if (score >= 6) return '**GOOD TIMING** - Favorable conditions with minor considerations';
+    if (score >= 4) return '**MODERATE TIMING** - Mixed signals, proceed with caution';
+    return '**POOR TIMING** - Consider delaying until conditions improve';
   }
 
   private identifyKeyTimingFactors(signals: any): string {
@@ -1042,37 +1121,53 @@ Development teams will receive detailed specifications through Kiro Spec Mode, w
 
   private interpretSignal(level: string): string {
     switch (level) {
-      case 'high': return 'Strong market pull, immediate opportunity';
-      case 'medium': return 'Moderate interest, good timing potential';
-      case 'low': return 'Limited demand, consider market development';
-      default: return 'Requires market research for validation';
+      case 'high':
+        return 'Strong market pull, immediate opportunity';
+      case 'medium':
+        return 'Moderate interest, good timing potential';
+      case 'low':
+        return 'Limited demand, consider market development';
+      default:
+        return 'Requires market research for validation';
     }
   }
 
   private interpretCompetitiveSignal(level: string): string {
     switch (level) {
-      case 'high': return 'Urgent need to respond, first-mover advantage critical';
-      case 'medium': return 'Competitive opportunity, differentiation important';
-      case 'low': return 'Market leadership opportunity, set standards';
-      default: return 'Competitive analysis needed';
+      case 'high':
+        return 'Urgent need to respond, first-mover advantage critical';
+      case 'medium':
+        return 'Competitive opportunity, differentiation important';
+      case 'low':
+        return 'Market leadership opportunity, set standards';
+      default:
+        return 'Competitive analysis needed';
     }
   }
 
   private interpretTechnicalSignal(level: string): string {
     switch (level) {
-      case 'high': return 'Technology ready, implementation feasible';
-      case 'medium': return 'Some technical challenges, manageable risk';
-      case 'low': return 'Significant technical hurdles, high risk';
-      default: return 'Technical feasibility assessment required';
+      case 'high':
+        return 'Technology ready, implementation feasible';
+      case 'medium':
+        return 'Some technical challenges, manageable risk';
+      case 'low':
+        return 'Significant technical hurdles, high risk';
+      default:
+        return 'Technical feasibility assessment required';
     }
   }
 
   private interpretResourceSignal(level: string): string {
     switch (level) {
-      case 'high': return 'Resources available, can proceed immediately';
-      case 'medium': return 'Limited resources, prioritization needed';
-      case 'low': return 'Resource constraints, consider phased approach';
-      default: return 'Resource planning required';
+      case 'high':
+        return 'Resources available, can proceed immediately';
+      case 'medium':
+        return 'Limited resources, prioritization needed';
+      case 'low':
+        return 'Resource constraints, consider phased approach';
+      default:
+        return 'Resource planning required';
     }
   }
 

@@ -1,22 +1,22 @@
 /**
  * Competitive Analysis Data Quality Validation Framework
- * 
+ *
  * This module provides comprehensive validation logic for competitive and market data quality,
  * implements graceful degradation for insufficient data scenarios, and manages confidence scoring.
  */
 
-import { 
-  CompetitorAnalysisResult, 
-  MarketSizingResult, 
-  SourceReference, 
-  DataQualityCheck, 
-  ValidationResult, 
+import {
+  CompetitorAnalysisResult,
+  MarketSizingResult,
+  SourceReference,
+  DataQualityCheck,
+  ValidationResult,
   QualityIndicator,
   CompetitiveAnalysisError,
   MarketSizingError,
   COMPETITIVE_ANALYSIS_DEFAULTS,
   MARKET_SIZING_DEFAULTS,
-  SOURCE_RELIABILITY_THRESHOLDS
+  SOURCE_RELIABILITY_THRESHOLDS,
 } from '../models/competitive';
 
 // ============================================================================
@@ -89,7 +89,9 @@ export class DataQualityValidator {
     // Validate market context
     if (!marketContext) {
       dataGaps.push('Market context not provided');
-      recommendations.push('Provide industry, geography, and target segment for more accurate analysis');
+      recommendations.push(
+        'Provide industry, geography, and target segment for more accurate analysis'
+      );
       confidence *= 0.8;
     } else {
       const contextValidation = this.validateMarketContext(marketContext);
@@ -103,7 +105,7 @@ export class DataQualityValidator {
     const genericPatterns = [
       /\b(app|application|system|platform|tool|solution)\b/gi,
       /\b(better|improved|enhanced|optimized)\b/gi,
-      /\b(users?|customers?|people)\b/gi
+      /\b(users?|customers?|people)\b/gi,
     ];
 
     const genericMatches = genericPatterns.reduce((count, pattern) => {
@@ -113,7 +115,9 @@ export class DataQualityValidator {
 
     if (genericMatches > 5) {
       warnings.push('Feature description appears generic and may limit competitive analysis depth');
-      recommendations.push('Include specific functionality, target market, or unique value propositions');
+      recommendations.push(
+        'Include specific functionality, target market, or unique value propositions'
+      );
       confidence *= 0.9;
     }
 
@@ -123,14 +127,18 @@ export class DataQualityValidator {
       warnings,
       recommendations,
       dataGaps,
-      qualityScore: this.calculateQualityScore(confidence, warnings.length, dataGaps.length)
+      qualityScore: this.calculateQualityScore(confidence, warnings.length, dataGaps.length),
     };
   }
 
   /**
    * Validate market sizing input parameters
    */
-  validateMarketSizingInput(featureIdea: string, marketDefinition: any, sizingMethods: string[]): ValidationResult {
+  validateMarketSizingInput(
+    featureIdea: string,
+    marketDefinition: any,
+    sizingMethods: string[]
+  ): ValidationResult {
     const warnings: string[] = [];
     const recommendations: string[] = [];
     const dataGaps: string[] = [];
@@ -191,7 +199,7 @@ export class DataQualityValidator {
 
     const validMethods = ['top-down', 'bottom-up', 'value-theory'];
     const invalidMethods = sizingMethods.filter(method => !validMethods.includes(method));
-    
+
     if (invalidMethods.length > 0) {
       throw new MarketSizingError(
         `Invalid sizing methods: ${invalidMethods.join(', ')}`,
@@ -212,7 +220,7 @@ export class DataQualityValidator {
       warnings,
       recommendations,
       dataGaps,
-      qualityScore: this.calculateQualityScore(confidence, warnings.length, dataGaps.length)
+      qualityScore: this.calculateQualityScore(confidence, warnings.length, dataGaps.length),
     };
   }
 
@@ -256,7 +264,7 @@ export class DataQualityValidator {
       sourceReliability,
       dataFreshness,
       methodologyRigor,
-      strategyQuality.score
+      strategyQuality.score,
     ]);
 
     return {
@@ -265,7 +273,7 @@ export class DataQualityValidator {
       methodologyRigor,
       overallConfidence,
       qualityIndicators,
-      recommendations: [...new Set(recommendations)] // Remove duplicates
+      recommendations: [...new Set(recommendations)], // Remove duplicates
     };
   }
 
@@ -309,7 +317,7 @@ export class DataQualityValidator {
       sourceReliability,
       dataFreshness,
       assumptionQuality.score,
-      confidenceQuality.score
+      confidenceQuality.score,
     ]);
 
     return {
@@ -318,7 +326,7 @@ export class DataQualityValidator {
       methodologyRigor,
       overallConfidence,
       qualityIndicators,
-      recommendations: [...new Set(recommendations)]
+      recommendations: [...new Set(recommendations)],
     };
   }
 
@@ -353,7 +361,7 @@ export class DataQualityValidator {
       warnings,
       recommendations,
       dataGaps,
-      qualityScore: confidence
+      qualityScore: confidence,
     };
   }
 
@@ -371,7 +379,7 @@ export class DataQualityValidator {
         metric: 'Competitor Count',
         score: 0,
         description: 'No competitors identified',
-        impact: 'critical'
+        impact: 'critical',
       });
       recommendations.push('Expand competitor research to identify market players');
       return { indicators, recommendations, score: 0 };
@@ -382,7 +390,7 @@ export class DataQualityValidator {
         metric: 'Competitor Count',
         score: 0.6,
         description: `Only ${competitors.length} competitors found (minimum ${COMPETITIVE_ANALYSIS_DEFAULTS.MIN_COMPETITORS} recommended)`,
-        impact: 'important'
+        impact: 'important',
       });
       recommendations.push('Research additional competitors for comprehensive analysis');
       score *= 0.8;
@@ -393,13 +401,13 @@ export class DataQualityValidator {
     competitors.forEach((competitor, index) => {
       const completeness = this.calculateCompetitorCompleteness(competitor);
       if (completeness > 0.7) completeProfiles++;
-      
+
       if (completeness < 0.5) {
         indicators.push({
           metric: `Competitor ${index + 1} Data Completeness`,
           score: completeness,
           description: `Insufficient data for ${competitor.name || 'unnamed competitor'}`,
-          impact: 'important'
+          impact: 'important',
         });
       }
     });
@@ -414,7 +422,7 @@ export class DataQualityValidator {
       metric: 'Profile Completeness',
       score: profileCompletenessRatio,
       description: `${Math.round(profileCompletenessRatio * 100)}% of competitor profiles are complete`,
-      impact: profileCompletenessRatio > 0.7 ? 'minor' : 'important'
+      impact: profileCompletenessRatio > 0.7 ? 'minor' : 'important',
     });
 
     return { indicators, recommendations, score };
@@ -434,34 +442,39 @@ export class DataQualityValidator {
         metric: 'Source Attribution',
         score: 0,
         description: 'No sources referenced',
-        impact: 'critical'
+        impact: 'critical',
       });
       recommendations.push('Add credible source references to support analysis');
       return { indicators, recommendations, averageReliability: 0, averageFreshness: 0 };
     }
 
     const reliabilityScores = sources.map(s => s.reliability);
-    const averageReliability = reliabilityScores.reduce((a, b) => a + b, 0) / reliabilityScores.length;
+    const averageReliability =
+      reliabilityScores.reduce((a, b) => a + b, 0) / reliabilityScores.length;
 
-    const freshnessScores = sources.map(s => this.calculateFreshnessScore(s.dataFreshness.ageInDays));
+    const freshnessScores = sources.map(s =>
+      this.calculateFreshnessScore(s.dataFreshness.ageInDays)
+    );
     const averageFreshness = freshnessScores.reduce((a, b) => a + b, 0) / freshnessScores.length;
 
     indicators.push({
       metric: 'Source Reliability',
       score: averageReliability,
       description: `Average source reliability: ${Math.round(averageReliability * 100)}%`,
-      impact: averageReliability > SOURCE_RELIABILITY_THRESHOLDS.HIGH ? 'minor' : 'important'
+      impact: averageReliability > SOURCE_RELIABILITY_THRESHOLDS.HIGH ? 'minor' : 'important',
     });
 
     indicators.push({
       metric: 'Data Freshness',
       score: averageFreshness,
       description: `Average data freshness score: ${Math.round(averageFreshness * 100)}%`,
-      impact: averageFreshness > 0.7 ? 'minor' : 'important'
+      impact: averageFreshness > 0.7 ? 'minor' : 'important',
     });
 
     if (averageReliability < SOURCE_RELIABILITY_THRESHOLDS.MEDIUM) {
-      recommendations.push('Include more authoritative sources (McKinsey, Gartner, industry reports)');
+      recommendations.push(
+        'Include more authoritative sources (McKinsey, Gartner, industry reports)'
+      );
     }
 
     if (averageFreshness < 0.6) {
@@ -485,7 +498,7 @@ export class DataQualityValidator {
         metric: 'SWOT Analysis Coverage',
         score: 0,
         description: 'No SWOT analysis provided',
-        impact: 'important'
+        impact: 'important',
       });
       recommendations.push('Include SWOT analysis for key competitors');
       return { indicators, recommendations, rigorScore: 0 };
@@ -511,7 +524,7 @@ export class DataQualityValidator {
       metric: 'SWOT Analysis Rigor',
       score: confidenceRatio,
       description: `${Math.round(confidenceRatio * 100)}% of SWOT items have high confidence`,
-      impact: confidenceRatio > 0.6 ? 'minor' : 'important'
+      impact: confidenceRatio > 0.6 ? 'minor' : 'important',
     });
 
     if (confidenceRatio < 0.5) {
@@ -535,14 +548,15 @@ export class DataQualityValidator {
         metric: 'Strategic Recommendations',
         score: 0,
         description: 'No strategic recommendations provided',
-        impact: 'important'
+        impact: 'important',
       });
       validationRecommendations.push('Include actionable strategic recommendations');
       return { indicators, recommendations: validationRecommendations, score: 0 };
     }
 
-    const detailedRecommendations = recommendations.filter(rec => 
-      rec.implementation && Array.isArray(rec.implementation) && rec.implementation.length > 0
+    const detailedRecommendations = recommendations.filter(
+      rec =>
+        rec.implementation && Array.isArray(rec.implementation) && rec.implementation.length > 0
     );
 
     const detailRatio = detailedRecommendations.length / recommendations.length;
@@ -552,11 +566,13 @@ export class DataQualityValidator {
       metric: 'Recommendation Detail',
       score: detailRatio,
       description: `${Math.round(detailRatio * 100)}% of recommendations include implementation details`,
-      impact: detailRatio > 0.7 ? 'minor' : 'important'
+      impact: detailRatio > 0.7 ? 'minor' : 'important',
     });
 
     if (detailRatio < 0.6) {
-      validationRecommendations.push('Add implementation steps and timelines to strategic recommendations');
+      validationRecommendations.push(
+        'Add implementation steps and timelines to strategic recommendations'
+      );
     }
 
     return { indicators, recommendations: validationRecommendations, score };
@@ -581,7 +597,7 @@ export class DataQualityValidator {
         metric: 'Market Size Logic',
         score: 0.3,
         description: 'TAM/SAM/SOM relationship is illogical',
-        impact: 'critical'
+        impact: 'critical',
       });
       recommendations.push('Ensure TAM > SAM > SOM in market sizing calculations');
       rigorScore *= 0.5;
@@ -590,20 +606,20 @@ export class DataQualityValidator {
         metric: 'Market Size Logic',
         score: 1.0,
         description: 'TAM/SAM/SOM relationship is logical',
-        impact: 'minor'
+        impact: 'minor',
       });
     }
 
     // Validate methodology diversity
     const methodologies = result.methodology.map(m => m.type);
     const uniqueMethodologies = [...new Set(methodologies)];
-    
+
     const methodologyScore = uniqueMethodologies.length / 3; // Max 3 methodologies
     indicators.push({
       metric: 'Methodology Diversity',
       score: methodologyScore,
       description: `${uniqueMethodologies.length} different sizing methodologies used`,
-      impact: methodologyScore > 0.6 ? 'minor' : 'important'
+      impact: methodologyScore > 0.6 ? 'minor' : 'important',
     });
 
     if (uniqueMethodologies.length < 2) {
@@ -628,7 +644,7 @@ export class DataQualityValidator {
         metric: 'Market Assumptions',
         score: 0,
         description: 'No market assumptions documented',
-        impact: 'important'
+        impact: 'important',
       });
       recommendations.push('Document key market assumptions for transparency');
       return { indicators, recommendations, score: 0 };
@@ -642,7 +658,7 @@ export class DataQualityValidator {
       metric: 'Assumption Confidence',
       score: confidenceRatio,
       description: `${Math.round(confidenceRatio * 100)}% of assumptions have high confidence`,
-      impact: confidenceRatio > 0.6 ? 'minor' : 'important'
+      impact: confidenceRatio > 0.6 ? 'minor' : 'important',
     });
 
     if (confidenceRatio < 0.5) {
@@ -666,14 +682,14 @@ export class DataQualityValidator {
         metric: 'Confidence Intervals',
         score: 0,
         description: 'No confidence intervals provided',
-        impact: 'important'
+        impact: 'important',
       });
       recommendations.push('Include confidence intervals for market size estimates');
       return { indicators, recommendations, score: 0 };
     }
 
-    const validIntervals = intervals.filter(interval => 
-      interval.lowerBound < interval.upperBound && interval.confidenceLevel > 0
+    const validIntervals = intervals.filter(
+      interval => interval.lowerBound < interval.upperBound && interval.confidenceLevel > 0
     );
 
     const validityRatio = validIntervals.length / intervals.length;
@@ -683,7 +699,7 @@ export class DataQualityValidator {
       metric: 'Confidence Interval Validity',
       score: validityRatio,
       description: `${Math.round(validityRatio * 100)}% of confidence intervals are valid`,
-      impact: validityRatio > 0.8 ? 'minor' : 'important'
+      impact: validityRatio > 0.8 ? 'minor' : 'important',
     });
 
     if (validityRatio < 0.8) {
@@ -700,22 +716,26 @@ export class DataQualityValidator {
   private calculateCompetitorCompleteness(competitor: any): number {
     const requiredFields = ['name', 'strengths', 'weaknesses', 'keyFeatures', 'pricing'];
     const optionalFields = ['marketShare', 'targetMarket', 'recentMoves'];
-    
+
     let score = 0;
-    let totalFields = requiredFields.length + optionalFields.length;
+    const totalFields = requiredFields.length + optionalFields.length;
 
     requiredFields.forEach(field => {
-      if (competitor[field] && 
-          (typeof competitor[field] === 'string' ? competitor[field].trim() : true) &&
-          (Array.isArray(competitor[field]) ? competitor[field].length > 0 : true)) {
+      if (
+        competitor[field] &&
+        (typeof competitor[field] === 'string' ? competitor[field].trim() : true) &&
+        (Array.isArray(competitor[field]) ? competitor[field].length > 0 : true)
+      ) {
         score += 2; // Required fields worth more
       }
     });
 
     optionalFields.forEach(field => {
-      if (competitor[field] && 
-          (typeof competitor[field] === 'string' ? competitor[field].trim() : true) &&
-          (Array.isArray(competitor[field]) ? competitor[field].length > 0 : true)) {
+      if (
+        competitor[field] &&
+        (typeof competitor[field] === 'string' ? competitor[field].trim() : true) &&
+        (Array.isArray(competitor[field]) ? competitor[field].length > 0 : true)
+      ) {
         score += 1;
       }
     });
@@ -733,24 +753,28 @@ export class DataQualityValidator {
 
   private calculateOverallConfidence(scores: number[]): number {
     if (scores.length === 0) return 0;
-    
+
     // Weighted average with emphasis on critical factors
     const weights = [0.25, 0.25, 0.2, 0.15, 0.15]; // Adjust based on importance
     const weightedSum = scores.reduce((sum, score, index) => {
-      const weight = weights[index] || (1 / scores.length);
-      return sum + (score * weight);
+      const weight = weights[index] || 1 / scores.length;
+      return sum + score * weight;
     }, 0);
 
     return Math.min(weightedSum, 1.0);
   }
 
-  private calculateQualityScore(confidence: number, warningCount: number, gapCount: number): number {
+  private calculateQualityScore(
+    confidence: number,
+    warningCount: number,
+    gapCount: number
+  ): number {
     let score = confidence;
-    
+
     // Penalize for warnings and gaps
-    score -= (warningCount * 0.05);
-    score -= (gapCount * 0.1);
-    
+    score -= warningCount * 0.05;
+    score -= gapCount * 0.1;
+
     return Math.max(score, 0);
   }
 }
@@ -783,16 +807,16 @@ export class GracefulDegradationManager {
         recommendations: [
           'No competitors identified. Cannot perform competitive analysis.',
           'Consider researching direct and indirect competitors in your market space.',
-          'Use alternative analysis methods like market research or customer interviews.'
+          'Use alternative analysis methods like market research or customer interviews.',
         ],
-        adjustedConfidence: 0
+        adjustedConfidence: 0,
       };
     }
 
     if (availableCompetitors.length < minRequired) {
       degradedAnalysis = true;
       adjustedConfidence = Math.max(0.3, availableCompetitors.length / minRequired);
-      
+
       recommendations.push(
         `Limited competitor data (${availableCompetitors.length}/${minRequired}). Analysis will be less comprehensive.`,
         'Consider expanding competitor research for more complete analysis.',
@@ -804,7 +828,7 @@ export class GracefulDegradationManager {
       canProceed: true,
       degradedAnalysis,
       recommendations,
-      adjustedConfidence
+      adjustedConfidence,
     };
   }
 
@@ -827,7 +851,8 @@ export class GracefulDegradationManager {
     const availableMethodologies: string[] = [];
 
     const missingFields = requiredFields.filter(field => !availableData[field]);
-    const completenessRatio = (requiredFields.length - missingFields.length) / requiredFields.length;
+    const completenessRatio =
+      (requiredFields.length - missingFields.length) / requiredFields.length;
 
     if (completenessRatio < 0.3) {
       return {
@@ -836,10 +861,10 @@ export class GracefulDegradationManager {
         recommendations: [
           'Insufficient market data for reliable sizing analysis.',
           `Missing critical fields: ${missingFields.join(', ')}`,
-          'Gather additional market research before attempting sizing analysis.'
+          'Gather additional market research before attempting sizing analysis.',
         ],
         adjustedConfidence: 0,
-        availableMethodologies: []
+        availableMethodologies: [],
       };
     }
 
@@ -863,17 +888,17 @@ export class GracefulDegradationManager {
         recommendations: [
           'No suitable sizing methodologies available with current data.',
           'Gather industry reports for top-down analysis.',
-          'Collect customer and pricing data for bottom-up analysis.'
+          'Collect customer and pricing data for bottom-up analysis.',
         ],
         adjustedConfidence: 0,
-        availableMethodologies: []
+        availableMethodologies: [],
       };
     }
 
     if (completenessRatio < 0.7) {
       degradedAnalysis = true;
       adjustedConfidence = completenessRatio;
-      
+
       recommendations.push(
         `Market data is ${Math.round(completenessRatio * 100)}% complete. Analysis will have limitations.`,
         `Available methodologies: ${availableMethodologies.join(', ')}`,
@@ -886,7 +911,7 @@ export class GracefulDegradationManager {
       degradedAnalysis,
       recommendations,
       adjustedConfidence,
-      availableMethodologies
+      availableMethodologies,
     };
   }
 
@@ -907,8 +932,8 @@ export class GracefulDegradationManager {
     let adjustedConfidence = 1.0;
     let degradedAnalysis = false;
 
-    const staleSources = sources.filter(source => 
-      source.dataFreshness.ageInDays > freshnessThreshold
+    const staleSources = sources.filter(
+      source => source.dataFreshness.ageInDays > freshnessThreshold
     );
 
     const staleRatio = staleSources.length / sources.length;
@@ -916,7 +941,7 @@ export class GracefulDegradationManager {
     if (staleRatio > 0.8) {
       degradedAnalysis = true;
       adjustedConfidence = 0.4;
-      
+
       recommendations.push(
         'Most data sources are stale. Analysis reliability is significantly reduced.',
         'Update analysis with recent market data and competitor information.',
@@ -925,14 +950,14 @@ export class GracefulDegradationManager {
     } else if (staleRatio > 0.5) {
       degradedAnalysis = true;
       adjustedConfidence = 0.7;
-      
+
       recommendations.push(
         'Some data sources are outdated. Analysis may not reflect current market conditions.',
         'Refresh key data points for more accurate analysis.'
       );
     } else if (staleRatio > 0.2) {
       adjustedConfidence = 0.9;
-      
+
       recommendations.push(
         'Minor data freshness issues detected. Overall analysis remains reliable.'
       );
@@ -943,7 +968,7 @@ export class GracefulDegradationManager {
       degradedAnalysis,
       recommendations,
       adjustedConfidence,
-      staleSourceCount: staleSources.length
+      staleSourceCount: staleSources.length,
     };
   }
 }
