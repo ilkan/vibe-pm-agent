@@ -1,104 +1,165 @@
-# 🎬 Vibe PM Agent Demonstrations
+# Vibe PM Agent - Comprehensive Demo
 
-Real-world scenarios showing PM Mode in action - from raw developer intent to executive-ready business cases **with authoritative citations**.
+This directory contains real-life examples demonstrating the Vibe PM Agent's capabilities with actual outputs, including confidence scoring and citation mechanisms.
 
 ## 🎯 Demo Scenarios
 
-### 🆕 **AI Code Review Assistant** (`ai-code-review-assistant/`) ⭐ **LATEST**
-**Context**: Development team building AI-powered code review assistant for security and performance
-**Demonstrates**: **Complete PM workflow with 6 new tools** - Business opportunity → Business case → Executive communication
-**Features**: Professional PM documents with McKinsey, Gartner, BCG citations, 300% ROI analysis, market timing validation
+### 1. AI Code Review Assistant (`ai-code-review-assistant/`)
+**Scenario**: A development team wants to build an AI-powered code review assistant to improve code quality and reduce review time.
+
+**Demonstrates**:
+- Complete PM workflow from idea to execution plan
+- Business opportunity analysis with market validation
+- ROI projections with comparable company data
+- Executive communication generation
+- Citation management and confidence scoring
+
+### 2. Real-time Collaboration Platform (`realtime-collaboration/`)
+**Scenario**: A startup wants to build a real-time collaboration platform to compete with Slack and Microsoft Teams.
+
+**Demonstrates**:
+- Market timing validation
+- Strategic alignment assessment
+- Resource optimization analysis
+- Competitive intelligence integration
+
+### 3. Customer Support Automation (`customer-support-automation/`)
+**Scenario**: An e-commerce company wants to implement AI-powered customer support to reduce response times and improve satisfaction.
+
+**Demonstrates**:
+- Multi-scenario business case development
+- Risk assessment and mitigation strategies
+- Stakeholder communication generation
+- Evidence-backed decision making
+
+## 🚀 Quick Start
+
+### Run All Demos
+```bash
+cd demo
+npm run demo:all
+```
+
+### Run Individual Demos
+```bash
+# AI Code Review Assistant (Recommended)
+cd ai-code-review-assistant
+node run-complete-workflow.js
+
+# Real-time Collaboration Platform
+cd realtime-collaboration
+node run-analysis.js
+
+# Customer Support Automation
+cd customer-support-automation
+node run-business-case.js
+```
+
+## 📊 Key Features Demonstrated
+
+### Evidence-Backed Analysis
+- **Citations**: All outputs include source URLs, publication dates, and credibility ratings
+- **Confidence Scoring**: 0-100% confidence based on evidence quality
+- **Source Validation**: Automatic verification of market research data
+- **Methodology Transparency**: Clear explanation of analysis approaches
+
+### Professional PM Artifacts
+- **Business Cases**: ROI analysis with multi-scenario projections
+- **Executive One-Pagers**: Management-ready summaries using Pyramid Principle
+- **PR-FAQs**: Amazon-style product announcements
+- **Strategic Assessments**: OKR alignment and competitive positioning
+
+### Consulting-Grade Frameworks
+- **MECE Analysis**: Mutually Exclusive, Collectively Exhaustive breakdowns
+- **Impact vs Effort Matrix**: Prioritization with visual quadrants
+- **Risk Assessment**: Comprehensive risk identification and mitigation
+- **Market Timing**: Right-time recommendations with supporting evidence
+
+## 📈 Expected Outputs
+
+Each demo generates:
+1. **Business Opportunity Analysis** (with 15+ citations)
+2. **Comprehensive Business Case** (ROI projections, risk assessment)
+3. **Executive One-Pager** (management summary)
+4. **Strategic Alignment Assessment** (OKR mapping)
+5. **Market Timing Validation** (go/no-go recommendation)
+6. **Resource Optimization Plan** (development efficiency)
+
+## 🔍 Citation System Example
+
+```json
+{
+  "confidence_score": 87,
+  "evidence_quality": "High",
+  "citations": [
+    {
+      "id": "mckinsey_2024_ai_productivity",
+      "source": "McKinsey Global Institute",
+      "title": "The Economic Potential of Generative AI",
+      "url": "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/the-economic-potential-of-generative-ai-the-next-productivity-frontier",
+      "publication_date": "2024-06-14",
+      "credibility_rating": "A",
+      "relevance_score": 0.92,
+      "key_finding": "AI could contribute $2.6-4.4 trillion annually to global economy"
+    }
+  ]
+}
+```
+
+## 🎯 Hackathon Judges - Quick Validation
+
+### 1. Verify Core Functionality
 ```bash
 cd demo/ai-code-review-assistant
-node run-complete-workflow.js   # Full PM workflow demonstration
-./show-analysis.sh             # View business analysis results
+node run-complete-workflow.js
 ```
+**Expected**: 6 professional documents generated in ~30 seconds
 
-### 🆕 **AI Customer Support Platform** (`ai-customer-support/`) 
-**Context**: SaaS company building AI-powered customer support automation
-**Demonstrates**: **Citation integration across all PM tools** with McKinsey, Gartner, BCG, HBR sources
-**Features**: 6 professional documents, 25+ authoritative citations, executive-ready quality
+### 2. Check Citation Quality
 ```bash
-cd demo/ai-customer-support
-node test-citations.js          # Test new PM tools with citations
-node test-enhanced-tools.js     # Test enhanced existing tools
-./show-results.sh              # View all generated documents
+grep -r "citation" outputs/ | head -10
 ```
+**Expected**: 25+ citations from McKinsey, Gartner, BCG, Harvard Business Review
 
-### 1. **SaaS Churn Prevention** (`churn-prediction/`)
-**Context**: SaaS company with above-average churn (based on Klipfolio benchmarks [3])
-**Demonstrates**: Market timing validation, ROI analysis using real SaaS metrics, stakeholder communication
-
-### 2. **E-commerce Personalization** (`ecommerce-personalization/`)
-**Context**: Online retailer considering AI-powered product recommendations
-**Demonstrates**: Competitive analysis, resource optimization, phased rollout planning
-
-### 3. **FinTech Compliance** (`fintech-compliance/`)
-**Context**: Financial startup needs automated compliance monitoring before Series B
-**Demonstrates**: Risk assessment, regulatory timing, executive communication
-
-### 4. **Developer Tools Integration** (`devtools-integration/`)
-**Context**: Engineering team wants to build internal CI/CD optimization platform
-**Demonstrates**: Technical ROI, developer productivity metrics, build-vs-buy analysis
-
-## 🚀 How to Run Demos
-
-### 🎯 **Complete PM Workflow Demo** (Recommended)
+### 3. Validate Confidence Scoring
 ```bash
-cd demo/ai-code-review-assistant
-node run-complete-workflow.js   # Full PM workflow with 6 new tools
-./show-analysis.sh             # View business analysis
+grep -r "confidence_score" outputs/ | head -5
 ```
-**Generates**: Business opportunity analysis → Business case with 300% ROI → Executive one-pager → Market timing validation
+**Expected**: Scores between 75-95% with evidence justification
 
-### 🎯 **Citation Integration Demo** 
+### 4. Review Professional Quality
 ```bash
-cd demo/ai-customer-support
-node test-citations.js          # New PM tools with citations
-node test-enhanced-tools.js     # Enhanced existing tools
-./show-results.sh              # View all results
+cat outputs/executive-onepager.md
 ```
-**Generates**: 6 professional documents with 25+ citations from McKinsey, Gartner, BCG, HBR, PwC
+**Expected**: Executive-ready document with Pyramid Principle structure
 
-### Traditional Demos
-Each demo folder contains:
-- `input.json` - Raw developer intent and context
-- `analysis/` - Step-by-step PM Mode analysis
-- `outputs/` - Generated business cases, one-pagers, PR-FAQs
-- `kiro-integration/` - How results integrate with Spec and Vibe modes
+## 📋 Demo Checklist
 
-### Quick Demo
+- [ ] All demos run without errors
+- [ ] Citations include credible sources (McKinsey, Gartner, BCG, HBR)
+- [ ] Confidence scores are justified with evidence quality
+- [ ] Professional PM artifacts are generated
+- [ ] ROI calculations include multiple scenarios
+- [ ] Market timing includes competitive analysis
+- [ ] Strategic alignment maps to company OKRs
+- [ ] Resource optimization provides actionable recommendations
+
+## 🔧 Troubleshooting
+
+### Common Issues
+1. **Missing Dependencies**: Run `npm install` in root directory
+2. **Build Errors**: Run `npm run build` before demos
+3. **MCP Server Not Running**: Start with `npm run mcp:server`
+
+### Debug Mode
 ```bash
-cd demo/churn-prediction
-cat input.json | node ../../bin/mcp-server.js --tool analyze_business_opportunity
+DEBUG=vibe-pm-agent:* node run-complete-workflow.js
 ```
 
-## 📊 Expected Outcomes
+## 📞 Support
 
-Each demo shows:
-- ✅ **Market Timing**: Analysis using real industry benchmarks and timing factors
-- ✅ **Business Case**: ROI calculations based on authoritative industry data  
-- ✅ **Executive Communication**: Documents following proven PM frameworks
-- ✅ **Kiro Integration**: Steering files for persistent strategic context
-- ✅ **Implementation Roadmap**: Phased approach with industry-standard practices
-- ✅ **🆕 Authoritative Citations**: Every document includes references from McKinsey, Gartner, BCG, HBR, PwC
-- ✅ **🆕 Professional Quality**: Executive-ready documents with consulting-grade backing
-
-## 📚 Data Sources & Methodology
-
-All scenarios use **real industry data** from authoritative sources:
-- **SaaS Metrics**: Klipfolio, Gainsight benchmarks [3,8]
-- **E-commerce Data**: Baymard Institute conversion studies [7]  
-- **PM Benchmarks**: ProductPlan, Gartner research [1,4]
-- **🆕 Citation Integration**: McKinsey, Gartner, BCG, Harvard Business Review, PwC, Bain, Deloitte
-- **No fictional metrics or hallucinated data**
-
-### 🎯 **Citation Quality Standards**
-- **15 high-authority sources** from top consulting firms and research organizations
-- **100% from 2024** ensuring recency and relevance
-- **Global scope** with industry-specific focus
-- **Detailed methodology** and sample sizes for each source
-
-See `docs/citations.json` for complete citation database and `demo/ai-customer-support/DEMO-RESULTS.md` for validation results.
-
-*Demonstrates evidence-based WHY → WHAT → HOW development workflow **with authoritative backing***
+For issues with demos:
+1. Check `demo/logs/` for error details
+2. Verify MCP server is running
+3. Ensure all dependencies are installed
+4. Review individual tool outputs in `outputs/` directories
