@@ -54,7 +54,7 @@ export class ErrorHandler {
    */
   static handleIntentParsingFailure(error: unknown, rawIntent: string): never {
     const errorMessage = error instanceof Error ? error.message : 'Unknown parsing error';
-    
+
     if (error instanceof ValidationError) {
       throw new IntentParsingError(
         `Input validation failed: ${errorMessage}`,
@@ -91,7 +91,7 @@ export class ErrorHandler {
    */
   static handleAnalysisFailure(error: unknown, fallbackAnalysis?: any): any {
     const errorMessage = error instanceof Error ? error.message : 'Unknown analysis error';
-    
+
     if (fallbackAnalysis) {
       console.warn(`Analysis failed, using fallback: ${errorMessage}`);
       return fallbackAnalysis;
@@ -99,12 +99,10 @@ export class ErrorHandler {
 
     // Create minimal fallback analysis
     const minimalAnalysis = {
-      techniquesUsed: [
-        { name: 'MECE', relevanceScore: 0.5, applicableScenarios: ['general'] }
-      ],
+      techniquesUsed: [{ name: 'MECE', relevanceScore: 0.5, applicableScenarios: ['general'] }],
       keyFindings: ['Basic analysis completed with limited techniques'],
       totalQuotaSavings: 10,
-      implementationComplexity: 'medium' as const
+      implementationComplexity: 'medium' as const,
     };
 
     console.warn(`Analysis failed, using minimal fallback: ${errorMessage}`);
@@ -116,23 +114,25 @@ export class ErrorHandler {
    */
   static handleOptimizationFailure(error: unknown, originalWorkflow: any): any {
     const errorMessage = error instanceof Error ? error.message : 'Unknown optimization error';
-    
+
     // Create fallback optimized workflow with minimal changes
     const fallbackOptimization = {
       ...originalWorkflow,
-      optimizations: [{
-        type: 'caching',
-        description: 'Basic caching optimization (fallback)',
-        stepsAffected: [originalWorkflow.steps?.[0]?.id || 'step-1'],
-        estimatedSavings: { vibes: 0, specs: 0, percentage: 5 }
-      }],
+      optimizations: [
+        {
+          type: 'caching',
+          description: 'Basic caching optimization (fallback)',
+          stepsAffected: [originalWorkflow.steps?.[0]?.id || 'step-1'],
+          estimatedSavings: { vibes: 0, specs: 0, percentage: 5 },
+        },
+      ],
       efficiencyGains: {
         vibeReduction: 5,
         specReduction: 0,
         totalSavingsPercentage: 5,
-        costSavings: 0
+        costSavings: 0,
       },
-      originalWorkflow
+      originalWorkflow,
     };
 
     console.warn(`Optimization failed, using fallback: ${errorMessage}`);
@@ -144,7 +144,7 @@ export class ErrorHandler {
    */
   static handleForecastingFailure(error: unknown, workflow?: any): any {
     const errorMessage = error instanceof Error ? error.message : 'Unknown forecasting error';
-    
+
     // Create conservative fallback forecast
     const stepCount = workflow?.steps?.length || 3;
     const fallbackForecast = {
@@ -153,13 +153,15 @@ export class ErrorHandler {
       estimatedCost: stepCount * 0.05,
       confidenceLevel: 'low' as const,
       scenario: 'fallback' as const,
-      breakdown: [{
-        stepId: 'fallback',
-        stepDescription: 'Fallback estimation',
-        vibes: stepCount * 2,
-        specs: Math.ceil(stepCount / 2),
-        cost: stepCount * 0.05
-      }]
+      breakdown: [
+        {
+          stepId: 'fallback',
+          stepDescription: 'Fallback estimation',
+          vibes: stepCount * 2,
+          specs: Math.ceil(stepCount / 2),
+          cost: stepCount * 0.05,
+        },
+      ],
     };
 
     console.warn(`Forecasting failed, using fallback: ${errorMessage}`);
@@ -171,27 +173,30 @@ export class ErrorHandler {
    */
   static handleROIAnalysisFailure(error: unknown, baselineForecast?: any): any {
     const errorMessage = error instanceof Error ? error.message : 'Unknown ROI analysis error';
-    
+
     const fallbackROI = {
-      scenarios: [{
-        name: 'Conservative',
-        forecast: baselineForecast || this.handleForecastingFailure(error),
-        savingsPercentage: 0,
-        implementationEffort: 'none',
-        riskLevel: 'none'
-      }, {
-        name: 'Balanced',
-        forecast: {
-          ...baselineForecast || this.handleForecastingFailure(error),
-          estimatedCost: (baselineForecast?.estimatedCost || 0.15) * 0.8
+      scenarios: [
+        {
+          name: 'Conservative',
+          forecast: baselineForecast || this.handleForecastingFailure(error),
+          savingsPercentage: 0,
+          implementationEffort: 'none',
+          riskLevel: 'none',
         },
-        savingsPercentage: 20,
-        implementationEffort: 'medium',
-        riskLevel: 'low'
-      }],
+        {
+          name: 'Balanced',
+          forecast: {
+            ...(baselineForecast || this.handleForecastingFailure(error)),
+            estimatedCost: (baselineForecast?.estimatedCost || 0.15) * 0.8,
+          },
+          savingsPercentage: 20,
+          implementationEffort: 'medium',
+          riskLevel: 'low',
+        },
+      ],
       recommendations: ['Apply moderate optimization for balanced risk-reward'],
       bestOption: 'Balanced',
-      riskAssessment: 'Low risk with moderate savings potential'
+      riskAssessment: 'Low risk with moderate savings potential',
     };
 
     console.warn(`ROI analysis failed, using fallback: ${errorMessage}`);
@@ -202,20 +207,20 @@ export class ErrorHandler {
    * Convert any error to a ProcessingError
    */
   static toProcessingError(
-    error: unknown, 
-    stage: ProcessingError['stage'], 
-    type: string, 
+    error: unknown,
+    stage: ProcessingError['stage'],
+    type: string,
     suggestedAction: string,
     fallbackAvailable: boolean = false
   ): ProcessingError {
     const message = error instanceof Error ? error.message : String(error);
-    
+
     return {
       stage,
       type,
       message,
       suggestedAction,
-      fallbackAvailable
+      fallbackAvailable,
     };
   }
 
@@ -226,11 +231,11 @@ export class ErrorHandler {
     if (error instanceof ProcessingFailureError) {
       return error.fallbackAvailable;
     }
-    
+
     if (error instanceof ValidationError) {
       return false; // Validation errors require user input correction
     }
-    
+
     // Most processing errors are recoverable with fallbacks
     return true;
   }
@@ -269,9 +274,9 @@ export class ErrorHandler {
       stack: error instanceof Error ? error.stack : undefined,
       type: error instanceof Error ? error.constructor.name : typeof error,
       recoverable: this.isRecoverable(error),
-      ...context
+      ...context,
     };
-    
+
     console.error(JSON.stringify(errorInfo));
   }
 
@@ -287,12 +292,12 @@ export class ErrorHandler {
       return await operation();
     } catch (error) {
       this.logError(error, errorContext);
-      
+
       if (this.isRecoverable(error)) {
         console.warn(`Operation ${errorContext.operation} failed, using fallback value`);
         return fallbackValue;
       }
-      
+
       throw error;
     }
   }
@@ -316,7 +321,7 @@ export class RetryHandler {
         return await operation();
       } catch (error) {
         lastError = error;
-        
+
         // Don't retry validation errors or other non-transient errors
         if (error instanceof ValidationError || error instanceof IntentParsingError) {
           throw error;
@@ -326,7 +331,9 @@ export class RetryHandler {
           break;
         }
 
-        console.warn(`Operation failed (attempt ${attempt}/${maxRetries}), retrying in ${currentDelay}ms...`);
+        console.warn(
+          `Operation failed (attempt ${attempt}/${maxRetries}), retrying in ${currentDelay}ms...`
+        );
         await new Promise(resolve => setTimeout(resolve, currentDelay));
         currentDelay *= backoffMultiplier;
       }

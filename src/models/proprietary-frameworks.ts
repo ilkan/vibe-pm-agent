@@ -21,14 +21,37 @@ export interface ProprietaryPMFramework {
  * Market timing signal from proprietary analysis
  */
 export interface MarketTimingSignal {
-  signal_type: 'Economic' | 'Patent' | 'Talent' | 'Regulatory' | 'Market' | 'Technology' | 'Competitive' | 'Customer' | 'Investment' | 'Innovation' | 'Social';
+  signal_type:
+    | 'Economic'
+    | 'Patent'
+    | 'Talent'
+    | 'Regulatory'
+    | 'Market'
+    | 'Technology'
+    | 'Competitive'
+    | 'Customer'
+    | 'Investment'
+    | 'Innovation'
+    | 'Social';
   industry: string;
   signal_name: string;
   current_value: number;
   historical_average: number;
-  trend_strength: 'Very Strong' | 'Strong Positive' | 'Moderate Positive' | 'Stable' | 'Moderate Negative' | 'Strong Negative';
+  trend_strength:
+    | 'Very Strong'
+    | 'Strong Positive'
+    | 'Moderate Positive'
+    | 'Stable'
+    | 'Moderate Negative'
+    | 'Strong Negative';
   market_impact: 'Very High' | 'High' | 'Medium' | 'Low';
-  timing_recommendation: 'Immediate Action' | 'Accelerate' | 'Proceed Steadily' | 'Proceed with Caution' | 'Monitor Closely' | 'Wait and See';
+  timing_recommendation:
+    | 'Immediate Action'
+    | 'Accelerate'
+    | 'Proceed Steadily'
+    | 'Proceed with Caution'
+    | 'Monitor Closely'
+    | 'Wait and See';
   confidence_score: number;
   data_sources: string[];
   weighted_score?: number;

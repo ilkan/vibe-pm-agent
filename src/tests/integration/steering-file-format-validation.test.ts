@@ -71,12 +71,12 @@ describe('Steering File Format Validation Tests', () => {
         {
           method: 'createFromOnePager',
           content: '# Executive Summary\n## Problem\nNeed better steering files.',
-          expectedDocType: DocumentType.ONE_PAGER
+          expectedDocType: DocumentType.ONEPAGER
         },
         {
           method: 'createFromPRFAQ',
           content: '# Press Release\nNew steering system launched.',
-          expectedDocType: DocumentType.PR_FAQ
+          expectedDocType: DocumentType.PRFAQ
         },
         {
           method: 'createFromTaskPlan',

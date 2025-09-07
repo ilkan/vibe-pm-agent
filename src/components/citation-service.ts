@@ -1,9 +1,9 @@
 // Citation service for finding and managing references in PM documents
 
-import { 
-  Citation, 
-  CitationContext, 
-  ReferenceCollection, 
+import {
+  Citation,
+  CitationContext,
+  ReferenceCollection,
   CitationRequirements,
   CitationSearchCriteria,
   CitationValidation,
@@ -11,7 +11,7 @@ import {
   CitationMetrics,
   CitationSourceType,
   CitationConfidence,
-  CitationDatabase
+  CitationDatabase,
 } from '../models/citations';
 
 /**
@@ -37,57 +37,57 @@ export class CitationService {
         base_url: 'https://www.mckinsey.com',
         specialization: ['business_strategy', 'digital_transformation', 'productivity'],
         search_capabilities: ['industry_reports', 'benchmarks', 'case_studies'],
-        access_type: 'free'
+        access_type: 'free',
       },
       {
         name: 'Harvard Business Review',
         base_url: 'https://hbr.org',
         specialization: ['management', 'leadership', 'innovation'],
         search_capabilities: ['peer_reviewed', 'case_studies', 'frameworks'],
-        access_type: 'subscription'
+        access_type: 'subscription',
       },
       {
         name: 'Gartner Research',
         base_url: 'https://www.gartner.com',
         specialization: ['technology', 'market_research', 'forecasting'],
         search_capabilities: ['magic_quadrants', 'hype_cycles', 'market_sizing'],
-        access_type: 'subscription'
+        access_type: 'subscription',
       },
       {
         name: 'Forrester Research',
         base_url: 'https://www.forrester.com',
         specialization: ['customer_experience', 'technology_adoption', 'market_trends'],
         search_capabilities: ['wave_reports', 'predictions', 'benchmarks'],
-        access_type: 'subscription'
+        access_type: 'subscription',
       },
       {
         name: 'Bain & Company Insights',
         base_url: 'https://www.bain.com',
         specialization: ['strategy', 'operations', 'transformation'],
         search_capabilities: ['industry_insights', 'benchmarks', 'case_studies'],
-        access_type: 'free'
+        access_type: 'free',
       },
       {
         name: 'BCG Insights',
         base_url: 'https://www.bcg.com',
         specialization: ['digital', 'sustainability', 'innovation'],
         search_capabilities: ['research_reports', 'surveys', 'frameworks'],
-        access_type: 'free'
+        access_type: 'free',
       },
       {
         name: 'Deloitte Insights',
         base_url: 'https://www2.deloitte.com',
         specialization: ['industry_trends', 'workforce', 'technology'],
         search_capabilities: ['surveys', 'benchmarks', 'predictions'],
-        access_type: 'free'
+        access_type: 'free',
       },
       {
         name: 'PwC Research',
         base_url: 'https://www.pwc.com',
         specialization: ['ceo_survey', 'digital_transformation', 'sustainability'],
         search_capabilities: ['global_surveys', 'industry_analysis', 'benchmarks'],
-        access_type: 'free'
-      }
+        access_type: 'free',
+      },
     ];
   }
 
@@ -105,14 +105,15 @@ export class CitationService {
         published_at: '2024-01-22',
         source_type: CitationSourceType.CONSULTING_STUDY,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'High-performing product teams spend 25% less time on documentation through automation',
+        key_finding:
+          'High-performing product teams spend 25% less time on documentation through automation',
         organization: 'McKinsey & Company',
         methodology: 'Survey of 1,200+ product managers across industries',
         sample_size: 1200,
         geographic_scope: 'Global',
-        industry_focus: ['technology', 'financial_services', 'healthcare', 'retail']
+        industry_focus: ['technology', 'financial_services', 'healthcare', 'retail'],
       },
-      
+
       // SaaS Metrics
       {
         id: 'saas_metrics_2024',
@@ -127,7 +128,7 @@ export class CitationService {
         methodology: 'Analysis of 500+ SaaS companies',
         sample_size: 500,
         geographic_scope: 'North America',
-        industry_focus: ['saas', 'software']
+        industry_focus: ['saas', 'software'],
       },
 
       // Customer Success
@@ -139,12 +140,13 @@ export class CitationService {
         published_at: '2024-07-10',
         source_type: CitationSourceType.INDUSTRY_REPORT,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Proactive customer success reduces churn by 25-40% compared to reactive approaches',
+        key_finding:
+          'Proactive customer success reduces churn by 25-40% compared to reactive approaches',
         organization: 'Gainsight',
         methodology: 'Analysis of customer success data from 800+ companies',
         sample_size: 800,
         geographic_scope: 'Global',
-        industry_focus: ['saas', 'technology', 'financial_services']
+        industry_focus: ['saas', 'technology', 'financial_services'],
       },
 
       // AI in Product Management
@@ -161,7 +163,7 @@ export class CitationService {
         methodology: 'Survey and interviews with 300+ product leaders',
         sample_size: 300,
         geographic_scope: 'Global',
-        industry_focus: ['technology', 'software', 'ai']
+        industry_focus: ['technology', 'software', 'ai'],
       },
 
       // E-commerce Conversion
@@ -173,12 +175,13 @@ export class CitationService {
         published_at: '2024-05-20',
         source_type: CitationSourceType.BENCHMARK_STUDY,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Average e-commerce conversion rate: 2.86% across industries, 69.8% cart abandonment rate',
+        key_finding:
+          'Average e-commerce conversion rate: 2.86% across industries, 69.8% cart abandonment rate',
         organization: 'Baymard Institute',
         methodology: 'Analysis of 50+ large-scale usability studies',
         sample_size: 50,
         geographic_scope: 'Global',
-        industry_focus: ['ecommerce', 'retail']
+        industry_focus: ['ecommerce', 'retail'],
       },
 
       // Product-Led Growth
@@ -195,24 +198,25 @@ export class CitationService {
         methodology: 'Analysis of 200+ PLG companies',
         sample_size: 200,
         geographic_scope: 'North America, Europe',
-        industry_focus: ['saas', 'technology', 'software']
+        industry_focus: ['saas', 'technology', 'software'],
       },
 
       // Digital Transformation ROI
       {
         id: 'digital_transformation_roi_2024',
-        title: 'Digital Transformation ROI: What Works and What Doesn\'t',
+        title: "Digital Transformation ROI: What Works and What Doesn't",
         url: 'https://www.bcg.com/insights/digital-transformation-roi-2024',
         domain: 'bcg.com',
         published_at: '2024-03-15',
         source_type: CitationSourceType.CONSULTING_STUDY,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Companies with clear digital strategies achieve 2.5x higher ROI on technology investments',
+        key_finding:
+          'Companies with clear digital strategies achieve 2.5x higher ROI on technology investments',
         organization: 'Boston Consulting Group',
         methodology: 'Survey of 1,500+ executives across industries',
         sample_size: 1500,
         geographic_scope: 'Global',
-        industry_focus: ['technology', 'manufacturing', 'financial_services', 'healthcare']
+        industry_focus: ['technology', 'manufacturing', 'financial_services', 'healthcare'],
       },
 
       // Agile Development Productivity
@@ -229,8 +233,8 @@ export class CitationService {
         methodology: 'Analysis of development teams using Atlassian tools',
         sample_size: 1000,
         geographic_scope: 'Global',
-        industry_focus: ['software', 'technology']
-      }
+        industry_focus: ['software', 'technology'],
+      },
     ];
   }
 
@@ -238,14 +242,15 @@ export class CitationService {
    * Find relevant citations based on search criteria
    */
   async findRelevantCitations(criteria: CitationSearchCriteria): Promise<Citation[]> {
-    let relevantCitations = this.citationDatabase.filter(citation => {
+    const relevantCitations = this.citationDatabase.filter(citation => {
       // Filter by keywords
-      const keywordMatch = criteria.keywords.some(keyword => 
-        citation.title.toLowerCase().includes(keyword.toLowerCase()) ||
-        citation.key_finding.toLowerCase().includes(keyword.toLowerCase()) ||
-        citation.industry_focus?.some(industry => 
-          industry.toLowerCase().includes(keyword.toLowerCase())
-        )
+      const keywordMatch = criteria.keywords.some(
+        keyword =>
+          citation.title.toLowerCase().includes(keyword.toLowerCase()) ||
+          citation.key_finding.toLowerCase().includes(keyword.toLowerCase()) ||
+          citation.industry_focus?.some(industry =>
+            industry.toLowerCase().includes(keyword.toLowerCase())
+          )
       );
 
       if (!keywordMatch) return false;
@@ -294,7 +299,7 @@ export class CitationService {
       const confidenceOrder = { low: 0, medium: 1, high: 2 };
       const confidenceDiff = confidenceOrder[b.confidence] - confidenceOrder[a.confidence];
       if (confidenceDiff !== 0) return confidenceDiff;
-      
+
       return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
     });
 
@@ -306,84 +311,89 @@ export class CitationService {
    */
   getCitationRequirements(documentType: string): CitationRequirements {
     const requirements: Record<string, CitationRequirements> = {
-      'business_case': {
+      business_case: {
         document_type: 'business_case',
         minimum_citations: 5,
         required_source_types: [
           CitationSourceType.CONSULTING_STUDY,
           CitationSourceType.INDUSTRY_REPORT,
-          CitationSourceType.BENCHMARK_STUDY
+          CitationSourceType.BENCHMARK_STUDY,
         ],
         minimum_confidence_level: CitationConfidence.MEDIUM,
         industry_specific: true,
-        recency_requirement_months: 24
+        recency_requirement_months: 24,
       },
-      'market_analysis': {
+      market_analysis: {
         document_type: 'market_analysis',
         minimum_citations: 8,
         required_source_types: [
           CitationSourceType.INDUSTRY_REPORT,
           CitationSourceType.SURVEY_DATA,
           CitationSourceType.BENCHMARK_STUDY,
-          CitationSourceType.CONSULTING_STUDY
+          CitationSourceType.CONSULTING_STUDY,
         ],
         minimum_confidence_level: CitationConfidence.HIGH,
         industry_specific: true,
-        recency_requirement_months: 18
+        recency_requirement_months: 18,
       },
-      'executive_onepager': {
+      executive_onepager: {
         document_type: 'executive_onepager',
         minimum_citations: 3,
         required_source_types: [
           CitationSourceType.CONSULTING_STUDY,
-          CitationSourceType.INDUSTRY_REPORT
+          CitationSourceType.INDUSTRY_REPORT,
         ],
         minimum_confidence_level: CitationConfidence.HIGH,
         industry_specific: false,
-        recency_requirement_months: 12
+        recency_requirement_months: 12,
       },
-      'pr_faq': {
+      pr_faq: {
         document_type: 'pr_faq',
         minimum_citations: 2,
         required_source_types: [
           CitationSourceType.INDUSTRY_REPORT,
-          CitationSourceType.BENCHMARK_STUDY
+          CitationSourceType.BENCHMARK_STUDY,
         ],
         minimum_confidence_level: CitationConfidence.MEDIUM,
         industry_specific: false,
-        recency_requirement_months: 18
+        recency_requirement_months: 18,
       },
-      'competitive_analysis': {
+      competitive_analysis: {
         document_type: 'competitive_analysis',
         minimum_citations: 6,
         required_source_types: [
           CitationSourceType.INDUSTRY_REPORT,
           CitationSourceType.CONSULTING_STUDY,
           CitationSourceType.CASE_STUDY,
-          CitationSourceType.BENCHMARK_STUDY
+          CitationSourceType.BENCHMARK_STUDY,
         ],
         minimum_confidence_level: CitationConfidence.HIGH,
         industry_specific: true,
-        recency_requirement_months: 12
-      }
+        recency_requirement_months: 12,
+      },
     };
 
-    return requirements[documentType] || {
-      document_type: documentType,
-      minimum_citations: 3,
-      required_source_types: [CitationSourceType.INDUSTRY_REPORT],
-      minimum_confidence_level: CitationConfidence.MEDIUM,
-      industry_specific: false,
-      recency_requirement_months: 24
-    };
+    return (
+      requirements[documentType] || {
+        document_type: documentType,
+        minimum_citations: 3,
+        required_source_types: [CitationSourceType.INDUSTRY_REPORT],
+        minimum_confidence_level: CitationConfidence.MEDIUM,
+        industry_specific: false,
+        recency_requirement_months: 24,
+      }
+    );
   }
 
   /**
    * Format citations for different output styles
    */
-  formatCitation(citation: Citation, style: 'apa' | 'business' | 'inline' = 'business'): FormattedCitation {
+  formatCitation(
+    citation: Citation,
+    style: 'apa' | 'business' | 'inline' = 'business'
+  ): FormattedCitation {
     const year = new Date(citation.published_at).getFullYear();
-    
+
     switch (style) {
       case 'apa':
         const authors = citation.authors?.join(', ') || citation.organization || citation.domain;
@@ -393,9 +403,9 @@ export class CitationService {
           in_text_citation: `(${authors}, ${year})`,
           bibliography_entry: `${authors} (${year}). ${citation.title}. Retrieved from ${citation.url}`,
           style: 'apa',
-          hyperlink: citation.url
+          hyperlink: citation.url,
         };
-        
+
       case 'inline':
         return {
           citation_id: citation.id,
@@ -403,9 +413,9 @@ export class CitationService {
           in_text_citation: `[${citation.id}]`,
           bibliography_entry: `[${citation.id}] ${citation.title} (${year}). ${citation.organization}. ${citation.url}`,
           style: 'inline',
-          hyperlink: citation.url
+          hyperlink: citation.url,
         };
-        
+
       case 'business':
       default:
         return {
@@ -414,7 +424,7 @@ export class CitationService {
           in_text_citation: `[${citation.id}]`,
           bibliography_entry: `[${citation.id}] ${citation.title}. ${citation.organization} (${year}). ${citation.key_finding}. Available: ${citation.url}`,
           style: 'business',
-          hyperlink: citation.url
+          hyperlink: citation.url,
         };
     }
   }
@@ -444,7 +454,7 @@ export class CitationService {
       bibliography_style: 'business',
       last_updated: new Date().toISOString(),
       total_citations: citations.length,
-      confidence_distribution: confidenceDistribution
+      confidence_distribution: confidenceDistribution,
     };
   }
 
@@ -454,39 +464,50 @@ export class CitationService {
   calculateCitationMetrics(citations: Citation[]): CitationMetrics {
     const uniqueDomains = new Set(citations.map(c => c.domain)).size;
     const confidenceScores = { high: 3, medium: 2, low: 1 };
-    const averageConfidence = citations.reduce((sum, c) => sum + confidenceScores[c.confidence], 0) / citations.length;
-    
+    const averageConfidence =
+      citations.reduce((sum, c) => sum + confidenceScores[c.confidence], 0) / citations.length;
+
     // Calculate recency score (0-100)
     const now = new Date();
     const recencyScores = citations.map(c => {
-      const monthsOld = (now.getTime() - new Date(c.published_at).getTime()) / (1000 * 60 * 60 * 24 * 30);
-      return Math.max(0, 100 - (monthsOld * 2)); // Lose 2 points per month
+      const monthsOld =
+        (now.getTime() - new Date(c.published_at).getTime()) / (1000 * 60 * 60 * 24 * 30);
+      return Math.max(0, 100 - monthsOld * 2); // Lose 2 points per month
     });
-    const recencyScore = recencyScores.reduce((sum, score) => sum + score, 0) / recencyScores.length;
+    const recencyScore =
+      recencyScores.reduce((sum, score) => sum + score, 0) / recencyScores.length;
 
     // Calculate source type distribution
-    const sourceTypeDistribution = citations.reduce((acc, citation) => {
-      acc[citation.source_type] = (acc[citation.source_type] || 0) + 1;
-      return acc;
-    }, {} as Record<CitationSourceType, number>);
+    const sourceTypeDistribution = citations.reduce(
+      (acc, citation) => {
+        acc[citation.source_type] = (acc[citation.source_type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<CitationSourceType, number>
+    );
 
     // Diversity score based on source type variety
-    const diversityScore = Math.min(100, (Object.keys(sourceTypeDistribution).length / Object.keys(CitationSourceType).length) * 100);
+    const diversityScore = Math.min(
+      100,
+      (Object.keys(sourceTypeDistribution).length / Object.keys(CitationSourceType).length) * 100
+    );
 
     // Credibility score based on confidence levels and source types
     const highCredibilityTypes = [
       CitationSourceType.ACADEMIC_PAPER,
       CitationSourceType.CONSULTING_STUDY,
       CitationSourceType.GOVERNMENT_DATA,
-      CitationSourceType.RESEARCH_PUBLICATION
+      CitationSourceType.RESEARCH_PUBLICATION,
     ];
-    const credibilityScore = citations.reduce((score, citation) => {
-      let points = confidenceScores[citation.confidence] * 10;
-      if (highCredibilityTypes.includes(citation.source_type)) {
-        points += 20;
-      }
-      return score + points;
-    }, 0) / (citations.length * 50); // Normalize to 0-100
+    const credibilityScore =
+      citations.reduce((score, citation) => {
+        let points = confidenceScores[citation.confidence] * 10;
+        if (highCredibilityTypes.includes(citation.source_type)) {
+          points += 20;
+        }
+        return score + points;
+      }, 0) /
+      (citations.length * 50); // Normalize to 0-100
 
     return {
       total_citations: citations.length,
@@ -495,7 +516,7 @@ export class CitationService {
       source_type_distribution: sourceTypeDistribution,
       recency_score: Math.round(recencyScore),
       diversity_score: Math.round(diversityScore),
-      credibility_score: Math.round(credibilityScore * 100)
+      credibility_score: Math.round(credibilityScore * 100),
     };
   }
 
@@ -503,13 +524,9 @@ export class CitationService {
    * Generate bibliography section for documents
    */
   generateBibliography(citations: Citation[], style: 'business' | 'apa' = 'business'): string {
-    const formattedCitations = citations.map(citation => 
-      this.formatCitation(citation, style)
-    );
+    const formattedCitations = citations.map(citation => this.formatCitation(citation, style));
 
-    const bibliography = formattedCitations
-      .map(fc => fc.bibliography_entry)
-      .join('\n\n');
+    const bibliography = formattedCitations.map(fc => fc.bibliography_entry).join('\n\n');
 
     return `## References\n\n${bibliography}`;
   }
@@ -527,7 +544,128 @@ export class CitationService {
       citation_id: citationId,
       used_in_section: section,
       specific_claim: claim,
-      context_relevance: relevance
+      context_relevance: relevance,
     };
+  }
+
+  /**
+   * Search citations by tag
+   */
+  searchCitationsByTag(tag: string): Citation[] {
+    return this.citationDatabase.filter(
+      citation =>
+        citation.industry_focus?.some(industry =>
+          industry.toLowerCase().includes(tag.toLowerCase())
+        ) || citation.key_finding.toLowerCase().includes(tag.toLowerCase())
+    );
+  }
+
+  /**
+   * Get citations by source type
+   */
+  getCitationsBySourceType(sourceType: string): Citation[] {
+    return this.citationDatabase.filter(citation =>
+      citation.source_type.toString().toLowerCase().includes(sourceType.toLowerCase())
+    );
+  }
+
+  /**
+   * Get citations by credibility rating
+   */
+  getCitationsByCredibility(rating: string): Citation[] {
+    return this.citationDatabase.filter(
+      citation => citation.confidence.toLowerCase() === rating.toLowerCase()
+    );
+  }
+
+  /**
+   * Create a new citation
+   */
+  createCitation(data: Partial<Citation>): Citation {
+    const citation: Citation = {
+      id: data.id || `citation_${Date.now()}`,
+      title: data.title || '',
+      url: data.url || '',
+      domain: data.domain || '',
+      published_at: data.published_at || new Date().toISOString(),
+      source_type: data.source_type || CitationSourceType.INDUSTRY_REPORT,
+      confidence: data.confidence || CitationConfidence.MEDIUM,
+      key_finding: data.key_finding || '',
+      organization: data.organization || '',
+      methodology: data.methodology,
+      sample_size: data.sample_size,
+      geographic_scope: data.geographic_scope,
+      industry_focus: data.industry_focus,
+      authors: data.authors,
+    };
+    return citation;
+  }
+
+  /**
+   * Add citation to database
+   */
+  addCitation(citation: Citation): void {
+    this.citationDatabase.push(citation);
+  }
+
+  /**
+   * Export citations in different formats
+   */
+  exportCitations(format: 'json' | 'bibtex' | 'csv'): string {
+    switch (format) {
+      case 'json':
+        return JSON.stringify(this.citationDatabase, null, 2);
+      case 'bibtex':
+        return this.citationDatabase
+          .map(citation => {
+            const year = new Date(citation.published_at).getFullYear();
+            return `@article{${citation.id},
+  title={${citation.title}},
+  author={${citation.organization || citation.authors?.join(' and ') || 'Unknown'}},
+  year={${year}},
+  url={${citation.url}}
+}`;
+          })
+          .join('\n\n');
+      case 'csv':
+        const headers = 'id,title,organization,year,url,confidence';
+        const rows = this.citationDatabase.map(citation => {
+          const year = new Date(citation.published_at).getFullYear();
+          return `"${citation.id}","${citation.title}","${citation.organization}","${year}","${citation.url}","${citation.confidence}"`;
+        });
+        return [headers, ...rows].join('\n');
+      default:
+        return JSON.stringify(this.citationDatabase, null, 2);
+    }
+  }
+
+  /**
+   * Import citations from external data
+   */
+  importCitations(data: string, format: 'json' | 'bibtex' | 'csv'): number {
+    try {
+      if (format === 'json') {
+        const citations = JSON.parse(data) as Citation[];
+        citations.forEach(citation => this.addCitation(citation));
+        return citations.length;
+      }
+      // For now, only support JSON import
+      return 0;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  /**
+   * Search citations by title or content
+   */
+  searchCitations(query: string): Citation[] {
+    const lowerQuery = query.toLowerCase();
+    return this.citationDatabase.filter(
+      citation =>
+        citation.title.toLowerCase().includes(lowerQuery) ||
+        citation.key_finding.toLowerCase().includes(lowerQuery) ||
+        citation.organization?.toLowerCase().includes(lowerQuery)
+    );
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Steering File Error Handling Utilities
- * 
+ *
  * Comprehensive error handling and validation for steering file operations
  * with graceful fallbacks and recovery strategies.
  */
@@ -26,21 +26,33 @@ export class SteeringFileError extends Error {
 }
 
 export class ValidationError extends SteeringFileError {
-  constructor(message: string, public readonly field: string, cause?: Error) {
+  constructor(
+    message: string,
+    public readonly field: string,
+    cause?: Error
+  ) {
     super(message, 'VALIDATION_ERROR', 'validation', true, cause);
     this.name = 'ValidationError';
   }
 }
 
 export class FileSystemError extends SteeringFileError {
-  constructor(message: string, public readonly filePath: string, cause?: Error) {
+  constructor(
+    message: string,
+    public readonly filePath: string,
+    cause?: Error
+  ) {
     super(message, 'FILESYSTEM_ERROR', 'file_operation', true, cause);
     this.name = 'FileSystemError';
   }
 }
 
 export class ContentProcessingError extends SteeringFileError {
-  constructor(message: string, public readonly documentType: DocumentType, cause?: Error) {
+  constructor(
+    message: string,
+    public readonly documentType: DocumentType,
+    cause?: Error
+  ) {
     super(message, 'CONTENT_PROCESSING_ERROR', 'content_processing', true, cause);
     this.name = 'ContentProcessingError';
   }
@@ -86,7 +98,7 @@ export class SteeringFileValidator {
     'generatedBy',
     'generatedAt',
     'featureName',
-    'documentType'
+    'documentType',
   ];
 
   private static readonly VALID_INCLUSION_RULES = ['always', 'fileMatch', 'manual'];
@@ -115,20 +127,21 @@ export class SteeringFileValidator {
 
       // Cross-validation checks
       this.performCrossValidation(steeringFile, errors, warnings, suggestions);
-
     } catch (error) {
-      errors.push(new ValidationError(
-        `Validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'general',
-        error instanceof Error ? error : undefined
-      ));
+      errors.push(
+        new ValidationError(
+          `Validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          'general',
+          error instanceof Error ? error : undefined
+        )
+      );
     }
 
     return {
       isValid: errors.length === 0,
       errors,
       warnings,
-      suggestions
+      suggestions,
     };
   }
 
@@ -168,26 +181,31 @@ export class SteeringFileValidator {
 
       // Check for malformed markdown
       this.validateMarkdownStructure(content, warnings, suggestions);
-
     } catch (error) {
-      errors.push(new ValidationError(
-        `Document validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'document',
-        error instanceof Error ? error : undefined
-      ));
+      errors.push(
+        new ValidationError(
+          `Document validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          'document',
+          error instanceof Error ? error : undefined
+        )
+      );
     }
 
     return {
       isValid: errors.length === 0,
       errors,
       warnings,
-      suggestions
+      suggestions,
     };
   }
 
   // Private validation methods
 
-  private static validateFilename(filename: string, errors: ValidationError[], warnings: string[]): void {
+  private static validateFilename(
+    filename: string,
+    errors: ValidationError[],
+    warnings: string[]
+  ): void {
     if (!filename) {
       errors.push(new ValidationError('Filename is required', 'filename'));
       return;
@@ -213,9 +231,9 @@ export class SteeringFileValidator {
   }
 
   private static validateFrontMatter(
-    frontMatter: FrontMatter, 
-    errors: ValidationError[], 
-    warnings: string[], 
+    frontMatter: FrontMatter,
+    errors: ValidationError[],
+    warnings: string[],
     suggestions: string[]
   ): void {
     if (!frontMatter) {
@@ -226,30 +244,38 @@ export class SteeringFileValidator {
     // Check required fields
     for (const field of this.REQUIRED_FRONT_MATTER_FIELDS) {
       if (!(field in frontMatter) || !frontMatter[field as keyof FrontMatter]) {
-        errors.push(new ValidationError(`Required front matter field '${field}' is missing`, field));
+        errors.push(
+          new ValidationError(`Required front matter field '${field}' is missing`, field)
+        );
       }
     }
 
     // Validate inclusion rule
     if (frontMatter.inclusion && !this.VALID_INCLUSION_RULES.includes(frontMatter.inclusion)) {
-      errors.push(new ValidationError(
-        `Invalid inclusion rule: ${frontMatter.inclusion}. Must be one of: ${this.VALID_INCLUSION_RULES.join(', ')}`,
-        'inclusion'
-      ));
+      errors.push(
+        new ValidationError(
+          `Invalid inclusion rule: ${frontMatter.inclusion}. Must be one of: ${this.VALID_INCLUSION_RULES.join(', ')}`,
+          'inclusion'
+        )
+      );
     }
 
     // Validate document type
     if (frontMatter.documentType && !this.VALID_DOCUMENT_TYPES.includes(frontMatter.documentType)) {
-      errors.push(new ValidationError(
-        `Invalid document type: ${frontMatter.documentType}. Must be one of: ${this.VALID_DOCUMENT_TYPES.join(', ')}`,
-        'documentType'
-      ));
+      errors.push(
+        new ValidationError(
+          `Invalid document type: ${frontMatter.documentType}. Must be one of: ${this.VALID_DOCUMENT_TYPES.join(', ')}`,
+          'documentType'
+        )
+      );
     }
 
     // Validate fileMatch pattern when inclusion is 'fileMatch'
     if (frontMatter.inclusion === 'fileMatch' && !frontMatter.fileMatchPattern) {
       warnings.push('fileMatchPattern is recommended when inclusion is set to "fileMatch"');
-      suggestions.push('Consider adding a fileMatchPattern to specify which files this steering applies to');
+      suggestions.push(
+        'Consider adding a fileMatchPattern to specify which files this steering applies to'
+      );
     }
 
     // Validate timestamp format
@@ -257,10 +283,14 @@ export class SteeringFileValidator {
       try {
         const date = new Date(frontMatter.generatedAt);
         if (isNaN(date.getTime())) {
-          errors.push(new ValidationError('generatedAt must be a valid ISO timestamp', 'generatedAt'));
+          errors.push(
+            new ValidationError('generatedAt must be a valid ISO timestamp', 'generatedAt')
+          );
         }
       } catch {
-        errors.push(new ValidationError('generatedAt must be a valid ISO timestamp', 'generatedAt'));
+        errors.push(
+          new ValidationError('generatedAt must be a valid ISO timestamp', 'generatedAt')
+        );
       }
     }
 
@@ -276,9 +306,9 @@ export class SteeringFileValidator {
   }
 
   private static validateContent(
-    content: string, 
-    errors: ValidationError[], 
-    warnings: string[], 
+    content: string,
+    errors: ValidationError[],
+    warnings: string[],
     suggestions: string[]
   ): void {
     if (!content || content.trim().length === 0) {
@@ -299,14 +329,14 @@ export class SteeringFileValidator {
     // Check for common markdown issues
     const lines = content.split('\n');
     let hasHeaders = false;
-    
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      
+
       if (line.startsWith('#')) {
         hasHeaders = true;
       }
-      
+
       // Check for very long lines
       if (line.length > 200) {
         warnings.push(`Line ${i + 1} is very long (${line.length} characters)`);
@@ -318,14 +348,20 @@ export class SteeringFileValidator {
     }
   }
 
-  private static validateReferences(references: string[], warnings: string[], suggestions: string[]): void {
+  private static validateReferences(
+    references: string[],
+    warnings: string[],
+    suggestions: string[]
+  ): void {
     if (!references || references.length === 0) {
-      suggestions.push('Consider adding file references to related documents using #[[file:path]] syntax');
+      suggestions.push(
+        'Consider adding file references to related documents using #[[file:path]] syntax'
+      );
       return;
     }
 
     const fileRefPattern = /^#\[\[file:[^\]]+\]\]$/;
-    
+
     for (const ref of references) {
       if (!fileRefPattern.test(ref)) {
         warnings.push(`Reference "${ref}" does not follow the expected #[[file:path]] format`);
@@ -344,10 +380,12 @@ export class SteeringFileValidator {
       const sanitizedFeatureName = steeringFile.frontMatter.featureName
         .toLowerCase()
         .replace(/[^a-z0-9]/g, '-');
-      
+
       if (!steeringFile.filename.toLowerCase().includes(sanitizedFeatureName)) {
         warnings.push('Filename does not appear to match the feature name');
-        suggestions.push('Consider using a filename that includes the feature name for better organization');
+        suggestions.push(
+          'Consider using a filename that includes the feature name for better organization'
+        );
       }
     }
 
@@ -362,13 +400,13 @@ export class SteeringFileValidator {
   // Document type specific validation methods
 
   private static validateRequirementsDocument(
-    content: string, 
-    errors: ValidationError[], 
-    warnings: string[], 
+    content: string,
+    errors: ValidationError[],
+    warnings: string[],
     suggestions: string[]
   ): void {
     const lowerContent = content.toLowerCase();
-    
+
     if (!lowerContent.includes('requirement') && !lowerContent.includes('user story')) {
       warnings.push('Requirements document does not contain typical requirements language');
     }
@@ -379,13 +417,13 @@ export class SteeringFileValidator {
   }
 
   private static validateDesignDocument(
-    content: string, 
-    errors: ValidationError[], 
-    warnings: string[], 
+    content: string,
+    errors: ValidationError[],
+    warnings: string[],
     suggestions: string[]
   ): void {
     const lowerContent = content.toLowerCase();
-    
+
     if (!lowerContent.includes('design') && !lowerContent.includes('architecture')) {
       warnings.push('Design document does not contain typical design language');
     }
@@ -396,30 +434,34 @@ export class SteeringFileValidator {
   }
 
   private static validateOnePagerDocument(
-    content: string, 
-    errors: ValidationError[], 
-    warnings: string[], 
+    content: string,
+    errors: ValidationError[],
+    warnings: string[],
     suggestions: string[]
   ): void {
     const lowerContent = content.toLowerCase();
-    
+
     if (!lowerContent.includes('executive') && !lowerContent.includes('summary')) {
       warnings.push('One-pager document does not contain typical executive summary language');
     }
 
-    if (!lowerContent.includes('roi') && !lowerContent.includes('cost') && !lowerContent.includes('benefit')) {
+    if (
+      !lowerContent.includes('roi') &&
+      !lowerContent.includes('cost') &&
+      !lowerContent.includes('benefit')
+    ) {
       suggestions.push('Consider including ROI or cost-benefit analysis');
     }
   }
 
   private static validatePRFAQDocument(
-    content: string, 
-    errors: ValidationError[], 
-    warnings: string[], 
+    content: string,
+    errors: ValidationError[],
+    warnings: string[],
     suggestions: string[]
   ): void {
     const lowerContent = content.toLowerCase();
-    
+
     if (!lowerContent.includes('press release') && !lowerContent.includes('faq')) {
       warnings.push('PR-FAQ document does not contain typical press release or FAQ language');
     }
@@ -430,13 +472,13 @@ export class SteeringFileValidator {
   }
 
   private static validateTasksDocument(
-    content: string, 
-    errors: ValidationError[], 
-    warnings: string[], 
+    content: string,
+    errors: ValidationError[],
+    warnings: string[],
     suggestions: string[]
   ): void {
     const lowerContent = content.toLowerCase();
-    
+
     if (!lowerContent.includes('task') && !lowerContent.includes('implementation')) {
       warnings.push('Tasks document does not contain typical task or implementation language');
     }
@@ -446,23 +488,27 @@ export class SteeringFileValidator {
     }
   }
 
-  private static validateMarkdownStructure(content: string, warnings: string[], suggestions: string[]): void {
+  private static validateMarkdownStructure(
+    content: string,
+    warnings: string[],
+    suggestions: string[]
+  ): void {
     // Check for common markdown issues
     const lines = content.split('\n');
     let inCodeBlock = false;
     let codeBlockCount = 0;
-    
+
     for (const line of lines) {
       if (line.startsWith('```')) {
         inCodeBlock = !inCodeBlock;
         codeBlockCount++;
       }
     }
-    
+
     if (codeBlockCount % 2 !== 0) {
       warnings.push('Unmatched code block markers (```) detected');
     }
-    
+
     // Check for unescaped special characters that might cause issues
     if (content.includes('{{') || content.includes('}}')) {
       suggestions.push('Consider escaping template-like syntax if not intentional');
@@ -484,15 +530,15 @@ export class SteeringErrorRecovery {
     if (error instanceof FileSystemError) {
       return this.handleFileSystemError(error, context);
     }
-    
+
     if (error instanceof ValidationError) {
       return this.handleValidationError(error, context);
     }
-    
+
     if (error instanceof ContentProcessingError) {
       return this.handleContentProcessingError(error, context);
     }
-    
+
     // Generic error handling
     return this.handleGenericError(error, context);
   }
@@ -500,7 +546,10 @@ export class SteeringErrorRecovery {
   /**
    * Execute recovery strategy
    */
-  static async executeRecovery(strategy: RecoveryStrategy, context: ErrorRecoveryContext): Promise<boolean> {
+  static async executeRecovery(
+    strategy: RecoveryStrategy,
+    context: ErrorRecoveryContext
+  ): Promise<boolean> {
     try {
       switch (strategy.strategy) {
         case 'retry':
@@ -509,33 +558,33 @@ export class SteeringErrorRecovery {
             return true; // Indicate retry should be attempted
           }
           return false;
-          
+
         case 'fallback':
           if (strategy.action) {
             await strategy.action();
             return true;
           }
           return false;
-          
+
         case 'skip':
           SteeringLogger.warn(`Skipping operation: ${strategy.message}`, { context });
           return false;
-          
+
         case 'user_intervention':
-          SteeringLogger.error(`User intervention required: ${strategy.message}`, { 
-            context, 
-            error: context.lastError 
+          SteeringLogger.error(`User intervention required: ${strategy.message}`, {
+            context,
+            error: context.lastError,
           });
           return false;
-          
+
         default:
           return false;
       }
     } catch (recoveryError) {
-      SteeringLogger.error('Recovery strategy failed', { 
+      SteeringLogger.error('Recovery strategy failed', {
         originalError: context.lastError,
         recoveryError,
-        strategy: strategy.strategy
+        strategy: strategy.strategy,
       });
       return false;
     }
@@ -543,25 +592,28 @@ export class SteeringErrorRecovery {
 
   // Private recovery strategy handlers
 
-  private static handleFileSystemError(error: FileSystemError, context: ErrorRecoveryContext): RecoveryStrategy {
+  private static handleFileSystemError(
+    error: FileSystemError,
+    context: ErrorRecoveryContext
+  ): RecoveryStrategy {
     const errorMessage = error.message.toLowerCase();
-    
+
     if (errorMessage.includes('permission') || errorMessage.includes('access')) {
       return {
         canRecover: false,
         strategy: 'user_intervention',
-        message: `Permission denied for file operation: ${error.filePath}. Please check file permissions.`
+        message: `Permission denied for file operation: ${error.filePath}. Please check file permissions.`,
       };
     }
-    
+
     if (errorMessage.includes('no space') || errorMessage.includes('disk full')) {
       return {
         canRecover: false,
         strategy: 'user_intervention',
-        message: 'Insufficient disk space. Please free up space and try again.'
+        message: 'Insufficient disk space. Please free up space and try again.',
       };
     }
-    
+
     if (errorMessage.includes('not found') || errorMessage.includes('enoent')) {
       return {
         canRecover: true,
@@ -570,27 +622,30 @@ export class SteeringErrorRecovery {
         action: async () => {
           const dir = path.dirname(error.filePath);
           await fs.mkdir(dir, { recursive: true });
-        }
+        },
       };
     }
-    
+
     // Generic file system error - try retry
     if (context.attemptCount < context.maxAttempts) {
       return {
         canRecover: true,
         strategy: 'retry',
-        message: `Retrying file operation (attempt ${context.attemptCount + 1}/${context.maxAttempts})`
+        message: `Retrying file operation (attempt ${context.attemptCount + 1}/${context.maxAttempts})`,
       };
     }
-    
+
     return {
       canRecover: false,
       strategy: 'skip',
-      message: `File system operation failed after ${context.maxAttempts} attempts`
+      message: `File system operation failed after ${context.maxAttempts} attempts`,
     };
   }
 
-  private static handleValidationError(error: ValidationError, context: ErrorRecoveryContext): RecoveryStrategy {
+  private static handleValidationError(
+    error: ValidationError,
+    context: ErrorRecoveryContext
+  ): RecoveryStrategy {
     if (error.field === 'content' && error.message.includes('empty')) {
       return {
         canRecover: true,
@@ -598,10 +653,10 @@ export class SteeringErrorRecovery {
         message: 'Using minimal content template for empty content',
         action: async () => {
           // This would be handled by the calling code to use a fallback template
-        }
+        },
       };
     }
-    
+
     if (error.field === 'filename') {
       return {
         canRecover: true,
@@ -609,19 +664,22 @@ export class SteeringErrorRecovery {
         message: 'Generating safe filename',
         action: async () => {
           // This would be handled by the calling code to generate a safe filename
-        }
+        },
       };
     }
-    
+
     // Most validation errors require user intervention
     return {
       canRecover: false,
       strategy: 'user_intervention',
-      message: `Validation failed: ${error.message}. Please correct the input and try again.`
+      message: `Validation failed: ${error.message}. Please correct the input and try again.`,
     };
   }
 
-  private static handleContentProcessingError(error: ContentProcessingError, context: ErrorRecoveryContext): RecoveryStrategy {
+  private static handleContentProcessingError(
+    error: ContentProcessingError,
+    context: ErrorRecoveryContext
+  ): RecoveryStrategy {
     if (error.message.includes('malformed') || error.message.includes('parse')) {
       return {
         canRecover: true,
@@ -629,23 +687,23 @@ export class SteeringErrorRecovery {
         message: 'Using simplified content processing for malformed document',
         action: async () => {
           // This would be handled by the calling code to use simplified processing
-        }
+        },
       };
     }
-    
+
     // Try retry for transient processing errors
     if (context.attemptCount < context.maxAttempts) {
       return {
         canRecover: true,
         strategy: 'retry',
-        message: `Retrying content processing (attempt ${context.attemptCount + 1}/${context.maxAttempts})`
+        message: `Retrying content processing (attempt ${context.attemptCount + 1}/${context.maxAttempts})`,
       };
     }
-    
+
     return {
       canRecover: false,
       strategy: 'skip',
-      message: `Content processing failed after ${context.maxAttempts} attempts`
+      message: `Content processing failed after ${context.maxAttempts} attempts`,
     };
   }
 
@@ -655,14 +713,14 @@ export class SteeringErrorRecovery {
       return {
         canRecover: true,
         strategy: 'retry',
-        message: `Retrying operation (attempt ${context.attemptCount + 1}/${context.maxAttempts})`
+        message: `Retrying operation (attempt ${context.attemptCount + 1}/${context.maxAttempts})`,
       };
     }
-    
+
     return {
       canRecover: false,
       strategy: 'skip',
-      message: `Operation failed after ${context.maxAttempts} attempts: ${error.message}`
+      message: `Operation failed after ${context.maxAttempts} attempts: ${error.message}`,
     };
   }
 
@@ -732,11 +790,14 @@ export class SteeringLogger {
    */
   static getLogsAsString(level?: LogLevel): string {
     const logsToFormat = level ? this.getLogsByLevel(level) : this.logs;
-    
+
     return logsToFormat
-      .map(log => `[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}${
-        log.metadata ? ` | ${JSON.stringify(log.metadata)}` : ''
-      }`)
+      .map(
+        log =>
+          `[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}${
+            log.metadata ? ` | ${JSON.stringify(log.metadata)}` : ''
+          }`
+      )
       .join('\n');
   }
 
@@ -757,7 +818,7 @@ export class SteeringLogger {
       timestamp: new Date().toISOString(),
       level,
       message,
-      metadata
+      metadata,
     };
 
     this.logs.push(logEntry);
@@ -769,10 +830,9 @@ export class SteeringLogger {
 
     // Also log to console in development
     if (process.env.NODE_ENV === 'development') {
-      const consoleMethod = level === 'error' ? console.error : 
-                           level === 'warn' ? console.warn : 
-                           console.log;
-      
+      const consoleMethod =
+        level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+
       consoleMethod(`[SteeringFile] ${message}`, metadata || '');
     }
   }
@@ -811,7 +871,7 @@ export class SteeringFallbacks {
 
       // Ensure it has the right extension
       if (!safeFilename.endsWith('.md')) {
-        safeFilename = safeFilename.replace(/\.[^.]*$/, '') + '.md';
+        safeFilename = `${safeFilename.replace(/\.[^.]*$/, '')}.md`;
       }
 
       // If still invalid, generate a new one
@@ -833,7 +893,7 @@ export class SteeringFallbacks {
    */
   static generateMinimalContent(documentType: DocumentType, featureName: string): string {
     const timestamp = new Date().toISOString();
-    
+
     return `# ${documentType.charAt(0).toUpperCase() + documentType.slice(1)} Guidance: ${featureName}
 
 This steering file was generated with minimal content due to processing issues with the original document.
@@ -854,18 +914,19 @@ Please add references to related files using the #[[file:path]] syntax.
    * Generate safe front matter when original fails validation
    */
   static generateSafeFrontMatter(
-    documentType: DocumentType, 
-    featureName: string, 
+    documentType: DocumentType,
+    featureName: string,
     originalFrontMatter?: Partial<FrontMatter>
   ): FrontMatter {
     const timestamp = new Date().toISOString();
-    
+
     // Validate the original inclusion rule
     const validInclusionRules = ['always', 'fileMatch', 'manual'];
-    const safeInclusion = originalFrontMatter?.inclusion && validInclusionRules.includes(originalFrontMatter.inclusion) 
-      ? originalFrontMatter.inclusion 
-      : 'manual';
-    
+    const safeInclusion =
+      originalFrontMatter?.inclusion && validInclusionRules.includes(originalFrontMatter.inclusion)
+        ? originalFrontMatter.inclusion
+        : 'manual';
+
     return {
       inclusion: safeInclusion,
       fileMatchPattern: originalFrontMatter?.fileMatchPattern,
@@ -873,7 +934,7 @@ Please add references to related files using the #[[file:path]] syntax.
       generatedAt: timestamp,
       featureName: featureName || 'unnamed-feature',
       documentType,
-      description: originalFrontMatter?.description || `Fallback ${documentType} guidance`
+      description: originalFrontMatter?.description || `Fallback ${documentType} guidance`,
     };
   }
 
@@ -887,9 +948,16 @@ Please add references to related files using the #[[file:path]] syntax.
     originalFrontMatter?: Partial<FrontMatter>
   ): SteeringFile {
     const safeFeatureName = featureName || 'unnamed-feature';
-    const filename = this.generateSafeFilename(`${documentType}-${safeFeatureName}.md`, documentType);
-    const frontMatter = this.generateSafeFrontMatter(documentType, safeFeatureName, originalFrontMatter);
-    
+    const filename = this.generateSafeFilename(
+      `${documentType}-${safeFeatureName}.md`,
+      documentType
+    );
+    const frontMatter = this.generateSafeFrontMatter(
+      documentType,
+      safeFeatureName,
+      originalFrontMatter
+    );
+
     let content = originalContent;
     if (!content || content.trim().length === 0) {
       content = this.generateMinimalContent(documentType, safeFeatureName);
@@ -899,7 +967,7 @@ Please add references to related files using the #[[file:path]] syntax.
       filename,
       frontMatter,
       content,
-      references: []
+      references: [],
     };
   }
 }
@@ -921,24 +989,26 @@ export class SteeringOperationWrapper {
 
     while (attemptCount < maxAttempts) {
       try {
-        SteeringLogger.debug(`Executing ${operationName}`, { attempt: attemptCount + 1, maxAttempts });
-        
+        SteeringLogger.debug(`Executing ${operationName}`, {
+          attempt: attemptCount + 1,
+          maxAttempts,
+        });
+
         const result = await operation();
-        
+
         if (attemptCount > 0) {
           SteeringLogger.info(`${operationName} succeeded after ${attemptCount + 1} attempts`);
         }
-        
+
         return { success: true, result };
-        
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         attemptCount++;
-        
-        SteeringLogger.warn(`${operationName} failed on attempt ${attemptCount}`, { 
+
+        SteeringLogger.warn(`${operationName} failed on attempt ${attemptCount}`, {
           error: lastError.message,
           attempt: attemptCount,
-          maxAttempts
+          maxAttempts,
         });
 
         if (attemptCount < maxAttempts) {
@@ -947,20 +1017,20 @@ export class SteeringOperationWrapper {
             attemptCount,
             maxAttempts,
             lastError,
-            fallbackOptions: []
+            fallbackOptions: [],
           };
 
           const strategy = SteeringErrorRecovery.determineRecoveryStrategy(lastError, context);
-          
+
           if (strategy.canRecover) {
             const recovered = await SteeringErrorRecovery.executeRecovery(strategy, context);
-            
+
             if (recovered && strategy.strategy === 'retry') {
               continue; // Retry the operation
             } else if (recovered) {
-              return { 
-                success: true, 
-                recoveryApplied: strategy.message 
+              return {
+                success: true,
+                recoveryApplied: strategy.message,
               };
             }
           }
@@ -968,14 +1038,14 @@ export class SteeringOperationWrapper {
       }
     }
 
-    SteeringLogger.error(`${operationName} failed after ${maxAttempts} attempts`, { 
+    SteeringLogger.error(`${operationName} failed after ${maxAttempts} attempts`, {
       finalError: lastError?.message,
-      totalAttempts: attemptCount
+      totalAttempts: attemptCount,
     });
 
-    return { 
-      success: false, 
-      error: lastError || new Error(`${operationName} failed after ${maxAttempts} attempts`) 
+    return {
+      success: false,
+      error: lastError || new Error(`${operationName} failed after ${maxAttempts} attempts`),
     };
   }
 }

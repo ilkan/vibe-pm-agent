@@ -1,7 +1,7 @@
 /**
  * Confidence Scoring and Uncertainty Management System
- * 
- * This module implements confidence scoring for analysis results, creates uncertainty 
+ *
+ * This module implements confidence scoring for analysis results, creates uncertainty
  * indicators and recommendation systems for competitive and market analysis.
  */
 
@@ -18,7 +18,7 @@ import {
   ConfidenceInterval,
   COMPETITIVE_ANALYSIS_DEFAULTS,
   MARKET_SIZING_DEFAULTS,
-  SOURCE_RELIABILITY_THRESHOLDS
+  SOURCE_RELIABILITY_THRESHOLDS,
 } from '../models/competitive';
 
 // ============================================================================
@@ -44,7 +44,12 @@ export interface ConfidenceComponent {
 }
 
 export interface UncertaintyFactor {
-  type: 'data-quality' | 'methodology' | 'market-volatility' | 'competitive-dynamics' | 'assumption-risk';
+  type:
+    | 'data-quality'
+    | 'methodology'
+    | 'market-volatility'
+    | 'competitive-dynamics'
+    | 'assumption-risk';
   description: string;
   impact: number; // 0-1 scale, how much it reduces confidence
   likelihood: number; // 0-1 scale, probability of this uncertainty affecting results
@@ -53,7 +58,12 @@ export interface UncertaintyFactor {
 }
 
 export interface ConfidenceRecommendation {
-  type: 'improve-data' | 'validate-assumptions' | 'expand-research' | 'monitor-changes' | 'seek-expert-input';
+  type:
+    | 'improve-data'
+    | 'validate-assumptions'
+    | 'expand-research'
+    | 'monitor-changes'
+    | 'seek-expert-input';
   priority: 'immediate' | 'high' | 'medium' | 'low';
   description: string;
   expectedImpact: number; // Expected confidence improvement (0-1 scale)
@@ -83,10 +93,7 @@ export class ConfidenceScorer {
   private readonly weights: ConfidenceWeights;
   private readonly thresholds: ConfidenceThresholds;
 
-  constructor(
-    weights?: Partial<ConfidenceWeights>,
-    thresholds?: Partial<ConfidenceThresholds>
-  ) {
+  constructor(weights?: Partial<ConfidenceWeights>, thresholds?: Partial<ConfidenceThresholds>) {
     this.weights = { ...DEFAULT_CONFIDENCE_WEIGHTS, ...weights };
     this.thresholds = { ...DEFAULT_CONFIDENCE_THRESHOLDS, ...thresholds };
   }
@@ -152,7 +159,7 @@ export class ConfidenceScorer {
       uncertaintyFactors,
       recommendations,
       reliabilityLevel: this.determineReliabilityLevel(adjustedOverall),
-      lastCalculated: new Date().toISOString()
+      lastCalculated: new Date().toISOString(),
     };
   }
 
@@ -187,7 +194,9 @@ export class ConfidenceScorer {
     components.push(sourceComponent);
 
     // Confidence Intervals Component
-    const intervalComponent = this.calculateConfidenceIntervalConfidence(result.confidenceIntervals);
+    const intervalComponent = this.calculateConfidenceIntervalConfidence(
+      result.confidenceIntervals
+    );
     components.push(intervalComponent);
 
     // Calculate uncertainty factors
@@ -212,7 +221,7 @@ export class ConfidenceScorer {
       uncertaintyFactors,
       recommendations,
       reliabilityLevel: this.determineReliabilityLevel(adjustedOverall),
-      lastCalculated: new Date().toISOString()
+      lastCalculated: new Date().toISOString(),
     };
   }
 
@@ -241,12 +250,11 @@ export class ConfidenceScorer {
   // ============================================================================
 
   private calculateDataQualityConfidence(dataQuality: DataQualityCheck): ConfidenceComponent {
-    const score = (
+    const score =
       dataQuality.sourceReliability * 0.3 +
       dataQuality.dataFreshness * 0.3 +
       dataQuality.methodologyRigor * 0.2 +
-      dataQuality.overallConfidence * 0.2
-    );
+      dataQuality.overallConfidence * 0.2;
 
     return {
       name: 'Data Quality',
@@ -256,9 +264,9 @@ export class ConfidenceScorer {
       contributingFactors: [
         `Source reliability: ${Math.round(dataQuality.sourceReliability * 100)}%`,
         `Data freshness: ${Math.round(dataQuality.dataFreshness * 100)}%`,
-        `Methodology rigor: ${Math.round(dataQuality.methodologyRigor * 100)}%`
+        `Methodology rigor: ${Math.round(dataQuality.methodologyRigor * 100)}%`,
       ],
-      uncertaintyImpact: score > 0.8 ? 'low' : score > 0.6 ? 'medium' : 'high'
+      uncertaintyImpact: score > 0.8 ? 'low' : score > 0.6 ? 'medium' : 'high',
     };
   }
 
@@ -271,19 +279,20 @@ export class ConfidenceScorer {
     if (competitorCount === 0) {
       score = 0;
     } else if (competitorCount < minCompetitors) {
-      score = Math.max(0.3, competitorCount / minCompetitors * 0.7);
+      score = Math.max(0.3, (competitorCount / minCompetitors) * 0.7);
     } else if (competitorCount <= maxCompetitors) {
-      score = 0.7 + (competitorCount - minCompetitors) / (maxCompetitors - minCompetitors) * 0.3;
+      score = 0.7 + ((competitorCount - minCompetitors) / (maxCompetitors - minCompetitors)) * 0.3;
     } else {
       score = 1.0; // More competitors is generally better
     }
 
     // Adjust for competitor data completeness
     const completenessScores = competitors.map(c => this.calculateCompetitorCompleteness(c));
-    const avgCompleteness = completenessScores.length > 0 
-      ? completenessScores.reduce((a, b) => a + b, 0) / completenessScores.length 
-      : 0;
-    
+    const avgCompleteness =
+      completenessScores.length > 0
+        ? completenessScores.reduce((a, b) => a + b, 0) / completenessScores.length
+        : 0;
+
     score *= avgCompleteness;
 
     return {
@@ -294,9 +303,9 @@ export class ConfidenceScorer {
       contributingFactors: [
         `Competitor count: ${competitorCount}`,
         `Average data completeness: ${Math.round(avgCompleteness * 100)}%`,
-        `Coverage adequacy: ${competitorCount >= minCompetitors ? 'Adequate' : 'Insufficient'}`
+        `Coverage adequacy: ${competitorCount >= minCompetitors ? 'Adequate' : 'Insufficient'}`,
       ],
-      uncertaintyImpact: score > 0.7 ? 'low' : score > 0.5 ? 'medium' : 'high'
+      uncertaintyImpact: score > 0.7 ? 'low' : score > 0.5 ? 'medium' : 'high',
     };
   }
 
@@ -308,7 +317,7 @@ export class ConfidenceScorer {
         weight: this.weights.sourceReliability,
         description: 'No sources referenced',
         contributingFactors: ['No source attribution provided'],
-        uncertaintyImpact: 'critical'
+        uncertaintyImpact: 'critical',
       };
     }
 
@@ -316,10 +325,10 @@ export class ConfidenceScorer {
     const avgReliability = reliabilityScores.reduce((a, b) => a + b, 0) / reliabilityScores.length;
 
     // Bonus for authoritative sources
-    const authoritativeSources = sources.filter(s => 
+    const authoritativeSources = sources.filter(s =>
       ['mckinsey', 'gartner', 'wef'].includes(s.type)
     );
-    const authoritativeBonus = Math.min(0.2, authoritativeSources.length / sources.length * 0.2);
+    const authoritativeBonus = Math.min(0.2, (authoritativeSources.length / sources.length) * 0.2);
 
     const score = Math.min(1.0, avgReliability + authoritativeBonus);
 
@@ -331,10 +340,14 @@ export class ConfidenceScorer {
       contributingFactors: [
         `Source count: ${sources.length}`,
         `Average reliability: ${Math.round(avgReliability * 100)}%`,
-        `Authoritative sources: ${authoritativeSources.length}/${sources.length}`
+        `Authoritative sources: ${authoritativeSources.length}/${sources.length}`,
       ],
-      uncertaintyImpact: score > SOURCE_RELIABILITY_THRESHOLDS.HIGH ? 'low' : 
-                        score > SOURCE_RELIABILITY_THRESHOLDS.MEDIUM ? 'medium' : 'high'
+      uncertaintyImpact:
+        score > SOURCE_RELIABILITY_THRESHOLDS.HIGH
+          ? 'low'
+          : score > SOURCE_RELIABILITY_THRESHOLDS.MEDIUM
+            ? 'medium'
+            : 'high',
     };
   }
 
@@ -348,28 +361,34 @@ export class ConfidenceScorer {
     // SWOT analysis depth
     if (swotAnalyses.length > 0) {
       const totalItems = swotAnalyses.reduce((total, swot) => {
-        return total + 
+        return (
+          total +
           (swot.strengths?.length || 0) +
           (swot.weaknesses?.length || 0) +
           (swot.opportunities?.length || 0) +
-          (swot.threats?.length || 0);
+          (swot.threats?.length || 0)
+        );
       }, 0);
 
       const swotScore = Math.min(1.0, totalItems / (swotAnalyses.length * 8)); // 8 items per competitor ideal
       score += swotScore * 0.5;
-      factors.push(`SWOT depth: ${totalItems} total items across ${swotAnalyses.length} competitors`);
+      factors.push(
+        `SWOT depth: ${totalItems} total items across ${swotAnalyses.length} competitors`
+      );
     } else {
       factors.push('No SWOT analysis provided');
     }
 
     // Strategic recommendations depth
     if (recommendations.length > 0) {
-      const detailedRecommendations = recommendations.filter(r => 
-        r.implementation && r.implementation.length > 0
+      const detailedRecommendations = recommendations.filter(
+        r => r.implementation && r.implementation.length > 0
       );
       const recommendationScore = detailedRecommendations.length / recommendations.length;
       score += recommendationScore * 0.5;
-      factors.push(`${detailedRecommendations.length}/${recommendations.length} recommendations have implementation details`);
+      factors.push(
+        `${detailedRecommendations.length}/${recommendations.length} recommendations have implementation details`
+      );
     } else {
       factors.push('No strategic recommendations provided');
     }
@@ -380,7 +399,7 @@ export class ConfidenceScorer {
       weight: this.weights.analysisDepth,
       description: `Analysis depth score: ${Math.round(score * 100)}%`,
       contributingFactors: factors,
-      uncertaintyImpact: score > 0.7 ? 'low' : score > 0.5 ? 'medium' : 'high'
+      uncertaintyImpact: score > 0.7 ? 'low' : score > 0.5 ? 'medium' : 'high',
     };
   }
 
@@ -395,13 +414,17 @@ export class ConfidenceScorer {
       { key: 'targetSegment', weight: 0.2, label: 'Target segment' },
       { key: 'marketMaturity', weight: 0.15, label: 'Market maturity' },
       { key: 'regulatoryEnvironment', weight: 0.075, label: 'Regulatory context' },
-      { key: 'technologyTrends', weight: 0.075, label: 'Technology trends' }
+      { key: 'technologyTrends', weight: 0.075, label: 'Technology trends' },
     ];
 
     contextElements.forEach(element => {
-      if (marketContext[element.key] && 
-          (typeof marketContext[element.key] === 'string' ? marketContext[element.key].trim() : true) &&
-          (Array.isArray(marketContext[element.key]) ? marketContext[element.key].length > 0 : true)) {
+      if (
+        marketContext[element.key] &&
+        (typeof marketContext[element.key] === 'string'
+          ? marketContext[element.key].trim()
+          : true) &&
+        (Array.isArray(marketContext[element.key]) ? marketContext[element.key].length > 0 : true)
+      ) {
         score += element.weight;
         factors.push(`${element.label}: Provided`);
       } else {
@@ -415,7 +438,7 @@ export class ConfidenceScorer {
       weight: this.weights.marketContext,
       description: `Market context completeness: ${Math.round(score * 100)}%`,
       contributingFactors: factors,
-      uncertaintyImpact: score > 0.8 ? 'low' : score > 0.6 ? 'medium' : 'high'
+      uncertaintyImpact: score > 0.8 ? 'low' : score > 0.6 ? 'medium' : 'high',
     };
   }
 
@@ -427,17 +450,19 @@ export class ConfidenceScorer {
         weight: this.weights.methodologyRigor,
         description: 'No methodologies specified',
         contributingFactors: ['No sizing methodologies provided'],
-        uncertaintyImpact: 'critical'
+        uncertaintyImpact: 'critical',
       };
     }
 
     const uniqueMethodologies = [...new Set(methodologies.map(m => m.type))];
     const diversityScore = Math.min(1.0, uniqueMethodologies.length / 3); // Max 3 methodologies
 
-    const avgReliability = methodologies.reduce((sum, m) => sum + (m.reliability || 0), 0) / methodologies.length;
-    const avgConfidence = methodologies.reduce((sum, m) => sum + (m.confidence || 0), 0) / methodologies.length;
+    const avgReliability =
+      methodologies.reduce((sum, m) => sum + (m.reliability || 0), 0) / methodologies.length;
+    const avgConfidence =
+      methodologies.reduce((sum, m) => sum + (m.confidence || 0), 0) / methodologies.length;
 
-    const score = (diversityScore * 0.4 + avgReliability * 0.3 + avgConfidence * 0.3);
+    const score = diversityScore * 0.4 + avgReliability * 0.3 + avgConfidence * 0.3;
 
     return {
       name: 'Methodology Rigor',
@@ -447,9 +472,9 @@ export class ConfidenceScorer {
       contributingFactors: [
         `Methodology diversity: ${uniqueMethodologies.join(', ')}`,
         `Average reliability: ${Math.round(avgReliability * 100)}%`,
-        `Average confidence: ${Math.round(avgConfidence * 100)}%`
+        `Average confidence: ${Math.round(avgConfidence * 100)}%`,
       ],
-      uncertaintyImpact: score > 0.7 ? 'low' : score > 0.5 ? 'medium' : 'high'
+      uncertaintyImpact: score > 0.7 ? 'low' : score > 0.5 ? 'medium' : 'high',
     };
   }
 
@@ -503,7 +528,7 @@ export class ConfidenceScorer {
       weight: this.weights.marketSizeLogic,
       description: `Market size relationships: ${score > 0.8 ? 'Logical' : 'Issues detected'}`,
       contributingFactors: factors,
-      uncertaintyImpact: score > 0.8 ? 'low' : score > 0.5 ? 'medium' : 'critical'
+      uncertaintyImpact: score > 0.8 ? 'low' : score > 0.5 ? 'medium' : 'critical',
     };
   }
 
@@ -515,11 +540,12 @@ export class ConfidenceScorer {
         weight: this.weights.assumptionValidity,
         description: 'No assumptions documented',
         contributingFactors: ['Assumptions not explicitly stated'],
-        uncertaintyImpact: 'high'
+        uncertaintyImpact: 'high',
       };
     }
 
-    const avgConfidence = assumptions.reduce((sum, a) => sum + a.confidence, 0) / assumptions.length;
+    const avgConfidence =
+      assumptions.reduce((sum, a) => sum + a.confidence, 0) / assumptions.length;
     const highImpactAssumptions = assumptions.filter(a => a.impact === 'high');
     const highConfidenceAssumptions = assumptions.filter(a => a.confidence > 0.7);
 
@@ -534,13 +560,15 @@ export class ConfidenceScorer {
         `Total assumptions: ${assumptions.length}`,
         `High-impact assumptions: ${highImpactAssumptions.length}`,
         `High-confidence assumptions: ${highConfidenceAssumptions.length}`,
-        `Average confidence: ${Math.round(avgConfidence * 100)}%`
+        `Average confidence: ${Math.round(avgConfidence * 100)}%`,
       ],
-      uncertaintyImpact: score > 0.7 ? 'low' : score > 0.5 ? 'medium' : 'high'
+      uncertaintyImpact: score > 0.7 ? 'low' : score > 0.5 ? 'medium' : 'high',
     };
   }
 
-  private calculateConfidenceIntervalConfidence(intervals: ConfidenceInterval[]): ConfidenceComponent {
+  private calculateConfidenceIntervalConfidence(
+    intervals: ConfidenceInterval[]
+  ): ConfidenceComponent {
     if (intervals.length === 0) {
       return {
         name: 'Confidence Intervals',
@@ -548,14 +576,17 @@ export class ConfidenceScorer {
         weight: this.weights.confidenceIntervals,
         description: 'No confidence intervals provided',
         contributingFactors: ['Statistical uncertainty not quantified'],
-        uncertaintyImpact: 'medium'
+        uncertaintyImpact: 'medium',
       };
     }
 
-    const validIntervals = intervals.filter(i => i.lowerBound < i.upperBound && i.confidenceLevel > 0);
+    const validIntervals = intervals.filter(
+      i => i.lowerBound < i.upperBound && i.confidenceLevel > 0
+    );
     const validityRatio = validIntervals.length / intervals.length;
 
-    const avgConfidenceLevel = validIntervals.reduce((sum, i) => sum + i.confidenceLevel, 0) / validIntervals.length;
+    const avgConfidenceLevel =
+      validIntervals.reduce((sum, i) => sum + i.confidenceLevel, 0) / validIntervals.length;
     const score = validityRatio * (avgConfidenceLevel > 0.9 ? 1.0 : avgConfidenceLevel);
 
     return {
@@ -565,9 +596,9 @@ export class ConfidenceScorer {
       description: `${validIntervals.length}/${intervals.length} valid intervals`,
       contributingFactors: [
         `Valid intervals: ${validIntervals.length}/${intervals.length}`,
-        `Average confidence level: ${Math.round(avgConfidenceLevel * 100)}%`
+        `Average confidence level: ${Math.round(avgConfidenceLevel * 100)}%`,
       ],
-      uncertaintyImpact: score > 0.8 ? 'low' : score > 0.6 ? 'medium' : 'high'
+      uncertaintyImpact: score > 0.8 ? 'low' : score > 0.6 ? 'medium' : 'high',
     };
   }
 
@@ -591,17 +622,19 @@ export class ConfidenceScorer {
         mitigation: [
           'Seek additional authoritative sources',
           'Cross-validate findings with industry experts',
-          'Update analysis with more recent data'
+          'Update analysis with more recent data',
         ],
-        severity: dataQuality.sourceReliability < SOURCE_RELIABILITY_THRESHOLDS.LOW ? 'critical' : 'high'
+        severity:
+          dataQuality.sourceReliability < SOURCE_RELIABILITY_THRESHOLDS.LOW ? 'critical' : 'high',
       });
     }
 
     // Competitive dynamics uncertainties
     const recentMoves = result.competitiveMatrix.competitors.reduce(
-      (total, c) => total + (c.recentMoves?.length || 0), 0
+      (total, c) => total + (c.recentMoves?.length || 0),
+      0
     );
-    
+
     if (recentMoves > result.competitiveMatrix.competitors.length * 2) {
       factors.push({
         type: 'competitive-dynamics',
@@ -611,9 +644,9 @@ export class ConfidenceScorer {
         mitigation: [
           'Monitor competitor announcements regularly',
           'Set up competitive intelligence alerts',
-          'Plan for scenario-based strategic responses'
+          'Plan for scenario-based strategic responses',
         ],
-        severity: 'medium'
+        severity: 'medium',
       });
     }
 
@@ -627,9 +660,9 @@ export class ConfidenceScorer {
         mitigation: [
           'Focus on flexible strategic options',
           'Increase monitoring frequency',
-          'Develop multiple scenario plans'
+          'Develop multiple scenario plans',
         ],
-        severity: 'high'
+        severity: 'high',
       });
     }
 
@@ -652,16 +685,16 @@ export class ConfidenceScorer {
         mitigation: [
           'Apply additional sizing methodologies',
           'Cross-validate with industry benchmarks',
-          'Seek expert validation of approach'
+          'Seek expert validation of approach',
         ],
-        severity: 'medium'
+        severity: 'medium',
       });
     }
 
     // Assumption risk uncertainties
     const highImpactAssumptions = result.assumptions.filter(a => a.impact === 'high');
     const lowConfidenceHighImpact = highImpactAssumptions.filter(a => a.confidence < 0.6);
-    
+
     if (lowConfidenceHighImpact.length > 0) {
       factors.push({
         type: 'assumption-risk',
@@ -671,15 +704,16 @@ export class ConfidenceScorer {
         mitigation: [
           'Validate key assumptions with additional research',
           'Develop sensitivity analysis for critical assumptions',
-          'Create scenario plans for assumption variations'
+          'Create scenario plans for assumption variations',
         ],
-        severity: 'high'
+        severity: 'high',
       });
     }
 
     // Market volatility uncertainties
     const growthRateVariance = Math.abs(result.tam.growthRate - result.sam.growthRate);
-    if (growthRateVariance > 0.1) { // 10% difference
+    if (growthRateVariance > 0.1) {
+      // 10% difference
       factors.push({
         type: 'market-volatility',
         description: 'Significant growth rate differences indicate market uncertainty',
@@ -688,9 +722,9 @@ export class ConfidenceScorer {
         mitigation: [
           'Monitor market indicators regularly',
           'Update growth projections quarterly',
-          'Prepare for multiple growth scenarios'
+          'Prepare for multiple growth scenarios',
         ],
-        severity: 'medium'
+        severity: 'medium',
       });
     }
 
@@ -703,8 +737,8 @@ export class ConfidenceScorer {
 
   private calculateWeightedConfidence(components: ConfidenceComponent[]): number {
     const totalWeight = components.reduce((sum, c) => sum + c.weight, 0);
-    const weightedSum = components.reduce((sum, c) => sum + (c.score * c.weight), 0);
-    
+    const weightedSum = components.reduce((sum, c) => sum + c.score * c.weight, 0);
+
     return totalWeight > 0 ? weightedSum / totalWeight : 0;
   }
 
@@ -716,13 +750,15 @@ export class ConfidenceScorer {
 
     uncertaintyFactors.forEach(factor => {
       const adjustment = factor.impact * factor.likelihood;
-      adjustedConfidence *= (1 - adjustment);
+      adjustedConfidence *= 1 - adjustment;
     });
 
     return Math.max(0, Math.min(1, adjustedConfidence));
   }
 
-  private determineReliabilityLevel(confidence: number): 'very-high' | 'high' | 'medium' | 'low' | 'very-low' {
+  private determineReliabilityLevel(
+    confidence: number
+  ): 'very-high' | 'high' | 'medium' | 'low' | 'very-low' {
     if (confidence >= this.thresholds.veryHigh) return 'very-high';
     if (confidence >= this.thresholds.high) return 'high';
     if (confidence >= this.thresholds.medium) return 'medium';
@@ -754,7 +790,9 @@ export class ConfidenceScorer {
     // Sort by priority and expected impact
     return recommendations.sort((a, b) => {
       const priorityOrder = { immediate: 4, high: 3, medium: 2, low: 1 };
-      return priorityOrder[b.priority] - priorityOrder[a.priority] || b.expectedImpact - a.expectedImpact;
+      return (
+        priorityOrder[b.priority] - priorityOrder[a.priority] || b.expectedImpact - a.expectedImpact
+      );
     });
   }
 
@@ -766,29 +804,51 @@ export class ConfidenceScorer {
       'Data Quality': {
         type: 'improve-data' as const,
         description: 'Improve data quality by updating sources and validation',
-        actions: ['Update stale data sources', 'Add authoritative references', 'Validate key data points']
+        actions: [
+          'Update stale data sources',
+          'Add authoritative references',
+          'Validate key data points',
+        ],
       },
       'Competitor Coverage': {
         type: 'expand-research' as const,
         description: 'Expand competitor research for comprehensive coverage',
-        actions: ['Identify additional competitors', 'Gather detailed competitor profiles', 'Research indirect competitors']
+        actions: [
+          'Identify additional competitors',
+          'Gather detailed competitor profiles',
+          'Research indirect competitors',
+        ],
       },
       'Source Reliability': {
         type: 'improve-data' as const,
         description: 'Enhance source reliability with authoritative references',
-        actions: ['Add McKinsey/Gartner reports', 'Include industry analyst research', 'Cite academic studies']
+        actions: [
+          'Add McKinsey/Gartner reports',
+          'Include industry analyst research',
+          'Cite academic studies',
+        ],
       },
       'Methodology Rigor': {
         type: 'validate-assumptions' as const,
         description: 'Strengthen methodology with additional approaches',
-        actions: ['Apply multiple sizing methods', 'Cross-validate results', 'Document methodology limitations']
-      }
+        actions: [
+          'Apply multiple sizing methods',
+          'Cross-validate results',
+          'Document methodology limitations',
+        ],
+      },
     };
 
-    const recommendation = baseRecommendations[component.name as keyof typeof baseRecommendations] || {
+    const recommendation = baseRecommendations[
+      component.name as keyof typeof baseRecommendations
+    ] || {
       type: 'improve-data' as const,
       description: `Improve ${component.name.toLowerCase()} component`,
-      actions: ['Review and enhance data quality', 'Validate assumptions', 'Seek additional sources']
+      actions: [
+        'Review and enhance data quality',
+        'Validate assumptions',
+        'Seek additional sources',
+      ],
     };
 
     return {
@@ -797,49 +857,58 @@ export class ConfidenceScorer {
       expectedImpact: Math.min(0.4, (0.8 - component.score) * component.weight),
       effort: component.score < 0.3 ? 'high' : 'medium',
       timeline: component.score < 0.3 ? '1-2 weeks' : '2-4 weeks',
-      specificActions: recommendation.actions
+      specificActions: recommendation.actions,
     };
   }
 
   private generateUncertaintyRecommendation(factor: UncertaintyFactor): ConfidenceRecommendation {
     const typeMapping = {
       'data-quality': 'improve-data' as const,
-      'methodology': 'validate-assumptions' as const,
+      methodology: 'validate-assumptions' as const,
       'market-volatility': 'monitor-changes' as const,
       'competitive-dynamics': 'monitor-changes' as const,
-      'assumption-risk': 'validate-assumptions' as const
+      'assumption-risk': 'validate-assumptions' as const,
     };
 
     return {
       type: typeMapping[factor.type],
-      priority: factor.severity === 'critical' ? 'immediate' : factor.severity === 'high' ? 'high' : 'medium',
+      priority:
+        factor.severity === 'critical'
+          ? 'immediate'
+          : factor.severity === 'high'
+            ? 'high'
+            : 'medium',
       description: factor.description,
       expectedImpact: factor.impact * factor.likelihood,
       effort: factor.severity === 'critical' ? 'high' : 'medium',
       timeline: factor.severity === 'critical' ? 'Immediate' : '1-3 weeks',
-      specificActions: factor.mitigation
+      specificActions: factor.mitigation,
     };
   }
 
   private calculateCompetitorCompleteness(competitor: any): number {
     const requiredFields = ['name', 'strengths', 'weaknesses', 'keyFeatures', 'pricing'];
     const optionalFields = ['marketShare', 'targetMarket', 'recentMoves'];
-    
+
     let score = 0;
-    let totalFields = requiredFields.length + optionalFields.length;
+    const totalFields = requiredFields.length + optionalFields.length;
 
     requiredFields.forEach(field => {
-      if (competitor[field] && 
-          (typeof competitor[field] === 'string' ? competitor[field].trim() : true) &&
-          (Array.isArray(competitor[field]) ? competitor[field].length > 0 : true)) {
+      if (
+        competitor[field] &&
+        (typeof competitor[field] === 'string' ? competitor[field].trim() : true) &&
+        (Array.isArray(competitor[field]) ? competitor[field].length > 0 : true)
+      ) {
         score += 2; // Required fields worth more
       }
     });
 
     optionalFields.forEach(field => {
-      if (competitor[field] && 
-          (typeof competitor[field] === 'string' ? competitor[field].trim() : true) &&
-          (Array.isArray(competitor[field]) ? competitor[field].length > 0 : true)) {
+      if (
+        competitor[field] &&
+        (typeof competitor[field] === 'string' ? competitor[field].trim() : true) &&
+        (Array.isArray(competitor[field]) ? competitor[field].length > 0 : true)
+      ) {
         score += 1;
       }
     });
@@ -860,19 +929,21 @@ export class ConfidenceScorer {
 
     if (marketShares.length > 0) {
       const avgMarketShare = marketShares.reduce((a, b) => a + b, 0) / marketShares.length;
-      const variance = marketShares.reduce((sum, share) => sum + Math.pow(share - avgMarketShare, 2), 0) / marketShares.length;
-      
+      const variance =
+        marketShares.reduce((sum, share) => sum + Math.pow(share - avgMarketShare, 2), 0) /
+        marketShares.length;
+
       indicators.push({
         metric: 'Market Share Distribution',
         currentValue: avgMarketShare,
         uncertaintyRange: {
           lower: Math.max(0, avgMarketShare - Math.sqrt(variance)),
           upper: Math.min(100, avgMarketShare + Math.sqrt(variance)),
-          confidenceLevel: 0.68 // 1 standard deviation
+          confidenceLevel: 0.68, // 1 standard deviation
         },
         volatility: Math.sqrt(variance) / avgMarketShare,
         trendDirection: 'unknown',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       });
     }
 
@@ -894,18 +965,21 @@ export class ConfidenceScorer {
         uncertaintyRange: {
           lower: tamConfidenceInterval.lowerBound,
           upper: tamConfidenceInterval.upperBound,
-          confidenceLevel: tamConfidenceInterval.confidenceLevel
+          confidenceLevel: tamConfidenceInterval.confidenceLevel,
         },
-        volatility: (tamConfidenceInterval.upperBound - tamConfidenceInterval.lowerBound) / result.tam.value,
+        volatility:
+          (tamConfidenceInterval.upperBound - tamConfidenceInterval.lowerBound) / result.tam.value,
         trendDirection: result.tam.growthRate > 0 ? 'increasing' : 'decreasing',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       });
     }
 
     // Growth rate uncertainty
     const growthRates = [result.tam.growthRate, result.sam.growthRate, result.som.growthRate];
     const avgGrowthRate = growthRates.reduce((a, b) => a + b, 0) / growthRates.length;
-    const growthVariance = growthRates.reduce((sum, rate) => sum + Math.pow(rate - avgGrowthRate, 2), 0) / growthRates.length;
+    const growthVariance =
+      growthRates.reduce((sum, rate) => sum + Math.pow(rate - avgGrowthRate, 2), 0) /
+      growthRates.length;
 
     indicators.push({
       metric: 'Market Growth Rate',
@@ -913,11 +987,11 @@ export class ConfidenceScorer {
       uncertaintyRange: {
         lower: avgGrowthRate - Math.sqrt(growthVariance),
         upper: avgGrowthRate + Math.sqrt(growthVariance),
-        confidenceLevel: 0.68
+        confidenceLevel: 0.68,
       },
       volatility: Math.sqrt(growthVariance),
       trendDirection: avgGrowthRate > 0 ? 'increasing' : 'decreasing',
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     });
 
     return indicators;
@@ -949,21 +1023,21 @@ interface ConfidenceThresholds {
 
 const DEFAULT_CONFIDENCE_WEIGHTS: ConfidenceWeights = {
   dataQuality: 0.25,
-  competitorCoverage: 0.20,
-  sourceReliability: 0.20,
+  competitorCoverage: 0.2,
+  sourceReliability: 0.2,
   analysisDepth: 0.15,
-  marketContext: 0.10,
+  marketContext: 0.1,
   methodologyRigor: 0.25,
-  marketSizeLogic: 0.20,
-  assumptionValidity: 0.20,
-  confidenceIntervals: 0.15
+  marketSizeLogic: 0.2,
+  assumptionValidity: 0.2,
+  confidenceIntervals: 0.15,
 };
 
 const DEFAULT_CONFIDENCE_THRESHOLDS: ConfidenceThresholds = {
   veryHigh: 0.9,
   high: 0.75,
   medium: 0.6,
-  low: 0.4
+  low: 0.4,
 };
 
 // ============================================================================

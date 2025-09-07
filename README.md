@@ -159,6 +159,11 @@ npm run type-check      # Run TypeScript type checking
 npm test               # Run all tests
 npm run test:unit      # Run unit tests only
 npm run test:integration # Run integration tests only
+
+# Cleanup (removes test artifacts)
+npm run cleanup        # Clean up test artifacts
+npm run cleanup:verbose # Clean with detailed output
+npm run cleanup:dry-run # Preview what would be cleaned
 npm run test:watch     # Run tests in watch mode
 
 # MCP Server

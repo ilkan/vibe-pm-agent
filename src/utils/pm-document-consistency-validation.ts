@@ -1,15 +1,15 @@
 // Cross-document consistency validation for PM documents
 // Ensures alignment between requirements, design, management one-pagers, PR-FAQs, and task plans
 
-import { 
-  ManagementOnePager, 
-  PRFAQ, 
-  PMRequirements, 
-  DesignOptions, 
+import {
+  ManagementOnePager,
+  PRFAQ,
+  PMRequirements,
+  DesignOptions,
   TaskPlan,
   Task,
   DesignOption,
-  PriorityItem
+  PriorityItem,
 } from '../components/pm-document-generator';
 import { ValidationError } from './validation';
 
@@ -39,7 +39,6 @@ export interface ConsistencyWarning {
  * Validates alignment between requirements, design, and PM documents
  */
 export class PMDocumentConsistencyValidator {
-  
   /**
    * Validate consistency between management one-pager and requirements/design
    */
@@ -67,7 +66,7 @@ export class PMDocumentConsistencyValidator {
     return {
       isValid: errors.filter(e => e.severity === 'high').length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -98,7 +97,7 @@ export class PMDocumentConsistencyValidator {
     return {
       isValid: errors.filter(e => e.severity === 'high').length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -129,22 +128,20 @@ export class PMDocumentConsistencyValidator {
     return {
       isValid: errors.filter(e => e.severity === 'high').length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
   /**
    * Validate consistency across all PM documents
    */
-  validateCrossDocumentConsistency(
-    documents: {
-      requirements?: PMRequirements;
-      design?: DesignOptions;
-      onePager?: ManagementOnePager;
-      prfaq?: PRFAQ;
-      taskPlan?: TaskPlan;
-    }
-  ): ConsistencyValidationResult {
+  validateCrossDocumentConsistency(documents: {
+    requirements?: PMRequirements;
+    design?: DesignOptions;
+    onePager?: ManagementOnePager;
+    prfaq?: PRFAQ;
+    taskPlan?: TaskPlan;
+  }): ConsistencyValidationResult {
     const errors: ConsistencyError[] = [];
     const warnings: ConsistencyWarning[] = [];
 
@@ -152,7 +149,11 @@ export class PMDocumentConsistencyValidator {
 
     // Validate one-pager consistency
     if (onePager) {
-      const onePagerResult = this.validateManagementOnePagerConsistency(onePager, requirements, design);
+      const onePagerResult = this.validateManagementOnePagerConsistency(
+        onePager,
+        requirements,
+        design
+      );
       errors.push(...onePagerResult.errors);
       warnings.push(...onePagerResult.warnings);
     }
@@ -184,7 +185,7 @@ export class PMDocumentConsistencyValidator {
     return {
       isValid: errors.filter(e => e.severity === 'high').length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -199,52 +200,61 @@ export class PMDocumentConsistencyValidator {
     // Check if business goal aligns with one-pager answer
     const businessGoalKeywords = this.extractKeywords(requirements.businessGoal);
     const answerKeywords = this.extractKeywords(onePager.answer);
-    
+
     if (!this.hasKeywordOverlap(businessGoalKeywords, answerKeywords)) {
       warnings.push({
         type: 'potential_misalignment',
         message: 'Management one-pager answer may not align with business goal from requirements',
         documents: ['ManagementOnePager', 'PMRequirements'],
-        suggestion: 'Ensure the decision statement reflects the core business objective'
+        suggestion: 'Ensure the decision statement reflects the core business objective',
       });
     }
 
     // Check if scope items align with functional requirements
-    const functionalReqKeywords = requirements.functionalRequirements.flatMap(req => this.extractKeywords(req));
+    const functionalReqKeywords = requirements.functionalRequirements.flatMap(req =>
+      this.extractKeywords(req)
+    );
     const scopeKeywords = onePager.whatScopeToday.flatMap(scope => this.extractKeywords(scope));
-    
+
     if (!this.hasKeywordOverlap(functionalReqKeywords, scopeKeywords)) {
       warnings.push({
         type: 'potential_misalignment',
         message: 'Scope items in one-pager may not cover key functional requirements',
         documents: ['ManagementOnePager', 'PMRequirements'],
-        suggestion: 'Verify that scope items address the most critical functional requirements'
+        suggestion: 'Verify that scope items address the most critical functional requirements',
       });
     }
 
     // Check if risks align with constraints/risks from requirements
     const requirementRisks = this.extractKeywords(requirements.constraintsRisks.join(' '));
     const onePagerRisks = onePager.risksAndMitigations.flatMap(rm => this.extractKeywords(rm.risk));
-    
-    if (requirements.constraintsRisks.length > 0 && !this.hasKeywordOverlap(requirementRisks, onePagerRisks)) {
+
+    if (
+      requirements.constraintsRisks.length > 0 &&
+      !this.hasKeywordOverlap(requirementRisks, onePagerRisks)
+    ) {
       warnings.push({
         type: 'missing_detail',
         message: 'Key risks from requirements may not be addressed in one-pager',
         documents: ['ManagementOnePager', 'PMRequirements'],
-        suggestion: 'Consider including risks identified in requirements analysis'
+        suggestion: 'Consider including risks identified in requirements analysis',
       });
     }
 
     // Check MoSCoW priority alignment with options
     const mustHaveCount = requirements.priority.must.length;
     const shouldHaveCount = requirements.priority.should.length;
-    
-    if (mustHaveCount > 5 && onePager.options.balanced.summary.toLowerCase().includes('conservative')) {
+
+    if (
+      mustHaveCount > 5 &&
+      onePager.options.balanced.summary.toLowerCase().includes('conservative')
+    ) {
       warnings.push({
         type: 'potential_misalignment',
-        message: 'High number of must-have requirements may not align with conservative balanced option',
+        message:
+          'High number of must-have requirements may not align with conservative balanced option',
         documents: ['ManagementOnePager', 'PMRequirements'],
-        suggestion: 'Consider if balanced option adequately addresses must-have requirements'
+        suggestion: 'Consider if balanced option adequately addresses must-have requirements',
       });
     }
   }
@@ -256,23 +266,31 @@ export class PMDocumentConsistencyValidator {
     warnings: ConsistencyWarning[]
   ): void {
     // Check if options align between one-pager and design
-    const designOptionNames = [design.options.conservative.name, design.options.balanced.name, design.options.bold.name];
-    const onePagerOptionNames = [onePager.options.conservative.name, onePager.options.balanced.name, onePager.options.bold.name];
-    
+    const designOptionNames = [
+      design.options.conservative.name,
+      design.options.balanced.name,
+      design.options.bold.name,
+    ];
+    const onePagerOptionNames = [
+      onePager.options.conservative.name,
+      onePager.options.balanced.name,
+      onePager.options.bold.name,
+    ];
+
     if (!this.arraysMatch(designOptionNames, onePagerOptionNames)) {
       errors.push({
         type: 'alignment',
         severity: 'medium',
         message: 'Option names do not match between design options and management one-pager',
         documents: ['ManagementOnePager', 'DesignOptions'],
-        field: 'options'
+        field: 'options',
       });
     }
 
     // Check if impact/effort alignment makes sense
     const balancedDesignOption = design.options.balanced;
     const balancedOnePagerROI = onePager.roiSnapshot.options.balanced;
-    
+
     // Check for impact contradictions
     if (balancedDesignOption.impact === 'High' && balancedOnePagerROI.impact === 'Med') {
       errors.push({
@@ -280,7 +298,7 @@ export class PMDocumentConsistencyValidator {
         severity: 'high',
         message: 'Balanced option shows high impact in design but medium impact in ROI snapshot',
         documents: ['ManagementOnePager', 'DesignOptions'],
-        field: 'balanced.impact'
+        field: 'balanced.impact',
       });
     }
 
@@ -290,7 +308,7 @@ export class PMDocumentConsistencyValidator {
         severity: 'high',
         message: 'Balanced option shows low impact in design but high impact in ROI snapshot',
         documents: ['ManagementOnePager', 'DesignOptions'],
-        field: 'balanced.impact'
+        field: 'balanced.impact',
       });
     }
 
@@ -301,7 +319,7 @@ export class PMDocumentConsistencyValidator {
         severity: 'high',
         message: 'Balanced option shows medium effort in design but low effort in ROI snapshot',
         documents: ['ManagementOnePager', 'DesignOptions'],
-        field: 'balanced.effort'
+        field: 'balanced.effort',
       });
     }
 
@@ -311,20 +329,20 @@ export class PMDocumentConsistencyValidator {
         severity: 'high',
         message: 'Balanced option shows high effort in design but low effort in ROI snapshot',
         documents: ['ManagementOnePager', 'DesignOptions'],
-        field: 'balanced.effort'
+        field: 'balanced.effort',
       });
     }
 
     // Check if timing recommendation aligns
     const designTimingKeywords = this.extractKeywords(design.rightTimeRecommendation);
     const onePagerTimingKeywords = this.extractKeywords(onePager.rightTimeRecommendation);
-    
+
     if (!this.hasKeywordOverlap(designTimingKeywords, onePagerTimingKeywords)) {
       warnings.push({
         type: 'potential_misalignment',
         message: 'Timing recommendations may not be consistent between design and one-pager',
         documents: ['ManagementOnePager', 'DesignOptions'],
-        suggestion: 'Ensure timing rationale is consistent across documents'
+        suggestion: 'Ensure timing rationale is consistent across documents',
       });
     }
   }
@@ -338,7 +356,7 @@ export class PMDocumentConsistencyValidator {
     const recommendedOptions = [
       onePager.options.conservative.recommended,
       onePager.options.balanced.recommended,
-      onePager.options.bold.recommended
+      onePager.options.bold.recommended,
     ].filter(Boolean);
 
     if (recommendedOptions.length !== 1) {
@@ -347,18 +365,21 @@ export class PMDocumentConsistencyValidator {
         severity: 'medium',
         message: 'Exactly one option should be marked as recommended',
         documents: ['ManagementOnePager'],
-        field: 'options.recommended'
+        field: 'options.recommended',
       });
     }
 
     // Check if ROI snapshot aligns with option descriptions
-    if (onePager.options.conservative.summary.toLowerCase().includes('advanced') && 
-        onePager.roiSnapshot.options.conservative.effort === 'High') {
+    if (
+      onePager.options.conservative.summary.toLowerCase().includes('advanced') &&
+      onePager.roiSnapshot.options.conservative.effort === 'High'
+    ) {
       warnings.push({
         type: 'potential_misalignment',
-        message: 'Conservative option description suggests advanced features but ROI shows high effort',
+        message:
+          'Conservative option description suggests advanced features but ROI shows high effort',
         documents: ['ManagementOnePager'],
-        suggestion: 'Ensure conservative option truly represents a low-effort approach'
+        suggestion: 'Ensure conservative option truly represents a low-effort approach',
       });
     }
 
@@ -368,7 +389,7 @@ export class PMDocumentConsistencyValidator {
         type: 'format_issue',
         message: 'Answer statement is quite long - consider making it more concise',
         documents: ['ManagementOnePager'],
-        suggestion: 'Keep the answer to one clear, decisive line'
+        suggestion: 'Keep the answer to one clear, decisive line',
       });
     }
 
@@ -379,7 +400,7 @@ export class PMDocumentConsistencyValidator {
         severity: 'medium',
         message: 'Exactly 3 core reasons should be provided in the because section',
         documents: ['ManagementOnePager'],
-        field: 'because'
+        field: 'because',
       });
     }
 
@@ -390,7 +411,7 @@ export class PMDocumentConsistencyValidator {
         severity: 'medium',
         message: 'Exactly 3 key risks with mitigations should be provided',
         documents: ['ManagementOnePager'],
-        field: 'risksAndMitigations'
+        field: 'risksAndMitigations',
       });
     }
   }
@@ -404,13 +425,13 @@ export class PMDocumentConsistencyValidator {
     // Check if press release problem aligns with business goal
     const businessGoalKeywords = this.extractKeywords(requirements.businessGoal);
     const pressReleaseKeywords = this.extractKeywords(prfaq.pressRelease.body);
-    
+
     if (!this.hasKeywordOverlap(businessGoalKeywords, pressReleaseKeywords)) {
       warnings.push({
         type: 'potential_misalignment',
         message: 'Press release may not clearly reflect the business goal from requirements',
         documents: ['PRFAQ', 'PMRequirements'],
-        suggestion: 'Ensure press release body addresses the core business objective'
+        suggestion: 'Ensure press release body addresses the core business objective',
       });
     }
 
@@ -419,29 +440,36 @@ export class PMDocumentConsistencyValidator {
     if (customerFAQ && requirements.userNeeds.jobs.length > 0) {
       const customerKeywords = this.extractKeywords(customerFAQ.answer);
       const jobsKeywords = requirements.userNeeds.jobs.flatMap(job => this.extractKeywords(job));
-      
+
       if (!this.hasKeywordOverlap(customerKeywords, jobsKeywords)) {
         warnings.push({
           type: 'potential_misalignment',
           message: 'Customer definition in FAQ may not align with user jobs from requirements',
           documents: ['PRFAQ', 'PMRequirements'],
-          suggestion: 'Ensure customer definition reflects the jobs to be done'
+          suggestion: 'Ensure customer definition reflects the jobs to be done',
         });
       }
     }
 
     // Check if success metrics align with business goal
-    const metricsFAQ = prfaq.faq.find(faq => faq.question.toLowerCase().includes('measure success'));
+    const metricsFAQ = prfaq.faq.find(faq =>
+      faq.question.toLowerCase().includes('measure success')
+    );
     if (metricsFAQ && requirements.businessGoal) {
       const metricsText = metricsFAQ.answer.toLowerCase();
       const goalText = requirements.businessGoal.toLowerCase();
-      
-      if (goalText.includes('cost') && !metricsText.includes('cost') && !metricsText.includes('saving')) {
+
+      if (
+        goalText.includes('cost') &&
+        !metricsText.includes('cost') &&
+        !metricsText.includes('saving')
+      ) {
         warnings.push({
           type: 'missing_detail',
-          message: 'Success metrics may not include cost-related measures despite cost-focused business goal',
+          message:
+            'Success metrics may not include cost-related measures despite cost-focused business goal',
           documents: ['PRFAQ', 'PMRequirements'],
-          suggestion: 'Consider including cost or efficiency metrics'
+          suggestion: 'Consider including cost or efficiency metrics',
         });
       }
     }
@@ -456,13 +484,13 @@ export class PMDocumentConsistencyValidator {
     // Check if press release solution aligns with recommended design option
     const solutionKeywords = this.extractKeywords(prfaq.pressRelease.body);
     const balancedOptionKeywords = this.extractKeywords(design.options.balanced.summary);
-    
+
     if (!this.hasKeywordOverlap(solutionKeywords, balancedOptionKeywords)) {
       warnings.push({
         type: 'potential_misalignment',
         message: 'Press release solution may not align with recommended design option',
         documents: ['PRFAQ', 'DesignOptions'],
-        suggestion: 'Ensure press release describes the balanced/recommended approach'
+        suggestion: 'Ensure press release describes the balanced/recommended approach',
       });
     }
 
@@ -470,14 +498,16 @@ export class PMDocumentConsistencyValidator {
     const risksFAQ = prfaq.faq.find(faq => faq.question.toLowerCase().includes('risk'));
     if (risksFAQ && design.options.balanced.majorRisks.length > 0) {
       const faqRiskKeywords = this.extractKeywords(risksFAQ.answer);
-      const designRiskKeywords = design.options.balanced.majorRisks.flatMap(risk => this.extractKeywords(risk));
-      
+      const designRiskKeywords = design.options.balanced.majorRisks.flatMap(risk =>
+        this.extractKeywords(risk)
+      );
+
       if (!this.hasKeywordOverlap(faqRiskKeywords, designRiskKeywords)) {
         warnings.push({
           type: 'missing_detail',
           message: 'FAQ risks may not address key risks identified in design options',
           documents: ['PRFAQ', 'DesignOptions'],
-          suggestion: 'Consider including major risks from the recommended design option'
+          suggestion: 'Consider including major risks from the recommended design option',
         });
       }
     }
@@ -496,7 +526,7 @@ export class PMDocumentConsistencyValidator {
         severity: 'medium',
         message: `Press release body is ${wordCount} words, should be under 250 words`,
         documents: ['PRFAQ'],
-        field: 'pressRelease.body'
+        field: 'pressRelease.body',
       });
     }
 
@@ -511,12 +541,12 @@ export class PMDocumentConsistencyValidator {
       'what is not included',
       'how does this compare to alternatives',
       'estimated cost',
-      'next 2 releases'
+      'next 2 releases',
     ];
 
     const providedQuestions = prfaq.faq.map(faq => faq.question.toLowerCase());
-    const missingQuestions = requiredQuestions.filter(required => 
-      !providedQuestions.some(provided => provided.includes(required.split(' ')[0]))
+    const missingQuestions = requiredQuestions.filter(
+      required => !providedQuestions.some(provided => provided.includes(required.split(' ')[0]))
     );
 
     if (missingQuestions.length > 0) {
@@ -525,7 +555,7 @@ export class PMDocumentConsistencyValidator {
         severity: 'high',
         message: `Missing required FAQ questions: ${missingQuestions.join(', ')}`,
         documents: ['PRFAQ'],
-        field: 'faq'
+        field: 'faq',
       });
     }
 
@@ -535,16 +565,16 @@ export class PMDocumentConsistencyValidator {
         severity: 'medium',
         message: `FAQ has ${prfaq.faq.length} questions, should be limited to 20 Q&As`,
         documents: ['PRFAQ'],
-        field: 'faq'
+        field: 'faq',
       });
     }
 
     // Check if launch checklist has essential items
     const essentialChecklistItems = ['scope freeze', 'timeline', 'dependencies'];
     const checklistText = prfaq.launchChecklist.map(item => item.task.toLowerCase()).join(' ');
-    
-    const missingEssentials = essentialChecklistItems.filter(essential => 
-      !checklistText.includes(essential)
+
+    const missingEssentials = essentialChecklistItems.filter(
+      essential => !checklistText.includes(essential)
     );
 
     if (missingEssentials.length > 0) {
@@ -552,7 +582,7 @@ export class PMDocumentConsistencyValidator {
         type: 'missing_detail',
         message: `Launch checklist may be missing essential items: ${missingEssentials.join(', ')}`,
         documents: ['PRFAQ'],
-        suggestion: 'Consider adding scope freeze, timeline, and dependency management items'
+        suggestion: 'Consider adding scope freeze, timeline, and dependency management items',
       });
     }
   }
@@ -564,11 +594,7 @@ export class PMDocumentConsistencyValidator {
     warnings: ConsistencyWarning[]
   ): void {
     // Check if task priorities align with design option selection
-    const allTasks = [
-      ...taskPlan.immediateWins,
-      ...taskPlan.shortTerm,
-      ...taskPlan.longTerm
-    ];
+    const allTasks = [...taskPlan.immediateWins, ...taskPlan.shortTerm, ...taskPlan.longTerm];
 
     const mustHaveTasks = allTasks.filter(task => task.priority === 'Must');
     const shouldHaveTasks = allTasks.filter(task => task.priority === 'Should');
@@ -577,9 +603,10 @@ export class PMDocumentConsistencyValidator {
     if (design.options.balanced.effort === 'Low' && mustHaveTasks.length > 8) {
       warnings.push({
         type: 'potential_misalignment',
-        message: 'High number of must-have tasks may not align with low-effort balanced design option',
+        message:
+          'High number of must-have tasks may not align with low-effort balanced design option',
         documents: ['TaskPlan', 'DesignOptions'],
-        suggestion: 'Review if task priorities match the effort level of the recommended design'
+        suggestion: 'Review if task priorities match the effort level of the recommended design',
       });
     }
 
@@ -592,7 +619,7 @@ export class PMDocumentConsistencyValidator {
         type: 'potential_misalignment',
         message: 'High-impact tasks should typically be included in immediate wins',
         documents: ['TaskPlan'],
-        suggestion: 'Consider moving high-impact tasks to immediate wins phase'
+        suggestion: 'Consider moving high-impact tasks to immediate wins phase',
       });
     }
 
@@ -605,7 +632,7 @@ export class PMDocumentConsistencyValidator {
         type: 'potential_misalignment',
         message: 'Task descriptions may not cover key features from the recommended design option',
         documents: ['TaskPlan', 'DesignOptions'],
-        suggestion: 'Ensure tasks implement the features described in the balanced design option'
+        suggestion: 'Ensure tasks implement the features described in the balanced design option',
       });
     }
   }
@@ -616,11 +643,7 @@ export class PMDocumentConsistencyValidator {
     errors: ConsistencyError[],
     warnings: ConsistencyWarning[]
   ): void {
-    const allTasks = [
-      ...taskPlan.immediateWins,
-      ...taskPlan.shortTerm,
-      ...taskPlan.longTerm
-    ];
+    const allTasks = [...taskPlan.immediateWins, ...taskPlan.shortTerm, ...taskPlan.longTerm];
 
     // Check if must-have requirements are covered by must-have tasks
     const mustHaveReqs = requirements.priority.must;
@@ -631,34 +654,42 @@ export class PMDocumentConsistencyValidator {
         type: 'missing_detail',
         message: 'Number of must-have tasks may not adequately cover must-have requirements',
         documents: ['TaskPlan', 'PMRequirements'],
-        suggestion: 'Ensure all must-have requirements are addressed by must-have tasks'
+        suggestion: 'Ensure all must-have requirements are addressed by must-have tasks',
       });
     }
 
     // Check if functional requirements are addressed in task descriptions
-    const functionalReqKeywords = requirements.functionalRequirements.flatMap(req => this.extractKeywords(req));
-    const taskKeywords = allTasks.flatMap(task => this.extractKeywords(task.description + ' ' + task.name));
+    const functionalReqKeywords = requirements.functionalRequirements.flatMap(req =>
+      this.extractKeywords(req)
+    );
+    const taskKeywords = allTasks.flatMap(task =>
+      this.extractKeywords(`${task.description} ${task.name}`)
+    );
 
     if (!this.hasKeywordOverlap(functionalReqKeywords, taskKeywords)) {
       warnings.push({
         type: 'potential_misalignment',
         message: 'Task descriptions may not adequately address functional requirements',
         documents: ['TaskPlan', 'PMRequirements'],
-        suggestion: 'Review tasks to ensure they implement the specified functional requirements'
+        suggestion: 'Review tasks to ensure they implement the specified functional requirements',
       });
     }
 
     // Check if constraints are addressed in guardrails check
     if (requirements.constraintsRisks.length > 0) {
-      const constraintKeywords = requirements.constraintsRisks.flatMap(constraint => this.extractKeywords(constraint));
-      const guardrailKeywords = taskPlan.guardrailsCheck.checkCriteria.flatMap(criteria => this.extractKeywords(criteria));
+      const constraintKeywords = requirements.constraintsRisks.flatMap(constraint =>
+        this.extractKeywords(constraint)
+      );
+      const guardrailKeywords = taskPlan.guardrailsCheck.checkCriteria.flatMap(criteria =>
+        this.extractKeywords(criteria)
+      );
 
       if (!this.hasKeywordOverlap(constraintKeywords, guardrailKeywords)) {
         warnings.push({
           type: 'missing_detail',
           message: 'Guardrails check may not address key constraints from requirements',
           documents: ['TaskPlan', 'PMRequirements'],
-          suggestion: 'Consider adding constraint checks to the guardrails task'
+          suggestion: 'Consider adding constraint checks to the guardrails task',
         });
       }
     }
@@ -670,13 +701,16 @@ export class PMDocumentConsistencyValidator {
     warnings: ConsistencyWarning[]
   ): void {
     // Check if guardrails check is properly defined as Task 0
-    if (!taskPlan.guardrailsCheck.id.includes('0') && !taskPlan.guardrailsCheck.name.toLowerCase().includes('guardrail')) {
+    if (
+      !taskPlan.guardrailsCheck.id.includes('0') &&
+      !taskPlan.guardrailsCheck.name.toLowerCase().includes('guardrail')
+    ) {
       errors.push({
         type: 'format',
         severity: 'medium',
         message: 'Guardrails check should be clearly identified as Task 0',
         documents: ['TaskPlan'],
-        field: 'guardrailsCheck'
+        field: 'guardrailsCheck',
       });
     }
 
@@ -687,7 +721,7 @@ export class PMDocumentConsistencyValidator {
         severity: 'high',
         message: 'Immediate wins phase should have at least 1 task',
         documents: ['TaskPlan'],
-        field: 'immediateWins'
+        field: 'immediateWins',
       });
     }
 
@@ -696,7 +730,7 @@ export class PMDocumentConsistencyValidator {
         type: 'format_issue',
         message: 'Immediate wins phase has more than 3 tasks - consider if all are truly immediate',
         documents: ['TaskPlan'],
-        suggestion: 'Keep immediate wins to 1-3 high-impact, low-effort tasks'
+        suggestion: 'Keep immediate wins to 1-3 high-impact, low-effort tasks',
       });
     }
 
@@ -705,7 +739,7 @@ export class PMDocumentConsistencyValidator {
         type: 'format_issue',
         message: 'Short-term phase has more than 6 tasks - consider moving some to long-term',
         documents: ['TaskPlan'],
-        suggestion: 'Keep short-term phase to 3-6 tasks for manageable execution'
+        suggestion: 'Keep short-term phase to 3-6 tasks for manageable execution',
       });
     }
 
@@ -714,7 +748,7 @@ export class PMDocumentConsistencyValidator {
       taskPlan.guardrailsCheck,
       ...taskPlan.immediateWins,
       ...taskPlan.shortTerm,
-      ...taskPlan.longTerm
+      ...taskPlan.longTerm,
     ];
 
     const taskIds = allTasks.map(task => task.id);
@@ -726,7 +760,7 @@ export class PMDocumentConsistencyValidator {
         severity: 'high',
         message: `Duplicate task IDs found: ${duplicateIds.join(', ')}`,
         documents: ['TaskPlan'],
-        field: 'taskIds'
+        field: 'taskIds',
       });
     }
 
@@ -737,7 +771,7 @@ export class PMDocumentConsistencyValidator {
           type: 'potential_misalignment',
           message: `Task "${task.name}" is marked as Must priority but Low impact`,
           documents: ['TaskPlan'],
-          suggestion: 'Review if low-impact tasks should be Must priority'
+          suggestion: 'Review if low-impact tasks should be Must priority',
         });
       }
 
@@ -746,7 +780,7 @@ export class PMDocumentConsistencyValidator {
           type: 'potential_misalignment',
           message: `Task "${task.name}" is high-impact, low-effort but not in immediate wins`,
           documents: ['TaskPlan'],
-          suggestion: 'Consider moving high-impact, low-effort tasks to immediate wins'
+          suggestion: 'Consider moving high-impact, low-effort tasks to immediate wins',
         });
       }
     });
@@ -762,19 +796,23 @@ export class PMDocumentConsistencyValidator {
     const onePagerTiming = onePager.answer.toLowerCase();
     const prfaqTiming = prfaq.pressRelease.body.toLowerCase();
 
-    if (onePagerTiming.includes('immediately') && !prfaqTiming.includes('now') && !prfaqTiming.includes('today')) {
+    if (
+      onePagerTiming.includes('immediately') &&
+      !prfaqTiming.includes('now') &&
+      !prfaqTiming.includes('today')
+    ) {
       warnings.push({
         type: 'potential_misalignment',
         message: 'One-pager suggests immediate action but PR-FAQ may not emphasize urgency',
         documents: ['ManagementOnePager', 'PRFAQ'],
-        suggestion: 'Ensure timing urgency is consistent across documents'
+        suggestion: 'Ensure timing urgency is consistent across documents',
       });
     }
 
     // Check if risks are consistent
     const onePagerRisks = onePager.risksAndMitigations.map(rm => rm.risk.toLowerCase());
     const risksFAQ = prfaq.faq.find(faq => faq.question.toLowerCase().includes('risk'));
-    
+
     if (risksFAQ) {
       const faqRisks = risksFAQ.answer.toLowerCase();
       const hasOverlap = onePagerRisks.some(risk => {
@@ -787,13 +825,15 @@ export class PMDocumentConsistencyValidator {
           type: 'potential_misalignment',
           message: 'Risk assessments may not be consistent between one-pager and PR-FAQ',
           documents: ['ManagementOnePager', 'PRFAQ'],
-          suggestion: 'Ensure key risks are addressed consistently in both documents'
+          suggestion: 'Ensure key risks are addressed consistently in both documents',
         });
       }
     }
 
     // Check if scope aligns with what's not included
-    const notIncludedFAQ = prfaq.faq.find(faq => faq.question.toLowerCase().includes('not included'));
+    const notIncludedFAQ = prfaq.faq.find(faq =>
+      faq.question.toLowerCase().includes('not included')
+    );
     if (notIncludedFAQ && onePager.whatScopeToday.length > 0) {
       const scopeKeywords = onePager.whatScopeToday.flatMap(scope => this.extractKeywords(scope));
       const notIncludedKeywords = this.extractKeywords(notIncludedFAQ.answer);
@@ -802,9 +842,10 @@ export class PMDocumentConsistencyValidator {
         errors.push({
           type: 'contradiction',
           severity: 'high',
-          message: 'Items listed in scope today appear to overlap with what\'s not included in PR-FAQ',
+          message:
+            "Items listed in scope today appear to overlap with what's not included in PR-FAQ",
           documents: ['ManagementOnePager', 'PRFAQ'],
-          field: 'scope_vs_not_included'
+          field: 'scope_vs_not_included',
         });
       }
     }
@@ -816,11 +857,7 @@ export class PMDocumentConsistencyValidator {
     errors: ConsistencyError[],
     warnings: ConsistencyWarning[]
   ): void {
-    const allTasks = [
-      ...taskPlan.immediateWins,
-      ...taskPlan.shortTerm,
-      ...taskPlan.longTerm
-    ];
+    const allTasks = [...taskPlan.immediateWins, ...taskPlan.shortTerm, ...taskPlan.longTerm];
 
     // Check if task effort distribution aligns with design effort
     const balancedOption = design.options.balanced;
@@ -832,35 +869,39 @@ export class PMDocumentConsistencyValidator {
         type: 'potential_misalignment',
         message: 'High proportion of large tasks may not align with low-effort design option',
         documents: ['DesignOptions', 'TaskPlan'],
-        suggestion: 'Review if task sizing matches the effort level of the recommended design'
+        suggestion: 'Review if task sizing matches the effort level of the recommended design',
       });
     }
 
     // Check if high-impact design translates to high-impact tasks
     if (balancedOption.impact === 'High') {
       const highImpactTasks = allTasks.filter(task => task.impact === 'High').length;
-      
+
       if (highImpactTasks < 3) {
         warnings.push({
           type: 'potential_misalignment',
           message: 'High-impact design option should have more high-impact tasks',
           documents: ['DesignOptions', 'TaskPlan'],
-          suggestion: 'Ensure task impact levels reflect the design option impact'
+          suggestion: 'Ensure task impact levels reflect the design option impact',
         });
       }
     }
 
     // Check if design risks are addressed in guardrails
     if (balancedOption.majorRisks.length > 0) {
-      const designRiskKeywords = balancedOption.majorRisks.flatMap(risk => this.extractKeywords(risk));
-      const guardrailKeywords = taskPlan.guardrailsCheck.checkCriteria.flatMap(criteria => this.extractKeywords(criteria));
+      const designRiskKeywords = balancedOption.majorRisks.flatMap(risk =>
+        this.extractKeywords(risk)
+      );
+      const guardrailKeywords = taskPlan.guardrailsCheck.checkCriteria.flatMap(criteria =>
+        this.extractKeywords(criteria)
+      );
 
       if (!this.hasKeywordOverlap(designRiskKeywords, guardrailKeywords)) {
         warnings.push({
           type: 'missing_detail',
           message: 'Major design risks may not be addressed in guardrails check',
           documents: ['DesignOptions', 'TaskPlan'],
-          suggestion: 'Consider adding checks for major design risks in the guardrails task'
+          suggestion: 'Consider adding checks for major design risks in the guardrails task',
         });
       }
     }
@@ -870,22 +911,46 @@ export class PMDocumentConsistencyValidator {
 
   private extractKeywords(text: string): string[] {
     if (!text) return [];
-    
+
     return text
       .toLowerCase()
       .replace(/[^\w\s]/g, ' ')
       .split(/\s+/)
       .filter(word => word.length > 3)
-      .filter(word => !['this', 'that', 'with', 'from', 'they', 'will', 'have', 'been', 'were', 'said', 'each', 'which', 'their', 'time', 'would', 'there', 'could', 'other'].includes(word));
+      .filter(
+        word =>
+          ![
+            'this',
+            'that',
+            'with',
+            'from',
+            'they',
+            'will',
+            'have',
+            'been',
+            'were',
+            'said',
+            'each',
+            'which',
+            'their',
+            'time',
+            'would',
+            'there',
+            'could',
+            'other',
+          ].includes(word)
+      );
   }
 
   private hasKeywordOverlap(keywords1: string[], keywords2: string[]): boolean {
     if (keywords1.length === 0 || keywords2.length === 0) return false;
-    
-    return keywords1.some(keyword1 => 
-      keywords2.some(keyword2 => 
-        keyword1.includes(keyword2) || keyword2.includes(keyword1) || 
-        this.areSimilarWords(keyword1, keyword2)
+
+    return keywords1.some(keyword1 =>
+      keywords2.some(
+        keyword2 =>
+          keyword1.includes(keyword2) ||
+          keyword2.includes(keyword1) ||
+          this.areSimilarWords(keyword1, keyword2)
       )
     );
   }
@@ -903,12 +968,10 @@ export class PMDocumentConsistencyValidator {
       ['design', 'architecture', 'structure'],
       ['task', 'activity', 'action', 'work'],
       ['impact', 'effect', 'influence'],
-      ['effort', 'work', 'labor']
+      ['effort', 'work', 'labor'],
     ];
 
-    return synonyms.some(group => 
-      group.includes(word1) && group.includes(word2)
-    );
+    return synonyms.some(group => group.includes(word1) && group.includes(word2));
   }
 
   private arraysMatch(arr1: string[], arr2: string[]): boolean {
@@ -920,15 +983,13 @@ export class PMDocumentConsistencyValidator {
 /**
  * Convenience function to validate all PM documents for consistency
  */
-export function validatePMDocumentConsistency(
-  documents: {
-    requirements?: PMRequirements;
-    design?: DesignOptions;
-    onePager?: ManagementOnePager;
-    prfaq?: PRFAQ;
-    taskPlan?: TaskPlan;
-  }
-): ConsistencyValidationResult {
+export function validatePMDocumentConsistency(documents: {
+  requirements?: PMRequirements;
+  design?: DesignOptions;
+  onePager?: ManagementOnePager;
+  prfaq?: PRFAQ;
+  taskPlan?: TaskPlan;
+}): ConsistencyValidationResult {
   const validator = new PMDocumentConsistencyValidator();
   return validator.validateCrossDocumentConsistency(documents);
 }

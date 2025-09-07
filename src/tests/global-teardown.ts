@@ -1,6 +1,6 @@
 /**
  * Jest Global Teardown
- * 
+ *
  * Runs after all tests complete to clean up test artifacts
  */
 

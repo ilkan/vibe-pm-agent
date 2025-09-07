@@ -190,6 +190,25 @@ class TestRunner {
     return report;
   }
 
+  async runCleanup() {
+    console.log('🧹 Running post-test cleanup...');
+    
+    try {
+      const result = await this.runCommand('node', ['scripts/cleanup.mjs']);
+      
+      if (result.success) {
+        console.log('✅ Test cleanup completed');
+      } else {
+        console.warn('⚠️ Test cleanup had issues:', result.stderr);
+      }
+      
+      return result.success;
+    } catch (error) {
+      console.error('❌ Test cleanup failed:', error.message);
+      return false;
+    }
+  }
+
   async runAll() {
     console.log('🚀 Starting comprehensive test suite...\n');
     
@@ -200,6 +219,9 @@ class TestRunner {
     const integrationSuccess = await this.runIntegrationTests();
     const coverageSuccess = await this.generateCoverage();
     const performanceSuccess = await this.runPerformanceBenchmarks();
+    
+    // Run cleanup regardless of test results
+    const cleanupSuccess = await this.runCleanup();
     
     const totalTime = Date.now() - startTime;
     
@@ -213,6 +235,9 @@ class TestRunner {
     
     if (overallSuccess) {
       console.log('✅ All test phases completed successfully!');
+      if (!cleanupSuccess) {
+        console.warn('⚠️ Note: Cleanup had issues, but tests passed');
+      }
       process.exit(0);
     } else {
       console.log('❌ Some test phases failed. Check the report for details.');

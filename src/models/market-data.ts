@@ -136,7 +136,12 @@ export interface CompetitorProfile {
  * Unique insights from proprietary analysis
  */
 export interface UniqueInsight {
-  insight_type: 'innovation_analysis' | 'developer_ecosystem' | 'patent_landscape' | 'funding_patterns' | 'talent_flow';
+  insight_type:
+    | 'innovation_analysis'
+    | 'developer_ecosystem'
+    | 'patent_landscape'
+    | 'funding_patterns'
+    | 'talent_flow';
   description: string;
   data: any;
   confidence_score: number;

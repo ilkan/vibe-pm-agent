@@ -1,11 +1,11 @@
 // Performance optimization utilities for AI Agent Pipeline
 
-import { 
-  ParsedIntent, 
-  OptimizedWorkflow, 
-  ROIAnalysis, 
+import {
+  ParsedIntent,
+  OptimizedWorkflow,
+  ROIAnalysis,
   ConsultingSummary,
-  Workflow 
+  Workflow,
 } from '../models';
 import { ConsultingAnalysis } from '../components/business-analyzer';
 
@@ -45,7 +45,7 @@ export class PipelineCache {
     this.config = {
       maxSize: config.maxSize || 1000,
       defaultTTL: config.defaultTTL || 300000, // 5 minutes
-      cleanupInterval: config.cleanupInterval || 60000 // 1 minute
+      cleanupInterval: config.cleanupInterval || 60000, // 1 minute
     };
 
     this.startCleanupTimer();
@@ -56,7 +56,7 @@ export class PipelineCache {
    */
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       return null;
     }
@@ -70,7 +70,7 @@ export class PipelineCache {
     // Update access statistics
     entry.accessCount++;
     entry.lastAccessed = Date.now();
-    
+
     return entry.data as T;
   }
 
@@ -88,7 +88,7 @@ export class PipelineCache {
       timestamp: Date.now(),
       ttl: ttl || this.config.defaultTTL,
       accessCount: 1,
-      lastAccessed: Date.now()
+      lastAccessed: Date.now(),
     };
 
     this.cache.set(key, entry);
@@ -121,13 +121,19 @@ export class PipelineCache {
    * Get cache statistics
    */
   getStats(): { size: number; hitRate: number; memoryUsage: number } {
-    const totalAccesses = Array.from(this.cache.values()).reduce((sum, entry) => sum + entry.accessCount, 0);
-    const hits = Array.from(this.cache.values()).reduce((sum, entry) => sum + (entry.accessCount - 1), 0);
-    
+    const totalAccesses = Array.from(this.cache.values()).reduce(
+      (sum, entry) => sum + entry.accessCount,
+      0
+    );
+    const hits = Array.from(this.cache.values()).reduce(
+      (sum, entry) => sum + (entry.accessCount - 1),
+      0
+    );
+
     return {
       size: this.cache.size,
       hitRate: totalAccesses > 0 ? hits / totalAccesses : 0,
-      memoryUsage: this.estimateMemoryUsage()
+      memoryUsage: this.estimateMemoryUsage(),
     };
   }
 
@@ -213,9 +219,12 @@ export class ParallelProcessor {
   /**
    * Execute operations in batches
    */
-  async executeBatched<T>(operations: Array<() => Promise<T>>, batchSize: number = 3): Promise<T[]> {
+  async executeBatched<T>(
+    operations: Array<() => Promise<T>>,
+    batchSize: number = 3
+  ): Promise<T[]> {
     const results: T[] = [];
-    
+
     for (let i = 0; i < operations.length; i += batchSize) {
       const batch = operations.slice(i, i + batchSize);
       const batchResults = await Promise.all(batch.map(op => op()));
@@ -226,8 +235,8 @@ export class ParallelProcessor {
   }
 
   private async executeWithConcurrencyControl<T>(
-    operation: () => Promise<T>, 
-    index: number, 
+    operation: () => Promise<T>,
+    index: number,
     results: T[]
   ): Promise<void> {
     // Wait for available slot
@@ -236,7 +245,7 @@ export class ParallelProcessor {
     }
 
     this.activeOperations++;
-    
+
     try {
       results[index] = await operation();
     } finally {
@@ -256,9 +265,9 @@ export class PerformanceMonitor {
     averageExecutionTime: 0,
     parallelOperationsCount: 0,
     memoryUsage: 0,
-    errorRate: 0
+    errorRate: 0,
   };
-  
+
   private executionTimes: number[] = [];
   private errorCount = 0;
   private maxHistorySize = 1000;
@@ -268,25 +277,25 @@ export class PerformanceMonitor {
    */
   recordExecution(executionTime: number, cacheHit: boolean = false, parallelOps: number = 0): void {
     this.metrics.totalRequests++;
-    
+
     if (cacheHit) {
       this.metrics.cacheHits++;
     } else {
       this.metrics.cacheMisses++;
     }
-    
+
     this.metrics.parallelOperationsCount += parallelOps;
-    
+
     // Track execution times with rolling window
     this.executionTimes.push(executionTime);
     if (this.executionTimes.length > this.maxHistorySize) {
       this.executionTimes.shift();
     }
-    
+
     // Update average execution time
-    this.metrics.averageExecutionTime = 
+    this.metrics.averageExecutionTime =
       this.executionTimes.reduce((sum, time) => sum + time, 0) / this.executionTimes.length;
-    
+
     // Update memory usage
     this.metrics.memoryUsage = this.getMemoryUsage();
   }
@@ -296,9 +305,8 @@ export class PerformanceMonitor {
    */
   recordError(): void {
     this.errorCount++;
-    this.metrics.errorRate = this.metrics.totalRequests > 0 
-      ? (this.errorCount / this.metrics.totalRequests) * 100 
-      : 0;
+    this.metrics.errorRate =
+      this.metrics.totalRequests > 0 ? (this.errorCount / this.metrics.totalRequests) * 100 : 0;
   }
 
   /**
@@ -316,10 +324,11 @@ export class PerformanceMonitor {
     recommendations: string[];
     metrics: PerformanceMetrics;
   } {
-    const cacheHitRate = this.metrics.totalRequests > 0 
-      ? (this.metrics.cacheHits / this.metrics.totalRequests) * 100 
-      : 0;
-    
+    const cacheHitRate =
+      this.metrics.totalRequests > 0
+        ? (this.metrics.cacheHits / this.metrics.totalRequests) * 100
+        : 0;
+
     let status: 'excellent' | 'good' | 'acceptable' | 'poor' = 'excellent';
     const recommendations: string[] = [];
 
@@ -335,7 +344,9 @@ export class PerformanceMonitor {
     }
 
     if (cacheHitRate < 30) {
-      recommendations.push('Low cache hit rate - consider increasing cache TTL or improving cache keys');
+      recommendations.push(
+        'Low cache hit rate - consider increasing cache TTL or improving cache keys'
+      );
     }
 
     if (this.metrics.errorRate > 5) {
@@ -346,14 +357,15 @@ export class PerformanceMonitor {
       recommendations.push('Monitor error rate and improve error handling');
     }
 
-    if (this.metrics.memoryUsage > 100 * 1024 * 1024) { // 100MB
+    if (this.metrics.memoryUsage > 100 * 1024 * 1024) {
+      // 100MB
       recommendations.push('High memory usage - consider cache cleanup or size limits');
     }
 
     return {
       status,
       recommendations,
-      metrics: this.getMetrics()
+      metrics: this.getMetrics(),
     };
   }
 
@@ -368,7 +380,7 @@ export class PerformanceMonitor {
       averageExecutionTime: 0,
       parallelOperationsCount: 0,
       memoryUsage: 0,
-      errorRate: 0
+      errorRate: 0,
     };
     this.executionTimes = [];
     this.errorCount = 0;
@@ -418,7 +430,9 @@ export class CacheKeyGenerator {
    */
   static forROIAnalysis(workflow: Workflow, optimizedWorkflow?: OptimizedWorkflow): string {
     const workflowHash = this.hashObject(workflow);
-    const optimizedHash = optimizedWorkflow ? this.hashObject(optimizedWorkflow) : 'no-optimization';
+    const optimizedHash = optimizedWorkflow
+      ? this.hashObject(optimizedWorkflow)
+      : 'no-optimization';
     return `roi:${workflowHash}:${optimizedHash}`;
   }
 
@@ -435,7 +449,7 @@ export class CacheKeyGenerator {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(36);
@@ -469,26 +483,25 @@ export class ParallelOperationFactory {
     return {
       intentValidation: async () => {
         // Validate intent structure and completeness
-        return !!(parsedIntent.businessObjective && 
-                 parsedIntent.operationsRequired.length > 0);
+        return !!(parsedIntent.businessObjective && parsedIntent.operationsRequired.length > 0);
       },
-      
+
       riskAssessment: async () => {
         // Assess potential risks in parallel
         const risks = [];
-        
+
         // Check for quota-intensive operations
         if (parsedIntent.operationsRequired.some(op => op.estimatedQuotaCost > 10)) {
           risks.push({ type: 'high_quota_usage', severity: 'medium' });
         }
-        
+
         // Check for complex operations
         if (parsedIntent.technicalRequirements.some(req => req.complexity === 'high')) {
           risks.push({ type: 'high_complexity', severity: 'low' });
         }
-        
+
         return risks;
-      }
+      },
     };
   }
 
@@ -499,36 +512,39 @@ export class ParallelOperationFactory {
       techniqueSelection: async () => {
         // Select appropriate consulting techniques in parallel
         const techniques = [];
-        
+
         // MECE is always applicable
         techniques.push({ name: 'MECE', relevanceScore: 0.8 });
-        
+
         // Value Driver Tree for cost-focused intents
-        if (parsedIntent.businessObjective.toLowerCase().includes('cost') ||
-            parsedIntent.businessObjective.toLowerCase().includes('efficiency')) {
+        if (
+          parsedIntent.businessObjective.toLowerCase().includes('cost') ||
+          parsedIntent.businessObjective.toLowerCase().includes('efficiency')
+        ) {
           techniques.push({ name: 'ValueDriverTree', relevanceScore: 0.9 });
         }
-        
+
         // Impact vs Effort for complex workflows
         if (parsedIntent.operationsRequired.length > 3) {
           techniques.push({ name: 'ImpactEffort', relevanceScore: 0.7 });
         }
-        
+
         return techniques;
       },
-      
+
       quotaEstimation: async () => {
         // Estimate quota usage in parallel
         const totalQuota = parsedIntent.operationsRequired.reduce(
-          (sum, op) => sum + op.estimatedQuotaCost, 0
+          (sum, op) => sum + op.estimatedQuotaCost,
+          0
         );
-        
+
         return {
           naive: totalQuota,
           optimized: Math.round(totalQuota * 0.7), // Assume 30% optimization
-          zeroBased: Math.round(totalQuota * 0.5)   // Assume 50% with radical redesign
+          zeroBased: Math.round(totalQuota * 0.5), // Assume 50% with radical redesign
         };
-      }
+      },
     };
   }
 }

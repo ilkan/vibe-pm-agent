@@ -1,15 +1,22 @@
 // Consulting technique data structures and interfaces
 
-import { 
-  MarketSizingResult, 
-  CompetitorAnalysisResult, 
+import {
+  MarketSizingResult,
+  CompetitorAnalysisResult,
   MarketGap as CompetitiveMarketGap,
   StrategyRecommendation as CompetitiveStrategyRecommendation,
-  CompetitiveMove
+  CompetitiveMove,
 } from './competitive';
 
 export interface ConsultingTechnique {
-  name: 'MECE' | 'Pyramid' | 'ValueDriverTree' | 'ZeroBased' | 'ImpactEffort' | 'ValueProp' | 'OptionFraming';
+  name:
+    | 'MECE'
+    | 'Pyramid'
+    | 'ValueDriverTree'
+    | 'ZeroBased'
+    | 'ImpactEffort'
+    | 'ValueProp'
+    | 'OptionFraming';
   relevanceScore: number;
   applicableScenarios: string[];
 }

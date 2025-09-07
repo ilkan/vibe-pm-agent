@@ -20,6 +20,17 @@ describe('MCP Server Startup Tests', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(async () => {
+    if (server) {
+      try {
+        await server.close();
+      } catch (error) {
+        // Ignore cleanup errors in tests
+      }
+      server = null as any;
+    }
+  });
+
   afterAll(() => {
     // Force exit to prevent hanging
     jest.clearAllTimers();

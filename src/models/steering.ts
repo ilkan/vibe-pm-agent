@@ -1,6 +1,6 @@
 /**
  * Steering File System Interfaces and Data Models
- * 
+ *
  * This module defines the core interfaces and types for the steering file integration
  * system that converts PM agent outputs into Kiro steering files.
  */
@@ -15,7 +15,7 @@ export enum DocumentType {
   PRFAQ = 'prfaq',
   TASKS = 'tasks',
   COMPETITIVE_ANALYSIS = 'competitive_analysis',
-  MARKET_SIZING = 'market_sizing'
+  MARKET_SIZING = 'market_sizing',
 }
 
 /**
