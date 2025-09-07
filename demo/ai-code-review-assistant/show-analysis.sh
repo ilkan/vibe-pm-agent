@@ -1,17 +1,15 @@
 #!/bin/bash
 
-# Show Analysis Results - AI Code Review Assistant Demo
-# Displays the generated PM analysis documents in a readable format
+# AI Code Review Assistant - Analysis Results Viewer
+# This script displays all generated PM analysis documents
 
-set -e
-
-echo "🎯 AI Code Review Assistant - PM Analysis Results"
-echo "=================================================="
+echo "🎯 AI Code Review Assistant - Complete PM Analysis Results"
+echo "=========================================================="
 echo ""
 
 # Check if outputs directory exists
 if [ ! -d "outputs" ]; then
-    echo "❌ No outputs directory found. Please run the demo first:"
+    echo "❌ No outputs directory found. Run the demo first:"
     echo "   node run-complete-workflow.js"
     exit 1
 fi
@@ -22,86 +20,144 @@ show_file() {
     local title=$2
     
     if [ -f "outputs/$file" ]; then
-        echo "📊 $title"
-        echo "$(printf '=%.0s' {1..50})"
+        echo "📄 $title"
+        echo "$(printf '=%.0s' {1..60})"
+        if [[ $file == *.md ]]; then
+            cat "outputs/$file"
+        else
+            echo "📊 Key Metrics from $file:"
+            if command -v jq &> /dev/null; then
+                # Use jq for pretty JSON formatting if available
+                case $file in
+                    "workflow-summary.json")
+                        echo "Business Recommendation: $(jq -r '.key_findings.business_opportunity.recommendation' outputs/$file)"
+                        echo "ROI (Balanced): $(jq -r '.key_findings.financial_case.roi_balanced' outputs/$file)"
+                        echo "Strategic Alignment: $(jq -r '.key_findings.strategic_alignment.overall_score' outputs/$file)/100"
+                        echo "Market Timing: $(jq -r '.key_findings.market_timing.recommendation' outputs/$file)"
+                        echo "Average Confidence: $(jq -r '.average_confidence' outputs/$file)%"
+                        echo "Total Citations: $(jq -r '.total_citations' outputs/$file)"
+                        ;;
+                    "strategic-alignment.json")
+                        echo "Overall Alignment Score: $(jq -r '.alignment_assessment.overall_score' outputs/$file)/100"
+                        echo "Mission Alignment: $(jq -r '.alignment_assessment.mission_alignment.score' outputs/$file)/100"
+                        echo "Confidence: $(jq -r '.evidence.confidence_score' outputs/$file)%"
+                        ;;
+                    "market-timing.json")
+                        echo "Recommendation: $(jq -r '.timing_assessment.overall_recommendation' outputs/$file)"
+                        echo "Competitive Window: $(jq -r '.timing_assessment.competitive_window.first_mover_advantage' outputs/$file)"
+                        echo "Confidence: $(jq -r '.timing_assessment.confidence_score' outputs/$file)%"
+                        ;;
+                    "resource-optimization.json")
+                        echo "Recommended Team Size: $(jq -r '.optimization_analysis.recommended_team_structure.total_team_size' outputs/$file)"
+                        echo "Optimized Cost: $(jq -r '.optimization_analysis.resource_constraints.budget_optimization.optimized_estimate' outputs/$file)"
+                        echo "Confidence: $(jq -r '.evidence.confidence_score' outputs/$file)%"
+                        ;;
+                esac
+            else
+                # Fallback to basic grep if jq not available
+                echo "📋 Summary data (install 'jq' for better formatting):"
+                grep -E '"(recommendation|confidence_score|overall_score)"' "outputs/$file" | head -5
+            fi
+        fi
         echo ""
-        head -30 "outputs/$file"
-        echo ""
-        echo "... (showing first 30 lines)"
-        echo ""
-        echo "📄 Full document: outputs/$file"
         echo ""
     else
-        echo "❌ File not found: outputs/$file"
+        echo "⚠️  $file not found"
         echo ""
     fi
 }
 
 # Display executive summary first
-if [ -f "outputs/executive-summary.md" ]; then
-    echo "🎯 EXECUTIVE SUMMARY"
-    echo "$(printf '=%.0s' {1..60})"
-    echo ""
-    cat "outputs/executive-summary.md"
-    echo ""
-    echo "$(printf '=%.0s' {1..60})"
-    echo ""
-fi
-
-# Show individual analyses
-show_file "opportunity-analysis.md" "Business Opportunity Analysis"
-show_file "business-case-analysis.md" "Business Case & ROI Analysis" 
-show_file "communication-analysis.md" "Executive Communication"
-show_file "timing-analysis.md" "Market Timing Validation"
-show_file "alignment-analysis.md" "Strategic Alignment Assessment"
-show_file "optimization-analysis.md" "Resource Optimization"
-
-# Show file statistics
-echo "📈 Analysis Statistics"
-echo "====================="
-echo ""
-echo "Generated Documents:"
-ls -la outputs/ | grep -E '\.(md|txt)$' | wc -l | xargs echo "  • Total files:"
-echo ""
-
-echo "Document Sizes:"
-for file in outputs/*.md; do
-    if [ -f "$file" ]; then
-        filename=$(basename "$file")
-        lines=$(wc -l < "$file")
-        words=$(wc -w < "$file")
-        echo "  • $filename: $lines lines, $words words"
+echo "🎯 EXECUTIVE SUMMARY"
+echo "==================="
+if [ -f "outputs/workflow-summary.json" ]; then
+    if command -v jq &> /dev/null; then
+        echo "📊 Key Findings:"
+        echo "   • Business Decision: $(jq -r '.key_findings.business_opportunity.recommendation' outputs/workflow-summary.json)"
+        echo "   • ROI (Balanced): $(jq -r '.key_findings.financial_case.roi_balanced' outputs/workflow-summary.json)"
+        echo "   • Payback Period: $(jq -r '.key_findings.financial_case.payback_period' outputs/workflow-summary.json)"
+        echo "   • Strategic Alignment: $(jq -r '.key_findings.strategic_alignment.overall_score' outputs/workflow-summary.json)/100"
+        echo "   • Market Timing: $(jq -r '.key_findings.market_timing.recommendation' outputs/workflow-summary.json)"
+        echo "   • Average Confidence: $(jq -r '.average_confidence' outputs/workflow-summary.json)%"
+        echo "   • Total Citations: $(jq -r '.total_citations' outputs/workflow-summary.json)"
+        echo ""
     fi
-done
-echo ""
-
-echo "Key Metrics Summary:"
-if [ -f "outputs/executive-summary.md" ]; then
-    echo "  • ROI: $(grep -o '[0-9]\+%' outputs/executive-summary.md | head -1 || echo 'N/A')"
-    echo "  • Payback Period: $(grep -o '[0-9]\+ months' outputs/executive-summary.md | head -1 || echo 'N/A')"
-    echo "  • Market Timing Score: $(grep -o '[0-9]\+/10' outputs/executive-summary.md | head -1 || echo 'N/A')"
-    echo "  • Strategic Alignment: $(grep -o '[0-9]\+/10' outputs/executive-summary.md | tail -1 || echo 'N/A')"
 fi
-echo ""
 
-echo "💡 Key Insights:"
-echo "  • Complete PM workflow from opportunity to execution plan"
-echo "  • All analyses backed by authoritative sources (McKinsey, Gartner, BCG)"
-echo "  • Executive-ready documents suitable for board presentations"
-echo "  • Strong business case with quantified ROI and risk mitigation"
-echo "  • Optimal market timing with strategic alignment validation"
-echo ""
+# Show main documents
+show_file "business-opportunity-analysis.md" "1. BUSINESS OPPORTUNITY ANALYSIS"
+show_file "business-case.md" "2. COMPREHENSIVE BUSINESS CASE"
+show_file "executive-onepager.md" "3. EXECUTIVE ONE-PAGER"
 
-echo "🔄 Next Steps:"
-echo "  1. Review detailed analyses in outputs/ directory"
-echo "  2. Use executive-summary.md for stakeholder presentations"
-echo "  3. Proceed to Kiro Spec Mode for technical requirements"
-echo "  4. Use Kiro Vibe Mode for implementation"
-echo ""
+# Show supporting analysis
+show_file "strategic-alignment.json" "4. STRATEGIC ALIGNMENT ASSESSMENT"
+show_file "market-timing.json" "5. MARKET TIMING VALIDATION"
+show_file "resource-optimization.json" "6. RESOURCE OPTIMIZATION ANALYSIS"
 
-echo "📚 PM Mode Benefits Demonstrated:"
-echo "  • Strategic WHY analysis before technical WHAT/HOW"
-echo "  • Professional consulting-grade business documentation"
-echo "  • Risk-assessed investment recommendations"
-echo "  • Market-validated timing and competitive positioning"
-echo "  • Resource-optimized implementation planning"
+# Show workflow summary
+show_file "workflow-summary.json" "7. WORKFLOW SUMMARY & METRICS"
+
+echo "🎯 CITATION ANALYSIS"
+echo "==================="
+echo "📚 Evidence Quality Assessment:"
+
+# Count citations across all files
+total_citations=0
+if command -v jq &> /dev/null; then
+    for file in outputs/*.json; do
+        if [ -f "$file" ]; then
+            citations=$(jq -r 'try .evidence.citations | length // 0' "$file" 2>/dev/null)
+            if [ "$citations" != "null" ] && [ "$citations" -gt 0 ]; then
+                total_citations=$((total_citations + citations))
+                filename=$(basename "$file")
+                echo "   • $filename: $citations citations"
+            fi
+        fi
+    done
+    echo "   • Total Citations: $total_citations"
+else
+    echo "   • Install 'jq' for detailed citation analysis"
+    citation_count=$(grep -r "citation" outputs/ | wc -l)
+    echo "   • Estimated Citations: ~$citation_count references"
+fi
+
+echo ""
+echo "🔍 CONFIDENCE SCORING"
+echo "===================="
+echo "📊 Analysis Confidence Levels:"
+
+if command -v jq &> /dev/null; then
+    for file in outputs/*.json; do
+        if [ -f "$file" ]; then
+            confidence=$(jq -r 'try .evidence.confidence_score // try .timing_assessment.confidence_score // try .alignment_assessment.overall_score // "N/A"' "$file" 2>/dev/null)
+            if [ "$confidence" != "null" ] && [ "$confidence" != "N/A" ]; then
+                filename=$(basename "$file" .json)
+                echo "   • $filename: $confidence%"
+            fi
+        fi
+    done
+fi
+
+echo ""
+echo "📁 FILES GENERATED"
+echo "=================="
+echo "📄 Markdown Documents (Human-Readable):"
+ls -la outputs/*.md 2>/dev/null | awk '{print "   • " $9 " (" $5 " bytes)"}' || echo "   No markdown files found"
+
+echo ""
+echo "📊 JSON Data Files (Machine-Readable):"
+ls -la outputs/*.json 2>/dev/null | awk '{print "   • " $9 " (" $5 " bytes)"}' || echo "   No JSON files found"
+
+echo ""
+echo "✅ Analysis Complete!"
+echo ""
+echo "💡 Next Steps:"
+echo "   1. Review executive-onepager.md for management presentation"
+echo "   2. Use business-case.md for detailed financial analysis"
+echo "   3. Reference strategic-alignment.json for OKR mapping"
+echo "   4. Check market-timing.json for competitive positioning"
+echo ""
+echo "🔧 Technical Details:"
+echo "   • Run 'cat outputs/workflow-summary.json | jq' for full metrics"
+echo "   • All outputs include confidence scores and citations"
+echo "   • Documents follow professional PM frameworks (MECE, Pyramid Principle)"
