@@ -18,8 +18,8 @@ describe('PM-Focused MCP Tool Schemas', () => {
         roi_inputs: {
           cost_naive: 100000,
           cost_balanced: 60000,
-          cost_bold: 30000
-        }
+          cost_bold: 30000,
+        },
       };
 
       const result = registry.validateToolInput('generate_management_onepager', validInput);
@@ -30,7 +30,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
     test('should validate input with only required fields', () => {
       const validInput = {
         requirements: 'System must provide urgent quota optimization',
-        design: 'MCP server architecture with multi-stage pipeline'
+        design: 'MCP server architecture with multi-stage pipeline',
       };
 
       const result = registry.validateToolInput('generate_management_onepager', validInput);
@@ -39,7 +39,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
 
     test('should reject input missing required fields', () => {
       const invalidInput = {
-        requirements: 'System must provide urgent quota optimization'
+        requirements: 'System must provide urgent quota optimization',
         // Missing design field
       };
 
@@ -64,7 +64,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
       const validInput = {
         requirements: 'System must provide urgent quota optimization',
         design: 'MCP server architecture with multi-stage pipeline',
-        target_date: '2024-06-15'
+        target_date: '2024-06-15',
       };
 
       const result = registry.validateToolInput('generate_pr_faq', validInput);
@@ -74,7 +74,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
     test('should validate input with only required fields', () => {
       const validInput = {
         requirements: 'System must provide urgent quota optimization',
-        design: 'MCP server architecture with multi-stage pipeline'
+        design: 'MCP server architecture with multi-stage pipeline',
       };
 
       const result = registry.validateToolInput('generate_pr_faq', validInput);
@@ -83,7 +83,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
 
     test('should reject input missing required fields', () => {
       const invalidInput = {
-        design: 'MCP server architecture with multi-stage pipeline'
+        design: 'MCP server architecture with multi-stage pipeline',
         // Missing requirements field
       };
 
@@ -111,10 +111,10 @@ describe('PM-Focused MCP Tool Schemas', () => {
           budget: 100000,
           quotas: {
             maxVibes: 1000,
-            maxSpecs: 50
+            maxSpecs: 50,
           },
-          deadlines: 'Q1 2024 launch target'
-        }
+          deadlines: 'Q1 2024 launch target',
+        },
       };
 
       const result = registry.validateToolInput('generate_requirements', validInput);
@@ -123,7 +123,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
 
     test('should validate input with only required field', () => {
       const validInput = {
-        raw_intent: 'I want to optimize my workflow to reduce quota consumption'
+        raw_intent: 'I want to optimize my workflow to reduce quota consumption',
       };
 
       const result = registry.validateToolInput('generate_requirements', validInput);
@@ -133,8 +133,8 @@ describe('PM-Focused MCP Tool Schemas', () => {
     test('should reject input missing required field', () => {
       const invalidInput = {
         context: {
-          roadmap_theme: 'Developer Experience'
-        }
+          roadmap_theme: 'Developer Experience',
+        },
         // Missing raw_intent field
       };
 
@@ -155,7 +155,8 @@ describe('PM-Focused MCP Tool Schemas', () => {
   describe('generate_design_options schema', () => {
     test('should validate valid input', () => {
       const validInput = {
-        requirements: 'System must provide urgent quota optimization with consulting-grade analysis'
+        requirements:
+          'System must provide urgent quota optimization with consulting-grade analysis',
       };
 
       const result = registry.validateToolInput('generate_design_options', validInput);
@@ -185,8 +186,8 @@ describe('PM-Focused MCP Tool Schemas', () => {
         limits: {
           max_vibes: 1000,
           max_specs: 50,
-          budget_usd: 100000
-        }
+          budget_usd: 100000,
+        },
       };
 
       const result = registry.validateToolInput('generate_task_plan', validInput);
@@ -195,7 +196,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
 
     test('should validate input with only required field', () => {
       const validInput = {
-        design: 'MCP server architecture with multi-stage pipeline and PM document generation'
+        design: 'MCP server architecture with multi-stage pipeline and PM document generation',
       };
 
       const result = registry.validateToolInput('generate_task_plan', validInput);
@@ -205,8 +206,8 @@ describe('PM-Focused MCP Tool Schemas', () => {
     test('should reject input missing required field', () => {
       const invalidInput = {
         limits: {
-          max_vibes: 1000
-        }
+          max_vibes: 1000,
+        },
         // Missing design field
       };
 
@@ -227,7 +228,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
   describe('Tool Registry Integration', () => {
     test('should register all PM-focused tools', () => {
       const toolNames = registry.getToolNames();
-      
+
       expect(toolNames).toContain('generate_management_onepager');
       expect(toolNames).toContain('generate_pr_faq');
       expect(toolNames).toContain('generate_requirements');
@@ -263,11 +264,14 @@ describe('PM-Focused MCP Tool Schemas', () => {
     test('should handle empty string inputs appropriately', () => {
       const inputWithEmptyStrings = {
         requirements: '',
-        design: ''
+        design: '',
       };
 
       // Empty strings should still pass basic validation (business logic validation happens later)
-      const result = registry.validateToolInput('generate_management_onepager', inputWithEmptyStrings);
+      const result = registry.validateToolInput(
+        'generate_management_onepager',
+        inputWithEmptyStrings
+      );
       expect(result.valid).toBe(true);
     });
 
@@ -276,7 +280,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
         requirements: 'Valid requirements',
         design: 'Valid design',
         tasks: null,
-        roi_inputs: undefined
+        roi_inputs: undefined,
       };
 
       const result = registry.validateToolInput('generate_management_onepager', inputWithNulls);
@@ -289,9 +293,9 @@ describe('PM-Focused MCP Tool Schemas', () => {
         context: {
           quotas: {
             maxVibes: 1000,
-            maxSpecs: 50
-          }
-        }
+            maxSpecs: 50,
+          },
+        },
       };
 
       const result = registry.validateToolInput('generate_requirements', inputWithNestedObjects);

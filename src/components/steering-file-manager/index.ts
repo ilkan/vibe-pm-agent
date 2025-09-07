@@ -1,18 +1,18 @@
 /**
  * SteeringFileManager Component
- * 
+ *
  * Handles file system operations for steering files including saving, conflict detection,
  * and intelligent filename generation.
  */
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { 
-  SteeringFile, 
-  SaveResult, 
-  ConflictInfo, 
+import {
+  SteeringFile,
+  SaveResult,
+  ConflictInfo,
   DocumentType,
-  SteeringFileStats 
+  SteeringFileStats,
 } from '../../models/steering';
 import {
   SteeringFileValidator,
@@ -20,7 +20,7 @@ import {
   SteeringFallbacks,
   SteeringOperationWrapper,
   FileSystemError,
-  ValidationError
+  ValidationError,
 } from '../../utils/steering-error-handling';
 
 /**
@@ -44,7 +44,7 @@ const DEFAULT_CONFIG: SteeringFileManagerConfig = {
   steeringDirectory: '.kiro/steering',
   createBackups: true,
   maxVersions: 5,
-  validateContent: true
+  validateContent: true,
 };
 
 /**
@@ -61,7 +61,7 @@ export class SteeringFileManager {
       filesUpdated: 0,
       conflictsEncountered: 0,
       documentTypesProcessed: [],
-      processingTimeMs: 0
+      processingTimeMs: 0,
     };
   }
 
@@ -70,101 +70,98 @@ export class SteeringFileManager {
    */
   async saveSteeringFile(steeringFile: SteeringFile): Promise<SaveResult> {
     const startTime = Date.now();
-    
+
     SteeringLogger.info('Starting steering file save operation', {
       filename: steeringFile.filename,
       documentType: steeringFile.frontMatter.documentType,
-      featureName: steeringFile.frontMatter.featureName
+      featureName: steeringFile.frontMatter.featureName,
     });
 
-    const result = await SteeringOperationWrapper.executeWithErrorHandling(
-      async () => {
-        // Validate steering file content first
-        if (this.config.validateContent) {
-          const validationResult = SteeringFileValidator.validateSteeringFile(steeringFile);
-          
-          if (!validationResult.isValid) {
-            SteeringLogger.warn('Steering file validation failed, attempting recovery', {
-              errors: validationResult.errors.map(e => e.message),
-              warnings: validationResult.warnings
-            });
+    const result = await SteeringOperationWrapper.executeWithErrorHandling(async () => {
+      // Validate steering file content first
+      if (this.config.validateContent) {
+        const validationResult = SteeringFileValidator.validateSteeringFile(steeringFile);
 
-            // Attempt to create a fallback steering file
-            const fallbackFile = SteeringFallbacks.createFallbackSteeringFile(
-              steeringFile.frontMatter.documentType,
-              steeringFile.frontMatter.featureName,
-              steeringFile.content,
-              steeringFile.frontMatter
-            );
-
-            // Use fallback if original is severely broken
-            if (validationResult.errors.length > 3) {
-              steeringFile = fallbackFile;
-              SteeringLogger.info('Using fallback steering file due to severe validation errors');
-            } else {
-              // Try to fix minor issues
-              steeringFile = this.attemptValidationFixes(steeringFile, validationResult);
-            }
-          } else if (validationResult.warnings.length > 0) {
-            SteeringLogger.warn('Steering file validation warnings', {
-              warnings: validationResult.warnings,
-              suggestions: validationResult.suggestions
-            });
-          }
-        }
-
-        // Ensure steering directory exists
-        await this.ensureSteeringDirectoryWithErrorHandling();
-
-        // Check for conflicts with enhanced error handling
-        const conflictInfo = await this.checkConflictsWithErrorHandling(steeringFile.filename);
-        
-        if (conflictInfo.exists) {
-          this.stats.conflictsEncountered++;
-          SteeringLogger.info('Conflict detected, resolving', {
-            existingFile: conflictInfo.existingFile,
-            suggestedAction: conflictInfo.suggestedAction
+        if (!validationResult.isValid) {
+          SteeringLogger.warn('Steering file validation failed, attempting recovery', {
+            errors: validationResult.errors.map(e => e.message),
+            warnings: validationResult.warnings,
           });
-          
-          const resolvedFilename = await this.resolveConflict(steeringFile, conflictInfo);
-          steeringFile.filename = resolvedFilename;
+
+          // Attempt to create a fallback steering file
+          const fallbackFile = SteeringFallbacks.createFallbackSteeringFile(
+            steeringFile.frontMatter.documentType,
+            steeringFile.frontMatter.featureName,
+            steeringFile.content,
+            steeringFile.frontMatter
+          );
+
+          // Use fallback if original is severely broken
+          if (validationResult.errors.length > 3) {
+            steeringFile = fallbackFile;
+            SteeringLogger.info('Using fallback steering file due to severe validation errors');
+          } else {
+            // Try to fix minor issues
+            steeringFile = this.attemptValidationFixes(steeringFile, validationResult);
+          }
+        } else if (validationResult.warnings.length > 0) {
+          SteeringLogger.warn('Steering file validation warnings', {
+            warnings: validationResult.warnings,
+            suggestions: validationResult.suggestions,
+          });
         }
+      }
 
-        // Generate full file path
-        const fullPath = path.join(this.config.steeringDirectory, steeringFile.filename);
-        steeringFile.fullPath = fullPath;
+      // Ensure steering directory exists
+      await this.ensureSteeringDirectoryWithErrorHandling();
 
-        // Create backup if file exists and backups are enabled
-        if (this.config.createBackups && await this.fileExists(fullPath)) {
-          await this.createBackupWithErrorHandling(fullPath);
-        }
+      // Check for conflicts with enhanced error handling
+      const conflictInfo = await this.checkConflictsWithErrorHandling(steeringFile.filename);
 
-        // Generate the complete file content
-        const fileContent = this.generateFileContent(steeringFile);
-
-        // Write the file with error handling
-        await this.writeFileWithErrorHandling(fullPath, fileContent);
-
-        // Update statistics
-        const action = conflictInfo.exists ? 'updated' : 'created';
-        this.updateStats(action, steeringFile.frontMatter.documentType);
-
-        SteeringLogger.info('Steering file saved successfully', {
-          filename: steeringFile.filename,
-          action,
-          fullPath
+      if (conflictInfo.exists) {
+        this.stats.conflictsEncountered++;
+        SteeringLogger.info('Conflict detected, resolving', {
+          existingFile: conflictInfo.existingFile,
+          suggestedAction: conflictInfo.suggestedAction,
         });
 
-        return {
-          success: true,
-          filename: steeringFile.filename,
-          action: action as 'created' | 'updated',
-          message: `Steering file ${action} successfully`,
-          fullPath
-        };
-      },
-      'saveSteeringFile'
-    );
+        const resolvedFilename = await this.resolveConflict(steeringFile, conflictInfo);
+        steeringFile.filename = resolvedFilename;
+      }
+
+      // Generate full file path
+      const fullPath = path.join(this.config.steeringDirectory, steeringFile.filename);
+      steeringFile.fullPath = fullPath;
+
+      // Create backup if file exists and backups are enabled
+      if (this.config.createBackups && (await this.fileExists(fullPath))) {
+        await this.createBackupWithErrorHandling(fullPath);
+      }
+
+      // Generate the complete file content
+      const fileContent = this.generateFileContent(steeringFile);
+
+      // Write the file with error handling
+      await this.writeFileWithErrorHandling(fullPath, fileContent);
+
+      // Update statistics
+      const action = conflictInfo.exists ? 'updated' : 'created';
+      this.updateStats(action, steeringFile.frontMatter.documentType);
+
+      SteeringLogger.info('Steering file saved successfully', {
+        filename: steeringFile.filename,
+        action,
+        fullPath,
+      });
+
+      return {
+        success: true,
+        filename: steeringFile.filename,
+        action: action as 'created' | 'updated',
+        message: `Steering file ${action} successfully`,
+        fullPath,
+      };
+    }, 'saveSteeringFile');
 
     this.stats.processingTimeMs += Date.now() - startTime;
 
@@ -172,18 +169,18 @@ export class SteeringFileManager {
       SteeringLogger.error('Failed to save steering file', {
         filename: steeringFile.filename,
         error: result.error?.message,
-        recoveryApplied: result.recoveryApplied
+        recoveryApplied: result.recoveryApplied,
       });
 
       return {
         success: false,
         filename: steeringFile.filename,
         action: 'skipped',
-        message: result.recoveryApplied 
+        message: result.recoveryApplied
           ? `Save failed but recovery applied: ${result.recoveryApplied}`
           : `Failed to save steering file: ${result.error?.message || 'Unknown error'}`,
         fullPath: steeringFile.fullPath,
-        warnings: result.error ? [result.error.message] : undefined
+        warnings: result.error ? [result.error.message] : undefined,
       };
     }
 
@@ -195,14 +192,14 @@ export class SteeringFileManager {
    */
   async checkConflicts(filename: string): Promise<ConflictInfo> {
     const fullPath = path.join(this.config.steeringDirectory, filename);
-    
+
     try {
       const exists = await this.fileExists(fullPath);
-      
+
       if (!exists) {
         return {
           exists: false,
-          suggestedAction: 'update'
+          suggestedAction: 'update',
         };
       }
 
@@ -214,17 +211,16 @@ export class SteeringFileManager {
         exists: true,
         existingFile: fullPath,
         suggestedAction: isRecent ? 'version' : 'update',
-        reason: isRecent 
+        reason: isRecent
           ? 'File was modified recently, consider versioning'
           : 'File exists but is older, safe to update',
-        suggestedFilename: isRecent ? this.generateVersionedFilename(filename) : filename
+        suggestedFilename: isRecent ? this.generateVersionedFilename(filename) : filename,
       };
-
     } catch (error) {
       return {
         exists: false,
         suggestedAction: 'update',
-        reason: `Could not check file status: ${error instanceof Error ? error.message : 'Unknown error'}`
+        reason: `Could not check file status: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }
@@ -235,10 +231,10 @@ export class SteeringFileManager {
   resolveNaming(baseName: string, documentType: string): string {
     // Sanitize base name
     const sanitizedBaseName = this.sanitizeFilename(baseName);
-    
+
     // Generate filename based on document type
     const typePrefix = this.getDocumentTypePrefix(documentType);
-    
+
     // Combine parts
     let filename: string;
     if (typePrefix) {
@@ -279,7 +275,7 @@ export class SteeringFileManager {
       filesUpdated: 0,
       conflictsEncountered: 0,
       documentTypesProcessed: [],
-      processingTimeMs: 0
+      processingTimeMs: 0,
     };
   }
 
@@ -299,7 +295,9 @@ export class SteeringFileManager {
     } catch {
       try {
         await fs.mkdir(this.config.steeringDirectory, { recursive: true });
-        SteeringLogger.info('Created steering directory', { directory: this.config.steeringDirectory });
+        SteeringLogger.info('Created steering directory', {
+          directory: this.config.steeringDirectory,
+        });
       } catch (error) {
         throw new FileSystemError(
           `Failed to create steering directory: ${this.config.steeringDirectory}`,
@@ -316,13 +314,13 @@ export class SteeringFileManager {
     } catch (error) {
       SteeringLogger.warn('Error checking for conflicts, assuming no conflict', {
         filename,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
-      
+
       return {
         exists: false,
         suggestedAction: 'update',
-        reason: 'Could not check for conflicts due to error'
+        reason: 'Could not check for conflicts due to error',
       };
     }
   }
@@ -336,7 +334,7 @@ export class SteeringFileManager {
       // Backup failure shouldn't prevent the main operation
       SteeringLogger.warn('Failed to create backup file', {
         filePath,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -355,7 +353,7 @@ export class SteeringFileManager {
 
   private attemptValidationFixes(steeringFile: SteeringFile, validationResult: any): SteeringFile {
     const fixedFile = { ...steeringFile };
-    
+
     // Fix common validation issues
     for (const error of validationResult.errors) {
       if (error.field === 'filename' && !fixedFile.filename.endsWith('.md')) {
@@ -363,20 +361,23 @@ export class SteeringFileManager {
           fixedFile.filename,
           fixedFile.frontMatter.documentType
         );
-        SteeringLogger.info('Fixed filename validation issue', { 
+        SteeringLogger.info('Fixed filename validation issue', {
           original: steeringFile.filename,
-          fixed: fixedFile.filename
+          fixed: fixedFile.filename,
         });
       }
-      
-      if (error.field === 'content' && (!fixedFile.content || fixedFile.content.trim().length === 0)) {
+
+      if (
+        error.field === 'content' &&
+        (!fixedFile.content || fixedFile.content.trim().length === 0)
+      ) {
         fixedFile.content = SteeringFallbacks.generateMinimalContent(
           fixedFile.frontMatter.documentType,
           fixedFile.frontMatter.featureName
         );
         SteeringLogger.info('Fixed empty content validation issue');
       }
-      
+
       if (error.field === 'generatedAt' && fixedFile.frontMatter.generatedAt) {
         try {
           new Date(fixedFile.frontMatter.generatedAt);
@@ -386,7 +387,7 @@ export class SteeringFileManager {
         }
       }
     }
-    
+
     return fixedFile;
   }
 
@@ -411,12 +412,17 @@ export class SteeringFileManager {
     }
   }
 
-  private async resolveConflict(steeringFile: SteeringFile, conflictInfo: ConflictInfo): Promise<string> {
+  private async resolveConflict(
+    steeringFile: SteeringFile,
+    conflictInfo: ConflictInfo
+  ): Promise<string> {
     switch (conflictInfo.suggestedAction) {
       case 'version':
         return this.generateVersionedFilename(steeringFile.filename);
       case 'rename':
-        return conflictInfo.suggestedFilename || this.generateVersionedFilename(steeringFile.filename);
+        return (
+          conflictInfo.suggestedFilename || this.generateVersionedFilename(steeringFile.filename)
+        );
       case 'update':
       default:
         return steeringFile.filename;
@@ -459,10 +465,7 @@ export class SteeringFileManager {
 
   private generateFileContent(steeringFile: SteeringFile): string {
     // Generate front-matter YAML
-    const frontMatterLines = [
-      '---',
-      `inclusion: ${steeringFile.frontMatter.inclusion}`,
-    ];
+    const frontMatterLines = ['---', `inclusion: ${steeringFile.frontMatter.inclusion}`];
 
     if (steeringFile.frontMatter.fileMatchPattern) {
       frontMatterLines.push(`fileMatchPattern: '${steeringFile.frontMatter.fileMatchPattern}'`);
@@ -499,7 +502,7 @@ export class SteeringFileManager {
       [DocumentType.DESIGN]: 'design',
       [DocumentType.ONEPAGER]: 'onepager',
       [DocumentType.PRFAQ]: 'prfaq',
-      [DocumentType.TASKS]: 'tasks'
+      [DocumentType.TASKS]: 'tasks',
     };
 
     return prefixMap[documentType] || '';

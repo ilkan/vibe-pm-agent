@@ -11,7 +11,7 @@ import {
   SteeringFileError,
   ValidationError,
   FileSystemError,
-  ContentProcessingError
+  ContentProcessingError,
 } from '../../utils/steering-error-handling';
 import { DocumentType, SteeringFile, FrontMatter } from '../../models/steering';
 import * as fs from 'fs/promises';
@@ -31,10 +31,10 @@ describe('SteeringFileValidator', () => {
           generatedBy: 'vibe-pm-agent',
           generatedAt: '2024-01-01T00:00:00.000Z',
           featureName: 'test-feature',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: '# Test Feature\n\nThis is a test steering file with sufficient content.',
-        references: ['#[[file:.kiro/specs/test-feature/design.md]]']
+        references: ['#[[file:.kiro/specs/test-feature/design.md]]'],
       };
 
       const result = SteeringFileValidator.validateSteeringFile(validSteeringFile);
@@ -51,10 +51,10 @@ describe('SteeringFileValidator', () => {
           generatedBy: 'test',
           generatedAt: '2024-01-01T00:00:00.000Z',
           featureName: '',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       const result = SteeringFileValidator.validateSteeringFile(invalidSteeringFile);
@@ -71,10 +71,10 @@ describe('SteeringFileValidator', () => {
           generatedBy: 'test',
           generatedAt: '2024-01-01T00:00:00.000Z',
           featureName: 'test',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       const result = SteeringFileValidator.validateSteeringFile(invalidSteeringFile);
@@ -91,10 +91,10 @@ describe('SteeringFileValidator', () => {
           generatedBy: 'test',
           generatedAt: '2024-01-01T00:00:00.000Z',
           featureName: 'test',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       const result = SteeringFileValidator.validateSteeringFile(invalidSteeringFile);
@@ -111,10 +111,10 @@ describe('SteeringFileValidator', () => {
           generatedBy: 'test',
           generatedAt: '2024-01-01T00:00:00.000Z',
           featureName: 'test',
-          documentType: DocumentType.REQUIREMENTS
+          documentType: DocumentType.REQUIREMENTS,
         },
         content: 'Test content',
-        references: []
+        references: [],
       };
 
       const result = SteeringFileValidator.validateSteeringFile(steeringFile);
@@ -153,7 +153,10 @@ As a developer, I want to create requirements, so that I can build features.
     it('should warn about missing requirements language', () => {
       const content = 'This is just some random text without proper documentation.';
 
-      const result = SteeringFileValidator.validatePMAgentDocument(content, DocumentType.REQUIREMENTS);
+      const result = SteeringFileValidator.validatePMAgentDocument(
+        content,
+        DocumentType.REQUIREMENTS
+      );
 
       expect(result.isValid).toBe(true); // Content is valid but has warnings
       expect(result.warnings.length).toBeGreaterThan(0);
@@ -172,7 +175,10 @@ This describes the system architecture.
 - Component B
       `;
 
-      const result = SteeringFileValidator.validatePMAgentDocument(designContent, DocumentType.DESIGN);
+      const result = SteeringFileValidator.validatePMAgentDocument(
+        designContent,
+        DocumentType.DESIGN
+      );
 
       expect(result.isValid).toBe(true);
     });
@@ -239,7 +245,10 @@ describe('SteeringFallbacks', () => {
   describe('generateSafeFilename', () => {
     it('should generate safe filename from invalid input', () => {
       const unsafeFilename = 'test<>:|?*.txt';
-      const safeFilename = SteeringFallbacks.generateSafeFilename(unsafeFilename, DocumentType.REQUIREMENTS);
+      const safeFilename = SteeringFallbacks.generateSafeFilename(
+        unsafeFilename,
+        DocumentType.REQUIREMENTS
+      );
 
       expect(safeFilename).toMatch(/\.md$/);
       expect(safeFilename).not.toMatch(/[<>:|?*]/);
@@ -253,7 +262,10 @@ describe('SteeringFallbacks', () => {
 
     it('should preserve valid parts of filename', () => {
       const filename = 'valid-feature-name.md';
-      const safeFilename = SteeringFallbacks.generateSafeFilename(filename, DocumentType.REQUIREMENTS);
+      const safeFilename = SteeringFallbacks.generateSafeFilename(
+        filename,
+        DocumentType.REQUIREMENTS
+      );
 
       expect(safeFilename).toBe('valid-feature-name.md');
     });
@@ -261,7 +273,10 @@ describe('SteeringFallbacks', () => {
 
   describe('generateMinimalContent', () => {
     it('should generate minimal content for each document type', () => {
-      const content = SteeringFallbacks.generateMinimalContent(DocumentType.REQUIREMENTS, 'test-feature');
+      const content = SteeringFallbacks.generateMinimalContent(
+        DocumentType.REQUIREMENTS,
+        'test-feature'
+      );
 
       expect(content).toContain('Requirements Guidance: test-feature');
       expect(content).toContain('Generated:');
@@ -293,7 +308,7 @@ describe('SteeringFallbacks', () => {
       const originalFrontMatter = {
         inclusion: 'fileMatch' as const,
         fileMatchPattern: 'test*',
-        description: 'Original description'
+        description: 'Original description',
       };
 
       const frontMatter = SteeringFallbacks.generateSafeFrontMatter(
@@ -332,7 +347,7 @@ describe('SteeringErrorRecovery', () => {
         attemptCount: 1,
         maxAttempts: 3,
         lastError: error,
-        fallbackOptions: []
+        fallbackOptions: [],
       };
 
       const strategy = SteeringErrorRecovery.determineRecoveryStrategy(error, context);
@@ -349,7 +364,7 @@ describe('SteeringErrorRecovery', () => {
         attemptCount: 1,
         maxAttempts: 3,
         lastError: error,
-        fallbackOptions: []
+        fallbackOptions: [],
       };
 
       const strategy = SteeringErrorRecovery.determineRecoveryStrategy(error, context);
@@ -366,7 +381,7 @@ describe('SteeringErrorRecovery', () => {
         attemptCount: 1,
         maxAttempts: 3,
         lastError: error,
-        fallbackOptions: []
+        fallbackOptions: [],
       };
 
       const strategy = SteeringErrorRecovery.determineRecoveryStrategy(error, context);
@@ -382,7 +397,7 @@ describe('SteeringErrorRecovery', () => {
         attemptCount: 1,
         maxAttempts: 3,
         lastError: error,
-        fallbackOptions: []
+        fallbackOptions: [],
       };
 
       const strategy = SteeringErrorRecovery.determineRecoveryStrategy(error, context);
@@ -397,14 +412,14 @@ describe('SteeringErrorRecovery', () => {
       const strategy = {
         canRecover: true,
         strategy: 'retry' as const,
-        message: 'Retrying operation'
+        message: 'Retrying operation',
       };
       const context = {
         operation: 'test',
         attemptCount: 1,
         maxAttempts: 3,
         lastError: new Error('Test error'),
-        fallbackOptions: []
+        fallbackOptions: [],
       };
 
       const result = await SteeringErrorRecovery.executeRecovery(strategy, context);
@@ -420,14 +435,14 @@ describe('SteeringErrorRecovery', () => {
         message: 'Using fallback',
         action: async () => {
           actionExecuted = true;
-        }
+        },
       };
       const context = {
         operation: 'test',
         attemptCount: 1,
         maxAttempts: 3,
         lastError: new Error('Test error'),
-        fallbackOptions: []
+        fallbackOptions: [],
       };
 
       const result = await SteeringErrorRecovery.executeRecovery(strategy, context);
@@ -440,14 +455,14 @@ describe('SteeringErrorRecovery', () => {
       const strategy = {
         canRecover: false,
         strategy: 'skip' as const,
-        message: 'Skipping operation'
+        message: 'Skipping operation',
       };
       const context = {
         operation: 'test',
         attemptCount: 3,
         maxAttempts: 3,
         lastError: new Error('Test error'),
-        fallbackOptions: []
+        fallbackOptions: [],
       };
 
       const result = await SteeringErrorRecovery.executeRecovery(strategy, context);
@@ -476,7 +491,8 @@ describe('SteeringOperationWrapper', () => {
   });
 
   it('should retry failed operations', async () => {
-    const operation = jest.fn()
+    const operation = jest
+      .fn()
       .mockRejectedValueOnce(new Error('First failure'))
       .mockRejectedValueOnce(new Error('Second failure'))
       .mockResolvedValue('success');
@@ -508,15 +524,12 @@ describe('SteeringOperationWrapper', () => {
   });
 
   it('should log operation attempts', async () => {
-    const operation = jest.fn()
+    const operation = jest
+      .fn()
       .mockRejectedValueOnce(new Error('First failure'))
       .mockResolvedValue('success');
 
-    await SteeringOperationWrapper.executeWithErrorHandling(
-      operation,
-      'testOperation',
-      2
-    );
+    await SteeringOperationWrapper.executeWithErrorHandling(operation, 'testOperation', 2);
 
     const logs = SteeringLogger.getLogs();
     expect(logs.some(log => log.message.includes('Executing testOperation'))).toBe(true);

@@ -9,7 +9,7 @@ import {
   ConfidenceComponent,
   UncertaintyFactor,
   ConfidenceRecommendation,
-  UncertaintyIndicator
+  UncertaintyIndicator,
 } from '../../utils/confidence-scoring';
 
 import {
@@ -21,7 +21,7 @@ import {
   StrategyRecommendation,
   MarketAssumption,
   ConfidenceInterval,
-  SOURCE_RELIABILITY_THRESHOLDS
+  SOURCE_RELIABILITY_THRESHOLDS,
 } from '../../models/competitive';
 
 describe('ConfidenceScorer', () => {
@@ -47,7 +47,7 @@ describe('ConfidenceScorer', () => {
               model: 'subscription',
               startingPrice: 99,
               currency: 'USD',
-              valueProposition: 'Enterprise solution'
+              valueProposition: 'Enterprise solution',
             },
             targetMarket: ['Enterprise'],
             recentMoves: [
@@ -56,9 +56,9 @@ describe('ConfidenceScorer', () => {
                 type: 'product-launch',
                 description: 'New feature launch',
                 impact: 'medium',
-                strategicImplication: 'Increased competition'
-              }
-            ]
+                strategicImplication: 'Increased competition',
+              },
+            ],
           },
           {
             name: 'Competitor B',
@@ -70,19 +70,19 @@ describe('ConfidenceScorer', () => {
               model: 'freemium',
               startingPrice: 0,
               currency: 'USD',
-              valueProposition: 'Cost-effective'
+              valueProposition: 'Cost-effective',
             },
             targetMarket: ['SMB'],
-            recentMoves: []
-          }
+            recentMoves: [],
+          },
         ],
         evaluationCriteria: [
           {
             name: 'Market Share',
             weight: 0.3,
             description: 'Current market position',
-            measurementType: 'quantitative'
-          }
+            measurementType: 'quantitative',
+          },
         ],
         rankings: [
           {
@@ -90,8 +90,8 @@ describe('ConfidenceScorer', () => {
             overallScore: 8.5,
             criteriaScores: { 'Market Share': 9.0 },
             rank: 1,
-            competitiveAdvantage: ['Strong brand']
-          }
+            competitiveAdvantage: ['Strong brand'],
+          },
         ],
         differentiationOpportunities: ['Focus on SMB market'],
         marketContext: {
@@ -100,27 +100,21 @@ describe('ConfidenceScorer', () => {
           targetSegment: 'Enterprise',
           marketMaturity: 'growth',
           regulatoryEnvironment: ['GDPR'],
-          technologyTrends: ['AI integration']
-        }
+          technologyTrends: ['AI integration'],
+        },
       },
       swotAnalysis: [
         {
           competitorName: 'Competitor A',
           strengths: [
             { description: 'Strong brand recognition', impact: 'high', confidence: 0.9 },
-            { description: 'Large customer base', impact: 'high', confidence: 0.8 }
+            { description: 'Large customer base', impact: 'high', confidence: 0.8 },
           ],
-          weaknesses: [
-            { description: 'High pricing', impact: 'medium', confidence: 0.7 }
-          ],
-          opportunities: [
-            { description: 'SMB market expansion', impact: 'high', confidence: 0.6 }
-          ],
-          threats: [
-            { description: 'New entrants', impact: 'medium', confidence: 0.5 }
-          ],
-          strategicImplications: ['Focus on value proposition']
-        }
+          weaknesses: [{ description: 'High pricing', impact: 'medium', confidence: 0.7 }],
+          opportunities: [{ description: 'SMB market expansion', impact: 'high', confidence: 0.6 }],
+          threats: [{ description: 'New entrants', impact: 'medium', confidence: 0.5 }],
+          strategicImplications: ['Focus on value proposition'],
+        },
       ],
       marketPositioning: {
         positioningMap: [
@@ -128,15 +122,15 @@ describe('ConfidenceScorer', () => {
             name: 'Price vs Features',
             lowEnd: 'Low Price',
             highEnd: 'High Features',
-            importance: 0.8
-          }
+            importance: 0.8,
+          },
         ],
         competitorPositions: [
           {
             competitorName: 'Competitor A',
             coordinates: { 'Price vs Features': 0.8 },
-            marketSegment: 'Enterprise'
-          }
+            marketSegment: 'Enterprise',
+          },
         ],
         marketGaps: [
           {
@@ -144,10 +138,10 @@ describe('ConfidenceScorer', () => {
             size: 'medium',
             difficulty: 'moderate',
             timeToMarket: '6-12 months',
-            potentialValue: 50000000
-          }
+            potentialValue: 50000000,
+          },
         ],
-        recommendedPositioning: ['Target mid-market with balanced offering']
+        recommendedPositioning: ['Target mid-market with balanced offering'],
       },
       strategicRecommendations: [
         {
@@ -161,21 +155,21 @@ describe('ConfidenceScorer', () => {
               action: 'Market research',
               timeline: '4 weeks',
               dependencies: [],
-              successMetrics: ['Survey completion', 'Customer interviews']
+              successMetrics: ['Survey completion', 'Customer interviews'],
             },
             {
               step: 2,
               action: 'Product development',
               timeline: '12 weeks',
               dependencies: ['Market research'],
-              successMetrics: ['Feature completion', 'Beta testing']
-            }
+              successMetrics: ['Feature completion', 'Beta testing'],
+            },
           ],
           expectedOutcome: 'Market entry within 6 months',
           riskLevel: 'medium',
           timeframe: '6 months',
-          resourceRequirements: ['Product team', 'Marketing budget']
-        }
+          resourceRequirements: ['Product team', 'Marketing budget'],
+        },
       ],
       sourceAttribution: [
         {
@@ -191,11 +185,11 @@ describe('ConfidenceScorer', () => {
             status: 'fresh',
             ageInDays: 30,
             recommendedUpdateFrequency: 90,
-            lastValidated: '2024-01-15'
+            lastValidated: '2024-01-15',
           },
           citationFormat: 'Gartner (2024)',
           keyFindings: ['Market growing at 15% annually'],
-          limitations: ['Limited geographic scope']
+          limitations: ['Limited geographic scope'],
         },
         {
           id: 'source2',
@@ -210,12 +204,12 @@ describe('ConfidenceScorer', () => {
             status: 'recent',
             ageInDays: 45,
             recommendedUpdateFrequency: 180,
-            lastValidated: '2024-01-15'
+            lastValidated: '2024-01-15',
           },
           citationFormat: 'McKinsey (2023)',
           keyFindings: ['Digital transformation driving growth'],
-          limitations: []
-        }
+          limitations: [],
+        },
       ],
       confidenceLevel: 'high',
       lastUpdated: '2024-01-15T10:00:00Z',
@@ -225,8 +219,8 @@ describe('ConfidenceScorer', () => {
         methodologyRigor: 0.8,
         overallConfidence: 0.85,
         qualityIndicators: [],
-        recommendations: []
-      }
+        recommendations: [],
+      },
     };
 
     // Mock market sizing result
@@ -240,7 +234,7 @@ describe('ConfidenceScorer', () => {
         dataQuality: 'high',
         calculationDate: '2024-01-15',
         geographicScope: ['North America', 'Europe'],
-        marketSegments: ['Enterprise', 'SMB']
+        marketSegments: ['Enterprise', 'SMB'],
       },
       sam: {
         value: 2000000000,
@@ -251,18 +245,18 @@ describe('ConfidenceScorer', () => {
         dataQuality: 'high',
         calculationDate: '2024-01-15',
         geographicScope: ['North America'],
-        marketSegments: ['Enterprise']
+        marketSegments: ['Enterprise'],
       },
       som: {
         value: 200000000,
         currency: 'USD',
         timeframe: '2024',
-        growthRate: 0.10,
+        growthRate: 0.1,
         methodology: 'value-theory',
         dataQuality: 'medium',
         calculationDate: '2024-01-15',
         geographicScope: ['North America'],
-        marketSegments: ['Enterprise']
+        marketSegments: ['Enterprise'],
       },
       methodology: [
         {
@@ -277,11 +271,11 @@ describe('ConfidenceScorer', () => {
               formula: 'Industry Size * Growth Rate',
               inputs: { industrySize: 8500000000, growthRate: 0.15 },
               output: 10000000000,
-              assumptions: ['Consistent growth rate']
-            }
+              assumptions: ['Consistent growth rate'],
+            },
           ],
           limitations: ['Geographic scope limited'],
-          confidence: 0.85
+          confidence: 0.85,
         },
         {
           type: 'bottom-up',
@@ -295,12 +289,12 @@ describe('ConfidenceScorer', () => {
               formula: 'Customers * ARPU',
               inputs: { customers: 20000, arpu: 100000 },
               output: 2000000000,
-              assumptions: ['Stable customer base']
-            }
+              assumptions: ['Stable customer base'],
+            },
           ],
           limitations: ['Sample size constraints'],
-          confidence: 0.75
-        }
+          confidence: 0.75,
+        },
       ],
       scenarios: [
         {
@@ -311,7 +305,7 @@ describe('ConfidenceScorer', () => {
           som: 150000000,
           probability: 0.3,
           keyAssumptions: ['Lower growth rates', 'Increased competition'],
-          riskFactors: ['Economic downturn', 'Market saturation']
+          riskFactors: ['Economic downturn', 'Market saturation'],
         },
         {
           name: 'balanced',
@@ -321,7 +315,7 @@ describe('ConfidenceScorer', () => {
           som: 200000000,
           probability: 0.5,
           keyAssumptions: ['Current growth trends continue'],
-          riskFactors: ['Regulatory changes']
+          riskFactors: ['Regulatory changes'],
         },
         {
           name: 'aggressive',
@@ -331,8 +325,8 @@ describe('ConfidenceScorer', () => {
           som: 300000000,
           probability: 0.2,
           keyAssumptions: ['Accelerated digital adoption'],
-          riskFactors: ['Technology disruption']
-        }
+          riskFactors: ['Technology disruption'],
+        },
       ],
       confidenceIntervals: [
         {
@@ -340,22 +334,22 @@ describe('ConfidenceScorer', () => {
           lowerBound: 8500000000,
           upperBound: 11500000000,
           confidenceLevel: 0.95,
-          methodology: 'statistical'
+          methodology: 'statistical',
         },
         {
           marketType: 'sam',
           lowerBound: 1700000000,
           upperBound: 2300000000,
-          confidenceLevel: 0.90,
-          methodology: 'expert-judgment'
+          confidenceLevel: 0.9,
+          methodology: 'expert-judgment',
         },
         {
           marketType: 'som',
           lowerBound: 150000000,
           upperBound: 250000000,
           confidenceLevel: 0.85,
-          methodology: 'scenario-analysis'
-        }
+          methodology: 'scenario-analysis',
+        },
       ],
       sourceAttribution: [
         {
@@ -371,12 +365,12 @@ describe('ConfidenceScorer', () => {
             status: 'fresh',
             ageInDays: 15,
             recommendedUpdateFrequency: 90,
-            lastValidated: '2024-01-15'
+            lastValidated: '2024-01-15',
           },
           citationFormat: 'Gartner (2024)',
           keyFindings: ['Market size $10B with 15% growth'],
-          limitations: []
-        }
+          limitations: [],
+        },
       ],
       assumptions: [
         {
@@ -385,22 +379,22 @@ describe('ConfidenceScorer', () => {
           value: 0.15,
           confidence: 0.8,
           impact: 'high',
-          sourceReference: 'market-source1'
+          sourceReference: 'market-source1',
         },
         {
           category: 'penetration-rate',
           description: 'Can capture 10% of SAM',
-          value: 0.10,
+          value: 0.1,
           confidence: 0.6,
-          impact: 'high'
+          impact: 'high',
         },
         {
           category: 'pricing',
           description: 'Average customer value $100k annually',
           value: 100000,
           confidence: 0.7,
-          impact: 'medium'
-        }
+          impact: 'medium',
+        },
       ],
       marketDynamics: {
         growthDrivers: ['Digital transformation', 'Remote work trends'],
@@ -409,12 +403,12 @@ describe('ConfidenceScorer', () => {
           {
             period: 'Q4',
             impact: 0.2,
-            description: 'Budget cycles drive Q4 purchases'
-          }
+            description: 'Budget cycles drive Q4 purchases',
+          },
         ],
         cyclicalFactors: ['Economic cycles affect enterprise spending'],
-        disruptiveForces: ['AI automation', 'New business models']
-      }
+        disruptiveForces: ['AI automation', 'New business models'],
+      },
     };
 
     // Mock data quality
@@ -428,10 +422,10 @@ describe('ConfidenceScorer', () => {
           metric: 'Source Count',
           score: 0.8,
           description: '2 authoritative sources',
-          impact: 'important'
-        }
+          impact: 'important',
+        },
       ],
-      recommendations: ['Add more recent data sources']
+      recommendations: ['Add more recent data sources'],
     };
   });
 
@@ -468,7 +462,9 @@ describe('ConfidenceScorer', () => {
         mockDataQuality
       );
 
-      const coverageComponent = confidenceScore.components.find(c => c.name === 'Competitor Coverage');
+      const coverageComponent = confidenceScore.components.find(
+        c => c.name === 'Competitor Coverage'
+      );
       expect(coverageComponent).toBeDefined();
       expect(coverageComponent!.contributingFactors).toContain('Competitor count: 2');
     });
@@ -483,8 +479,10 @@ describe('ConfidenceScorer', () => {
 
       expect(confidenceScore.overall).toBeLessThan(0.75);
       expect(confidenceScore.reliabilityLevel).toBe('medium');
-      
-      const coverageComponent = confidenceScore.components.find(c => c.name === 'Competitor Coverage');
+
+      const coverageComponent = confidenceScore.components.find(
+        c => c.name === 'Competitor Coverage'
+      );
       expect(coverageComponent!.score).toBe(0);
       expect(coverageComponent!.uncertaintyImpact).toBe('high');
     });
@@ -493,8 +491,8 @@ describe('ConfidenceScorer', () => {
       mockCompetitiveResult.sourceAttribution = [
         {
           ...mockCompetitiveResult.sourceAttribution[0],
-          reliability: 0.3 // Low reliability
-        }
+          reliability: 0.3, // Low reliability
+        },
       ];
 
       const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(
@@ -528,13 +526,13 @@ describe('ConfidenceScorer', () => {
       mockCompetitiveResult.competitiveMatrix.competitors = []; // No competitors
       mockCompetitiveResult.sourceAttribution = []; // No sources
 
-      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(
-        mockCompetitiveResult,
-        { ...mockDataQuality, sourceReliability: 0 }
-      );
+      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(mockCompetitiveResult, {
+        ...mockDataQuality,
+        sourceReliability: 0,
+      });
 
       expect(confidenceScore.recommendations.length).toBeGreaterThan(0);
-      
+
       const expandResearchRec = confidenceScore.recommendations.find(
         r => r.type === 'expand-research'
       );
@@ -563,9 +561,13 @@ describe('ConfidenceScorer', () => {
         mockDataQuality
       );
 
-      const methodologyComponent = confidenceScore.components.find(c => c.name === 'Methodology Rigor');
+      const methodologyComponent = confidenceScore.components.find(
+        c => c.name === 'Methodology Rigor'
+      );
       expect(methodologyComponent).toBeDefined();
-      expect(methodologyComponent!.contributingFactors).toContain('Methodology diversity: top-down, bottom-up');
+      expect(methodologyComponent!.contributingFactors).toContain(
+        'Methodology diversity: top-down, bottom-up'
+      );
     });
 
     it('should identify market size logic component', () => {
@@ -606,7 +608,9 @@ describe('ConfidenceScorer', () => {
         f => f.type === 'methodology'
       );
       expect(methodologyFactor).toBeDefined();
-      expect(methodologyFactor!.description).toContain('Single methodology increases sizing uncertainty');
+      expect(methodologyFactor!.description).toContain(
+        'Single methodology increases sizing uncertainty'
+      );
     });
 
     it('should handle low-confidence assumptions', () => {
@@ -616,8 +620,8 @@ describe('ConfidenceScorer', () => {
           description: 'Uncertain growth rate',
           value: 0.15,
           confidence: 0.3, // Low confidence
-          impact: 'high'
-        }
+          impact: 'high',
+        },
       ];
 
       const confidenceScore = scorer.calculateMarketSizingConfidence(
@@ -638,7 +642,9 @@ describe('ConfidenceScorer', () => {
         mockDataQuality
       );
 
-      const intervalComponent = confidenceScore.components.find(c => c.name === 'Confidence Intervals');
+      const intervalComponent = confidenceScore.components.find(
+        c => c.name === 'Confidence Intervals'
+      );
       expect(intervalComponent).toBeDefined();
       expect(intervalComponent!.score).toBeGreaterThan(0.8); // All intervals are valid
     });
@@ -650,8 +656,8 @@ describe('ConfidenceScorer', () => {
           lowerBound: 12000000000, // Lower > Upper (invalid)
           upperBound: 8000000000,
           confidenceLevel: 0.95,
-          methodology: 'statistical'
-        }
+          methodology: 'statistical',
+        },
       ];
 
       const confidenceScore = scorer.calculateMarketSizingConfidence(
@@ -671,11 +677,14 @@ describe('ConfidenceScorer', () => {
         mockDataQuality
       );
 
-      const indicators = scorer.generateUncertaintyIndicators(mockCompetitiveResult, confidenceScore);
+      const indicators = scorer.generateUncertaintyIndicators(
+        mockCompetitiveResult,
+        confidenceScore
+      );
 
       expect(indicators).toBeDefined();
       expect(Array.isArray(indicators)).toBe(true);
-      
+
       if (indicators.length > 0) {
         const indicator = indicators[0];
         expect(indicator.metric).toBeDefined();
@@ -692,7 +701,10 @@ describe('ConfidenceScorer', () => {
         mockDataQuality
       );
 
-      const indicators = scorer.generateUncertaintyIndicators(mockMarketSizingResult, confidenceScore);
+      const indicators = scorer.generateUncertaintyIndicators(
+        mockMarketSizingResult,
+        confidenceScore
+      );
 
       expect(indicators).toBeDefined();
       expect(Array.isArray(indicators)).toBe(true);
@@ -710,7 +722,10 @@ describe('ConfidenceScorer', () => {
         mockDataQuality
       );
 
-      const indicators = scorer.generateUncertaintyIndicators(mockCompetitiveResult, confidenceScore);
+      const indicators = scorer.generateUncertaintyIndicators(
+        mockCompetitiveResult,
+        confidenceScore
+      );
 
       const marketShareIndicator = indicators.find(i => i.metric === 'Market Share Distribution');
       if (marketShareIndicator) {
@@ -726,7 +741,10 @@ describe('ConfidenceScorer', () => {
         mockDataQuality
       );
 
-      const indicators = scorer.generateUncertaintyIndicators(mockMarketSizingResult, confidenceScore);
+      const indicators = scorer.generateUncertaintyIndicators(
+        mockMarketSizingResult,
+        confidenceScore
+      );
 
       const growthIndicator = indicators.find(i => i.metric === 'Market Growth Rate');
       expect(growthIndicator).toBeDefined();
@@ -737,10 +755,10 @@ describe('ConfidenceScorer', () => {
 
   describe('reliability level determination', () => {
     it('should determine very-high reliability', () => {
-      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(
-        mockCompetitiveResult,
-        { ...mockDataQuality, overallConfidence: 0.95 }
-      );
+      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(mockCompetitiveResult, {
+        ...mockDataQuality,
+        overallConfidence: 0.95,
+      });
 
       expect(confidenceScore.reliabilityLevel).toBe('high');
     });
@@ -749,10 +767,11 @@ describe('ConfidenceScorer', () => {
       mockCompetitiveResult.competitiveMatrix.competitors = [];
       mockCompetitiveResult.sourceAttribution = [];
 
-      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(
-        mockCompetitiveResult,
-        { ...mockDataQuality, sourceReliability: 0.2, overallConfidence: 0.3 }
-      );
+      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(mockCompetitiveResult, {
+        ...mockDataQuality,
+        sourceReliability: 0.2,
+        overallConfidence: 0.3,
+      });
 
       expect(confidenceScore.reliabilityLevel).toBe('very-low');
     });
@@ -763,10 +782,11 @@ describe('ConfidenceScorer', () => {
       mockCompetitiveResult.swotAnalysis = [];
       mockCompetitiveResult.strategicRecommendations = [];
 
-      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(
-        mockCompetitiveResult,
-        { ...mockDataQuality, sourceReliability: 0.1, overallConfidence: 0.1 }
-      );
+      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(mockCompetitiveResult, {
+        ...mockDataQuality,
+        sourceReliability: 0.1,
+        overallConfidence: 0.1,
+      });
 
       expect(confidenceScore.reliabilityLevel).toBe('very-low');
     });
@@ -777,14 +797,14 @@ describe('ConfidenceScorer', () => {
       mockCompetitiveResult.competitiveMatrix.competitors = [];
       mockCompetitiveResult.sourceAttribution = [];
 
-      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(
-        mockCompetitiveResult,
-        { ...mockDataQuality, sourceReliability: 0 }
-      );
+      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(mockCompetitiveResult, {
+        ...mockDataQuality,
+        sourceReliability: 0,
+      });
 
       const immediateRecs = confidenceScore.recommendations.filter(r => r.priority === 'immediate');
       expect(immediateRecs.length).toBeGreaterThan(0);
-      
+
       const expandResearchRec = immediateRecs.find(r => r.type === 'expand-research');
       expect(expandResearchRec).toBeDefined();
       expect(expandResearchRec!.expectedImpact).toBeGreaterThan(0);
@@ -808,10 +828,10 @@ describe('ConfidenceScorer', () => {
       mockCompetitiveResult.competitiveMatrix.competitors = [];
       mockCompetitiveResult.sourceAttribution = [];
 
-      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(
-        mockCompetitiveResult,
-        { ...mockDataQuality, sourceReliability: 0.3 }
-      );
+      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(mockCompetitiveResult, {
+        ...mockDataQuality,
+        sourceReliability: 0.3,
+      });
 
       const recommendations = confidenceScore.recommendations;
       expect(recommendations.length).toBeGreaterThan(1);
@@ -819,7 +839,7 @@ describe('ConfidenceScorer', () => {
       // Check that immediate priority comes before high priority
       const immediateIndex = recommendations.findIndex(r => r.priority === 'immediate');
       const highIndex = recommendations.findIndex(r => r.priority === 'high');
-      
+
       if (immediateIndex >= 0 && highIndex >= 0) {
         expect(immediateIndex).toBeLessThan(highIndex);
       }
@@ -832,17 +852,18 @@ describe('ConfidenceScorer', () => {
         ...mockCompetitiveResult,
         competitiveMatrix: {
           ...mockCompetitiveResult.competitiveMatrix,
-          competitors: []
+          competitors: [],
         },
         swotAnalysis: [],
         strategicRecommendations: [],
-        sourceAttribution: []
+        sourceAttribution: [],
       };
 
-      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(
-        emptyResult,
-        { ...mockDataQuality, sourceReliability: 0, overallConfidence: 0 }
-      );
+      const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(emptyResult, {
+        ...mockDataQuality,
+        sourceReliability: 0,
+        overallConfidence: 0,
+      });
 
       expect(confidenceScore.overall).toBeLessThan(0.3);
       expect(confidenceScore.reliabilityLevel).toBe('very-low');
@@ -855,13 +876,14 @@ describe('ConfidenceScorer', () => {
         methodology: [],
         assumptions: [],
         confidenceIntervals: [],
-        sourceAttribution: []
+        sourceAttribution: [],
       };
 
-      const confidenceScore = scorer.calculateMarketSizingConfidence(
-        emptyResult,
-        { ...mockDataQuality, sourceReliability: 0, methodologyRigor: 0 }
-      );
+      const confidenceScore = scorer.calculateMarketSizingConfidence(emptyResult, {
+        ...mockDataQuality,
+        sourceReliability: 0,
+        methodologyRigor: 0,
+      });
 
       expect(confidenceScore.overall).toBeLessThan(0.3);
       expect(confidenceScore.recommendations.length).toBeGreaterThan(0);
@@ -874,7 +896,7 @@ describe('ConfidenceScorer', () => {
         targetSegment: '',
         marketMaturity: 'growth',
         regulatoryEnvironment: [],
-        technologyTrends: []
+        technologyTrends: [],
       };
 
       const confidenceScore = scorer.calculateCompetitiveAnalysisConfidence(
@@ -882,7 +904,9 @@ describe('ConfidenceScorer', () => {
         mockDataQuality
       );
 
-      const marketContextComponent = confidenceScore.components.find(c => c.name === 'Market Context');
+      const marketContextComponent = confidenceScore.components.find(
+        c => c.name === 'Market Context'
+      );
       expect(marketContextComponent!.score).toBeLessThan(0.5);
     });
   });
@@ -907,11 +931,11 @@ describe('defaultConfidenceScorer', () => {
               model: 'subscription',
               startingPrice: 100,
               currency: 'USD',
-              valueProposition: 'Value'
+              valueProposition: 'Value',
             },
             targetMarket: ['Enterprise'],
-            recentMoves: []
-          }
+            recentMoves: [],
+          },
         ],
         evaluationCriteria: [],
         rankings: [],
@@ -922,15 +946,15 @@ describe('defaultConfidenceScorer', () => {
           targetSegment: 'Enterprise',
           marketMaturity: 'growth',
           regulatoryEnvironment: [],
-          technologyTrends: []
-        }
+          technologyTrends: [],
+        },
       },
       swotAnalysis: [],
       marketPositioning: {
         positioningMap: [],
         competitorPositions: [],
         marketGaps: [],
-        recommendedPositioning: []
+        recommendedPositioning: [],
       },
       strategicRecommendations: [],
       sourceAttribution: [],
@@ -942,8 +966,8 @@ describe('defaultConfidenceScorer', () => {
         methodologyRigor: 0.5,
         overallConfidence: 0.5,
         qualityIndicators: [],
-        recommendations: []
-      }
+        recommendations: [],
+      },
     };
 
     const mockDataQuality: DataQualityCheck = {
@@ -952,7 +976,7 @@ describe('defaultConfidenceScorer', () => {
       methodologyRigor: 0.5,
       overallConfidence: 0.5,
       qualityIndicators: [],
-      recommendations: []
+      recommendations: [],
     };
 
     const confidenceScore = defaultConfidenceScorer.calculateCompetitiveAnalysisConfidence(

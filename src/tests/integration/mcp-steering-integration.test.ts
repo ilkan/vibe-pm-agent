@@ -3,14 +3,14 @@
  */
 
 import { PMAgentMCPServer } from '../../mcp/server';
-import { 
-  RequirementsArgs, 
-  DesignOptionsArgs, 
-  ManagementOnePagerArgs, 
-  PRFAQArgs, 
+import {
+  RequirementsArgs,
+  DesignOptionsArgs,
+  ManagementOnePagerArgs,
+  PRFAQArgs,
   TaskPlanArgs,
   MCPToolContext,
-  SteeringFileOptions
+  SteeringFileOptions,
 } from '../../models/mcp';
 import { cleanupAfterTest } from '../utils/test-cleanup';
 import * as fs from 'fs/promises';
@@ -28,7 +28,7 @@ describe('MCP Steering Integration Tests', () => {
       sessionId: 'test-session',
       timestamp: Date.now(),
       requestId: 'test-request',
-      traceId: 'test-trace'
+      traceId: 'test-trace',
     };
   });
 
@@ -39,7 +39,7 @@ describe('MCP Steering Integration Tests', () => {
     } catch (error) {
       // Ignore cleanup errors
     }
-    
+
     // Clean up any test-generated steering files
     await cleanupAfterTest();
   });
@@ -50,12 +50,12 @@ describe('MCP Steering Integration Tests', () => {
         create_steering_files: true,
         feature_name: 'test-feature',
         inclusion_rule: 'fileMatch',
-        file_match_pattern: 'requirements*'
+        file_match_pattern: 'requirements*',
       };
 
       const args: RequirementsArgs = {
         raw_intent: 'Create a user authentication system with secure login and registration',
-        steering_options: steeringOptions
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -64,7 +64,7 @@ describe('MCP Steering Integration Tests', () => {
       expect(result.content[0].type).toBe('json');
       expect(result.content[0].json).toBeDefined();
       expect(result.metadata?.steeringFileCreated).toBe(true);
-      
+
       if (result.metadata?.steeringFiles) {
         expect(result.metadata.steeringFiles).toHaveLength(1);
         expect(result.metadata.steeringFiles[0].filename).toContain('requirements');
@@ -74,7 +74,7 @@ describe('MCP Steering Integration Tests', () => {
 
     test('should generate requirements without steering file when not requested', async () => {
       const args: RequirementsArgs = {
-        raw_intent: 'Create a user authentication system with secure login and registration'
+        raw_intent: 'Create a user authentication system with secure login and registration',
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -89,12 +89,12 @@ describe('MCP Steering Integration Tests', () => {
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: '', // Invalid feature name should cause failure
-        inclusion_rule: 'fileMatch'
+        inclusion_rule: 'fileMatch',
       };
 
       const args: RequirementsArgs = {
         raw_intent: 'Create a user authentication system',
-        steering_options: steeringOptions
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -111,12 +111,13 @@ describe('MCP Steering Integration Tests', () => {
         create_steering_files: true,
         feature_name: 'auth-system',
         inclusion_rule: 'fileMatch',
-        file_match_pattern: 'design*|architecture*'
+        file_match_pattern: 'design*|architecture*',
       };
 
       const args: DesignOptionsArgs = {
-        requirements: 'System must provide secure user authentication with login and registration capabilities',
-        steering_options: steeringOptions
+        requirements:
+          'System must provide secure user authentication with login and registration capabilities',
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGenerateDesignOptions(args, mockContext);
@@ -124,7 +125,7 @@ describe('MCP Steering Integration Tests', () => {
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('json');
       expect(result.metadata?.steeringFileCreated).toBe(true);
-      
+
       if (result.metadata?.steeringFiles) {
         expect(result.metadata.steeringFiles).toHaveLength(1);
         expect(result.metadata.steeringFiles[0].filename).toContain('design');
@@ -139,13 +140,14 @@ describe('MCP Steering Integration Tests', () => {
         create_steering_files: true,
         feature_name: 'executive-dashboard',
         inclusion_rule: 'manual',
-        filename_prefix: 'exec'
+        filename_prefix: 'exec',
       };
 
       const args: ManagementOnePagerArgs = {
         requirements: 'System must provide executive dashboard with key metrics and insights',
-        design: 'Dashboard architecture with real-time data visualization and reporting capabilities',
-        steering_options: steeringOptions
+        design:
+          'Dashboard architecture with real-time data visualization and reporting capabilities',
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGenerateManagementOnePager(args, mockContext);
@@ -153,7 +155,7 @@ describe('MCP Steering Integration Tests', () => {
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('markdown');
       expect(result.metadata?.steeringFileCreated).toBe(true);
-      
+
       if (result.metadata?.steeringFiles) {
         expect(result.metadata.steeringFiles).toHaveLength(1);
         expect(result.metadata.steeringFiles[0].filename).toContain('onepager');
@@ -167,14 +169,14 @@ describe('MCP Steering Integration Tests', () => {
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'product-launch',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       };
 
       const args: PRFAQArgs = {
         requirements: 'Launch new product feature with comprehensive documentation',
         design: 'Feature architecture with user-facing components and backend services',
         target_date: '2024-06-01',
-        steering_options: steeringOptions
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGeneratePRFAQ(args, mockContext);
@@ -184,7 +186,7 @@ describe('MCP Steering Integration Tests', () => {
       expect(result.content[0].markdown).toContain('Press Release');
       expect(result.content[0].markdown).toContain('FAQ');
       expect(result.metadata?.steeringFileCreated).toBe(true);
-      
+
       if (result.metadata?.steeringFiles) {
         expect(result.metadata.steeringFiles).toHaveLength(1);
         expect(result.metadata.steeringFiles[0].filename).toContain('prfaq');
@@ -199,17 +201,18 @@ describe('MCP Steering Integration Tests', () => {
         create_steering_files: true,
         feature_name: 'implementation-plan',
         inclusion_rule: 'fileMatch',
-        file_match_pattern: 'tasks*|implementation*'
+        file_match_pattern: 'tasks*|implementation*',
       };
 
       const args: TaskPlanArgs = {
-        design: 'Comprehensive system design with modular architecture and phased implementation approach',
+        design:
+          'Comprehensive system design with modular architecture and phased implementation approach',
         limits: {
           max_vibes: 50,
           max_specs: 10,
-          budget_usd: 10000
+          budget_usd: 10000,
         },
-        steering_options: steeringOptions
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGenerateTaskPlan(args, mockContext);
@@ -218,7 +221,7 @@ describe('MCP Steering Integration Tests', () => {
       expect(result.content[0].type).toBe('json');
       expect(result.content[0].json).toBeDefined();
       expect(result.metadata?.steeringFileCreated).toBe(true);
-      
+
       if (result.metadata?.steeringFiles) {
         expect(result.metadata.steeringFiles).toHaveLength(1);
         expect(result.metadata.steeringFiles[0].filename).toContain('tasks');
@@ -232,19 +235,19 @@ describe('MCP Steering Integration Tests', () => {
       const testCases = [
         { inclusion_rule: 'always' as const, expected: true },
         { inclusion_rule: 'fileMatch' as const, expected: true },
-        { inclusion_rule: 'manual' as const, expected: true }
+        { inclusion_rule: 'manual' as const, expected: true },
       ];
 
       for (const testCase of testCases) {
         const steeringOptions: SteeringFileOptions = {
           create_steering_files: true,
           feature_name: 'test-inclusion',
-          inclusion_rule: testCase.inclusion_rule
+          inclusion_rule: testCase.inclusion_rule,
         };
 
         const args: RequirementsArgs = {
           raw_intent: 'Test inclusion rule handling',
-          steering_options: steeringOptions
+          steering_options: steeringOptions,
         };
 
         const result = await server.handleGenerateRequirements(args, mockContext);
@@ -257,12 +260,12 @@ describe('MCP Steering Integration Tests', () => {
         create_steering_files: true,
         feature_name: 'custom-pattern',
         inclusion_rule: 'fileMatch',
-        file_match_pattern: 'custom-*|special-*'
+        file_match_pattern: 'custom-*|special-*',
       };
 
       const args: RequirementsArgs = {
         raw_intent: 'Test custom file match pattern',
-        steering_options: steeringOptions
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -275,12 +278,12 @@ describe('MCP Steering Integration Tests', () => {
         create_steering_files: true,
         feature_name: 'overwrite-test',
         inclusion_rule: 'always',
-        overwrite_existing: true
+        overwrite_existing: true,
       };
 
       const args: RequirementsArgs = {
         raw_intent: 'Test overwrite existing files',
-        steering_options: steeringOptions
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -293,12 +296,12 @@ describe('MCP Steering Integration Tests', () => {
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         // Missing feature_name
-        inclusion_rule: 'always'
+        inclusion_rule: 'always',
       };
 
       const args: RequirementsArgs = {
         raw_intent: 'Test missing feature name',
-        steering_options: steeringOptions
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -310,12 +313,12 @@ describe('MCP Steering Integration Tests', () => {
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'test',
-        inclusion_rule: 'invalid' as any // Invalid inclusion rule
+        inclusion_rule: 'invalid' as any, // Invalid inclusion rule
       };
 
       const args: RequirementsArgs = {
         raw_intent: 'Test invalid steering options',
-        steering_options: steeringOptions
+        steering_options: steeringOptions,
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -326,27 +329,29 @@ describe('MCP Steering Integration Tests', () => {
   describe('Performance and concurrency', () => {
     test('should handle concurrent steering file creation', async () => {
       const promises = [];
-      
+
       for (let i = 0; i < 3; i++) {
         const steeringOptions: SteeringFileOptions = {
           create_steering_files: true,
           feature_name: `concurrent-test-${i}`,
-          inclusion_rule: 'always'
+          inclusion_rule: 'always',
         };
 
         const args: RequirementsArgs = {
           raw_intent: `Concurrent test ${i}`,
-          steering_options: steeringOptions
+          steering_options: steeringOptions,
         };
 
-        promises.push(server.handleGenerateRequirements(args, {
-          ...mockContext,
-          requestId: `concurrent-${i}`
-        }));
+        promises.push(
+          server.handleGenerateRequirements(args, {
+            ...mockContext,
+            requestId: `concurrent-${i}`,
+          })
+        );
       }
 
       const results = await Promise.all(promises);
-      
+
       results.forEach((result, index) => {
         expect(result.isError).toBe(false);
         expect(result.metadata?.steeringFileCreated).toBe(true);

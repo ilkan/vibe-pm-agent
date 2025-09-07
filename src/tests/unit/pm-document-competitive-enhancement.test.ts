@@ -8,7 +8,7 @@ import { PMDocumentGenerator } from '../../components/pm-document-generator';
 
 describe('PMDocumentGenerator Competitive Enhancements', () => {
   let generator: PMDocumentGenerator;
-  
+
   const mockCompetitiveAnalysis = {
     competitiveMatrix: {
       competitors: [
@@ -16,55 +16,55 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
           name: 'Competitor A',
           strengths: ['Strong brand', 'Large user base'],
           weaknesses: ['High pricing', 'Limited features'],
-          marketShare: 25
+          marketShare: 25,
         },
         {
-          name: 'Competitor B', 
+          name: 'Competitor B',
           strengths: ['Innovation', 'User experience'],
           weaknesses: ['Limited resources', 'Market validation'],
-          marketShare: 15
-        }
+          marketShare: 15,
+        },
       ],
       differentiationOpportunities: [
         'Address industry-wide high pricing',
-        'Focus on underserved market segments'
-      ]
+        'Focus on underserved market segments',
+      ],
     },
     swotAnalysis: [
       {
         competitorName: 'Our Solution',
         strengths: [
           { description: 'Technology leadership and innovation', impact: 'high' },
-          { description: 'Strong customer focus and support', impact: 'high' }
+          { description: 'Strong customer focus and support', impact: 'high' },
         ],
         weaknesses: [],
         opportunities: [],
-        threats: []
-      }
+        threats: [],
+      },
     ],
     marketPositioning: {
       marketGaps: [
         { description: 'Mid-market segment with balanced features and pricing' },
-        { description: 'Premium features at competitive pricing' }
+        { description: 'Premium features at competitive pricing' },
       ],
       recommendedPositioning: [
         'Target underserved mid-market segment',
-        'Differentiate through superior user experience'
-      ]
+        'Differentiate through superior user experience',
+      ],
     },
     strategicRecommendations: [
       {
         type: 'differentiation',
         title: 'Feature-Based Differentiation',
-        description: 'Develop unique capabilities that competitors lack'
-      }
-    ]
+        description: 'Develop unique capabilities that competitors lack',
+      },
+    ],
   };
 
   const mockMarketSizing = {
     tam: { value: 50000000000, currency: 'USD', methodology: 'top-down' },
     sam: { value: 5000000000, currency: 'USD', methodology: 'bottom-up' },
-    som: { value: 500000000, currency: 'USD', methodology: 'value-theory' }
+    som: { value: 500000000, currency: 'USD', methodology: 'value-theory' },
   };
 
   beforeEach(() => {
@@ -110,7 +110,9 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
       expect(result.competitivePositioning).toBeDefined();
       expect(result.competitivePositioning?.marketPosition).toContain('medium market opportunity');
       expect(result.competitivePositioning?.keyDifferentiators).toHaveLength(3);
-      expect(result.competitivePositioning?.competitiveAdvantages).toContain('Technology leadership and innovation');
+      expect(result.competitivePositioning?.competitiveAdvantages).toContain(
+        'Technology leadership and innovation'
+      );
     });
 
     test('should not include competitive positioning when no competitive analysis provided', async () => {
@@ -122,7 +124,7 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
     test('should handle competitive analysis with missing data gracefully', async () => {
       const incompleteAnalysis = {
         competitiveMatrix: { competitors: [] },
-        strategicRecommendations: []
+        strategicRecommendations: [],
       };
 
       const result = await generator.generateManagementOnePager(
@@ -135,7 +137,9 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
 
       expect(result.competitivePositioning).toBeDefined();
       expect(result.competitivePositioning?.marketPosition).toContain('First-mover advantage');
-      expect(result.competitivePositioning?.keyDifferentiators).toContain('Superior user experience and functionality');
+      expect(result.competitivePositioning?.keyDifferentiators).toContain(
+        'Superior user experience and functionality'
+      );
     });
   });
 
@@ -175,9 +179,13 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
       );
 
       expect(result.competitiveDifferentiation).toBeDefined();
-      expect(result.competitiveDifferentiation?.uniqueValueProposition).toContain('500M market opportunity');
+      expect(result.competitiveDifferentiation?.uniqueValueProposition).toContain(
+        '500M market opportunity'
+      );
       expect(result.competitiveDifferentiation?.competitorComparison).toHaveLength(2);
-      expect(result.competitiveDifferentiation?.marketDifferentiators).toContain('Address industry-wide high pricing');
+      expect(result.competitiveDifferentiation?.marketDifferentiators).toContain(
+        'Address industry-wide high pricing'
+      );
     });
 
     test('should enhance press release headline with competitive advantage', async () => {
@@ -188,7 +196,9 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
         mockCompetitiveAnalysis
       );
 
-      expect(result.pressRelease.headline).toContain('Leveraging Target underserved mid-market segment');
+      expect(result.pressRelease.headline).toContain(
+        'Leveraging Target underserved mid-market segment'
+      );
     });
 
     test('should enhance FAQ with competitive comparison', async () => {
@@ -199,9 +209,10 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
         mockCompetitiveAnalysis
       );
 
-      const competitiveFAQ = result.faq.find(item => 
-        item.question.toLowerCase().includes('compare') && 
-        item.question.toLowerCase().includes('alternatives')
+      const competitiveFAQ = result.faq.find(
+        item =>
+          item.question.toLowerCase().includes('compare') &&
+          item.question.toLowerCase().includes('alternatives')
       );
 
       expect(competitiveFAQ).toBeDefined();
@@ -229,14 +240,18 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
     });
 
     test('should extract key differentiators from competitive matrix', async () => {
-      const positioning = (generator as any).generateCompetitivePositioning(mockCompetitiveAnalysis);
+      const positioning = (generator as any).generateCompetitivePositioning(
+        mockCompetitiveAnalysis
+      );
 
       expect(positioning.keyDifferentiators).toContain('Address industry-wide high pricing');
       expect(positioning.keyDifferentiators).toContain('Feature-Based Differentiation');
     });
 
     test('should generate competitive advantages from SWOT analysis', async () => {
-      const positioning = (generator as any).generateCompetitivePositioning(mockCompetitiveAnalysis);
+      const positioning = (generator as any).generateCompetitivePositioning(
+        mockCompetitiveAnalysis
+      );
 
       expect(positioning.competitiveAdvantages).toContain('Technology leadership and innovation');
     });
@@ -246,13 +261,15 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
         competitiveMatrix: { competitors: [], differentiationOpportunities: [] },
         swotAnalysis: [],
         marketPositioning: { marketGaps: [], recommendedPositioning: [] },
-        strategicRecommendations: []
+        strategicRecommendations: [],
       };
 
       const positioning = (generator as any).generateCompetitivePositioning(emptyAnalysis);
 
       expect(positioning.marketPosition).toContain('First-mover advantage');
-      expect(positioning.keyDifferentiators).toContain('Superior user experience and functionality');
+      expect(positioning.keyDifferentiators).toContain(
+        'Superior user experience and functionality'
+      );
       expect(positioning.competitiveAdvantages).toContain('Technology leadership and innovation');
     });
   });
@@ -265,11 +282,15 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
       );
 
       expect(differentiation.uniqueValueProposition).toContain('500M market opportunity');
-      expect(differentiation.uniqueValueProposition).toContain('address industry-wide high pricing');
+      expect(differentiation.uniqueValueProposition).toContain(
+        'address industry-wide high pricing'
+      );
     });
 
     test('should create competitor comparisons', async () => {
-      const differentiation = (generator as any).generateCompetitiveDifferentiation(mockCompetitiveAnalysis);
+      const differentiation = (generator as any).generateCompetitiveDifferentiation(
+        mockCompetitiveAnalysis
+      );
 
       expect(differentiation.competitorComparison).toHaveLength(2);
       expect(differentiation.competitorComparison[0].competitorName).toBe('Competitor A');
@@ -278,7 +299,9 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
     });
 
     test('should generate competitive comparison FAQ answer', async () => {
-      const answer = (generator as any).generateCompetitiveComparisonAnswer(mockCompetitiveAnalysis);
+      const answer = (generator as any).generateCompetitiveComparisonAnswer(
+        mockCompetitiveAnalysis
+      );
 
       expect(answer).toContain('Target underserved mid-market segment');
       expect(answer).toContain('address industry-wide high pricing');
@@ -312,7 +335,7 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
         competitiveMatrix: null,
         swotAnalysis: null,
         marketPositioning: null,
-        strategicRecommendations: null
+        strategicRecommendations: null,
       };
 
       const positioning = (generator as any).generateCompetitivePositioning(nullAnalysis);
@@ -323,7 +346,7 @@ describe('PMDocumentGenerator Competitive Enhancements', () => {
 
     test('should handle market sizing with zero values', async () => {
       const zeroMarketSizing = {
-        som: { value: 0, currency: 'USD', methodology: 'test' }
+        som: { value: 0, currency: 'USD', methodology: 'test' },
       };
 
       const positioning = (generator as any).generateCompetitivePositioning(

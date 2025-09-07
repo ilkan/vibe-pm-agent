@@ -1,16 +1,16 @@
 // Market Data Integrator - Unique Public Datasets Integration
 // Integrates real market data APIs and unique public datasets for competitive intelligence
 
-import { 
-  MarketDataSource, 
-  CompetitiveIntelligence, 
-  MarketMetrics, 
+import {
+  MarketDataSource,
+  CompetitiveIntelligence,
+  MarketMetrics,
   DataSourceConfig,
   MarketDataResponse,
   CompanyFinancials,
   IndustryBenchmarks,
   MarketTrends,
-  DataValidation
+  DataValidation,
 } from '../../models/market-data';
 
 /**
@@ -41,7 +41,7 @@ export class MarketDataIntegrator {
       update_frequency: 'quarterly',
       reliability_score: 95,
       coverage: 'US public companies',
-      unique_features: ['Real-time SEC filings', 'XBRL structured data', 'Historical financials']
+      unique_features: ['Real-time SEC filings', 'XBRL structured data', 'Historical financials'],
     });
 
     // Federal Reserve Economic Data (FRED)
@@ -54,7 +54,11 @@ export class MarketDataIntegrator {
       update_frequency: 'daily',
       reliability_score: 98,
       coverage: 'US economic indicators',
-      unique_features: ['Federal Reserve data', 'Economic forecasting', 'Monetary policy indicators']
+      unique_features: [
+        'Federal Reserve data',
+        'Economic forecasting',
+        'Monetary policy indicators',
+      ],
     });
 
     // World Bank Open Data
@@ -67,7 +71,7 @@ export class MarketDataIntegrator {
       update_frequency: 'annually',
       reliability_score: 92,
       coverage: 'Global economic indicators',
-      unique_features: ['Global development data', 'Country comparisons', 'Long-term trends']
+      unique_features: ['Global development data', 'Country comparisons', 'Long-term trends'],
     });
 
     // USPTO Patent Database
@@ -80,7 +84,7 @@ export class MarketDataIntegrator {
       update_frequency: 'weekly',
       reliability_score: 90,
       coverage: 'US patent system',
-      unique_features: ['Innovation tracking', 'Technology trends', 'Competitive R&D analysis']
+      unique_features: ['Innovation tracking', 'Technology trends', 'Competitive R&D analysis'],
     });
 
     // GitHub API - Developer ecosystem data
@@ -93,7 +97,11 @@ export class MarketDataIntegrator {
       update_frequency: 'real_time',
       reliability_score: 88,
       coverage: 'Global developer ecosystem',
-      unique_features: ['Open source trends', 'Developer productivity', 'Technology adoption rates']
+      unique_features: [
+        'Open source trends',
+        'Developer productivity',
+        'Technology adoption rates',
+      ],
     });
 
     // Bureau of Labor Statistics
@@ -106,7 +114,7 @@ export class MarketDataIntegrator {
       update_frequency: 'monthly',
       reliability_score: 94,
       coverage: 'US labor market',
-      unique_features: ['Employment trends', 'Wage analysis', 'Productivity benchmarks']
+      unique_features: ['Employment trends', 'Wage analysis', 'Productivity benchmarks'],
     });
 
     // Census Bureau Economic Indicators
@@ -119,7 +127,11 @@ export class MarketDataIntegrator {
       update_frequency: 'monthly',
       reliability_score: 93,
       coverage: 'US business and economic data',
-      unique_features: ['Business formation trends', 'Industry analysis', 'Economic structure data']
+      unique_features: [
+        'Business formation trends',
+        'Industry analysis',
+        'Economic structure data',
+      ],
     });
 
     // Crunchbase Open Data (simulated - would require API key)
@@ -132,7 +144,7 @@ export class MarketDataIntegrator {
       update_frequency: 'daily',
       reliability_score: 85,
       coverage: 'Global startup ecosystem',
-      unique_features: ['Funding analysis', 'Startup trends', 'Investor patterns']
+      unique_features: ['Funding analysis', 'Startup trends', 'Investor patterns'],
     });
   }
 
@@ -144,14 +156,14 @@ export class MarketDataIntegrator {
       required_fields: ['revenue', 'date', 'company_id'],
       data_types: { revenue: 'number', date: 'string', company_id: 'string' },
       range_checks: { revenue: { min: 0, max: 1000000000000 } },
-      freshness_requirement: 90 // days
+      freshness_requirement: 90, // days
     });
 
     this.validationRules.set('market_metrics', {
       required_fields: ['metric_name', 'value', 'date', 'source'],
       data_types: { metric_name: 'string', value: 'number', date: 'string', source: 'string' },
       range_checks: { value: { min: -1000000, max: 1000000 } },
-      freshness_requirement: 30 // days
+      freshness_requirement: 30, // days
     });
   }
 
@@ -159,8 +171,8 @@ export class MarketDataIntegrator {
    * Get comprehensive market intelligence for a company/industry
    */
   async getMarketIntelligence(
-    companyName: string, 
-    industry: string, 
+    companyName: string,
+    industry: string,
     analysisType: 'competitive' | 'market_sizing' | 'trend_analysis' = 'competitive'
   ): Promise<CompetitiveIntelligence> {
     const intelligence: CompetitiveIntelligence = {
@@ -175,7 +187,7 @@ export class MarketDataIntegrator {
       data_quality_score: 0,
       last_updated: new Date().toISOString(),
       confidence_intervals: {},
-      unique_insights: []
+      unique_insights: [],
     };
 
     try {
@@ -200,7 +212,7 @@ export class MarketDataIntegrator {
           insight_type: 'innovation_analysis',
           description: 'Patent filing trends and R&D activity analysis',
           data: patentData,
-          confidence_score: 85
+          confidence_score: 85,
         });
         intelligence.data_sources.push('uspto_patents');
       }
@@ -212,7 +224,7 @@ export class MarketDataIntegrator {
           insight_type: 'developer_ecosystem',
           description: 'Open source activity and developer engagement',
           data: githubData,
-          confidence_score: 78
+          confidence_score: 78,
         });
         intelligence.data_sources.push('github_ecosystem');
       }
@@ -223,7 +235,9 @@ export class MarketDataIntegrator {
       return intelligence;
     } catch (error) {
       console.error('Error gathering market intelligence:', error);
-      throw new Error(`Failed to gather market intelligence: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to gather market intelligence: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -248,7 +262,7 @@ export class MarketDataIntegrator {
         employees: this.generateEmployeeCount(companyName),
         filing_date: '2024-03-15',
         data_source: 'sec_edgar',
-        confidence_score: 92
+        confidence_score: 92,
       };
 
       // Calculate derived metrics
@@ -282,7 +296,7 @@ export class MarketDataIntegrator {
           confidence_interval: { lower: 1.8, upper: 2.4 },
           data_source: 'fred_economic',
           last_updated: new Date().toISOString(),
-          industry_impact: this.getIndustryImpact(industry, 'gdp_growth')
+          industry_impact: this.getIndustryImpact(industry, 'gdp_growth'),
         },
         {
           trend_name: 'Interest Rates',
@@ -292,7 +306,7 @@ export class MarketDataIntegrator {
           confidence_interval: { lower: 5.0, upper: 5.5 },
           data_source: 'fred_economic',
           last_updated: new Date().toISOString(),
-          industry_impact: this.getIndustryImpact(industry, 'interest_rates')
+          industry_impact: this.getIndustryImpact(industry, 'interest_rates'),
         },
         {
           trend_name: 'Inflation Rate',
@@ -302,8 +316,8 @@ export class MarketDataIntegrator {
           confidence_interval: { lower: 3.0, upper: 3.4 },
           data_source: 'fred_economic',
           last_updated: new Date().toISOString(),
-          industry_impact: this.getIndustryImpact(industry, 'inflation')
-        }
+          industry_impact: this.getIndustryImpact(industry, 'inflation'),
+        },
       ];
 
       this.setCache(cacheKey, trends, 3600000); // 1 hour cache
@@ -330,23 +344,23 @@ export class MarketDataIntegrator {
           patent_categories: [
             { category: 'Software/AI', count: Math.floor(10 + Math.random() * 100) },
             { category: 'Hardware', count: Math.floor(5 + Math.random() * 30) },
-            { category: 'Business Methods', count: Math.floor(2 + Math.random() * 20) }
-          ]
+            { category: 'Business Methods', count: Math.floor(2 + Math.random() * 20) },
+          ],
         },
         industry_innovation: {
           total_industry_patents: Math.floor(1000 + Math.random() * 10000),
-          growth_rate: (Math.random() * 20 - 5), // -5% to 15% growth
+          growth_rate: Math.random() * 20 - 5, // -5% to 15% growth
           top_innovators: [
             { company: 'Industry Leader 1', patents: Math.floor(200 + Math.random() * 300) },
             { company: 'Industry Leader 2', patents: Math.floor(150 + Math.random() * 250) },
-            { company: companyName, patents: Math.floor(50 + Math.random() * 100) }
-          ]
+            { company: companyName, patents: Math.floor(50 + Math.random() * 100) },
+          ],
         },
         innovation_metrics: {
           r_and_d_intensity: Math.random() * 15, // 0-15% of revenue
           patent_quality_score: 60 + Math.random() * 30, // 60-90 score
-          citation_impact: Math.random() * 5 // 0-5x average citations
-        }
+          citation_impact: Math.random() * 5, // 0-5x average citations
+        },
       };
 
       this.setCache(cacheKey, patentData, 604800000); // 7 day cache
@@ -372,22 +386,22 @@ export class MarketDataIntegrator {
           total_stars: Math.floor(100 + Math.random() * 10000),
           total_forks: Math.floor(50 + Math.random() * 2000),
           contributors: Math.floor(20 + Math.random() * 500),
-          languages: ['TypeScript', 'Python', 'JavaScript', 'Go', 'Rust']
+          languages: ['TypeScript', 'Python', 'JavaScript', 'Go', 'Rust'],
         },
         developer_activity: {
           commits_last_month: Math.floor(100 + Math.random() * 1000),
           active_contributors: Math.floor(10 + Math.random() * 100),
           issue_resolution_time: Math.floor(1 + Math.random() * 10), // days
-          community_engagement: Math.floor(50 + Math.random() * 40) // 50-90 score
+          community_engagement: Math.floor(50 + Math.random() * 40), // 50-90 score
         },
         technology_adoption: {
           trending_technologies: [
             { tech: 'AI/ML', adoption_score: Math.floor(70 + Math.random() * 30) },
             { tech: 'Cloud Native', adoption_score: Math.floor(60 + Math.random() * 30) },
-            { tech: 'DevOps', adoption_score: Math.floor(80 + Math.random() * 20) }
+            { tech: 'DevOps', adoption_score: Math.floor(80 + Math.random() * 20) },
           ],
-          innovation_index: Math.floor(60 + Math.random() * 35) // 60-95 score
-        }
+          innovation_index: Math.floor(60 + Math.random() * 35), // 60-95 score
+        },
       };
 
       this.setCache(cacheKey, githubData, 3600000); // 1 hour cache
@@ -404,13 +418,15 @@ export class MarketDataIntegrator {
   private generateRealisticRevenue(companyName: string): number {
     const companyType = this.inferCompanyType(companyName);
     const baseRevenue = {
-      'startup': 1000000 + Math.random() * 9000000, // $1M-$10M
-      'growth': 10000000 + Math.random() * 90000000, // $10M-$100M
-      'enterprise': 100000000 + Math.random() * 900000000, // $100M-$1B
-      'fortune500': 1000000000 + Math.random() * 49000000000 // $1B-$50B
+      startup: 1000000 + Math.random() * 9000000, // $1M-$10M
+      growth: 10000000 + Math.random() * 90000000, // $10M-$100M
+      enterprise: 100000000 + Math.random() * 900000000, // $100M-$1B
+      fortune500: 1000000000 + Math.random() * 49000000000, // $1B-$50B
     };
-    
-    return Math.floor(baseRevenue[companyType as keyof typeof baseRevenue] || baseRevenue['growth']);
+
+    return Math.floor(
+      baseRevenue[companyType as keyof typeof baseRevenue] || baseRevenue['growth']
+    );
   }
 
   /**
@@ -419,13 +435,15 @@ export class MarketDataIntegrator {
   private generateEmployeeCount(companyName: string): number {
     const companyType = this.inferCompanyType(companyName);
     const baseEmployees = {
-      'startup': 10 + Math.random() * 90, // 10-100
-      'growth': 100 + Math.random() * 900, // 100-1000
-      'enterprise': 1000 + Math.random() * 9000, // 1K-10K
-      'fortune500': 10000 + Math.random() * 90000 // 10K-100K
+      startup: 10 + Math.random() * 90, // 10-100
+      growth: 100 + Math.random() * 900, // 100-1000
+      enterprise: 1000 + Math.random() * 9000, // 1K-10K
+      fortune500: 10000 + Math.random() * 90000, // 10K-100K
     };
-    
-    return Math.floor(baseEmployees[companyType as keyof typeof baseEmployees] || baseEmployees['growth']);
+
+    return Math.floor(
+      baseEmployees[companyType as keyof typeof baseEmployees] || baseEmployees['growth']
+    );
   }
 
   /**
@@ -435,7 +453,8 @@ export class MarketDataIntegrator {
     const name = companyName.toLowerCase();
     if (name.includes('startup') || name.includes('labs') || name.includes('ai')) return 'startup';
     if (name.includes('corp') || name.includes('inc') || name.includes('ltd')) return 'enterprise';
-    if (name.includes('microsoft') || name.includes('google') || name.includes('amazon')) return 'fortune500';
+    if (name.includes('microsoft') || name.includes('google') || name.includes('amazon'))
+      return 'fortune500';
     return 'growth';
   }
 
@@ -444,20 +463,20 @@ export class MarketDataIntegrator {
    */
   private getTickerSymbol(companyName: string): string {
     const tickerMap: Record<string, string> = {
-      'microsoft': 'MSFT',
-      'google': 'GOOGL',
-      'amazon': 'AMZN',
-      'apple': 'AAPL',
-      'meta': 'META',
-      'tesla': 'TSLA',
-      'nvidia': 'NVDA'
+      microsoft: 'MSFT',
+      google: 'GOOGL',
+      amazon: 'AMZN',
+      apple: 'AAPL',
+      meta: 'META',
+      tesla: 'TSLA',
+      nvidia: 'NVDA',
     };
-    
+
     const name = companyName.toLowerCase();
     for (const [company, ticker] of Object.entries(tickerMap)) {
       if (name.includes(company)) return ticker;
     }
-    
+
     // Generate realistic ticker for unknown companies
     return companyName.substring(0, 4).toUpperCase();
   }
@@ -467,23 +486,23 @@ export class MarketDataIntegrator {
    */
   private getIndustryImpact(industry: string, indicator: string): string {
     const impacts: Record<string, Record<string, string>> = {
-      'technology': {
-        'gdp_growth': 'High positive correlation - tech drives GDP growth',
-        'interest_rates': 'Negative impact - higher rates reduce tech valuations',
-        'inflation': 'Mixed impact - increases costs but also pricing power'
+      technology: {
+        gdp_growth: 'High positive correlation - tech drives GDP growth',
+        interest_rates: 'Negative impact - higher rates reduce tech valuations',
+        inflation: 'Mixed impact - increases costs but also pricing power',
       },
-      'healthcare': {
-        'gdp_growth': 'Moderate correlation - defensive industry characteristics',
-        'interest_rates': 'Low impact - stable demand regardless of rates',
-        'inflation': 'Positive impact - healthcare inflation typically exceeds general inflation'
+      healthcare: {
+        gdp_growth: 'Moderate correlation - defensive industry characteristics',
+        interest_rates: 'Low impact - stable demand regardless of rates',
+        inflation: 'Positive impact - healthcare inflation typically exceeds general inflation',
       },
-      'financial_services': {
-        'gdp_growth': 'High correlation - financial health tied to economic growth',
-        'interest_rates': 'Positive impact - higher rates increase net interest margins',
-        'inflation': 'Mixed impact - increases costs but also loan demand'
-      }
+      financial_services: {
+        gdp_growth: 'High correlation - financial health tied to economic growth',
+        interest_rates: 'Positive impact - higher rates increase net interest margins',
+        inflation: 'Mixed impact - increases costs but also loan demand',
+      },
     };
-    
+
     return impacts[industry]?.[indicator] || 'Moderate impact on industry performance';
   }
 
@@ -500,7 +519,8 @@ export class MarketDataIntegrator {
     factors++;
 
     // Data freshness (0-25 points)
-    const hoursOld = (Date.now() - new Date(intelligence.last_updated).getTime()) / (1000 * 60 * 60);
+    const hoursOld =
+      (Date.now() - new Date(intelligence.last_updated).getTime()) / (1000 * 60 * 60);
     const freshnessScore = Math.max(0, 25 - hoursOld);
     score += freshnessScore;
     factors++;
@@ -509,14 +529,17 @@ export class MarketDataIntegrator {
     const completenessFactors = [
       intelligence.financial_metrics && Object.keys(intelligence.financial_metrics).length > 0,
       intelligence.market_trends && intelligence.market_trends.length > 0,
-      intelligence.unique_insights && intelligence.unique_insights.length > 0
+      intelligence.unique_insights && intelligence.unique_insights.length > 0,
     ];
-    const completenessScore = (completenessFactors.filter(Boolean).length / completenessFactors.length) * 25;
+    const completenessScore =
+      (completenessFactors.filter(Boolean).length / completenessFactors.length) * 25;
     score += completenessScore;
     factors++;
 
     // Confidence intervals availability (0-20 points)
-    const hasConfidenceIntervals = intelligence.confidence_intervals && Object.keys(intelligence.confidence_intervals).length > 0;
+    const hasConfidenceIntervals =
+      intelligence.confidence_intervals &&
+      Object.keys(intelligence.confidence_intervals).length > 0;
     score += hasConfidenceIntervals ? 20 : 0;
     factors++;
 
@@ -539,7 +562,7 @@ export class MarketDataIntegrator {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl
+      ttl,
     });
   }
 

@@ -8,7 +8,7 @@ import {
   validateTaskPlan,
   ConsistencyValidationResult,
   ConsistencyError,
-  ConsistencyWarning
+  ConsistencyWarning,
 } from '../../utils/pm-document-consistency-validation';
 import {
   ManagementOnePager,
@@ -18,7 +18,7 @@ import {
   TaskPlan,
   Task,
   DesignOption,
-  PriorityItem
+  PriorityItem,
 } from '../../components/pm-document-generator';
 
 describe('PMDocumentConsistencyValidator', () => {
@@ -30,37 +30,32 @@ describe('PMDocumentConsistencyValidator', () => {
 
   describe('Management One-Pager Validation', () => {
     const mockRequirements: PMRequirements = {
-      businessGoal: 'Reduce developer workflow costs by 40-60% through intelligent quota optimization',
+      businessGoal:
+        'Reduce developer workflow costs by 40-60% through intelligent quota optimization',
       userNeeds: {
         jobs: ['Optimize workflow efficiency', 'Reduce operational costs'],
         pains: ['High quota consumption', 'Manual optimization processes'],
-        gains: ['Significant cost savings', 'Automated optimization']
+        gains: ['Significant cost savings', 'Automated optimization'],
       },
       functionalRequirements: [
         'Natural language intent parsing',
         'Workflow optimization with batching',
-        'ROI analysis and forecasting'
+        'ROI analysis and forecasting',
       ],
       constraintsRisks: ['Technical complexity', 'User adoption challenges'],
       priority: {
         must: [
           { requirement: 'Intent parsing', justification: 'Core functionality' },
-          { requirement: 'Basic optimization', justification: 'Primary value' }
+          { requirement: 'Basic optimization', justification: 'Primary value' },
         ],
-        should: [
-          { requirement: 'Advanced analytics', justification: 'Enhanced value' }
-        ],
-        could: [
-          { requirement: 'Custom integrations', justification: 'Nice to have' }
-        ],
-        wont: [
-          { requirement: 'Legacy system support', justification: 'Out of scope' }
-        ]
+        should: [{ requirement: 'Advanced analytics', justification: 'Enhanced value' }],
+        could: [{ requirement: 'Custom integrations', justification: 'Nice to have' }],
+        wont: [{ requirement: 'Legacy system support', justification: 'Out of scope' }],
       },
       rightTimeVerdict: {
         decision: 'do_now',
-        reasoning: 'Market timing is optimal'
-      }
+        reasoning: 'Market timing is optimal',
+      },
     };
 
     const mockDesign: DesignOptions = {
@@ -72,7 +67,7 @@ describe('PMDocumentConsistencyValidator', () => {
           keyTradeoffs: ['Lower risk', 'Limited automation'],
           impact: 'Medium',
           effort: 'Low',
-          majorRisks: ['Limited value delivery']
+          majorRisks: ['Limited value delivery'],
         },
         balanced: {
           name: 'Balanced',
@@ -80,7 +75,7 @@ describe('PMDocumentConsistencyValidator', () => {
           keyTradeoffs: ['Balanced risk/reward', 'Good automation'],
           impact: 'High',
           effort: 'Medium',
-          majorRisks: ['Technical complexity', 'Integration challenges']
+          majorRisks: ['Technical complexity', 'Integration challenges'],
         },
         bold: {
           name: 'Bold',
@@ -88,58 +83,59 @@ describe('PMDocumentConsistencyValidator', () => {
           keyTradeoffs: ['High value', 'High complexity'],
           impact: 'High',
           effort: 'High',
-          majorRisks: ['Development complexity', 'Resource requirements']
-        }
+          majorRisks: ['Development complexity', 'Resource requirements'],
+        },
       },
       impactEffortMatrix: {
         highImpactLowEffort: [],
         highImpactHighEffort: [],
         lowImpactLowEffort: [],
-        lowImpactHighEffort: []
+        lowImpactHighEffort: [],
       },
-      rightTimeRecommendation: 'Now is optimal due to market conditions and technical readiness'
+      rightTimeRecommendation: 'Now is optimal due to market conditions and technical readiness',
     };
 
     const mockOnePager: ManagementOnePager = {
-      answer: 'Build automated workflow optimization now to capture 40-60% cost savings opportunity',
+      answer:
+        'Build automated workflow optimization now to capture 40-60% cost savings opportunity',
       because: [
         'Cost optimization opportunity with measurable ROI',
         'Technical architecture is well-defined',
-        'Market timing is optimal with minimal competition'
+        'Market timing is optimal with minimal competition',
       ],
       whatScopeToday: [
         'Natural language intent parsing engine',
         'Workflow optimization with batching strategies',
-        'ROI analysis and quota forecasting'
+        'ROI analysis and quota forecasting',
       ],
       risksAndMitigations: [
         {
           risk: 'Technical complexity may cause delays',
-          mitigation: 'Implement MVP first, iterate with advanced features'
+          mitigation: 'Implement MVP first, iterate with advanced features',
         },
         {
           risk: 'User adoption slower than expected',
-          mitigation: 'Conduct pilot program with key users'
+          mitigation: 'Conduct pilot program with key users',
         },
         {
           risk: 'Quota optimization accuracy below expectations',
-          mitigation: 'Establish clear metrics and improvement process'
-        }
+          mitigation: 'Establish clear metrics and improvement process',
+        },
       ],
       options: {
         conservative: {
           name: 'Conservative',
-          summary: 'Basic intent parsing with manual optimization recommendations'
+          summary: 'Basic intent parsing with manual optimization recommendations',
         },
         balanced: {
           name: 'Balanced',
           summary: 'Automated workflow optimization with consulting analysis',
-          recommended: true
+          recommended: true,
         },
         bold: {
           name: 'Bold',
-          summary: 'Full AI-powered consulting platform with advanced techniques'
-        }
+          summary: 'Full AI-powered consulting platform with advanced techniques',
+        },
       },
       roiSnapshot: {
         options: {
@@ -147,23 +143,24 @@ describe('PMDocumentConsistencyValidator', () => {
             effort: 'Low',
             impact: 'Med',
             estimatedCost: '$50K',
-            timing: 'Now'
+            timing: 'Now',
           },
           balanced: {
             effort: 'Med',
             impact: 'High',
             estimatedCost: '$150K',
-            timing: 'Now'
+            timing: 'Now',
           },
           bold: {
             effort: 'High',
             impact: 'VeryH',
             estimatedCost: '$300K',
-            timing: 'Later'
-          }
-        }
+            timing: 'Later',
+          },
+        },
       },
-      rightTimeRecommendation: 'Technical readiness supports immediate implementation with manageable risk'
+      rightTimeRecommendation:
+        'Technical readiness supports immediate implementation with manageable risk',
     };
 
     it('should validate consistent management one-pager successfully', () => {
@@ -184,9 +181,9 @@ describe('PMDocumentConsistencyValidator', () => {
           ...mockOnePager.options,
           conservative: {
             ...mockOnePager.options.conservative,
-            name: 'Minimal' // Different from design
-          }
-        }
+            name: 'Minimal', // Different from design
+          },
+        },
       };
 
       const result = validator.validateManagementOnePagerConsistency(
@@ -207,10 +204,10 @@ describe('PMDocumentConsistencyValidator', () => {
             balanced: {
               ...mockOnePager.roiSnapshot.options.balanced,
               impact: 'Med' as const, // Contradicts design high impact
-              effort: 'Low' as const   // Contradicts design medium effort
-            }
-          }
-        }
+              effort: 'Low' as const, // Contradicts design medium effort
+            },
+          },
+        },
       };
 
       const result = validator.validateManagementOnePagerConsistency(
@@ -228,8 +225,8 @@ describe('PMDocumentConsistencyValidator', () => {
         options: {
           conservative: { name: 'Conservative', summary: 'Basic approach' },
           balanced: { name: 'Balanced', summary: 'Balanced approach' }, // No recommended flag
-          bold: { name: 'Bold', summary: 'Advanced approach' }
-        }
+          bold: { name: 'Bold', summary: 'Advanced approach' },
+        },
       };
 
       const result = validator.validateManagementOnePagerConsistency(
@@ -238,13 +235,15 @@ describe('PMDocumentConsistencyValidator', () => {
         mockDesign
       );
 
-      expect(result.errors.some(e => e.type === 'format' && e.field === 'options.recommended')).toBe(true);
+      expect(
+        result.errors.some(e => e.type === 'format' && e.field === 'options.recommended')
+      ).toBe(true);
     });
 
     it('should detect incorrect number of reasons', () => {
       const wrongReasonsOnePager = {
         ...mockOnePager,
-        because: ['Only one reason'] // Should be exactly 3
+        because: ['Only one reason'], // Should be exactly 3
       };
 
       const result = validator.validateManagementOnePagerConsistency(
@@ -261,9 +260,9 @@ describe('PMDocumentConsistencyValidator', () => {
         ...mockOnePager,
         risksAndMitigations: [
           { risk: 'Risk 1', mitigation: 'Mitigation 1' },
-          { risk: 'Risk 2', mitigation: 'Mitigation 2' }
+          { risk: 'Risk 2', mitigation: 'Mitigation 2' },
           // Missing third risk
-        ]
+        ],
       };
 
       const result = validator.validateManagementOnePagerConsistency(
@@ -272,7 +271,9 @@ describe('PMDocumentConsistencyValidator', () => {
         mockDesign
       );
 
-      expect(result.errors.some(e => e.type === 'format' && e.field === 'risksAndMitigations')).toBe(true);
+      expect(
+        result.errors.some(e => e.type === 'format' && e.field === 'risksAndMitigations')
+      ).toBe(true);
     });
   });
 
@@ -281,27 +282,59 @@ describe('PMDocumentConsistencyValidator', () => {
       pressRelease: {
         date: '2025-05-30',
         headline: 'Revolutionary AI Agent Reduces Developer Workflow Costs by 60%',
-        subHeadline: 'Advanced AI system applies consulting-grade analysis to minimize quota consumption',
-        body: 'Today we announced the PM Agent Intent-to-Spec Optimizer, solving the critical problem of excessive quota consumption that has plagued developer workflows. Our breakthrough solution applies professional consulting techniques to automatically optimize workflows while preserving all functionality. The timing is optimal because market conditions are favorable and technical capabilities are mature. "This tool has transformed how we approach workflow optimization," said a beta customer. The system is available immediately through MCP integration.'
+        subHeadline:
+          'Advanced AI system applies consulting-grade analysis to minimize quota consumption',
+        body: 'Today we announced the PM Agent Intent-to-Spec Optimizer, solving the critical problem of excessive quota consumption that has plagued developer workflows. Our breakthrough solution applies professional consulting techniques to automatically optimize workflows while preserving all functionality. The timing is optimal because market conditions are favorable and technical capabilities are mature. "This tool has transformed how we approach workflow optimization," said a beta customer. The system is available immediately through MCP integration.',
       },
       faq: [
-        { question: 'Who is the customer?', answer: 'Developers and teams who want to optimize Kiro workflows' },
-        { question: 'What problem are we solving now?', answer: 'Excessive quota consumption in developer workflows' },
-        { question: 'Why now and why not later?', answer: 'Market timing is optimal with technical readiness' },
-        { question: 'What is the smallest lovable version?', answer: 'Basic intent parsing with optimization recommendations' },
-        { question: 'How will we measure success (3 metrics)?', answer: 'Quota reduction %, user adoption rate, cost savings' },
-        { question: 'What are the top 3 risks and mitigations?', answer: 'Technical complexity (MVP approach), adoption (pilot program), accuracy (metrics)' },
-        { question: 'What is not included?', answer: 'Legacy system support, custom enterprise integrations' },
-        { question: 'How does this compare to alternatives?', answer: 'First automated solution with consulting-grade analysis' },
-        { question: 'What\'s the estimated cost/quota footprint?', answer: '$150K development, 40-60% quota savings' },
-        { question: 'What are the next 2 releases after v1?', answer: 'Advanced analytics (v2), enterprise features (v3)' }
+        {
+          question: 'Who is the customer?',
+          answer: 'Developers and teams who want to optimize Kiro workflows',
+        },
+        {
+          question: 'What problem are we solving now?',
+          answer: 'Excessive quota consumption in developer workflows',
+        },
+        {
+          question: 'Why now and why not later?',
+          answer: 'Market timing is optimal with technical readiness',
+        },
+        {
+          question: 'What is the smallest lovable version?',
+          answer: 'Basic intent parsing with optimization recommendations',
+        },
+        {
+          question: 'How will we measure success (3 metrics)?',
+          answer: 'Quota reduction %, user adoption rate, cost savings',
+        },
+        {
+          question: 'What are the top 3 risks and mitigations?',
+          answer:
+            'Technical complexity (MVP approach), adoption (pilot program), accuracy (metrics)',
+        },
+        {
+          question: 'What is not included?',
+          answer: 'Legacy system support, custom enterprise integrations',
+        },
+        {
+          question: 'How does this compare to alternatives?',
+          answer: 'First automated solution with consulting-grade analysis',
+        },
+        {
+          question: "What's the estimated cost/quota footprint?",
+          answer: '$150K development, 40-60% quota savings',
+        },
+        {
+          question: 'What are the next 2 releases after v1?',
+          answer: 'Advanced analytics (v2), enterprise features (v3)',
+        },
       ],
       launchChecklist: [
         { task: 'Scope freeze by target date', owner: 'PM', dueDate: '2025-04-15' },
         { task: 'Technical architecture review', owner: 'Engineering', dueDate: '2025-04-20' },
         { task: 'Beta user recruitment', owner: 'Marketing', dueDate: '2025-05-01' },
-        { task: 'Documentation completion', owner: 'Technical Writing', dueDate: '2025-05-15' }
-      ]
+        { task: 'Documentation completion', owner: 'Technical Writing', dueDate: '2025-05-15' },
+      ],
     };
 
     const mockRequirements: PMRequirements = {
@@ -309,7 +342,7 @@ describe('PMDocumentConsistencyValidator', () => {
       userNeeds: {
         jobs: ['Optimize workflows', 'Reduce costs'],
         pains: ['High quota consumption', 'Manual processes'],
-        gains: ['Cost savings', 'Automation']
+        gains: ['Cost savings', 'Automation'],
       },
       functionalRequirements: ['Intent parsing', 'Optimization', 'ROI analysis'],
       constraintsRisks: ['Technical complexity', 'User adoption'],
@@ -317,19 +350,16 @@ describe('PMDocumentConsistencyValidator', () => {
         must: [{ requirement: 'Core functionality', justification: 'Essential' }],
         should: [],
         could: [],
-        wont: []
+        wont: [],
       },
       rightTimeVerdict: {
         decision: 'do_now',
-        reasoning: 'Optimal timing'
-      }
+        reasoning: 'Optimal timing',
+      },
     };
 
     it('should validate consistent PR-FAQ successfully', () => {
-      const result = validator.validatePRFAQConsistency(
-        mockPRFAQ,
-        mockRequirements
-      );
+      const result = validator.validatePRFAQConsistency(mockPRFAQ, mockRequirements);
 
       expect(result.isValid).toBe(true);
       expect(result.errors.filter(e => e.severity === 'high')).toHaveLength(0);
@@ -340,13 +370,15 @@ describe('PMDocumentConsistencyValidator', () => {
         ...mockPRFAQ,
         pressRelease: {
           ...mockPRFAQ.pressRelease,
-          body: Array(300).fill('word').join(' ') // 300 words, over the 250 limit
-        }
+          body: Array(300).fill('word').join(' '), // 300 words, over the 250 limit
+        },
       };
 
       const result = validator.validatePRFAQConsistency(longPRFAQ, mockRequirements);
 
-      expect(result.errors.some(e => e.type === 'format' && e.field === 'pressRelease.body')).toBe(true);
+      expect(result.errors.some(e => e.type === 'format' && e.field === 'pressRelease.body')).toBe(
+        true
+      );
     });
 
     it('should detect missing required FAQ questions', () => {
@@ -354,9 +386,9 @@ describe('PMDocumentConsistencyValidator', () => {
         ...mockPRFAQ,
         faq: [
           { question: 'Who is the customer?', answer: 'Developers' },
-          { question: 'What problem are we solving?', answer: 'Quota issues' }
+          { question: 'What problem are we solving?', answer: 'Quota issues' },
           // Missing 8 required questions
-        ]
+        ],
       };
 
       const result = validator.validatePRFAQConsistency(incompletePRFAQ, mockRequirements);
@@ -367,10 +399,12 @@ describe('PMDocumentConsistencyValidator', () => {
     it('should detect too many FAQ questions', () => {
       const tooManyFAQs = {
         ...mockPRFAQ,
-        faq: Array(25).fill(null).map((_, i) => ({
-          question: `Question ${i + 1}`,
-          answer: `Answer ${i + 1}`
-        }))
+        faq: Array(25)
+          .fill(null)
+          .map((_, i) => ({
+            question: `Question ${i + 1}`,
+            answer: `Answer ${i + 1}`,
+          })),
       };
 
       const result = validator.validatePRFAQConsistency(tooManyFAQs, mockRequirements);
@@ -382,9 +416,9 @@ describe('PMDocumentConsistencyValidator', () => {
       const incompleteChecklistPRFAQ = {
         ...mockPRFAQ,
         launchChecklist: [
-          { task: 'Random task', owner: 'Someone', dueDate: '2025-05-01' }
+          { task: 'Random task', owner: 'Someone', dueDate: '2025-05-01' },
           // Missing scope freeze, timeline, dependencies
-        ]
+        ],
       };
 
       const result = validator.validatePRFAQConsistency(incompleteChecklistPRFAQ, mockRequirements);
@@ -406,9 +440,9 @@ describe('PMDocumentConsistencyValidator', () => {
         limits: {
           maxVibes: 1000,
           maxSpecs: 100,
-          budgetUSD: 150000
+          budgetUSD: 150000,
         },
-        checkCriteria: ['Budget check', 'Quota validation', 'Resource availability']
+        checkCriteria: ['Budget check', 'Quota validation', 'Resource availability'],
       },
       immediateWins: [
         {
@@ -418,7 +452,7 @@ describe('PMDocumentConsistencyValidator', () => {
           acceptanceCriteria: ['Parse natural language', 'Extract requirements'],
           effort: 'S',
           impact: 'High',
-          priority: 'Must'
+          priority: 'Must',
         },
         {
           id: '1.2',
@@ -427,8 +461,8 @@ describe('PMDocumentConsistencyValidator', () => {
           acceptanceCriteria: ['Identify inefficiencies', 'Suggest improvements'],
           effort: 'M',
           impact: 'High',
-          priority: 'Must'
-        }
+          priority: 'Must',
+        },
       ],
       shortTerm: [
         {
@@ -438,7 +472,7 @@ describe('PMDocumentConsistencyValidator', () => {
           acceptanceCriteria: ['Apply MECE framework', 'Generate ROI analysis'],
           effort: 'L',
           impact: 'Med',
-          priority: 'Should'
+          priority: 'Should',
         },
         {
           id: '2.2',
@@ -447,8 +481,8 @@ describe('PMDocumentConsistencyValidator', () => {
           acceptanceCriteria: ['Tool definitions', 'Handler implementation'],
           effort: 'M',
           impact: 'High',
-          priority: 'Must'
-        }
+          priority: 'Must',
+        },
       ],
       longTerm: [
         {
@@ -458,9 +492,9 @@ describe('PMDocumentConsistencyValidator', () => {
           acceptanceCriteria: ['Custom integrations', 'Advanced security'],
           effort: 'L',
           impact: 'Med',
-          priority: 'Could'
-        }
-      ]
+          priority: 'Could',
+        },
+      ],
     };
 
     const mockDesign: DesignOptions = {
@@ -472,7 +506,7 @@ describe('PMDocumentConsistencyValidator', () => {
           keyTradeoffs: ['Low risk'],
           impact: 'Medium',
           effort: 'Low',
-          majorRisks: ['Limited value']
+          majorRisks: ['Limited value'],
         },
         balanced: {
           name: 'Balanced',
@@ -480,7 +514,7 @@ describe('PMDocumentConsistencyValidator', () => {
           keyTradeoffs: ['Balanced approach'],
           impact: 'High',
           effort: 'Medium',
-          majorRisks: ['Technical complexity', 'Integration challenges']
+          majorRisks: ['Technical complexity', 'Integration challenges'],
         },
         bold: {
           name: 'Bold',
@@ -488,23 +522,20 @@ describe('PMDocumentConsistencyValidator', () => {
           keyTradeoffs: ['High value'],
           impact: 'High',
           effort: 'High',
-          majorRisks: ['Development complexity']
-        }
+          majorRisks: ['Development complexity'],
+        },
       },
       impactEffortMatrix: {
         highImpactLowEffort: [],
         highImpactHighEffort: [],
         lowImpactLowEffort: [],
-        lowImpactHighEffort: []
+        lowImpactHighEffort: [],
       },
-      rightTimeRecommendation: 'Now is the right time'
+      rightTimeRecommendation: 'Now is the right time',
     };
 
     it('should validate consistent task plan successfully', () => {
-      const result = validator.validateTaskPlanConsistency(
-        mockTaskPlan,
-        mockDesign
-      );
+      const result = validator.validateTaskPlanConsistency(mockTaskPlan, mockDesign);
 
       expect(result.isValid).toBe(true);
       expect(result.errors.filter(e => e.severity === 'high')).toHaveLength(0);
@@ -516,50 +547,47 @@ describe('PMDocumentConsistencyValidator', () => {
         guardrailsCheck: {
           ...mockTaskPlan.guardrailsCheck,
           id: 'random-id',
-          name: 'Some Task'
-        }
+          name: 'Some Task',
+        },
       };
 
-      const result = validator.validateTaskPlanConsistency(
-        badGuardrailsTaskPlan,
-        mockDesign
-      );
+      const result = validator.validateTaskPlanConsistency(badGuardrailsTaskPlan, mockDesign);
 
-      expect(result.errors.some(e => e.type === 'format' && e.field === 'guardrailsCheck')).toBe(true);
+      expect(result.errors.some(e => e.type === 'format' && e.field === 'guardrailsCheck')).toBe(
+        true
+      );
     });
 
     it('should detect missing immediate wins', () => {
       const noImmediateWinsTaskPlan = {
         ...mockTaskPlan,
-        immediateWins: []
+        immediateWins: [],
       };
 
-      const result = validator.validateTaskPlanConsistency(
-        noImmediateWinsTaskPlan,
-        mockDesign
-      );
+      const result = validator.validateTaskPlanConsistency(noImmediateWinsTaskPlan, mockDesign);
 
-      expect(result.errors.some(e => e.type === 'missing' && e.field === 'immediateWins')).toBe(true);
+      expect(result.errors.some(e => e.type === 'missing' && e.field === 'immediateWins')).toBe(
+        true
+      );
     });
 
     it('should warn about too many immediate wins', () => {
       const tooManyImmediateWins = {
         ...mockTaskPlan,
-        immediateWins: Array(5).fill(null).map((_, i) => ({
-          id: `1.${i + 1}`,
-          name: `Task ${i + 1}`,
-          description: 'Description',
-          acceptanceCriteria: ['Criteria'],
-          effort: 'S' as const,
-          impact: 'High' as const,
-          priority: 'Must' as const
-        }))
+        immediateWins: Array(5)
+          .fill(null)
+          .map((_, i) => ({
+            id: `1.${i + 1}`,
+            name: `Task ${i + 1}`,
+            description: 'Description',
+            acceptanceCriteria: ['Criteria'],
+            effort: 'S' as const,
+            impact: 'High' as const,
+            priority: 'Must' as const,
+          })),
       };
 
-      const result = validator.validateTaskPlanConsistency(
-        tooManyImmediateWins,
-        mockDesign
-      );
+      const result = validator.validateTaskPlanConsistency(tooManyImmediateWins, mockDesign);
 
       expect(result.warnings.some(w => w.type === 'format_issue')).toBe(true);
     });
@@ -576,15 +604,12 @@ describe('PMDocumentConsistencyValidator', () => {
             acceptanceCriteria: ['Criteria'],
             effort: 'M' as const,
             impact: 'Med' as const,
-            priority: 'Should' as const
-          }
-        ]
+            priority: 'Should' as const,
+          },
+        ],
       };
 
-      const result = validator.validateTaskPlanConsistency(
-        duplicateIDTaskPlan,
-        mockDesign
-      );
+      const result = validator.validateTaskPlanConsistency(duplicateIDTaskPlan, mockDesign);
 
       expect(result.errors.some(e => e.type === 'format' && e.field === 'taskIds')).toBe(true);
     });
@@ -600,9 +625,9 @@ describe('PMDocumentConsistencyValidator', () => {
             acceptanceCriteria: ['Criteria'],
             effort: 'S' as const,
             impact: 'Low' as const, // Low impact but Must priority
-            priority: 'Must' as const
-          }
-        ]
+            priority: 'Must' as const,
+          },
+        ],
       };
 
       const result = validator.validateTaskPlanConsistency(
@@ -620,7 +645,7 @@ describe('PMDocumentConsistencyValidator', () => {
       userNeeds: {
         jobs: ['Optimize workflows'],
         pains: ['High costs'],
-        gains: ['Savings']
+        gains: ['Savings'],
       },
       functionalRequirements: ['Parsing', 'Optimization'],
       constraintsRisks: ['Complexity'],
@@ -628,12 +653,12 @@ describe('PMDocumentConsistencyValidator', () => {
         must: [{ requirement: 'Core', justification: 'Essential' }],
         should: [],
         could: [],
-        wont: []
+        wont: [],
       },
       rightTimeVerdict: {
         decision: 'do_now',
-        reasoning: 'Good timing'
-      }
+        reasoning: 'Good timing',
+      },
     };
 
     const mockOnePager: ManagementOnePager = {
@@ -643,21 +668,21 @@ describe('PMDocumentConsistencyValidator', () => {
       risksAndMitigations: [
         { risk: 'Complexity', mitigation: 'MVP approach' },
         { risk: 'Adoption', mitigation: 'Pilot program' },
-        { risk: 'Accuracy', mitigation: 'Metrics' }
+        { risk: 'Accuracy', mitigation: 'Metrics' },
       ],
       options: {
         conservative: { name: 'Conservative', summary: 'Basic' },
         balanced: { name: 'Balanced', summary: 'Automated', recommended: true },
-        bold: { name: 'Bold', summary: 'Full platform' }
+        bold: { name: 'Bold', summary: 'Full platform' },
       },
       roiSnapshot: {
         options: {
           conservative: { effort: 'Low', impact: 'Med', estimatedCost: '$50K', timing: 'Now' },
           balanced: { effort: 'Med', impact: 'High', estimatedCost: '$150K', timing: 'Now' },
-          bold: { effort: 'High', impact: 'VeryH', estimatedCost: '$300K', timing: 'Later' }
-        }
+          bold: { effort: 'High', impact: 'VeryH', estimatedCost: '$300K', timing: 'Later' },
+        },
       },
-      rightTimeRecommendation: 'Technical readiness supports immediate implementation'
+      rightTimeRecommendation: 'Technical readiness supports immediate implementation',
     };
 
     const mockPRFAQ: PRFAQ = {
@@ -665,32 +690,41 @@ describe('PMDocumentConsistencyValidator', () => {
         date: '2025-05-30',
         headline: 'Cost Optimization Tool Launched',
         subHeadline: 'Reduces workflow costs significantly',
-        body: 'Today we solve cost optimization challenges with automated workflows. Market timing is perfect.'
+        body: 'Today we solve cost optimization challenges with automated workflows. Market timing is perfect.',
       },
       faq: [
         { question: 'Who is the customer?', answer: 'Developers' },
         { question: 'What problem are we solving now?', answer: 'High costs' },
         { question: 'Why now and why not later?', answer: 'Perfect timing' },
         { question: 'What is the smallest lovable version?', answer: 'Basic parsing' },
-        { question: 'How will we measure success (3 metrics)?', answer: 'Cost reduction, adoption, satisfaction' },
-        { question: 'What are the top 3 risks and mitigations?', answer: 'Complexity (MVP), adoption (pilot), accuracy (metrics)' },
+        {
+          question: 'How will we measure success (3 metrics)?',
+          answer: 'Cost reduction, adoption, satisfaction',
+        },
+        {
+          question: 'What are the top 3 risks and mitigations?',
+          answer: 'Complexity (MVP), adoption (pilot), accuracy (metrics)',
+        },
         { question: 'What is not included?', answer: 'Legacy support' },
         { question: 'How does this compare to alternatives?', answer: 'First automated solution' },
-        { question: 'What\'s the estimated cost/quota footprint?', answer: '$150K investment' },
-        { question: 'What are the next 2 releases after v1?', answer: 'Analytics v2, enterprise v3' }
+        { question: "What's the estimated cost/quota footprint?", answer: '$150K investment' },
+        {
+          question: 'What are the next 2 releases after v1?',
+          answer: 'Analytics v2, enterprise v3',
+        },
       ],
       launchChecklist: [
         { task: 'Scope freeze', owner: 'PM', dueDate: '2025-04-15' },
         { task: 'Timeline review', owner: 'Engineering', dueDate: '2025-04-20' },
-        { task: 'Dependencies check', owner: 'PM', dueDate: '2025-05-01' }
-      ]
+        { task: 'Dependencies check', owner: 'PM', dueDate: '2025-05-01' },
+      ],
     };
 
     it('should validate consistent cross-document set', () => {
       const result = validatePMDocumentConsistency({
         requirements: mockRequirements,
         onePager: mockOnePager,
-        prfaq: mockPRFAQ
+        prfaq: mockPRFAQ,
       });
 
       expect(result.isValid).toBe(true);
@@ -700,21 +734,21 @@ describe('PMDocumentConsistencyValidator', () => {
     it('should detect timing inconsistency between one-pager and PR-FAQ', () => {
       const urgentOnePager = {
         ...mockOnePager,
-        answer: 'Build immediately due to urgent market need'
+        answer: 'Build immediately due to urgent market need',
       };
 
       const casualPRFAQ = {
         ...mockPRFAQ,
         pressRelease: {
           ...mockPRFAQ.pressRelease,
-          body: 'We are launching a nice tool when convenient. No rush.'
-        }
+          body: 'We are launching a nice tool when convenient. No rush.',
+        },
       };
 
       const result = validatePMDocumentConsistency({
         requirements: mockRequirements,
         onePager: urgentOnePager,
-        prfaq: casualPRFAQ
+        prfaq: casualPRFAQ,
       });
 
       expect(result.warnings.some(w => w.type === 'potential_misalignment')).toBe(true);
@@ -723,25 +757,27 @@ describe('PMDocumentConsistencyValidator', () => {
     it('should detect scope vs not-included contradiction', () => {
       const scopedOnePager = {
         ...mockOnePager,
-        whatScopeToday: ['Legacy system integration', 'Advanced features']
+        whatScopeToday: ['Legacy system integration', 'Advanced features'],
       };
 
       const contradictoryPRFAQ = {
         ...mockPRFAQ,
-        faq: mockPRFAQ.faq.map(faq => 
-          faq.question.includes('not included') 
+        faq: mockPRFAQ.faq.map(faq =>
+          faq.question.includes('not included')
             ? { ...faq, answer: 'Legacy system integration and advanced features are not included' }
             : faq
-        )
+        ),
       };
 
       const result = validatePMDocumentConsistency({
         requirements: mockRequirements,
         onePager: scopedOnePager,
-        prfaq: contradictoryPRFAQ
+        prfaq: contradictoryPRFAQ,
       });
 
-      expect(result.errors.some(e => e.type === 'contradiction' && e.field === 'scope_vs_not_included')).toBe(true);
+      expect(
+        result.errors.some(e => e.type === 'contradiction' && e.field === 'scope_vs_not_included')
+      ).toBe(true);
     });
   });
 
@@ -754,21 +790,21 @@ describe('PMDocumentConsistencyValidator', () => {
         risksAndMitigations: [
           { risk: 'Risk 1', mitigation: 'Mitigation 1' },
           { risk: 'Risk 2', mitigation: 'Mitigation 2' },
-          { risk: 'Risk 3', mitigation: 'Mitigation 3' }
+          { risk: 'Risk 3', mitigation: 'Mitigation 3' },
         ],
         options: {
           conservative: { name: 'Conservative', summary: 'Basic' },
           balanced: { name: 'Balanced', summary: 'Automated', recommended: true },
-          bold: { name: 'Bold', summary: 'Advanced' }
+          bold: { name: 'Bold', summary: 'Advanced' },
         },
         roiSnapshot: {
           options: {
             conservative: { effort: 'Low', impact: 'Med', estimatedCost: '$50K', timing: 'Now' },
             balanced: { effort: 'Med', impact: 'High', estimatedCost: '$150K', timing: 'Now' },
-            bold: { effort: 'High', impact: 'VeryH', estimatedCost: '$300K', timing: 'Later' }
-          }
+            bold: { effort: 'High', impact: 'VeryH', estimatedCost: '$300K', timing: 'Later' },
+          },
         },
-        rightTimeRecommendation: 'Good timing'
+        rightTimeRecommendation: 'Good timing',
       };
 
       const result = validateManagementOnePager(mockOnePager);
@@ -783,7 +819,7 @@ describe('PMDocumentConsistencyValidator', () => {
           date: '2025-05-30',
           headline: 'Test Headline',
           subHeadline: 'Test Sub',
-          body: 'Short body under 250 words.'
+          body: 'Short body under 250 words.',
         },
         faq: [
           { question: 'Who is the customer?', answer: 'Developers' },
@@ -794,12 +830,10 @@ describe('PMDocumentConsistencyValidator', () => {
           { question: 'What are the top 3 risks and mitigations?', answer: 'Risks' },
           { question: 'What is not included?', answer: 'Exclusions' },
           { question: 'How does this compare to alternatives?', answer: 'Comparison' },
-          { question: 'What\'s the estimated cost/quota footprint?', answer: 'Cost' },
-          { question: 'What are the next 2 releases after v1?', answer: 'Roadmap' }
+          { question: "What's the estimated cost/quota footprint?", answer: 'Cost' },
+          { question: 'What are the next 2 releases after v1?', answer: 'Roadmap' },
         ],
-        launchChecklist: [
-          { task: 'Task 1', owner: 'Owner 1', dueDate: '2025-05-01' }
-        ]
+        launchChecklist: [{ task: 'Task 1', owner: 'Owner 1', dueDate: '2025-05-01' }],
       };
 
       const result = validatePRFAQ(mockPRFAQ);
@@ -819,7 +853,7 @@ describe('PMDocumentConsistencyValidator', () => {
           impact: 'High',
           priority: 'Must',
           limits: { maxVibes: 1000 },
-          checkCriteria: ['Check 1']
+          checkCriteria: ['Check 1'],
         },
         immediateWins: [
           {
@@ -829,11 +863,11 @@ describe('PMDocumentConsistencyValidator', () => {
             acceptanceCriteria: ['Criteria'],
             effort: 'S',
             impact: 'High',
-            priority: 'Must'
-          }
+            priority: 'Must',
+          },
         ],
         shortTerm: [],
-        longTerm: []
+        longTerm: [],
       };
 
       const result = validateTaskPlan(mockTaskPlan);

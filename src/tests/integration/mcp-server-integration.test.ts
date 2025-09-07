@@ -2,15 +2,15 @@
 
 import { PMAgentMCPServer } from '../../mcp/server';
 import { MCPToolRegistry, MCP_SERVER_CONFIG } from '../../mcp/server-config';
-import { 
-  MCPServerOptions, 
+import {
+  MCPServerOptions,
   MCPToolContext,
   OptimizeIntentArgs,
   AnalyzeWorkflowArgs,
   GenerateROIArgs,
   ConsultingSummaryArgs,
   LogLevel,
-  MCPToolResult
+  MCPToolResult,
 } from '../../models/mcp';
 import { Workflow, OptimizedWorkflow } from '../../models/workflow';
 import { ConsultingAnalysis } from '../../components/business-analyzer';
@@ -22,8 +22,8 @@ jest.mock('../../pipeline/ai-agent-pipeline', () => ({
     processIntent: jest.fn(),
     analyzeWorkflow: jest.fn(),
     generateROIAnalysis: jest.fn(),
-    generateConsultingSummary: jest.fn()
-  }))
+    generateConsultingSummary: jest.fn(),
+  })),
 }));
 
 describe('MCP Server Integration Tests', () => {
@@ -36,16 +36,16 @@ describe('MCP Server Integration Tests', () => {
     // Set up console spies to capture logging
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    
+
     // Initialize server with comprehensive options
     const options: MCPServerOptions = {
       enableLogging: true,
-      enableMetrics: true
+      enableMetrics: true,
     };
-    
+
     server = new PMAgentMCPServer(options);
     mockPipeline = (server as any).pipeline;
-    
+
     // Set debug logging for comprehensive test coverage
     MCPLogger.setLogLevel(LogLevel.DEBUG);
   });
@@ -60,9 +60,9 @@ describe('MCP Server Integration Tests', () => {
     it('should expose all required MCP tools', () => {
       const registry = MCPToolRegistry.createDefault();
       const tools = registry.getAllTools();
-      
+
       expect(tools).toHaveLength(10);
-      
+
       const toolNames = tools.map(tool => tool.name);
       expect(toolNames).toContain('optimize_intent');
       expect(toolNames).toContain('analyze_workflow');
@@ -73,14 +73,14 @@ describe('MCP Server Integration Tests', () => {
     it('should have valid tool schemas for MCP discovery', () => {
       const registry = MCPToolRegistry.createDefault();
       const tools = registry.getAllTools();
-      
+
       tools.forEach(tool => {
         expect(tool.name).toBeTruthy();
         expect(tool.description).toBeTruthy();
         expect(tool.inputSchema).toBeTruthy();
         expect(tool.inputSchema.type).toBe('object');
         expect(tool.inputSchema.properties).toBeTruthy();
-        
+
         if (tool.inputSchema.required) {
           expect(Array.isArray(tool.inputSchema.required)).toBe(true);
         }
@@ -89,25 +89,25 @@ describe('MCP Server Integration Tests', () => {
 
     it('should validate tool inputs according to schemas', () => {
       const registry = MCPToolRegistry.createDefault();
-      
+
       // Test optimize_intent validation
       const validOptimizeInput = {
         intent: 'Create a user management system with authentication',
         parameters: {
           expectedUserVolume: 1000,
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
-      
+
       const optimizeValidation = registry.validateToolInput('optimize_intent', validOptimizeInput);
       expect(optimizeValidation.valid).toBe(true);
-      
+
       // Test invalid input
       const invalidOptimizeInput = {
         // Missing required 'intent' field
-        parameters: { expectedUserVolume: 1000 }
+        parameters: { expectedUserVolume: 1000 },
       };
-      
+
       const invalidValidation = registry.validateToolInput('optimize_intent', invalidOptimizeInput);
       expect(invalidValidation.valid).toBe(false);
       expect(invalidValidation.errors).toContain('Missing required field: intent');
@@ -116,10 +116,10 @@ describe('MCP Server Integration Tests', () => {
     it('should handle tool discovery requests', () => {
       const registry = MCPToolRegistry.createDefault();
       const toolNames = registry.getToolNames();
-      
+
       expect(toolNames).toEqual([
         'optimize_intent',
-        'analyze_workflow', 
+        'analyze_workflow',
         'generate_roi_analysis',
         'get_consulting_summary',
         'generate_management_onepager',
@@ -127,7 +127,7 @@ describe('MCP Server Integration Tests', () => {
         'generate_requirements',
         'generate_design_options',
         'generate_task_plan',
-        'validate_idea_quick'
+        'validate_idea_quick',
       ]);
     });
   });
@@ -139,7 +139,7 @@ describe('MCP Server Integration Tests', () => {
         sessionId: 'ecommerce-session',
         timestamp: Date.now(),
         requestId: 'ecommerce-req-001',
-        traceId: 'ecommerce-trace-001'
+        traceId: 'ecommerce-trace-001',
       };
 
       it('should optimize complex e-commerce system intent', async () => {
@@ -151,8 +151,8 @@ describe('MCP Server Integration Tests', () => {
           parameters: {
             expectedUserVolume: 10000,
             costConstraints: { maxCostDollars: 500 },
-            performanceSensitivity: 'high'
-          }
+            performanceSensitivity: 'high',
+          },
         };
 
         const mockResult = {
@@ -163,22 +163,23 @@ describe('MCP Server Integration Tests', () => {
             requirements: [
               { id: 'req-1', description: 'User authentication system', priority: 'high' },
               { id: 'req-2', description: 'Product catalog management', priority: 'high' },
-              { id: 'req-3', description: 'Shopping cart functionality', priority: 'medium' }
+              { id: 'req-3', description: 'Shopping cart functionality', priority: 'medium' },
             ],
-            design: { 
+            design: {
               overview: 'Microservices architecture with optimized data flow',
-              components: ['auth-service', 'catalog-service', 'cart-service', 'payment-service']
+              components: ['auth-service', 'catalog-service', 'cart-service', 'payment-service'],
             },
             tasks: [
               { id: 'task-1', description: 'Implement authentication service', status: 'pending' },
-              { id: 'task-2', description: 'Create product catalog API', status: 'pending' }
+              { id: 'task-2', description: 'Create product catalog API', status: 'pending' },
             ],
             consultingSummary: {
-              executiveSummary: 'E-commerce system optimized for high concurrency with 45% quota reduction',
+              executiveSummary:
+                'E-commerce system optimized for high concurrency with 45% quota reduction',
               keyFindings: [
                 'Batching opportunities in inventory updates',
                 'Caching potential for product catalog',
-                'Microservices decomposition reduces complexity'
+                'Microservices decomposition reduces complexity',
               ],
               recommendations: [
                 {
@@ -189,34 +190,35 @@ describe('MCP Server Integration Tests', () => {
                       type: 'quantitative',
                       description: '60% reduction in inventory update calls',
                       source: 'MECE analysis',
-                      confidence: 'high'
-                    }
+                      confidence: 'high',
+                    },
                   ],
-                  expectedOutcome: '60% reduction in inventory processing costs'
-                }
+                  expectedOutcome: '60% reduction in inventory processing costs',
+                },
               ],
               techniquesApplied: [
                 {
                   techniqueName: 'MECE',
                   keyInsight: 'System components are mutually exclusive with clear boundaries',
                   supportingData: { categories: 6, coverage: 100 },
-                  actionableRecommendation: 'Implement microservices with event-driven communication'
+                  actionableRecommendation:
+                    'Implement microservices with event-driven communication',
                 },
                 {
                   techniqueName: 'ValueDriverTree',
                   keyInsight: 'Inventory updates drive 40% of quota consumption',
                   supportingData: { primaryDrivers: 3, savingsPotential: 45 },
-                  actionableRecommendation: 'Batch inventory updates and use caching'
-                }
+                  actionableRecommendation: 'Batch inventory updates and use caching',
+                },
               ],
               supportingEvidence: [
                 {
                   type: 'quantitative',
                   description: 'Current architecture would consume 200 vibes/day',
                   source: 'Quota analysis',
-                  confidence: 'high'
-                }
-              ]
+                  confidence: 'high',
+                },
+              ],
             },
             roiAnalysis: {
               scenarios: [
@@ -231,12 +233,12 @@ describe('MCP Server Integration Tests', () => {
                     breakdown: [
                       { component: 'inventory-updates', vibes: 80, specs: 5 },
                       { component: 'user-auth', vibes: 60, specs: 4 },
-                      { component: 'catalog-search', vibes: 60, specs: 6 }
-                    ]
+                      { component: 'catalog-search', vibes: 60, specs: 6 },
+                    ],
                   },
                   savingsPercentage: 0,
                   implementationEffort: 'low',
-                  riskLevel: 'high'
+                  riskLevel: 'high',
                 },
                 {
                   name: 'Optimized Microservices',
@@ -249,21 +251,21 @@ describe('MCP Server Integration Tests', () => {
                     breakdown: [
                       { component: 'inventory-service', vibes: 30, specs: 8 },
                       { component: 'auth-service', vibes: 40, specs: 7 },
-                      { component: 'catalog-service', vibes: 40, specs: 10 }
-                    ]
+                      { component: 'catalog-service', vibes: 40, specs: 10 },
+                    ],
                   },
                   savingsPercentage: 45,
                   implementationEffort: 'medium',
-                  riskLevel: 'low'
-                }
+                  riskLevel: 'low',
+                },
               ],
               recommendations: [
                 'Implement microservices architecture for better scalability',
                 'Use event-driven patterns for inventory management',
-                'Apply caching strategies for product catalog'
+                'Apply caching strategies for product catalog',
               ],
               bestOption: 'Optimized Microservices',
-              riskAssessment: 'Low risk with proven patterns and high ROI'
+              riskAssessment: 'Low risk with proven patterns and high ROI',
             },
             alternativeOptions: {
               conservative: {
@@ -272,7 +274,7 @@ describe('MCP Server Integration Tests', () => {
                 quotaSavings: 25,
                 implementationEffort: 'low',
                 riskLevel: 'low',
-                estimatedROI: 1.8
+                estimatedROI: 1.8,
               },
               balanced: {
                 name: 'Microservices Architecture',
@@ -280,7 +282,7 @@ describe('MCP Server Integration Tests', () => {
                 quotaSavings: 45,
                 implementationEffort: 'medium',
                 riskLevel: 'low',
-                estimatedROI: 3.2
+                estimatedROI: 3.2,
               },
               bold: {
                 name: 'Serverless Event-Driven',
@@ -288,8 +290,8 @@ describe('MCP Server Integration Tests', () => {
                 quotaSavings: 65,
                 implementationEffort: 'high',
                 riskLevel: 'medium',
-                estimatedROI: 4.8
-              }
+                estimatedROI: 4.8,
+              },
             },
             metadata: {
               originalIntent: args.intent,
@@ -301,9 +303,9 @@ describe('MCP Server Integration Tests', () => {
                 estimatedCost: 550,
                 confidenceLevel: 'high',
                 scenario: 'optimized',
-                breakdown: []
-              }
-            }
+                breakdown: [],
+              },
+            },
           },
           efficiencySummary: {
             naiveApproach: {
@@ -312,7 +314,7 @@ describe('MCP Server Integration Tests', () => {
               estimatedCost: 1000,
               confidenceLevel: 'high',
               scenario: 'naive',
-              breakdown: []
+              breakdown: [],
             },
             optimizedApproach: {
               vibesConsumed: 110,
@@ -320,21 +322,21 @@ describe('MCP Server Integration Tests', () => {
               estimatedCost: 550,
               confidenceLevel: 'high',
               scenario: 'optimized',
-              breakdown: []
+              breakdown: [],
             },
             savings: {
               vibeReduction: 45,
               specReduction: -67,
               costSavings: 45,
-              totalSavingsPercentage: 45
+              totalSavingsPercentage: 45,
             },
             optimizationNotes: [
               'Applied microservices decomposition',
               'Implemented event-driven inventory updates',
               'Added caching layer for product catalog',
-              'Batched notification processing'
-            ]
-          }
+              'Batched notification processing',
+            ],
+          },
         };
 
         mockPipeline.processIntent.mockResolvedValue(mockResult);
@@ -345,13 +347,15 @@ describe('MCP Server Integration Tests', () => {
         expect(result.isError).toBeFalsy();
         expect(result.content).toHaveLength(1);
         expect(result.content[0].type).toBe('json');
-        
+
         const responseData = result.content[0].json;
         expect(responseData.success).toBe(true);
         expect(responseData.data.enhancedKiroSpec.name).toBe('E-commerce Platform');
-        expect(responseData.data.enhancedKiroSpec.consultingSummary.techniquesApplied).toHaveLength(2);
+        expect(responseData.data.enhancedKiroSpec.consultingSummary.techniquesApplied).toHaveLength(
+          2
+        );
         expect(responseData.data.efficiencySummary.savings.totalSavingsPercentage).toBe(45);
-        
+
         // Verify metadata
         expect(result.metadata?.executionTime).toBeDefined();
         expect(result.metadata?.quotaUsed).toBeDefined();
@@ -364,7 +368,7 @@ describe('MCP Server Integration Tests', () => {
         sessionId: 'analytics-session',
         timestamp: Date.now(),
         requestId: 'analytics-req-001',
-        traceId: 'analytics-trace-001'
+        traceId: 'analytics-trace-001',
       };
 
       it('should optimize data analytics pipeline intent', async () => {
@@ -375,8 +379,8 @@ describe('MCP Server Integration Tests', () => {
                    and reports. Include data validation, error handling, and monitoring.`,
           parameters: {
             expectedUserVolume: 500,
-            performanceSensitivity: 'high'
-          }
+            performanceSensitivity: 'high',
+          },
         };
 
         const mockResult = {
@@ -387,22 +391,28 @@ describe('MCP Server Integration Tests', () => {
             requirements: [
               { id: 'req-1', description: 'Multi-source data ingestion', priority: 'high' },
               { id: 'req-2', description: 'Real-time data transformation', priority: 'high' },
-              { id: 'req-3', description: 'ML model integration', priority: 'medium' }
+              { id: 'req-3', description: 'ML model integration', priority: 'medium' },
             ],
-            design: { 
+            design: {
               overview: 'Stream processing architecture with batch optimization',
-              components: ['ingestion-service', 'transform-service', 'ml-service', 'output-service']
+              components: [
+                'ingestion-service',
+                'transform-service',
+                'ml-service',
+                'output-service',
+              ],
             },
             tasks: [
               { id: 'task-1', description: 'Implement data ingestion layer', status: 'pending' },
-              { id: 'task-2', description: 'Create transformation pipeline', status: 'pending' }
+              { id: 'task-2', description: 'Create transformation pipeline', status: 'pending' },
             ],
             consultingSummary: {
-              executiveSummary: 'Analytics pipeline optimized with 55% quota reduction through batching and caching',
+              executiveSummary:
+                'Analytics pipeline optimized with 55% quota reduction through batching and caching',
               keyFindings: [
                 'Data transformation is the primary quota consumer',
                 'ML model calls can be batched effectively',
-                'Caching intermediate results reduces redundant processing'
+                'Caching intermediate results reduces redundant processing',
               ],
               recommendations: [
                 {
@@ -413,28 +423,28 @@ describe('MCP Server Integration Tests', () => {
                       type: 'quantitative',
                       description: '70% reduction in transformation calls',
                       source: 'ValueDriverTree analysis',
-                      confidence: 'high'
-                    }
+                      confidence: 'high',
+                    },
                   ],
-                  expectedOutcome: '70% reduction in transformation processing costs'
-                }
+                  expectedOutcome: '70% reduction in transformation processing costs',
+                },
               ],
               techniquesApplied: [
                 {
                   techniqueName: 'ValueDriverTree',
                   keyInsight: 'Data transformation drives 60% of quota consumption',
                   supportingData: { primaryDrivers: 4, savingsPotential: 55 },
-                  actionableRecommendation: 'Implement micro-batching and result caching'
-                }
+                  actionableRecommendation: 'Implement micro-batching and result caching',
+                },
               ],
               supportingEvidence: [
                 {
                   type: 'quantitative',
                   description: 'Current pipeline would process 1000 records/hour individually',
                   source: 'Pipeline analysis',
-                  confidence: 'high'
-                }
-              ]
+                  confidence: 'high',
+                },
+              ],
             },
             roiAnalysis: {
               scenarios: [
@@ -446,11 +456,11 @@ describe('MCP Server Integration Tests', () => {
                     estimatedCost: 750,
                     confidenceLevel: 'high',
                     scenario: 'naive',
-                    breakdown: []
+                    breakdown: [],
                   },
                   savingsPercentage: 0,
                   implementationEffort: 'low',
-                  riskLevel: 'medium'
+                  riskLevel: 'medium',
                 },
                 {
                   name: 'Micro-batch Processing',
@@ -460,20 +470,20 @@ describe('MCP Server Integration Tests', () => {
                     estimatedCost: 340,
                     confidenceLevel: 'high',
                     scenario: 'optimized',
-                    breakdown: []
+                    breakdown: [],
                   },
                   savingsPercentage: 55,
                   implementationEffort: 'medium',
-                  riskLevel: 'low'
-                }
+                  riskLevel: 'low',
+                },
               ],
               recommendations: [
                 'Implement micro-batching for data transformations',
                 'Add caching layer for ML model results',
-                'Use stream processing for real-time requirements'
+                'Use stream processing for real-time requirements',
               ],
               bestOption: 'Micro-batch Processing',
-              riskAssessment: 'Low risk with established streaming patterns'
+              riskAssessment: 'Low risk with established streaming patterns',
             },
             alternativeOptions: {
               conservative: {
@@ -482,7 +492,7 @@ describe('MCP Server Integration Tests', () => {
                 quotaSavings: 35,
                 implementationEffort: 'low',
                 riskLevel: 'low',
-                estimatedROI: 2.1
+                estimatedROI: 2.1,
               },
               balanced: {
                 name: 'Micro-batch Processing',
@@ -490,7 +500,7 @@ describe('MCP Server Integration Tests', () => {
                 quotaSavings: 55,
                 implementationEffort: 'medium',
                 riskLevel: 'low',
-                estimatedROI: 3.8
+                estimatedROI: 3.8,
               },
               bold: {
                 name: 'Stream Processing',
@@ -498,10 +508,10 @@ describe('MCP Server Integration Tests', () => {
                 quotaSavings: 45,
                 implementationEffort: 'high',
                 riskLevel: 'medium',
-                estimatedROI: 3.2
-              }
-            }
-          }
+                estimatedROI: 3.2,
+              },
+            },
+          },
         };
 
         mockPipeline.processIntent.mockResolvedValue(mockResult);
@@ -510,11 +520,13 @@ describe('MCP Server Integration Tests', () => {
 
         expect(result.isError).toBeFalsy();
         expect(result.content[0].type).toBe('json');
-        
+
         const responseData = result.content[0].json;
         expect(responseData.data.enhancedKiroSpec.name).toBe('Real-time Analytics Pipeline');
         expect(responseData.data.enhancedKiroSpec.roiAnalysis.scenarios).toHaveLength(2);
-        expect(responseData.data.enhancedKiroSpec.roiAnalysis.scenarios[1].savingsPercentage).toBe(55);
+        expect(responseData.data.enhancedKiroSpec.roiAnalysis.scenarios[1].savingsPercentage).toBe(
+          55
+        );
       });
     });
 
@@ -528,14 +540,14 @@ describe('MCP Server Integration Tests', () => {
           parameters: {
             expectedUserVolume: 50000,
             costConstraints: { maxCostDollars: 2000 },
-            performanceSensitivity: 'high'
-          }
+            performanceSensitivity: 'high',
+          },
         };
 
         const iotContext: MCPToolContext = {
           toolName: 'optimize_intent',
           sessionId: 'iot-session',
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
         const mockResult = {
@@ -544,20 +556,22 @@ describe('MCP Server Integration Tests', () => {
             name: 'IoT Device Management Platform',
             description: 'Scalable IoT platform with optimized data ingestion',
             consultingSummary: {
-              executiveSummary: 'IoT platform optimized for high-volume data ingestion with 60% quota reduction',
+              executiveSummary:
+                'IoT platform optimized for high-volume data ingestion with 60% quota reduction',
               keyFindings: [
                 'Telemetry data ingestion is the primary cost driver',
                 'Device configuration updates can be batched',
-                'Alert processing can be optimized with rule engines'
+                'Alert processing can be optimized with rule engines',
               ],
               techniquesApplied: [
                 {
                   techniqueName: 'MECE',
                   keyInsight: 'Device operations fall into distinct categories with no overlap',
                   supportingData: { categories: 5, coverage: 100 },
-                  actionableRecommendation: 'Separate ingestion, configuration, and analytics pipelines'
-                }
-              ]
+                  actionableRecommendation:
+                    'Separate ingestion, configuration, and analytics pipelines',
+                },
+              ],
             },
             roiAnalysis: {
               scenarios: [
@@ -569,11 +583,11 @@ describe('MCP Server Integration Tests', () => {
                     estimatedCost: 12000,
                     confidenceLevel: 'high',
                     scenario: 'naive',
-                    breakdown: []
+                    breakdown: [],
                   },
                   savingsPercentage: 0,
                   implementationEffort: 'low',
-                  riskLevel: 'high'
+                  riskLevel: 'high',
                 },
                 {
                   name: 'Batched Processing',
@@ -583,17 +597,17 @@ describe('MCP Server Integration Tests', () => {
                     estimatedCost: 4800,
                     confidenceLevel: 'high',
                     scenario: 'optimized',
-                    breakdown: []
+                    breakdown: [],
                   },
                   savingsPercentage: 60,
                   implementationEffort: 'medium',
-                  riskLevel: 'low'
-                }
+                  riskLevel: 'low',
+                },
               ],
               bestOption: 'Batched Processing',
-              riskAssessment: 'Low risk with proven IoT patterns'
-            }
-          }
+              riskAssessment: 'Low risk with proven IoT patterns',
+            },
+          },
         };
 
         mockPipeline.processIntent.mockResolvedValue(mockResult);
@@ -603,7 +617,9 @@ describe('MCP Server Integration Tests', () => {
         expect(result.isError).toBeFalsy();
         const responseData = result.content[0].json;
         expect(responseData.data.enhancedKiroSpec.name).toBe('IoT Device Management Platform');
-        expect(responseData.data.enhancedKiroSpec.roiAnalysis.scenarios[1].savingsPercentage).toBe(60);
+        expect(responseData.data.enhancedKiroSpec.roiAnalysis.scenarios[1].savingsPercentage).toBe(
+          60
+        );
       });
     });
   });
@@ -611,13 +627,13 @@ describe('MCP Server Integration Tests', () => {
   describe('Tool Response Validation', () => {
     it('should return properly formatted JSON responses for optimize_intent', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Simple test intent'
+        intent: 'Simple test intent',
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const mockResult = {
@@ -633,20 +649,41 @@ describe('MCP Server Integration Tests', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
-        }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
+        },
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockResult);
@@ -667,29 +704,34 @@ describe('MCP Server Integration Tests', () => {
       const mockWorkflow: Workflow = {
         id: 'test-workflow',
         steps: [
-          { id: 'step-1', type: 'vibe', description: 'Test step', inputs: [], outputs: [], quotaCost: 5 }
+          {
+            id: 'step-1',
+            type: 'vibe',
+            description: 'Test step',
+            inputs: [],
+            outputs: [],
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const args: AnalyzeWorkflowArgs = {
-        workflow: mockWorkflow
+        workflow: mockWorkflow,
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'analyze_workflow',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const mockAnalysis: ConsultingAnalysis = {
-        techniquesUsed: [
-          { name: 'MECE', relevanceScore: 0.8, applicableScenarios: ['analysis'] }
-        ],
+        techniquesUsed: [{ name: 'MECE', relevanceScore: 0.8, applicableScenarios: ['analysis'] }],
         keyFindings: ['Test finding'],
         totalQuotaSavings: 20,
-        implementationComplexity: 'low'
+        implementationComplexity: 'low',
       };
 
       mockPipeline.analyzeWorkflow.mockResolvedValue(mockAnalysis);
@@ -706,13 +748,13 @@ describe('MCP Server Integration Tests', () => {
 
     it('should handle error responses with proper format', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Test intent that will fail'
+        intent: 'Test intent that will fail',
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'test-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       mockPipeline.processIntent.mockRejectedValue(new Error('Test error'));
@@ -731,13 +773,13 @@ describe('MCP Server Integration Tests', () => {
   describe('Error Handling and Recovery', () => {
     it('should handle pipeline timeout gracefully', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Complex intent that times out'
+        intent: 'Complex intent that times out',
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'timeout-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       mockPipeline.processIntent.mockRejectedValue(new Error('Request timeout'));
@@ -746,7 +788,7 @@ describe('MCP Server Integration Tests', () => {
 
       expect(result.isError).toBe(true);
       expect(result.content[0].json.message).toContain('timeout');
-      
+
       // Verify error logging
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('optimize_intent handler failed')
@@ -756,17 +798,17 @@ describe('MCP Server Integration Tests', () => {
     it('should handle invalid workflow structures', async () => {
       const invalidWorkflow = {
         // Missing required fields
-        steps: []
+        steps: [],
       } as unknown as Workflow;
 
       const args: AnalyzeWorkflowArgs = {
-        workflow: invalidWorkflow
+        workflow: invalidWorkflow,
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'analyze_workflow',
         sessionId: 'invalid-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       mockPipeline.analyzeWorkflow.mockRejectedValue(new Error('Invalid workflow structure'));
@@ -774,7 +816,9 @@ describe('MCP Server Integration Tests', () => {
       const result = await server.handleAnalyzeWorkflow(args, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].json.message).toContain('Validation failed: workflow is required with valid id and steps array');
+      expect(result.content[0].json.message).toContain(
+        'Validation failed: workflow is required with valid id and steps array'
+      );
     });
 
     it('should handle resource exhaustion scenarios', async () => {
@@ -782,17 +826,24 @@ describe('MCP Server Integration Tests', () => {
         workflow: {
           id: 'resource-test',
           steps: [
-            { id: 'step-1', type: 'vibe', description: 'Test', inputs: [], outputs: [], quotaCost: 10 }
+            {
+              id: 'step-1',
+              type: 'vibe',
+              description: 'Test',
+              inputs: [],
+              outputs: [],
+              quotaCost: 10,
+            },
           ],
           dataFlow: [],
-          estimatedComplexity: 1
-        }
+          estimatedComplexity: 1,
+        },
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'generate_roi_analysis',
         sessionId: 'resource-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       mockPipeline.generateROIAnalysis.mockRejectedValue(
@@ -809,13 +860,13 @@ describe('MCP Server Integration Tests', () => {
   describe('Performance and Metrics', () => {
     it('should track execution times and quota usage', async () => {
       const args: OptimizeIntentArgs = {
-        intent: 'Performance test intent'
+        intent: 'Performance test intent',
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'perf-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const mockResult = {
@@ -831,19 +882,40 @@ describe('MCP Server Integration Tests', () => {
             keyFindings: [],
             recommendations: [],
             techniquesApplied: [],
-            supportingEvidence: []
+            supportingEvidence: [],
           },
           roiAnalysis: {
             scenarios: [],
             recommendations: [],
             bestOption: 'Balanced',
-            riskAssessment: 'Low'
+            riskAssessment: 'Low',
           },
           alternativeOptions: {
-            conservative: { name: 'Conservative', description: 'Safe', quotaSavings: 5, implementationEffort: 'low', riskLevel: 'low', estimatedROI: 1.2 },
-            balanced: { name: 'Balanced', description: 'Moderate', quotaSavings: 15, implementationEffort: 'medium', riskLevel: 'low', estimatedROI: 2.0 },
-            bold: { name: 'Bold', description: 'Aggressive', quotaSavings: 30, implementationEffort: 'high', riskLevel: 'medium', estimatedROI: 3.5 }
-          }
+            conservative: {
+              name: 'Conservative',
+              description: 'Safe',
+              quotaSavings: 5,
+              implementationEffort: 'low',
+              riskLevel: 'low',
+              estimatedROI: 1.2,
+            },
+            balanced: {
+              name: 'Balanced',
+              description: 'Moderate',
+              quotaSavings: 15,
+              implementationEffort: 'medium',
+              riskLevel: 'low',
+              estimatedROI: 2.0,
+            },
+            bold: {
+              name: 'Bold',
+              description: 'Aggressive',
+              quotaSavings: 30,
+              implementationEffort: 'high',
+              riskLevel: 'medium',
+              estimatedROI: 3.5,
+            },
+          },
         },
         efficiencySummary: {
           optimizedApproach: {
@@ -852,9 +924,9 @@ describe('MCP Server Integration Tests', () => {
             estimatedCost: 50,
             confidenceLevel: 'high',
             scenario: 'optimized',
-            breakdown: []
-          }
-        }
+            breakdown: [],
+          },
+        },
       };
 
       mockPipeline.processIntent.mockResolvedValue(mockResult);
@@ -885,32 +957,46 @@ describe('MCP Server Integration Tests', () => {
         workflow: {
           id: 'metrics-test',
           steps: [
-            { id: 'step-1', type: 'spec', description: 'Test', inputs: [], outputs: [], quotaCost: 3 }
+            {
+              id: 'step-1',
+              type: 'spec',
+              description: 'Test',
+              inputs: [],
+              outputs: [],
+              quotaCost: 3,
+            },
           ],
           dataFlow: [],
-          estimatedComplexity: 1
-        }
+          estimatedComplexity: 1,
+        },
       };
 
       const mockContext: MCPToolContext = {
         toolName: 'generate_roi_analysis',
         sessionId: 'metrics-session',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const mockROIAnalysis = {
         scenarios: [
           {
             name: 'Test Scenario',
-            forecast: { vibesConsumed: 5, specsConsumed: 2, estimatedCost: 25, confidenceLevel: 'high', scenario: 'naive', breakdown: [] },
+            forecast: {
+              vibesConsumed: 5,
+              specsConsumed: 2,
+              estimatedCost: 25,
+              confidenceLevel: 'high',
+              scenario: 'naive',
+              breakdown: [],
+            },
             savingsPercentage: 0,
             implementationEffort: 'none',
-            riskLevel: 'none'
-          }
+            riskLevel: 'none',
+          },
         ],
         recommendations: ['Test recommendation'],
         bestOption: 'Test Scenario',
-        riskAssessment: 'Low risk'
+        riskAssessment: 'Low risk',
       };
 
       mockPipeline.generateROIAnalysis.mockResolvedValue(mockROIAnalysis);
@@ -918,12 +1004,8 @@ describe('MCP Server Integration Tests', () => {
       await server.handleGenerateROI(args, mockContext);
 
       // Verify performance logging
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"level":"INFO"')
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('ROI analysis completed')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"INFO"'));
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('ROI analysis completed'));
     });
   });
 
@@ -961,9 +1043,7 @@ describe('MCP Server Integration Tests', () => {
       await expect(server.stop()).resolves.not.toThrow();
 
       // Verify shutdown logging
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('MCP Server stopped')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('MCP Server stopped'));
     });
   });
 });

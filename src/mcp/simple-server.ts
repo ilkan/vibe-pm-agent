@@ -38,10 +38,10 @@ export class SimplePMAgentMCPServer {
         overwriteExisting: false,
       },
       userPreferences: {
-        autoCreate: true,  // Enable auto-creation for MCP context
+        autoCreate: true, // Enable auto-creation for MCP context
         showPreview: false, // Disable preview prompts for MCP
-        showSummary: false  // Disable summary display for MCP
-      }
+        showSummary: false, // Disable summary display for MCP
+      },
     });
 
     this.setupHandlers();

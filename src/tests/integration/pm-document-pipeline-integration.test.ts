@@ -13,13 +13,14 @@ describe('PM Document Pipeline Integration', () => {
 
   describe('processIntent with PM document generation', () => {
     it('should generate all PM documents when requested', async () => {
-      const rawIntent = 'Create a user authentication system with OAuth integration and role-based access control';
+      const rawIntent =
+        'Create a user authentication system with OAuth integration and role-based access control';
       const params: OptionalParams = {
         expectedUserVolume: 1000,
         costConstraints: {
           maxVibes: 50,
           maxSpecs: 20,
-          maxCostDollars: 100
+          maxCostDollars: 100,
         },
         performanceSensitivity: 'medium',
         generatePMDocuments: {
@@ -32,9 +33,9 @@ describe('PM Document Pipeline Integration', () => {
           context: {
             roadmapTheme: 'Security Enhancement',
             budget: 50000,
-            deadlines: 'Q2 2024'
-          }
-        }
+            deadlines: 'Q2 2024',
+          },
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
@@ -75,9 +76,9 @@ describe('PM Document Pipeline Integration', () => {
           // Intentionally missing dependencies for some documents
           context: {
             roadmapTheme: 'Data Processing',
-            budget: 10000
-          }
-        }
+            budget: 10000,
+          },
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
@@ -92,7 +93,7 @@ describe('PM Document Pipeline Integration', () => {
       const rawIntent = 'Create a simple API endpoint for user data';
       const params: OptionalParams = {
         expectedUserVolume: 100,
-        performanceSensitivity: 'low'
+        performanceSensitivity: 'low',
         // No generatePMDocuments specified
       };
 
@@ -114,9 +115,9 @@ describe('PM Document Pipeline Integration', () => {
           // Only request specific documents
           context: {
             roadmapTheme: 'Communication Enhancement',
-            budget: 25000
-          }
-        }
+            budget: 25000,
+          },
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
@@ -125,7 +126,7 @@ describe('PM Document Pipeline Integration', () => {
       expect(result.pmDocuments).toBeDefined();
       expect(result.pmDocuments!.requirements).toBeDefined();
       expect(result.pmDocuments!.managementOnePager).toBeDefined();
-      
+
       // Should not generate unrequested documents
       expect(result.pmDocuments!.prfaq).toBeUndefined();
       expect(result.pmDocuments!.designOptions).toBeUndefined();
@@ -144,9 +145,9 @@ describe('PM Document Pipeline Integration', () => {
           managementOnePager: true,
           context: {
             roadmapTheme: 'Security & Storage',
-            budget: 40000
-          }
-        }
+            budget: 40000,
+          },
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
@@ -163,7 +164,7 @@ describe('PM Document Pipeline Integration', () => {
       // Verify content consistency
       const requirements = result.pmDocuments!.requirements as any;
       const designOptions = result.pmDocuments!.designOptions as any;
-      
+
       expect(requirements.businessGoal).toBeTruthy();
       expect(designOptions.problemFraming).toBeTruthy();
       expect(designOptions.options.conservative).toBeDefined();
@@ -179,16 +180,16 @@ describe('PM Document Pipeline Integration', () => {
           managementOnePager: true,
           taskPlan: true,
           context: {
-            budget: 5000
-          }
-        }
+            budget: 5000,
+          },
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
 
       expect(result.success).toBe(true);
       expect(result.pmDocuments).toBeDefined();
-      
+
       // Should not generate documents that require missing prerequisites
       expect(result.pmDocuments!.managementOnePager).toBeUndefined();
       expect(result.pmDocuments!.taskPlan).toBeUndefined();
@@ -201,8 +202,8 @@ describe('PM Document Pipeline Integration', () => {
       const params: OptionalParams = {
         generatePMDocuments: {
           requirements: true,
-          managementOnePager: true
-        }
+          managementOnePager: true,
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
@@ -221,9 +222,9 @@ describe('PM Document Pipeline Integration', () => {
           designOptions: true,
           // This should work for the first two documents
           context: {
-            roadmapTheme: 'Data Collection'
-          }
-        }
+            roadmapTheme: 'Data Collection',
+          },
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
@@ -243,9 +244,9 @@ describe('PM Document Pipeline Integration', () => {
           designOptions: true,
           context: {
             roadmapTheme: 'Productivity Tools',
-            budget: 30000
-          }
-        }
+            budget: 30000,
+          },
+        },
       };
 
       // First call
@@ -263,7 +264,7 @@ describe('PM Document Pipeline Integration', () => {
 
       expect(result2.success).toBe(true);
       expect(result2.pmDocuments).toBeDefined();
-      
+
       // Second call should be significantly faster due to caching
       expect(executionTime2).toBeLessThan(executionTime1 * 0.5);
     }, 30000);
@@ -274,7 +275,7 @@ describe('PM Document Pipeline Integration', () => {
         costConstraints: {
           maxVibes: 100,
           maxSpecs: 50,
-          maxCostDollars: 200
+          maxCostDollars: 200,
         },
         generatePMDocuments: {
           requirements: true,
@@ -284,9 +285,9 @@ describe('PM Document Pipeline Integration', () => {
           prfaq: true,
           context: {
             roadmapTheme: 'Real-time Communication',
-            budget: 75000
-          }
-        }
+            budget: 75000,
+          },
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);

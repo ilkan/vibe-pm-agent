@@ -1,6 +1,6 @@
 /**
  * Integration Tests for Steering File Analytics
- * 
+ *
  * Tests the end-to-end functionality of steering file analytics and management
  * utilities in realistic scenarios with actual file system operations.
  */
@@ -9,10 +9,10 @@ import { jest } from '@jest/globals';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { tmpdir } from 'os';
-import { 
+import {
   SteeringFileUtilities,
   SteeringFileAnalytics,
-  CleanupOptions
+  CleanupOptions,
 } from '../../components/steering-file-utilities';
 import { DocumentType, InclusionRule } from '../../models/steering';
 
@@ -35,7 +35,7 @@ describe('Steering File Analytics Integration', () => {
       steeringDirectory: steeringDir,
       backupDirectory: backupDir,
       defaultMaxAgeDays: 30,
-      defaultMaxUnusedDays: 7
+      defaultMaxUnusedDays: 7,
     });
   });
 
@@ -76,7 +76,7 @@ This document outlines the requirements for user authentication.
 ## Requirements
 1. Users must be able to log in with email and password
 2. System must support password reset functionality`,
-          age: 5 // days ago
+          age: 5, // days ago
         },
         {
           filename: 'design-user-auth.md',
@@ -96,7 +96,7 @@ OAuth 2.0 with JWT tokens
 ## Related Documents
 #[[file:.kiro/specs/user-auth/requirements.md]]
 #[[file:non-existent-file.md]]`,
-          age: 10 // days ago
+          age: 10, // days ago
         },
         {
           filename: 'onepager-payment-system.md',
@@ -112,13 +112,13 @@ documentType: onepager
 
 ## Executive Summary
 Implement payment processing system.`,
-          age: 45 // days ago (outdated)
+          age: 45, // days ago (outdated)
         },
         {
           filename: 'invalid-file.md',
           content: `# Invalid File
 This file has no front-matter and should be detected as invalid.`,
-          age: 2
+          age: 2,
         },
         {
           filename: 'tasks-user-auth.md',
@@ -136,15 +136,15 @@ documentType: tasks
 ## Implementation Plan
 - [ ] Set up OAuth provider
 - [ ] Implement JWT handling`,
-          age: 3
-        }
+          age: 3,
+        },
       ];
 
       // Write test files to disk
       for (const testFile of testFiles) {
         const filePath = path.join(steeringDir, testFile.filename);
         await fs.writeFile(filePath, testFile.content, 'utf8');
-        
+
         // Set file timestamps to simulate age
         const ageMs = testFile.age * 24 * 60 * 60 * 1000;
         const timestamp = new Date(Date.now() - ageMs);
@@ -168,7 +168,7 @@ documentType: tasks
       expect(analytics.filesByType[DocumentType.DESIGN]).toBe(1);
       expect(analytics.filesByType[DocumentType.ONEPAGER]).toBe(1);
       expect(analytics.filesByType[DocumentType.TASKS]).toBe(1);
-      
+
       expect(analytics.filesByInclusionRule['fileMatch']).toBe(2);
       expect(analytics.filesByInclusionRule['always']).toBe(1);
       expect(analytics.filesByInclusionRule['manual']).toBe(1);
@@ -179,23 +179,23 @@ documentType: tasks
       expect(analytics.outdatedFiles).toHaveLength(1);
       expect(analytics.outdatedFiles[0].filename).toBe('onepager-payment-system.md');
 
-      expect(analytics.topFeatures).toContainEqual({ 
-        featureName: 'user-authentication', 
-        count: 3 
+      expect(analytics.topFeatures).toContainEqual({
+        featureName: 'user-authentication',
+        count: 3,
       });
-      expect(analytics.topFeatures).toContainEqual({ 
-        featureName: 'payment-system', 
-        count: 1 
+      expect(analytics.topFeatures).toContainEqual({
+        featureName: 'payment-system',
+        count: 1,
       });
 
       expect(analytics.brokenReferences).toHaveLength(2); // Both files have broken refs
       const brokenFiles = analytics.brokenReferences.map(br => br.file.filename);
       expect(brokenFiles).toContain('design-user-auth.md');
       expect(brokenFiles).toContain('requirements-user-auth.md');
-      
+
       // Find the design file's broken references
-      const designBrokenRefs = analytics.brokenReferences.find(br => 
-        br.file.filename === 'design-user-auth.md'
+      const designBrokenRefs = analytics.brokenReferences.find(
+        br => br.file.filename === 'design-user-auth.md'
       );
       expect(designBrokenRefs?.brokenRefs).toContain('non-existent-file.md');
 
@@ -209,29 +209,29 @@ documentType: tasks
         {
           filename: 'requirements-feature-a.md',
           content: createSteeringFileContent('feature-a', DocumentType.REQUIREMENTS, 'fileMatch'),
-          age: 5
+          age: 5,
         },
         {
           filename: 'design-feature-a.md',
           content: createSteeringFileContent('feature-a', DocumentType.DESIGN, 'always'),
-          age: 10
+          age: 10,
         },
         {
           filename: 'requirements-feature-b.md',
           content: createSteeringFileContent('feature-b', DocumentType.REQUIREMENTS, 'manual'),
-          age: 15
+          age: 15,
         },
         {
           filename: 'tasks-feature-a.md',
           content: createSteeringFileContent('feature-a', DocumentType.TASKS, 'fileMatch'),
-          age: 20
-        }
+          age: 20,
+        },
       ];
 
       for (const testFile of testFiles) {
         const filePath = path.join(steeringDir, testFile.filename);
         await fs.writeFile(filePath, testFile.content, 'utf8');
-        
+
         const ageMs = testFile.age * 24 * 60 * 60 * 1000;
         const timestamp = new Date(Date.now() - ageMs);
         await fs.utimes(filePath, timestamp, timestamp);
@@ -261,19 +261,19 @@ documentType: tasks
   describe('Cleanup Operations Integration', () => {
     it('should perform comprehensive cleanup with backups', async () => {
       const now = Date.now();
-      
+
       // Create test files with different ages and characteristics
       const testFiles = [
         {
           filename: 'old-requirements.md',
           content: createSteeringFileContent('old-feature', DocumentType.REQUIREMENTS, 'always'),
-          age: 40 // Outdated
+          age: 40, // Outdated
         },
         {
           filename: 'unused-design.md',
           content: createSteeringFileContent('unused-feature', DocumentType.DESIGN, 'fileMatch'),
           age: 10, // Not old, but will be marked as unused by setting old modified time
-          lastModified: 15 // days ago (unused)
+          lastModified: 15, // days ago (unused)
         },
         {
           filename: 'recent-tasks.md',
@@ -294,12 +294,12 @@ This is a test steering file for recent-feature.
 Test content for tasks document.
 
 No broken references in this file.`,
-          age: 1 // Very recent, should not be removed
+          age: 1, // Very recent, should not be removed
         },
         {
           filename: 'invalid-file.md',
           content: '# Invalid file with no front-matter',
-          age: 5
+          age: 5,
         },
         {
           filename: 'broken-refs.md',
@@ -314,25 +314,25 @@ documentType: requirements
 # Broken References
 
 See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
-          age: 1 // Recent, but will be removed due to broken refs
-        }
+          age: 1, // Recent, but will be removed due to broken refs
+        },
       ];
 
       // Write files to disk
       for (const testFile of testFiles) {
         const filePath = path.join(steeringDir, testFile.filename);
         await fs.writeFile(filePath, testFile.content, 'utf8');
-        
+
         // Set creation time
         const creationAge = testFile.age * 24 * 60 * 60 * 1000;
         const creationTime = new Date(now - creationAge);
-        
+
         // Set last modified time (for unused detection)
         const modifiedAge = (testFile.lastModified || testFile.age) * 24 * 60 * 60 * 1000;
         const modifiedTime = new Date(now - modifiedAge);
-        
+
         await fs.utimes(filePath, modifiedTime, modifiedTime);
-        
+
         // Manually set birthtime for creation time (not directly supported by utimes)
         // This is a limitation of the test - in real scenarios birthtime would be set correctly
       }
@@ -344,7 +344,7 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
         removeInvalid: true,
         removeBrokenRefs: true,
         createBackups: true,
-        dryRun: false
+        dryRun: false,
       };
 
       const result = await utilities.cleanupSteeringFiles(cleanupOptions);
@@ -352,10 +352,10 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
       // Verify cleanup results
       expect(result.filesRemoved).toBeGreaterThan(0);
       expect(result.errors).toHaveLength(0);
-      
+
       // Check that backups were created
       expect(result.filesBackedUp).toBe(result.filesRemoved);
-      
+
       // Verify backup files exist
       const backupFiles = await fs.readdir(backupDir);
       expect(backupFiles.length).toBe(result.filesBackedUp);
@@ -374,12 +374,12 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
       const oldFile = {
         filename: 'old-file.md',
         content: createSteeringFileContent('old-feature', DocumentType.REQUIREMENTS, 'always'),
-        age: 40
+        age: 40,
       };
 
       const filePath = path.join(steeringDir, oldFile.filename);
       await fs.writeFile(filePath, oldFile.content, 'utf8');
-      
+
       const ageMs = oldFile.age * 24 * 60 * 60 * 1000;
       const timestamp = new Date(Date.now() - ageMs);
       await fs.utimes(filePath, timestamp, timestamp);
@@ -387,7 +387,7 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
       // Perform dry run cleanup
       const result = await utilities.cleanupSteeringFiles({
         maxAgeDays: 30,
-        dryRun: true
+        dryRun: true,
       });
 
       // Verify dry run results
@@ -396,7 +396,10 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
       expect(result.filesBackedUp).toBe(0); // No backups in dry run
 
       // Verify file still exists
-      const fileExists = await fs.access(filePath).then(() => true).catch(() => false);
+      const fileExists = await fs
+        .access(filePath)
+        .then(() => true)
+        .catch(() => false);
       expect(fileExists).toBe(true);
 
       // Verify no backup files were created
@@ -409,12 +412,12 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
       const testFile = {
         filename: 'old-file.md',
         content: createSteeringFileContent('old-feature', DocumentType.REQUIREMENTS, 'always'),
-        age: 40
+        age: 40,
       };
 
       const filePath = path.join(steeringDir, testFile.filename);
       await fs.writeFile(filePath, testFile.content, 'utf8');
-      
+
       const ageMs = testFile.age * 24 * 60 * 60 * 1000;
       const timestamp = new Date(Date.now() - ageMs);
       await fs.utimes(filePath, timestamp, timestamp);
@@ -422,7 +425,7 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
       // Perform cleanup - this should work without errors
       const result = await utilities.cleanupSteeringFiles({
         maxAgeDays: 30,
-        createBackups: false
+        createBackups: false,
       });
 
       // Should have successfully removed the old file
@@ -444,13 +447,13 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
         const feature = features[i % features.length];
         const type = types[i % types.length];
         const inclusion = inclusions[i % inclusions.length];
-        
+
         const filename = `${type}-${feature}-${i}.md`;
         const content = createSteeringFileContent(`${feature}-${i}`, type, inclusion);
-        
+
         const filePath = path.join(steeringDir, filename);
         await fs.writeFile(filePath, content, 'utf8');
-        
+
         // Vary file ages
         const age = Math.floor(Math.random() * 60) + 1; // 1-60 days
         const ageMs = age * 24 * 60 * 60 * 1000;
@@ -484,12 +487,12 @@ See #[[file:non-existent-1.md]] and #[[file:non-existent-2.md]]`,
 
   // Helper function to create steering file content
   function createSteeringFileContent(
-    featureName: string, 
-    documentType: DocumentType, 
+    featureName: string,
+    documentType: DocumentType,
     inclusion: InclusionRule
   ): string {
     const fileMatchPattern = inclusion === 'fileMatch' ? `'${documentType}*'` : undefined;
-    
+
     return `---
 inclusion: ${inclusion}${fileMatchPattern ? `\nfileMatchPattern: ${fileMatchPattern}` : ''}
 generatedBy: vibe-pm-agent

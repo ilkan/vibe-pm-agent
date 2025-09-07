@@ -4,14 +4,14 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { 
-  DocumentReferenceLinker, 
+import {
+  DocumentReferenceLinker,
   createDocumentReferenceLinker,
   validateFileReference,
   extractFilePath,
   FileReference,
   CrossReferenceValidation,
-  ReferenceDetectionConfig
+  ReferenceDetectionConfig,
 } from '../../components/document-reference-linker';
 import { SteeringContext, DocumentType } from '../../models/steering';
 
@@ -27,15 +27,15 @@ describe('DocumentReferenceLinker', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockWorkspaceRoot = '/test/workspace';
-    
+
     linker = new DocumentReferenceLinker(mockWorkspaceRoot);
-    
+
     mockContext = {
       featureName: 'user-authentication',
       projectName: 'auth-system',
       relatedFiles: [],
       inclusionRule: 'fileMatch',
-      fileMatchPattern: 'auth*'
+      fileMatchPattern: 'auth*',
     };
 
     // Setup default fs mocks
@@ -46,7 +46,7 @@ describe('DocumentReferenceLinker', () => {
   describe('constructor', () => {
     it('should initialize with default configuration', () => {
       const config = linker.getConfig();
-      
+
       expect(config.baseDirectory).toBe('.kiro/specs');
       expect(config.includeExtensions).toEqual(['.md', '.txt', '.json']);
       expect(config.excludePatterns).toEqual(['node_modules', '.git', 'dist', 'build']);
@@ -58,12 +58,12 @@ describe('DocumentReferenceLinker', () => {
       const customConfig: Partial<ReferenceDetectionConfig> = {
         baseDirectory: 'custom/specs',
         includeExtensions: ['.md'],
-        maxDepth: 3
+        maxDepth: 3,
       };
-      
+
       const customLinker = new DocumentReferenceLinker(mockWorkspaceRoot, customConfig);
       const config = customLinker.getConfig();
-      
+
       expect(config.baseDirectory).toBe('custom/specs');
       expect(config.includeExtensions).toEqual(['.md']);
       expect(config.maxDepth).toBe(3);
@@ -77,20 +77,20 @@ describe('DocumentReferenceLinker', () => {
       (mockFs.existsSync as jest.Mock).mockImplementation((filePath: any) => {
         return filePath.includes('.kiro/specs');
       });
-      
+
       (mockFs.readdirSync as jest.Mock).mockImplementation((dirPath: any) => {
         if (dirPath.includes('user-authentication')) {
           return [
             { name: 'requirements.md', isDirectory: () => false, isFile: () => true },
             { name: 'design.md', isDirectory: () => false, isFile: () => true },
-            { name: 'tasks.md', isDirectory: () => false, isFile: () => true }
+            { name: 'tasks.md', isDirectory: () => false, isFile: () => true },
           ];
         }
         return [];
       });
 
       const result = linker.addFileReferences(mockContext);
-      
+
       expect(result.relatedFiles.length).toBeGreaterThan(0);
       expect(result.featureName).toBe(mockContext.featureName);
       expect(result.inclusionRule).toBe(mockContext.inclusionRule);
@@ -98,9 +98,9 @@ describe('DocumentReferenceLinker', () => {
 
     it('should handle non-existent specs directory', () => {
       (mockFs.existsSync as jest.Mock).mockReturnValue(false);
-      
+
       const result = linker.addFileReferences(mockContext);
-      
+
       expect(result.relatedFiles).toEqual([]);
     });
   });
@@ -117,14 +117,14 @@ describe('DocumentReferenceLinker', () => {
         if (dirPath.includes('user-authentication')) {
           return [
             { name: 'requirements.md', isDirectory: () => false, isFile: () => true },
-            { name: 'design.md', isDirectory: () => false, isFile: () => true }
+            { name: 'design.md', isDirectory: () => false, isFile: () => true },
           ];
         }
         return [];
       });
 
       const files = linker.detectRelatedFiles('user-authentication');
-      
+
       expect(files.length).toBeGreaterThan(0);
       expect(mockFs.readdirSync).toHaveBeenCalled();
     });
@@ -132,18 +132,14 @@ describe('DocumentReferenceLinker', () => {
     it('should detect files in project directory when provided', () => {
       (mockFs.readdirSync as jest.Mock).mockImplementation((dirPath: any) => {
         if (dirPath.includes('auth-system')) {
-          return [
-            { name: 'overview.md', isDirectory: () => false, isFile: () => true }
-          ];
+          return [{ name: 'overview.md', isDirectory: () => false, isFile: () => true }];
         }
         return [];
       });
 
       const files = linker.detectRelatedFiles('user-authentication', 'auth-system');
-      
-      expect(mockFs.existsSync).toHaveBeenCalledWith(
-        expect.stringContaining('auth-system')
-      );
+
+      expect(mockFs.existsSync).toHaveBeenCalledWith(expect.stringContaining('auth-system'));
     });
 
     it('should find similar files in other directories', () => {
@@ -151,19 +147,17 @@ describe('DocumentReferenceLinker', () => {
         if (dirPath.includes('.kiro/specs') && !dirPath.includes('user-authentication')) {
           return [
             { name: 'authentication-service', isDirectory: () => true, isFile: () => false },
-            { name: 'user-management', isDirectory: () => true, isFile: () => false }
+            { name: 'user-management', isDirectory: () => true, isFile: () => false },
           ];
         }
         if (dirPath.includes('authentication-service')) {
-          return [
-            { name: 'auth-flow.md', isDirectory: () => false, isFile: () => true }
-          ];
+          return [{ name: 'auth-flow.md', isDirectory: () => false, isFile: () => true }];
         }
         return [];
       });
 
       const files = linker.detectRelatedFiles('user-authentication');
-      
+
       expect(files).toBeDefined();
     });
   });
@@ -172,13 +166,13 @@ describe('DocumentReferenceLinker', () => {
     it('should generate proper file references', () => {
       const filePaths = [
         '/test/workspace/.kiro/specs/feature/requirements.md',
-        '/test/workspace/.kiro/specs/feature/design.md'
+        '/test/workspace/.kiro/specs/feature/design.md',
       ];
 
       (mockFs.existsSync as jest.Mock).mockReturnValue(true);
 
       const references = linker.generateFileReferences(filePaths);
-      
+
       expect(references).toHaveLength(2);
       expect(references[0].reference).toBe('#[[file:.kiro/specs/feature/requirements.md]]');
       expect(references[0].documentType).toBe(DocumentType.REQUIREMENTS);
@@ -188,15 +182,12 @@ describe('DocumentReferenceLinker', () => {
     });
 
     it('should handle relative paths correctly', () => {
-      const filePaths = [
-        '.kiro/specs/feature/requirements.md',
-        'docs/api.md'
-      ];
+      const filePaths = ['.kiro/specs/feature/requirements.md', 'docs/api.md'];
 
       (mockFs.existsSync as jest.Mock).mockReturnValue(true);
 
       const references = linker.generateFileReferences(filePaths);
-      
+
       expect(references[0].reference).toBe('#[[file:.kiro/specs/feature/requirements.md]]');
       expect(references[1].reference).toBe('#[[file:docs/api.md]]');
     });
@@ -208,13 +199,13 @@ describe('DocumentReferenceLinker', () => {
         'task-list.md',
         'one-pager.md',
         'pr-faq.md',
-        'unknown.md'
+        'unknown.md',
       ];
 
       (mockFs.existsSync as jest.Mock).mockReturnValue(true);
 
       const references = linker.generateFileReferences(filePaths);
-      
+
       expect(references[0].documentType).toBe(DocumentType.REQUIREMENTS);
       expect(references[1].documentType).toBe(DocumentType.DESIGN);
       expect(references[2].documentType).toBe(DocumentType.TASKS);
@@ -231,7 +222,7 @@ describe('DocumentReferenceLinker', () => {
       });
 
       const references = linker.generateFileReferences(filePaths);
-      
+
       expect(references[0].exists).toBe(true);
       expect(references[1].exists).toBe(false);
     });
@@ -241,13 +232,13 @@ describe('DocumentReferenceLinker', () => {
     it('should validate correct references', () => {
       const references = [
         '#[[file:.kiro/specs/feature/requirements.md]]',
-        '#[[file:.kiro/specs/feature/design.md]]'
+        '#[[file:.kiro/specs/feature/design.md]]',
       ];
 
       (mockFs.existsSync as jest.Mock).mockReturnValue(true);
 
       const validation = linker.validateCrossReferences(references);
-      
+
       expect(validation.isValid).toBe(true);
       expect(validation.validReferences).toHaveLength(2);
       expect(validation.invalidReferences).toHaveLength(0);
@@ -255,15 +246,12 @@ describe('DocumentReferenceLinker', () => {
     });
 
     it('should detect invalid reference format', () => {
-      const references = [
-        'invalid-reference',
-        '#[[file:valid.md]]'
-      ];
+      const references = ['invalid-reference', '#[[file:valid.md]]'];
 
       (mockFs.existsSync as jest.Mock).mockReturnValue(true);
 
       const validation = linker.validateCrossReferences(references);
-      
+
       expect(validation.isValid).toBe(false);
       expect(validation.validReferences).toHaveLength(1);
       expect(validation.invalidReferences).toHaveLength(1);
@@ -275,11 +263,11 @@ describe('DocumentReferenceLinker', () => {
 
       (mockFs.existsSync as jest.Mock).mockReturnValue(false);
       (mockFs.readdirSync as jest.Mock).mockReturnValue([
-        { name: 'similar.md', isDirectory: () => false, isFile: () => true }
+        { name: 'similar.md', isDirectory: () => false, isFile: () => true },
       ]);
 
       const validation = linker.validateCrossReferences(references);
-      
+
       expect(validation.isValid).toBe(false);
       expect(validation.invalidReferences).toHaveLength(1);
       expect(validation.invalidReferences[0].reason).toContain('File does not exist');
@@ -290,14 +278,14 @@ describe('DocumentReferenceLinker', () => {
     it('should convert absolute paths to relative', () => {
       const absolutePath = '/test/workspace/src/file.md';
       const relativePath = linker.resolveRelativePath(absolutePath);
-      
+
       expect(relativePath).toBe('src/file.md');
     });
 
     it('should return relative paths unchanged', () => {
       const relativePath = 'src/file.md';
       const result = linker.resolveRelativePath(relativePath);
-      
+
       expect(result).toBe('src/file.md');
     });
   });
@@ -310,11 +298,11 @@ describe('DocumentReferenceLinker', () => {
 
       (mockFs.readdirSync as jest.Mock).mockReturnValue([
         { name: 'requirements.md', isDirectory: () => false, isFile: () => true },
-        { name: 'design.md', isDirectory: () => false, isFile: () => true }
+        { name: 'design.md', isDirectory: () => false, isFile: () => true },
       ]);
 
       const files = linker.getFeatureFiles('user-authentication');
-      
+
       expect(files.length).toBeGreaterThan(0);
       expect(files[0]).toHaveProperty('reference');
       expect(files[0]).toHaveProperty('documentType');
@@ -324,7 +312,7 @@ describe('DocumentReferenceLinker', () => {
       (mockFs.existsSync as jest.Mock).mockReturnValue(false);
 
       const files = linker.getFeatureFiles('non-existent');
-      
+
       expect(files).toEqual([]);
     });
   });
@@ -333,12 +321,12 @@ describe('DocumentReferenceLinker', () => {
     it('should update configuration', () => {
       const newConfig = {
         maxDepth: 10,
-        includeExtensions: ['.md', '.rst']
+        includeExtensions: ['.md', '.rst'],
       };
 
       linker.updateConfig(newConfig);
       const config = linker.getConfig();
-      
+
       expect(config.maxDepth).toBe(10);
       expect(config.includeExtensions).toEqual(['.md', '.rst']);
       expect(config.baseDirectory).toBe('.kiro/specs'); // Should keep existing
@@ -352,40 +340,38 @@ describe('DocumentReferenceLinker', () => {
       });
 
       const files = linker.detectRelatedFiles('test-feature');
-      
+
       expect(files).toEqual([]);
     });
 
     it('should handle empty feature names', () => {
       const files = linker.detectRelatedFiles('');
-      
+
       expect(files).toEqual([]);
     });
 
     it('should exclude hidden files and directories', () => {
       (mockFs.readdirSync as jest.Mock).mockReturnValue([
         { name: '.hidden', isDirectory: () => true, isFile: () => false },
-        { name: 'visible.md', isDirectory: () => false, isFile: () => true }
+        { name: 'visible.md', isDirectory: () => false, isFile: () => true },
       ]);
 
       const files = linker.detectRelatedFiles('test-feature');
-      
+
       // Should not include hidden files
       expect(files.every(file => !path.basename(file).startsWith('.'))).toBe(true);
     });
 
     it('should respect max depth configuration', () => {
       const shallowLinker = new DocumentReferenceLinker(mockWorkspaceRoot, { maxDepth: 1 });
-      
+
       (mockFs.readdirSync as jest.Mock).mockImplementation((dirPath: any) => {
         // Return nested structure that exceeds maxDepth
-        return [
-          { name: 'level1', isDirectory: () => true, isFile: () => false }
-        ];
+        return [{ name: 'level1', isDirectory: () => true, isFile: () => false }];
       });
 
       const files = shallowLinker.detectRelatedFiles('test-feature');
-      
+
       // Should respect depth limit
       expect(files).toBeDefined();
     });
@@ -396,7 +382,7 @@ describe('Factory and utility functions', () => {
   describe('createDocumentReferenceLinker', () => {
     it('should create linker with default settings', () => {
       const linker = createDocumentReferenceLinker();
-      
+
       expect(linker).toBeInstanceOf(DocumentReferenceLinker);
       expect(linker.getConfig().baseDirectory).toBe('.kiro/specs');
     });
@@ -404,7 +390,7 @@ describe('Factory and utility functions', () => {
     it('should create linker with custom settings', () => {
       const config = { maxDepth: 2 };
       const linker = createDocumentReferenceLinker('/custom/root', config);
-      
+
       expect(linker).toBeInstanceOf(DocumentReferenceLinker);
       expect(linker.getConfig().maxDepth).toBe(2);
     });
@@ -417,13 +403,13 @@ describe('Factory and utility functions', () => {
 
     it('should validate correct reference', () => {
       const isValid = validateFileReference('#[[file:test.md]]');
-      
+
       expect(isValid).toBe(true);
     });
 
     it('should reject invalid reference', () => {
       const isValid = validateFileReference('invalid-reference');
-      
+
       expect(isValid).toBe(false);
     });
   });
@@ -431,19 +417,19 @@ describe('Factory and utility functions', () => {
   describe('extractFilePath', () => {
     it('should extract file path from valid reference', () => {
       const filePath = extractFilePath('#[[file:path/to/file.md]]');
-      
+
       expect(filePath).toBe('path/to/file.md');
     });
 
     it('should return null for invalid reference', () => {
       const filePath = extractFilePath('invalid-reference');
-      
+
       expect(filePath).toBeNull();
     });
 
     it('should handle complex paths', () => {
       const filePath = extractFilePath('#[[file:.kiro/specs/feature-name/requirements.md]]');
-      
+
       expect(filePath).toBe('.kiro/specs/feature-name/requirements.md');
     });
   });
@@ -467,7 +453,7 @@ describe('Integration scenarios', () => {
       if (dirPath.includes('user-auth')) {
         return [
           { name: 'requirements.md', isDirectory: () => false, isFile: () => true },
-          { name: 'design.md', isDirectory: () => false, isFile: () => true }
+          { name: 'design.md', isDirectory: () => false, isFile: () => true },
         ];
       }
       return [];
@@ -475,14 +461,12 @@ describe('Integration scenarios', () => {
 
     // Detect files
     const detectedFiles = linker.detectRelatedFiles('user-auth');
-    
+
     // Generate references
     const references = linker.generateFileReferences(detectedFiles);
-    
+
     // Validate references
-    const validation = linker.validateCrossReferences(
-      references.map(ref => ref.reference)
-    );
+    const validation = linker.validateCrossReferences(references.map(ref => ref.reference));
 
     expect(detectedFiles.length).toBeGreaterThan(0);
     expect(references.length).toBe(detectedFiles.length);
@@ -498,11 +482,11 @@ describe('Integration scenarios', () => {
     });
 
     (mockFs.readdirSync as jest.Mock).mockReturnValue([
-      'requirements-v2.md' // Similar file exists in same directory
+      'requirements-v2.md', // Similar file exists in same directory
     ]);
 
     const validation = linker.validateCrossReferences(['#[[file:requirements.md]]']);
-    
+
     expect(validation.isValid).toBe(false);
     expect(validation.suggestions.length).toBeGreaterThan(0);
   });

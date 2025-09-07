@@ -1,6 +1,6 @@
 /**
  * Unit Tests for Market Analyzer Component
- * 
+ *
  * Tests TAM/SAM/SOM calculation engine with multiple methodologies
  * including top-down, bottom-up, and value-theory calculations.
  */
@@ -10,7 +10,7 @@ import {
   MarketSizingArgs,
   MarketSizingResult,
   MarketSizingError,
-  MARKET_SIZING_DEFAULTS
+  MARKET_SIZING_DEFAULTS,
 } from '../../models/competitive';
 
 describe('MarketAnalyzer', () => {
@@ -31,9 +31,9 @@ describe('MarketAnalyzer', () => {
         defaultTimeframe: '3 years',
         defaultCurrency: 'EUR',
         confidenceThreshold: 0.8,
-        enableScenarioAnalysis: false
+        enableScenarioAnalysis: false,
       };
-      
+
       const analyzer = new MarketAnalyzer(customConfig);
       expect(analyzer).toBeInstanceOf(MarketAnalyzer);
     });
@@ -41,13 +41,14 @@ describe('MarketAnalyzer', () => {
 
   describe('Market Sizing Analysis', () => {
     const validArgs: MarketSizingArgs = {
-      feature_idea: 'AI-powered customer service automation platform that reduces support costs by 40%',
+      feature_idea:
+        'AI-powered customer service automation platform that reduces support costs by 40%',
       market_definition: {
         industry: 'technology',
         geography: ['north america', 'europe'],
-        customer_segments: ['enterprise', 'mid-market']
+        customer_segments: ['enterprise', 'mid-market'],
       },
-      sizing_methods: ['top-down', 'bottom-up'] as const
+      sizing_methods: ['top-down', 'bottom-up'] as const,
     };
 
     it('should perform comprehensive market sizing analysis', async () => {
@@ -79,7 +80,7 @@ describe('MarketAnalyzer', () => {
       expect(result.tam.currency).toBe(MARKET_SIZING_DEFAULTS.DEFAULT_CURRENCY);
       expect(result.sam.currency).toBe(MARKET_SIZING_DEFAULTS.DEFAULT_CURRENCY);
       expect(result.som.currency).toBe(MARKET_SIZING_DEFAULTS.DEFAULT_CURRENCY);
-      
+
       expect(result.tam.timeframe).toBe(MARKET_SIZING_DEFAULTS.DEFAULT_TIMEFRAME);
       expect(result.sam.timeframe).toBe(MARKET_SIZING_DEFAULTS.DEFAULT_TIMEFRAME);
       expect(result.som.timeframe).toBe(MARKET_SIZING_DEFAULTS.DEFAULT_TIMEFRAME);
@@ -91,7 +92,7 @@ describe('MarketAnalyzer', () => {
       expect(result.tam.calculationDate).toBeDefined();
       expect(result.sam.calculationDate).toBeDefined();
       expect(result.som.calculationDate).toBeDefined();
-      
+
       // Verify dates are recent (within last minute)
       const now = new Date();
       const tamDate = new Date(result.tam.calculationDate);
@@ -112,9 +113,9 @@ describe('MarketAnalyzer', () => {
       market_definition: {
         industry: 'technology',
         geography: ['global'],
-        customer_segments: ['enterprise']
+        customer_segments: ['enterprise'],
       },
-      sizing_methods: [] as ('top-down' | 'bottom-up' | 'value-theory')[]
+      sizing_methods: [] as ('top-down' | 'bottom-up' | 'value-theory')[],
     };
 
     it('should calculate TAM using top-down methodology', async () => {
@@ -145,12 +146,15 @@ describe('MarketAnalyzer', () => {
     });
 
     it('should handle multiple methodologies and select best result', async () => {
-      const args = { ...baseArgs, sizing_methods: ['top-down', 'bottom-up', 'value-theory'] as const };
+      const args = {
+        ...baseArgs,
+        sizing_methods: ['top-down', 'bottom-up', 'value-theory'] as const,
+      };
       const result = await marketAnalyzer.analyzeMarketSize(args);
 
       expect(result.methodology).toHaveLength(3);
       expect(result.tam.value).toBeGreaterThan(0);
-      
+
       // Should have methodology information for all three approaches
       const methodologyTypes = result.methodology.map(m => m.type);
       expect(methodologyTypes).toContain('top-down');
@@ -163,7 +167,7 @@ describe('MarketAnalyzer', () => {
       const result = await marketAnalyzer.analyzeMarketSize(args);
 
       expect(result.methodology.length).toBeGreaterThan(0);
-      
+
       // Should use default methodologies
       const methodologyTypes = result.methodology.map(m => m.type);
       MARKET_SIZING_DEFAULTS.DEFAULT_SIZING_METHODS.forEach(method => {
@@ -178,9 +182,9 @@ describe('MarketAnalyzer', () => {
       market_definition: {
         industry: 'retail',
         geography: ['north america'],
-        customer_segments: ['mid-market', 'small business']
+        customer_segments: ['mid-market', 'small business'],
       },
-      sizing_methods: ['bottom-up'] as const
+      sizing_methods: ['bottom-up'] as const,
     };
 
     it('should calculate SAM as percentage of TAM', async () => {
@@ -206,16 +210,16 @@ describe('MarketAnalyzer', () => {
         ...validArgs,
         market_definition: {
           ...validArgs.market_definition,
-          geography: ['global']
-        }
+          geography: ['global'],
+        },
       };
-      
+
       const regionalArgs = {
         ...validArgs,
         market_definition: {
           ...validArgs.market_definition,
-          geography: ['north america']
-        }
+          geography: ['north america'],
+        },
       };
 
       const globalResult = await marketAnalyzer.analyzeMarketSize(globalArgs);
@@ -224,7 +228,7 @@ describe('MarketAnalyzer', () => {
       // Global should have higher SAM percentage due to broader reach
       const globalSamPercentage = globalResult.sam.value / globalResult.tam.value;
       const regionalSamPercentage = regionalResult.sam.value / regionalResult.tam.value;
-      
+
       expect(globalSamPercentage).toBeGreaterThanOrEqual(regionalSamPercentage);
     });
 
@@ -233,16 +237,16 @@ describe('MarketAnalyzer', () => {
         ...validArgs,
         market_definition: {
           ...validArgs.market_definition,
-          customer_segments: ['enterprise', 'mid-market', 'small business']
-        }
+          customer_segments: ['enterprise', 'mid-market', 'small business'],
+        },
       };
-      
+
       const singleSegmentArgs = {
         ...validArgs,
         market_definition: {
           ...validArgs.market_definition,
-          customer_segments: ['enterprise']
-        }
+          customer_segments: ['enterprise'],
+        },
       };
 
       const multiResult = await marketAnalyzer.analyzeMarketSize(multiSegmentArgs);
@@ -251,7 +255,7 @@ describe('MarketAnalyzer', () => {
       // Multi-segment should have higher SAM percentage
       const multiSamPercentage = multiResult.sam.value / multiResult.tam.value;
       const singleSamPercentage = singleResult.sam.value / singleResult.tam.value;
-      
+
       expect(multiSamPercentage).toBeGreaterThanOrEqual(singleSamPercentage);
     });
   });
@@ -262,16 +266,16 @@ describe('MarketAnalyzer', () => {
       market_definition: {
         industry: 'finance',
         geography: ['europe'],
-        customer_segments: ['enterprise']
+        customer_segments: ['enterprise'],
       },
-      sizing_methods: ['top-down'] as const
+      sizing_methods: ['top-down'] as const,
     };
 
     it('should generate three scenarios by default', async () => {
       const result = await marketAnalyzer.analyzeMarketSize(validArgs);
 
       expect(result.scenarios).toHaveLength(3);
-      
+
       const scenarioNames = result.scenarios.map(s => s.name);
       expect(scenarioNames).toContain('conservative');
       expect(scenarioNames).toContain('balanced');
@@ -283,7 +287,7 @@ describe('MarketAnalyzer', () => {
 
       const conservative = result.scenarios.find(s => s.name === 'conservative')!;
       const balanced = result.scenarios.find(s => s.name === 'balanced')!;
-      
+
       expect(conservative.tam).toBeLessThan(balanced.tam);
       expect(conservative.sam).toBeLessThan(balanced.sam);
       expect(conservative.som).toBeLessThan(balanced.som);
@@ -294,7 +298,7 @@ describe('MarketAnalyzer', () => {
 
       const aggressive = result.scenarios.find(s => s.name === 'aggressive')!;
       const balanced = result.scenarios.find(s => s.name === 'balanced')!;
-      
+
       expect(aggressive.tam).toBeGreaterThan(balanced.tam);
       expect(aggressive.sam).toBeGreaterThan(balanced.sam);
       expect(aggressive.som).toBeGreaterThan(balanced.som);
@@ -326,16 +330,16 @@ describe('MarketAnalyzer', () => {
       market_definition: {
         industry: 'healthcare',
         geography: ['north america'],
-        customer_segments: ['enterprise']
+        customer_segments: ['enterprise'],
       },
-      sizing_methods: ['bottom-up'] as const
+      sizing_methods: ['bottom-up'] as const,
     };
 
     it('should generate confidence intervals for TAM, SAM, and SOM', async () => {
       const result = await marketAnalyzer.analyzeMarketSize(validArgs);
 
       expect(result.confidenceIntervals).toHaveLength(3);
-      
+
       const intervalTypes = result.confidenceIntervals.map(ci => ci.marketType);
       expect(intervalTypes).toContain('tam');
       expect(intervalTypes).toContain('sam');
@@ -380,16 +384,16 @@ describe('MarketAnalyzer', () => {
       market_definition: {
         industry: 'manufacturing',
         geography: ['asia pacific'],
-        customer_segments: ['enterprise']
+        customer_segments: ['enterprise'],
       },
-      sizing_methods: ['value-theory'] as const
+      sizing_methods: ['value-theory'] as const,
     };
 
     it('should generate market assumptions', async () => {
       const result = await marketAnalyzer.analyzeMarketSize(validArgs);
 
       expect(result.assumptions).toHaveLength(3);
-      
+
       const categories = result.assumptions.map(a => a.category);
       expect(categories).toContain('market-growth');
       expect(categories).toContain('penetration-rate');
@@ -435,16 +439,16 @@ describe('MarketAnalyzer', () => {
       market_definition: {
         industry: 'technology',
         geography: ['north america'],
-        customer_segments: ['government']
+        customer_segments: ['government'],
       },
-      sizing_methods: ['top-down'] as const
+      sizing_methods: ['top-down'] as const,
     };
 
     it('should generate source attribution', async () => {
       const result = await marketAnalyzer.analyzeMarketSize(validArgs);
 
       expect(result.sourceAttribution).toHaveLength(1);
-      
+
       const source = result.sourceAttribution[0];
       expect(source.id).toBeDefined();
       expect(source.type).toBe('market-research');
@@ -480,13 +484,14 @@ describe('MarketAnalyzer', () => {
         market_definition: {
           industry: 'technology',
           geography: ['global'],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['top-down'] as const
+        sizing_methods: ['top-down'] as const,
       };
 
-      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs))
-        .rejects.toThrow(MarketSizingError);
+      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs)).rejects.toThrow(
+        MarketSizingError
+      );
     });
 
     it('should throw error for short feature idea', async () => {
@@ -495,13 +500,14 @@ describe('MarketAnalyzer', () => {
         market_definition: {
           industry: 'technology',
           geography: ['global'],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['top-down'] as const
+        sizing_methods: ['top-down'] as const,
       };
 
-      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs))
-        .rejects.toThrow(MarketSizingError);
+      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs)).rejects.toThrow(
+        MarketSizingError
+      );
     });
 
     it('should throw error for missing industry', async () => {
@@ -510,13 +516,14 @@ describe('MarketAnalyzer', () => {
         market_definition: {
           industry: '',
           geography: ['global'],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['top-down'] as const
+        sizing_methods: ['top-down'] as const,
       };
 
-      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs))
-        .rejects.toThrow(MarketSizingError);
+      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs)).rejects.toThrow(
+        MarketSizingError
+      );
     });
 
     it('should throw error for empty geography', async () => {
@@ -525,13 +532,14 @@ describe('MarketAnalyzer', () => {
         market_definition: {
           industry: 'technology',
           geography: [],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['top-down'] as const
+        sizing_methods: ['top-down'] as const,
       };
 
-      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs))
-        .rejects.toThrow(MarketSizingError);
+      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs)).rejects.toThrow(
+        MarketSizingError
+      );
     });
 
     it('should throw error for empty customer segments', async () => {
@@ -540,13 +548,14 @@ describe('MarketAnalyzer', () => {
         market_definition: {
           industry: 'technology',
           geography: ['global'],
-          customer_segments: []
+          customer_segments: [],
         },
-        sizing_methods: ['top-down'] as const
+        sizing_methods: ['top-down'] as const,
       };
 
-      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs))
-        .rejects.toThrow(MarketSizingError);
+      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs)).rejects.toThrow(
+        MarketSizingError
+      );
     });
 
     it('should throw error for unsupported methodology', async () => {
@@ -555,13 +564,14 @@ describe('MarketAnalyzer', () => {
         market_definition: {
           industry: 'technology',
           geography: ['global'],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['unsupported-method' as any]
+        sizing_methods: ['unsupported-method' as any],
       };
 
-      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs))
-        .rejects.toThrow(MarketSizingError);
+      await expect(marketAnalyzer.analyzeMarketSize(invalidArgs)).rejects.toThrow(
+        MarketSizingError
+      );
     });
 
     it('should include helpful error suggestions', async () => {
@@ -570,9 +580,9 @@ describe('MarketAnalyzer', () => {
         market_definition: {
           industry: 'technology',
           geography: ['global'],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['top-down'] as const
+        sizing_methods: ['top-down'] as const,
       };
 
       try {
@@ -592,9 +602,9 @@ describe('MarketAnalyzer', () => {
       market_definition: {
         industry: 'technology',
         geography: ['global'],
-        customer_segments: ['enterprise', 'mid-market']
+        customer_segments: ['enterprise', 'mid-market'],
       },
-      sizing_methods: ['top-down', 'bottom-up', 'value-theory'] as const
+      sizing_methods: ['top-down', 'bottom-up', 'value-theory'] as const,
     };
 
     it('should complete analysis within reasonable time', async () => {
@@ -608,7 +618,7 @@ describe('MarketAnalyzer', () => {
 
     it('should handle timeout configuration', async () => {
       const fastAnalyzer = new MarketAnalyzer({ maxCalculationTime: 1 }); // 1ms timeout
-      
+
       // Should still complete but may log warning
       const result = await fastAnalyzer.analyzeMarketSize(validArgs);
       expect(result).toBeDefined();
@@ -625,13 +635,13 @@ describe('MarketAnalyzer', () => {
           market_definition: {
             industry,
             geography: ['global'],
-            customer_segments: ['enterprise']
+            customer_segments: ['enterprise'],
           },
-          sizing_methods: ['top-down'] as const
+          sizing_methods: ['top-down'] as const,
         };
 
         const result = await marketAnalyzer.analyzeMarketSize(args);
-        
+
         expect(result.tam.value).toBeGreaterThan(0);
         expect(result.tam.growthRate).toBeGreaterThan(0);
         expect(result.tam.growthRate).toBeLessThan(1); // Should be reasonable growth rate
@@ -644,9 +654,9 @@ describe('MarketAnalyzer', () => {
         market_definition: {
           industry: 'technology',
           geography: ['global'],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['top-down'] as const
+        sizing_methods: ['top-down'] as const,
       };
 
       const retailArgs: MarketSizingArgs = {
@@ -654,9 +664,9 @@ describe('MarketAnalyzer', () => {
         market_definition: {
           industry: 'retail',
           geography: ['global'],
-          customer_segments: ['enterprise']
+          customer_segments: ['enterprise'],
         },
-        sizing_methods: ['top-down'] as const
+        sizing_methods: ['top-down'] as const,
       };
 
       const techResult = await marketAnalyzer.analyzeMarketSize(techArgs);
@@ -672,9 +682,9 @@ describe('MarketAnalyzer', () => {
       feature_idea: 'Geographic scope test feature',
       market_definition: {
         industry: 'technology',
-        customer_segments: ['enterprise']
+        customer_segments: ['enterprise'],
       },
-      sizing_methods: ['top-down'] as const
+      sizing_methods: ['top-down'] as const,
     };
 
     it('should calculate larger TAM for global scope', async () => {
@@ -682,16 +692,16 @@ describe('MarketAnalyzer', () => {
         ...baseArgs,
         market_definition: {
           ...baseArgs.market_definition,
-          geography: ['global']
-        }
+          geography: ['global'],
+        },
       };
 
       const regionalArgs = {
         ...baseArgs,
         market_definition: {
           ...baseArgs.market_definition,
-          geography: ['north america']
-        }
+          geography: ['north america'],
+        },
       };
 
       const globalResult = await marketAnalyzer.analyzeMarketSize(globalArgs);
@@ -705,16 +715,16 @@ describe('MarketAnalyzer', () => {
         ...baseArgs,
         market_definition: {
           ...baseArgs.market_definition,
-          geography: ['north america', 'europe', 'asia pacific']
-        }
+          geography: ['north america', 'europe', 'asia pacific'],
+        },
       };
 
       const singleRegionArgs = {
         ...baseArgs,
         market_definition: {
           ...baseArgs.market_definition,
-          geography: ['north america']
-        }
+          geography: ['north america'],
+        },
       };
 
       const multiResult = await marketAnalyzer.analyzeMarketSize(multiRegionArgs);

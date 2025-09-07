@@ -1,12 +1,12 @@
 // Integration tests for AI Agent Pipeline orchestration
 
 import { AIAgentPipeline } from '../../pipeline';
-import { 
-  OptionalParams, 
-  Workflow, 
+import {
+  OptionalParams,
+  Workflow,
   OptimizedWorkflow,
   ROIAnalysis,
-  ConsultingSummary 
+  ConsultingSummary,
 } from '../../models';
 import { ConsultingAnalysis } from '../../components/business-analyzer';
 
@@ -19,13 +19,14 @@ describe('AIAgentPipeline Integration Tests', () => {
 
   describe('processIntent - Full Pipeline Execution', () => {
     it('should execute complete pipeline with consulting techniques', async () => {
-      const rawIntent = 'I want to create a user management system that can handle user registration, authentication, and profile management efficiently';
+      const rawIntent =
+        'I want to create a user management system that can handle user registration, authentication, and profile management efficiently';
       const params: OptionalParams = {
         expectedUserVolume: 1000,
         costConstraints: {
-          maxCostDollars: 100
+          maxCostDollars: 100,
         },
-        performanceSensitivity: 'medium'
+        performanceSensitivity: 'medium',
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
@@ -35,24 +36,24 @@ describe('AIAgentPipeline Integration Tests', () => {
       expect(result.consultingSummary).toBeDefined();
       expect(result.roiAnalysis).toBeDefined();
       expect(result.metadata).toBeDefined();
-      
+
       // Verify enhanced spec structure
       expect(result.enhancedKiroSpec!.name).toBeTruthy();
       expect(result.enhancedKiroSpec!.tasks).toHaveLength(expect.any(Number));
       expect(result.enhancedKiroSpec!.consultingSummary).toBeDefined();
       expect(result.enhancedKiroSpec!.roiAnalysis).toBeDefined();
       expect(result.enhancedKiroSpec!.alternativeOptions).toBeDefined();
-      
+
       // Verify consulting summary
       expect(result.consultingSummary!.executiveSummary).toBeTruthy();
       expect(result.consultingSummary!.recommendations).toHaveLength(expect.any(Number));
       expect(result.consultingSummary!.techniquesApplied).toHaveLength(expect.any(Number));
-      
+
       // Verify ROI analysis
       expect(result.roiAnalysis!.scenarios).toHaveLength(expect.any(Number));
       expect(result.roiAnalysis!.bestOption).toBeTruthy();
       expect(result.roiAnalysis!.recommendations).toHaveLength(expect.any(Number));
-      
+
       // Verify metadata
       expect(result.metadata!.executionTime).toBeGreaterThan(0);
       expect(result.metadata!.sessionId).toBeTruthy();
@@ -82,14 +83,15 @@ describe('AIAgentPipeline Integration Tests', () => {
     }, 30000);
 
     it('should apply appropriate consulting techniques based on intent complexity', async () => {
-      const businessIntent = 'Optimize our customer onboarding process to reduce churn and improve user activation rates';
+      const businessIntent =
+        'Optimize our customer onboarding process to reduce churn and improve user activation rates';
 
       const result = await pipeline.processIntent(businessIntent);
 
       expect(result.success).toBe(true);
       expect(result.consultingSummary!.techniquesApplied).toContainEqual(
         expect.objectContaining({
-          techniqueName: expect.stringMatching(/MECE|ValueDriverTree|ImpactEffort/)
+          techniqueName: expect.stringMatching(/MECE|ValueDriverTree|ImpactEffort/),
         })
       );
       expect(result.roiAnalysis!.scenarios).toHaveLength(3);
@@ -134,7 +136,7 @@ describe('AIAgentPipeline Integration Tests', () => {
             description: 'Fetch user data from database',
             inputs: [],
             outputs: ['userData'],
-            quotaCost: 3
+            quotaCost: 3,
           },
           {
             id: 'step-2',
@@ -142,7 +144,7 @@ describe('AIAgentPipeline Integration Tests', () => {
             description: 'Analyze user behavior patterns',
             inputs: ['userData'],
             outputs: ['behaviorAnalysis'],
-            quotaCost: 8
+            quotaCost: 8,
           },
           {
             id: 'step-3',
@@ -150,11 +152,11 @@ describe('AIAgentPipeline Integration Tests', () => {
             description: 'Generate personalized recommendations',
             inputs: ['behaviorAnalysis'],
             outputs: ['recommendations'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 3
+        estimatedComplexity: 3,
       };
 
       const analysis = await pipeline.analyzeWorkflow(workflow);
@@ -176,11 +178,11 @@ describe('AIAgentPipeline Integration Tests', () => {
             description: 'Process large dataset',
             inputs: [],
             outputs: ['processedData'],
-            quotaCost: 15
-          }
+            quotaCost: 15,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 2
+        estimatedComplexity: 2,
       };
 
       const requestedTechniques = ['MECE', 'ValueDriverTree'];
@@ -194,7 +196,7 @@ describe('AIAgentPipeline Integration Tests', () => {
         id: '',
         steps: [],
         dataFlow: [],
-        estimatedComplexity: 0
+        estimatedComplexity: 0,
       };
 
       await expect(pipeline.analyzeWorkflow(invalidWorkflow)).rejects.toThrow();
@@ -212,11 +214,11 @@ describe('AIAgentPipeline Integration Tests', () => {
             description: 'Expensive operation',
             inputs: [],
             outputs: ['result'],
-            quotaCost: 20
-          }
+            quotaCost: 20,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 1
+        estimatedComplexity: 1,
       };
 
       const optimizedWorkflow: OptimizedWorkflow = {
@@ -229,22 +231,24 @@ describe('AIAgentPipeline Integration Tests', () => {
             description: 'Optimized operation',
             inputs: [],
             outputs: ['result'],
-            quotaCost: 5
-          }
+            quotaCost: 5,
+          },
         ],
-        optimizations: [{
-          type: 'vibe_to_spec',
-          description: 'Converted vibe to spec',
-          stepsAffected: ['step-1'],
-          estimatedSavings: { vibes: 15, specs: 0, percentage: 75 }
-        }],
+        optimizations: [
+          {
+            type: 'vibe_to_spec',
+            description: 'Converted vibe to spec',
+            stepsAffected: ['step-1'],
+            estimatedSavings: { vibes: 15, specs: 0, percentage: 75 },
+          },
+        ],
         originalWorkflow: baseWorkflow,
         efficiencyGains: {
           vibeReduction: 15,
           specReduction: 0,
           totalSavingsPercentage: 75,
-          costSavings: 15
-        }
+          costSavings: 15,
+        },
       };
 
       const roiAnalysis = await pipeline.generateROIAnalysis(baseWorkflow, optimizedWorkflow);
@@ -254,7 +258,7 @@ describe('AIAgentPipeline Integration Tests', () => {
       expect(roiAnalysis.scenarios.map(s => s.name)).toEqual(['Conservative', 'Balanced', 'Bold']);
       expect(roiAnalysis.bestOption).toBeTruthy();
       expect(roiAnalysis.recommendations).toHaveLength(expect.any(Number));
-      
+
       // Verify savings calculations
       const balancedScenario = roiAnalysis.scenarios.find(s => s.name === 'Balanced');
       expect(balancedScenario!.savingsPercentage).toBeGreaterThan(0);
@@ -264,21 +268,39 @@ describe('AIAgentPipeline Integration Tests', () => {
       const workflow: Workflow = {
         id: 'test-workflow',
         steps: [
-          { id: 'step-1', type: 'vibe', description: 'Operation 1', inputs: [], outputs: [], quotaCost: 10 },
-          { id: 'step-2', type: 'vibe', description: 'Operation 2', inputs: [], outputs: [], quotaCost: 8 }
+          {
+            id: 'step-1',
+            type: 'vibe',
+            description: 'Operation 1',
+            inputs: [],
+            outputs: [],
+            quotaCost: 10,
+          },
+          {
+            id: 'step-2',
+            type: 'vibe',
+            description: 'Operation 2',
+            inputs: [],
+            outputs: [],
+            quotaCost: 8,
+          },
         ],
         dataFlow: [],
-        estimatedComplexity: 2
+        estimatedComplexity: 2,
       };
 
       const zeroBasedSolution = {
         radicalApproach: 'Complete redesign using batch processing',
         assumptionsChallenged: ['Individual processing assumption'],
         potentialSavings: 80,
-        implementationRisk: 'medium' as const
+        implementationRisk: 'medium' as const,
       };
 
-      const roiAnalysis = await pipeline.generateROIAnalysis(workflow, undefined, zeroBasedSolution);
+      const roiAnalysis = await pipeline.generateROIAnalysis(
+        workflow,
+        undefined,
+        zeroBasedSolution
+      );
 
       expect(roiAnalysis.scenarios).toHaveLength(3);
       const boldScenario = roiAnalysis.scenarios.find(s => s.name === 'Bold');
@@ -291,11 +313,15 @@ describe('AIAgentPipeline Integration Tests', () => {
       const mockAnalysis: ConsultingAnalysis = {
         techniquesUsed: [
           { name: 'MECE', relevanceScore: 0.9, applicableScenarios: ['workflow analysis'] },
-          { name: 'ValueDriverTree', relevanceScore: 0.8, applicableScenarios: ['cost optimization'] }
+          {
+            name: 'ValueDriverTree',
+            relevanceScore: 0.8,
+            applicableScenarios: ['cost optimization'],
+          },
         ],
         keyFindings: [
           'Workflow has significant optimization potential',
-          'Current approach uses excessive vibe operations'
+          'Current approach uses excessive vibe operations',
         ],
         totalQuotaSavings: 45,
         implementationComplexity: 'medium',
@@ -303,8 +329,8 @@ describe('AIAgentPipeline Integration Tests', () => {
           radicalApproach: 'Batch processing approach',
           assumptionsChallenged: ['Real-time processing requirement'],
           potentialSavings: 60,
-          implementationRisk: 'medium'
-        }
+          implementationRisk: 'medium',
+        },
       };
 
       const summary = await pipeline.generateConsultingSummary(mockAnalysis);
@@ -314,7 +340,7 @@ describe('AIAgentPipeline Integration Tests', () => {
       expect(summary.recommendations).toHaveLength(expect.any(Number));
       expect(summary.techniquesApplied).toHaveLength(2);
       expect(summary.supportingEvidence).toHaveLength(expect.any(Number));
-      
+
       // Verify pyramid principle structure
       expect(summary.recommendations[0].mainRecommendation).toBeTruthy();
       expect(summary.recommendations[0].supportingReasons).toHaveLength(expect.any(Number));
@@ -326,25 +352,27 @@ describe('AIAgentPipeline Integration Tests', () => {
         techniquesUsed: [
           { name: 'MECE', relevanceScore: 0.9, applicableScenarios: ['analysis'] },
           { name: 'ValueDriverTree', relevanceScore: 0.8, applicableScenarios: ['optimization'] },
-          { name: 'ImpactEffort', relevanceScore: 0.7, applicableScenarios: ['prioritization'] }
+          { name: 'ImpactEffort', relevanceScore: 0.7, applicableScenarios: ['prioritization'] },
         ],
         keyFindings: ['Multiple optimization opportunities identified'],
         totalQuotaSavings: 30,
-        implementationComplexity: 'low'
+        implementationComplexity: 'low',
       };
 
       const requestedTechniques = ['MECE', 'ValueDriverTree'];
       const summary = await pipeline.generateConsultingSummary(mockAnalysis, requestedTechniques);
 
       expect(summary.techniquesApplied).toHaveLength(2);
-      expect(summary.techniquesApplied.every(t => requestedTechniques.includes(t.techniqueName))).toBe(true);
+      expect(
+        summary.techniquesApplied.every(t => requestedTechniques.includes(t.techniqueName))
+      ).toBe(true);
     });
   });
 
   describe('Pipeline Performance and Monitoring', () => {
     it('should track execution metrics', async () => {
       const intent = 'Create a simple data processing workflow';
-      
+
       const result = await pipeline.processIntent(intent);
 
       expect(result.metadata).toBeDefined();
@@ -358,7 +386,7 @@ describe('AIAgentPipeline Integration Tests', () => {
       const intents = [
         'Create user authentication system',
         'Build data analytics dashboard',
-        'Implement notification service'
+        'Implement notification service',
       ];
 
       const promises = intents.map(intent => pipeline.processIntent(intent));
@@ -379,15 +407,17 @@ describe('AIAgentPipeline Integration Tests', () => {
     it('should maintain performance under load', async () => {
       const intent = 'Process user data efficiently';
       const iterations = 5;
-      
+
       const startTime = Date.now();
-      const promises = Array(iterations).fill(null).map(() => pipeline.processIntent(intent));
+      const promises = Array(iterations)
+        .fill(null)
+        .map(() => pipeline.processIntent(intent));
       const results = await Promise.all(promises);
       const totalTime = Date.now() - startTime;
 
       expect(results).toHaveLength(iterations);
       results.forEach(result => expect(result.success).toBe(true));
-      
+
       // Average execution time should be reasonable
       const averageTime = totalTime / iterations;
       expect(averageTime).toBeLessThan(10000); // Less than 10 seconds per execution

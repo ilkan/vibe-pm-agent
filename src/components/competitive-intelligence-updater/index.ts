@@ -1,6 +1,6 @@
 /**
  * Competitive Intelligence Update System
- * 
+ *
  * This component implements data freshness tracking for competitive analysis,
  * update recommendation logic for stale competitive data, and automated
  * update management functionality.
@@ -14,7 +14,7 @@ import {
   DataQualityCheck,
   ValidationResult,
   CompetitiveAnalysisError,
-  COMPETITIVE_ANALYSIS_DEFAULTS
+  COMPETITIVE_ANALYSIS_DEFAULTS,
 } from '../../models/competitive';
 import { ReferenceManager, createReferenceManager } from '../reference-manager';
 
@@ -26,22 +26,22 @@ export interface CompetitiveIntelligenceTracker {
    * Tracks when competitive analysis was last updated
    */
   lastAnalysisDate: string;
-  
+
   /**
    * Tracks freshness of individual data sources
    */
   sourceFreshness: Map<string, FreshnessStatus>;
-  
+
   /**
    * Tracks competitor data staleness
    */
   competitorDataAge: Map<string, number>;
-  
+
   /**
    * Update recommendations based on data age
    */
   updateRecommendations: UpdateRecommendation[];
-  
+
   /**
    * Next recommended update date
    */
@@ -56,17 +56,17 @@ export interface UpdateConfiguration {
    * Maximum age in days before data is considered stale
    */
   staleThresholdDays: number;
-  
+
   /**
    * Maximum age in days before data is considered outdated
    */
   outdatedThresholdDays: number;
-  
+
   /**
    * Minimum confidence level to maintain
    */
   minConfidenceLevel: number;
-  
+
   /**
    * Update frequency for different source types (in days)
    */
@@ -77,7 +77,7 @@ export interface UpdateConfiguration {
     industryReport: number;
     marketResearch: number;
   };
-  
+
   /**
    * Priority thresholds for update recommendations
    */
@@ -133,7 +133,7 @@ export class CompetitiveIntelligenceUpdater {
       sourceFreshness: new Map(),
       competitorDataAge: new Map(),
       updateRecommendations: [],
-      nextUpdateDate: this.calculateNextUpdateDate(analysisResult)
+      nextUpdateDate: this.calculateNextUpdateDate(analysisResult),
     };
 
     // Track source freshness
@@ -149,10 +149,7 @@ export class CompetitiveIntelligenceUpdater {
     });
 
     // Generate update recommendations
-    tracker.updateRecommendations = this.generateUpdateRecommendations(
-      analysisResult,
-      tracker
-    );
+    tracker.updateRecommendations = this.generateUpdateRecommendations(analysisResult, tracker);
 
     // Store tracker
     this.trackers.set(analysisId, tracker);
@@ -203,14 +200,16 @@ export class CompetitiveIntelligenceUpdater {
   getUpdateRecommendations(analysisId: string): UpdateRecommendation[] {
     const tracker = this.trackers.get(analysisId);
     if (!tracker) {
-      return [{
-        type: 'analysis-rerun',
-        priority: 'high',
-        description: 'No tracking data available - full analysis update recommended',
-        estimatedEffort: '4-6 hours',
-        expectedImpact: 'Complete refresh of competitive intelligence',
-        dueDate: new Date().toISOString().split('T')[0]
-      }];
+      return [
+        {
+          type: 'analysis-rerun',
+          priority: 'high',
+          description: 'No tracking data available - full analysis update recommended',
+          estimatedEffort: '4-6 hours',
+          expectedImpact: 'Complete refresh of competitive intelligence',
+          dueDate: new Date().toISOString().split('T')[0],
+        },
+      ];
     }
 
     return tracker.updateRecommendations;
@@ -229,12 +228,15 @@ export class CompetitiveIntelligenceUpdater {
   /**
    * Gets freshness status for all tracked analyses
    */
-  getFreshnessStatus(): Map<string, {
-    analysisId: string;
-    status: 'fresh' | 'recent' | 'stale' | 'outdated';
-    daysSinceUpdate: number;
-    updateRecommendations: UpdateRecommendation[];
-  }> {
+  getFreshnessStatus(): Map<
+    string,
+    {
+      analysisId: string;
+      status: 'fresh' | 'recent' | 'stale' | 'outdated';
+      daysSinceUpdate: number;
+      updateRecommendations: UpdateRecommendation[];
+    }
+  > {
     const statusMap = new Map();
 
     this.trackers.forEach((tracker, analysisId) => {
@@ -254,7 +256,7 @@ export class CompetitiveIntelligenceUpdater {
         analysisId,
         status,
         daysSinceUpdate,
-        updateRecommendations: tracker.updateRecommendations
+        updateRecommendations: tracker.updateRecommendations,
       });
     });
 
@@ -324,7 +326,7 @@ export class CompetitiveIntelligenceUpdater {
       warnings,
       recommendations,
       dataGaps,
-      qualityScore
+      qualityScore,
     };
   }
 
@@ -375,7 +377,9 @@ export class CompetitiveIntelligenceUpdater {
         updateType = 'competitor-check';
         priority = 'medium';
         estimatedEffort = '2-3 hours';
-        nextUpdateDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 2 weeks
+        nextUpdateDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split('T')[0]; // 2 weeks
       } else {
         updateType = 'competitor-check';
         priority = 'low';
@@ -388,7 +392,7 @@ export class CompetitiveIntelligenceUpdater {
         nextUpdateDate,
         updateType,
         priority,
-        estimatedEffort
+        estimatedEffort,
       });
     });
 
@@ -408,18 +412,24 @@ export class CompetitiveIntelligenceUpdater {
 
   private calculateNextUpdateDate(analysisResult: CompetitorAnalysisResult): string {
     const lastUpdate = new Date(analysisResult.lastUpdated);
-    
+
     // Calculate update frequency based on source types
     const sourceTypes = analysisResult.sourceAttribution.map(s => s.type);
     let minUpdateFrequency = Math.min(
       ...sourceTypes.map(type => {
         switch (type) {
-          case 'mckinsey': return this.config.updateFrequency.mckinsey;
-          case 'gartner': return this.config.updateFrequency.gartner;
-          case 'wef': return this.config.updateFrequency.wef;
-          case 'industry-report': return this.config.updateFrequency.industryReport;
-          case 'market-research': return this.config.updateFrequency.marketResearch;
-          default: return this.config.updateFrequency.industryReport;
+          case 'mckinsey':
+            return this.config.updateFrequency.mckinsey;
+          case 'gartner':
+            return this.config.updateFrequency.gartner;
+          case 'wef':
+            return this.config.updateFrequency.wef;
+          case 'industry-report':
+            return this.config.updateFrequency.industryReport;
+          case 'market-research':
+            return this.config.updateFrequency.marketResearch;
+          default:
+            return this.config.updateFrequency.industryReport;
         }
       })
     );
@@ -437,10 +447,10 @@ export class CompetitiveIntelligenceUpdater {
 
   private calculateCompetitorDataAge(competitor: any, analysisDate: string): number {
     const analysisTime = new Date(analysisDate);
-    
+
     // Find the most recent data point for this competitor
     let mostRecentDate = analysisTime;
-    
+
     if (competitor.recentMoves && competitor.recentMoves.length > 0) {
       const recentMoveDate = new Date(competitor.recentMoves[0].date);
       if (recentMoveDate > mostRecentDate) {
@@ -474,7 +484,7 @@ export class CompetitiveIntelligenceUpdater {
         description: `Competitive analysis is ${analysisAge} days old and needs refresh`,
         estimatedEffort: '4-6 hours',
         expectedImpact: 'Updated competitive positioning and strategic recommendations',
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       });
     } else if (analysisAge > this.config.priorityThresholds.medium) {
       recommendations.push({
@@ -483,7 +493,7 @@ export class CompetitiveIntelligenceUpdater {
         description: `Verify if competitive landscape has changed in the last ${analysisAge} days`,
         estimatedEffort: '2-3 hours',
         expectedImpact: 'Confirmed current competitive positioning',
-        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       });
     }
 
@@ -500,7 +510,7 @@ export class CompetitiveIntelligenceUpdater {
         description: `${outdatedSources.length} sources are outdated and need replacement`,
         estimatedEffort: `${outdatedSources.length * 1}-${outdatedSources.length * 2} hours`,
         expectedImpact: 'Improved analysis credibility and accuracy',
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       });
     }
 
@@ -516,7 +526,7 @@ export class CompetitiveIntelligenceUpdater {
         description: `${staleCompetitors.length} competitors have stale data (no recent moves tracked)`,
         estimatedEffort: '3-4 hours',
         expectedImpact: 'Updated competitive intelligence and strategic positioning',
-        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       });
     }
 
@@ -527,7 +537,7 @@ export class CompetitiveIntelligenceUpdater {
         priority: 'medium',
         description: 'Low confidence analysis - consider additional research sources',
         estimatedEffort: '2-4 hours',
-        expectedImpact: 'Increased analysis confidence and reliability'
+        expectedImpact: 'Increased analysis confidence and reliability',
       });
     }
 

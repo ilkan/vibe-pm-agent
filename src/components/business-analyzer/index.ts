@@ -22,9 +22,14 @@ import {
   IntegratedInsight,
   OverallRecommendation,
   MarketSizingResult,
-  CompetitorAnalysisResult
+  CompetitorAnalysisResult,
 } from '../../models';
-import { validateParsedIntent, validateWorkflow, validateConsultingTechniques, ValidationError } from '../../utils/validation';
+import {
+  validateParsedIntent,
+  validateWorkflow,
+  validateConsultingTechniques,
+  ValidationError,
+} from '../../utils/validation';
 import { ErrorHandler, AnalysisError } from '../../utils/error-handling';
 
 export interface ConsultingAnalysis {
@@ -45,26 +50,29 @@ export interface IBusinessAnalyzer {
   applyMECE(workflow: Workflow, params?: OptionalParams): MECEAnalysis;
   applyValueDriverTree(workflow: Workflow, params?: OptionalParams): ValueDriverAnalysis;
   applyZeroBasedDesign(intent: ParsedIntent, params?: OptionalParams): ZeroBasedSolution;
-  applyImpactEffortMatrix(optimizations: Optimization[], params?: OptionalParams): PrioritizedOptimizations;
+  applyImpactEffortMatrix(
+    optimizations: Optimization[],
+    params?: OptionalParams
+  ): PrioritizedOptimizations;
   applyValuePropositionCanvas(intent: ParsedIntent, params?: OptionalParams): ValueProposition;
   generateOptionFraming(workflow: Workflow, params?: OptionalParams): ThreeOptionAnalysis;
   analyzeWithTechniques(intent: ParsedIntent, techniques?: string[]): Promise<ConsultingAnalysis>;
-  
+
   // Enhanced Business Opportunity Analysis (Task 4.1)
   analyzeEnhancedBusinessOpportunity(
-    intent: ParsedIntent, 
-    marketSizing?: MarketSizingResult, 
+    intent: ParsedIntent,
+    marketSizing?: MarketSizingResult,
     competitiveAnalysis?: CompetitorAnalysisResult,
     params?: OptionalParams
   ): Promise<EnhancedBusinessOpportunity>;
-  
+
   // Strategic Fit Assessment (Task 4.2)
   assessStrategicFit(
     intent: ParsedIntent,
     competitiveAnalysis?: CompetitorAnalysisResult,
     params?: OptionalParams
   ): StrategicFitAssessment;
-  
+
   analyzeMarketTiming(
     intent: ParsedIntent,
     competitiveAnalysis?: CompetitorAnalysisResult,
@@ -73,7 +81,6 @@ export interface IBusinessAnalyzer {
 }
 
 export class BusinessAnalyzer implements IBusinessAnalyzer {
-
   selectTechniques(intent: ParsedIntent, params?: OptionalParams): ConsultingTechnique[] {
     const allTechniques: ConsultingTechnique[] = [];
 
@@ -81,13 +88,15 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     const hasComplexWorkflow = intent.operationsRequired.length > 5;
     const hasHighQuotaRisk = intent.potentialRisks.some(risk => risk.severity === 'high');
     const hasMultipleDataSources = intent.dataSourcesNeeded.length > 2;
-    const hasProcessingRequirements = intent.technicalRequirements.some(req => req.type === 'processing');
+    const hasProcessingRequirements = intent.technicalRequirements.some(
+      req => req.type === 'processing'
+    );
 
     // Always apply MECE for quota driver categorization
     allTechniques.push({
       name: 'MECE',
       relevanceScore: 0.9,
-      applicableScenarios: ['quota optimization', 'workflow analysis', 'cost breakdown']
+      applicableScenarios: ['quota optimization', 'workflow analysis', 'cost breakdown'],
     });
 
     // Apply Value Driver Tree for complex workflows with high quota impact
@@ -95,7 +104,11 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       allTechniques.push({
         name: 'ValueDriverTree',
         relevanceScore: 0.88, // Higher score for complex workflows
-        applicableScenarios: ['cost analysis', 'optimization prioritization', 'root cause analysis']
+        applicableScenarios: [
+          'cost analysis',
+          'optimization prioritization',
+          'root cause analysis',
+        ],
       });
     }
 
@@ -104,7 +117,11 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       allTechniques.push({
         name: 'ZeroBased',
         relevanceScore: 0.87, // Higher score to ensure it's selected for high-risk scenarios
-        applicableScenarios: ['radical optimization', 'workflow redesign', 'assumption challenging']
+        applicableScenarios: [
+          'radical optimization',
+          'workflow redesign',
+          'assumption challenging',
+        ],
       });
     }
 
@@ -113,7 +130,11 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       allTechniques.push({
         name: 'ImpactEffort',
         relevanceScore: 0.75,
-        applicableScenarios: ['optimization prioritization', 'resource allocation', 'quick wins identification']
+        applicableScenarios: [
+          'optimization prioritization',
+          'resource allocation',
+          'quick wins identification',
+        ],
       });
     }
 
@@ -122,7 +143,11 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       allTechniques.push({
         name: 'ValueProp',
         relevanceScore: 0.6,
-        applicableScenarios: ['user value alignment', 'feature prioritization', 'pain point analysis']
+        applicableScenarios: [
+          'user value alignment',
+          'feature prioritization',
+          'pain point analysis',
+        ],
       });
     }
 
@@ -130,7 +155,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     allTechniques.push({
       name: 'OptionFraming',
       relevanceScore: 0.85,
-      applicableScenarios: ['decision making', 'risk assessment', 'alternative evaluation']
+      applicableScenarios: ['decision making', 'risk assessment', 'alternative evaluation'],
     });
 
     // Adjust technique relevance based on optional parameters
@@ -147,18 +172,18 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         {
           name: 'Pyramid' as const,
           relevanceScore: 0.5,
-          applicableScenarios: ['structured communication', 'recommendation clarity']
+          applicableScenarios: ['structured communication', 'recommendation clarity'],
         },
         {
           name: 'ValueDriverTree' as const,
           relevanceScore: 0.4,
-          applicableScenarios: ['cost analysis', 'optimization prioritization']
+          applicableScenarios: ['cost analysis', 'optimization prioritization'],
         },
         {
           name: 'ImpactEffort' as const,
           relevanceScore: 0.3,
-          applicableScenarios: ['optimization prioritization', 'resource allocation']
-        }
+          applicableScenarios: ['optimization prioritization', 'resource allocation'],
+        },
       ];
 
       for (const technique of additionalTechniques) {
@@ -189,7 +214,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         name: 'Vibe Operations',
         drivers: vibeOperations.map(step => step.description),
         quotaImpact: vibeQuotaImpact,
-        optimizationPotential: this.calculateOptimizationPotential(vibeOperations, 'vibe')
+        optimizationPotential: this.calculateOptimizationPotential(vibeOperations, 'vibe'),
       });
     }
 
@@ -200,7 +225,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         name: 'Spec Operations',
         drivers: specOperations.map(step => step.description),
         quotaImpact: specQuotaImpact,
-        optimizationPotential: this.calculateOptimizationPotential(specOperations, 'spec')
+        optimizationPotential: this.calculateOptimizationPotential(specOperations, 'spec'),
       });
     }
 
@@ -211,18 +236,27 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         name: 'Data Retrieval',
         drivers: dataOperations.map(step => step.description),
         quotaImpact: dataQuotaImpact,
-        optimizationPotential: this.calculateOptimizationPotential(dataOperations, 'data_retrieval')
+        optimizationPotential: this.calculateOptimizationPotential(
+          dataOperations,
+          'data_retrieval'
+        ),
       });
     }
 
     // Processing Operations Category
     if (processingOperations.length > 0) {
-      const processingQuotaImpact = processingOperations.reduce((sum, step) => sum + step.quotaCost, 0);
+      const processingQuotaImpact = processingOperations.reduce(
+        (sum, step) => sum + step.quotaCost,
+        0
+      );
       categories.push({
         name: 'Processing Operations',
         drivers: processingOperations.map(step => step.description),
         quotaImpact: processingQuotaImpact,
-        optimizationPotential: this.calculateOptimizationPotential(processingOperations, 'processing')
+        optimizationPotential: this.calculateOptimizationPotential(
+          processingOperations,
+          'processing'
+        ),
       });
     }
 
@@ -233,7 +267,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         name: 'Analysis Operations',
         drivers: analysisOperations.map(step => step.description),
         quotaImpact: analysisQuotaImpact,
-        optimizationPotential: this.calculateOptimizationPotential(analysisOperations, 'analysis')
+        optimizationPotential: this.calculateOptimizationPotential(analysisOperations, 'analysis'),
       });
     }
 
@@ -246,14 +280,16 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     const overlaps: string[] = [];
     workflow.steps.forEach(step => {
       if (step.type === 'processing' && step.description.toLowerCase().includes('data')) {
-        overlaps.push(`${step.description} could be categorized as both Processing and Data Retrieval`);
+        overlaps.push(
+          `${step.description} could be categorized as both Processing and Data Retrieval`
+        );
       }
     });
 
     return {
       categories,
       totalCoverage,
-      overlaps
+      overlaps,
     };
   }
 
@@ -303,11 +339,14 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     const totalQuotaCost = workflow.steps.reduce((sum, step) => sum + step.quotaCost, 0);
 
     // Group steps by type and analyze their cost impact
-    const stepsByType = workflow.steps.reduce((acc, step) => {
-      if (!acc[step.type]) acc[step.type] = [];
-      acc[step.type].push(step);
-      return acc;
-    }, {} as Record<string, any[]>);
+    const stepsByType = workflow.steps.reduce(
+      (acc, step) => {
+        if (!acc[step.type]) acc[step.type] = [];
+        acc[step.type].push(step);
+        return acc;
+      },
+      {} as Record<string, any[]>
+    );
 
     Object.entries(stepsByType).forEach(([type, steps]) => {
       const currentCost = steps.reduce((sum, step) => sum + step.quotaCost, 0);
@@ -348,7 +387,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         name: `${type.charAt(0).toUpperCase() + type.slice(1)} Operations`,
         currentCost,
         optimizedCost,
-        savingsPotential
+        savingsPotential,
       };
 
       // Classify as primary or secondary driver based on cost impact
@@ -371,7 +410,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     return {
       primaryDrivers: primaryDrivers.sort((a, b) => b.savingsPotential - a.savingsPotential),
       secondaryDrivers: secondaryDrivers.sort((a, b) => b.savingsPotential - a.savingsPotential),
-      rootCauses
+      rootCauses,
     };
   }
 
@@ -403,7 +442,8 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
 
     if (intent.potentialRisks.length > 2) {
       assumptionsChallenged.push('Assumption: Current workflow structure is necessary');
-      radicalApproach += 'Redesign workflow from scratch using event-driven architecture with minimal state. ';
+      radicalApproach +=
+        'Redesign workflow from scratch using event-driven architecture with minimal state. ';
       potentialSavings += 50;
       implementationRisk = 'high';
     }
@@ -411,7 +451,8 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     // If no major assumptions to challenge, provide a conservative zero-based approach
     if (assumptionsChallenged.length === 0) {
       assumptionsChallenged.push('Assumption: Current approach is the most efficient');
-      radicalApproach = 'Implement a completely stateless, functional approach with maximum reusability and minimal quota consumption.';
+      radicalApproach =
+        'Implement a completely stateless, functional approach with maximum reusability and minimal quota consumption.';
       potentialSavings = 25;
       implementationRisk = 'low';
     }
@@ -429,16 +470,19 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       radicalApproach: radicalApproach.trim(),
       assumptionsChallenged,
       potentialSavings: Math.min(potentialSavings, 85), // Cap at 85%
-      implementationRisk
+      implementationRisk,
     };
   }
 
-  applyImpactEffortMatrix(optimizations: Optimization[], params?: OptionalParams): PrioritizedOptimizations {
+  applyImpactEffortMatrix(
+    optimizations: Optimization[],
+    params?: OptionalParams
+  ): PrioritizedOptimizations {
     const matrix: PrioritizedOptimizations = {
       highImpactLowEffort: [],
       highImpactHighEffort: [],
       lowImpactLowEffort: [],
-      lowImpactHighEffort: []
+      lowImpactHighEffort: [],
     };
 
     optimizations.forEach(optimization => {
@@ -450,7 +494,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         quotaSavings: optimization.estimatedSavings.percentage,
         implementationEffort: effort,
         riskLevel: this.assessRiskLevel(optimization),
-        estimatedROI: this.calculateROI(optimization)
+        estimatedROI: this.calculateROI(optimization),
       };
 
       // Categorize based on impact (quota savings) and effort
@@ -547,7 +591,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       painPoints,
       gainCreators,
       painRelievers,
-      valuePropositionStatement
+      valuePropositionStatement,
     };
   }
 
@@ -561,27 +605,28 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       quotaSavings: Math.round(totalQuotaCost * 0.25), // 25% savings
       implementationEffort: 'low',
       riskLevel: 'low',
-      estimatedROI: 8.3 // 25% savings / 3 effort units
+      estimatedROI: 8.3, // 25% savings / 3 effort units
     };
 
     // Balanced Option: Moderate risk, good savings
     const balanced: OptimizationOption = {
       name: 'Balanced Optimization',
-      description: 'Combine multiple optimization strategies for significant improvements with manageable risk',
+      description:
+        'Combine multiple optimization strategies for significant improvements with manageable risk',
       quotaSavings: Math.round(totalQuotaCost * 0.45), // 45% savings
       implementationEffort: 'medium',
       riskLevel: 'medium',
-      estimatedROI: 22.5 // 45% savings / 2 effort units
+      estimatedROI: 22.5, // 45% savings / 2 effort units
     };
 
     // Bold Option: Higher risk, maximum savings
     const bold: OptimizationOption = {
       name: 'Bold Transformation',
       description: 'Radical workflow redesign using zero-based principles for maximum efficiency',
-      quotaSavings: Math.round(totalQuotaCost * 0.70), // 70% savings
+      quotaSavings: Math.round(totalQuotaCost * 0.7), // 70% savings
       implementationEffort: 'high',
       riskLevel: 'high',
-      estimatedROI: 23.3 // 70% savings / 3 effort units
+      estimatedROI: 23.3, // 70% savings / 3 effort units
     };
 
     // Adjust options based on optional parameters
@@ -592,15 +637,19 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     return {
       conservative,
       balanced,
-      bold
+      bold,
     };
   }
 
-  private adjustTechniqueRelevanceForParameters(techniques: ConsultingTechnique[], params: OptionalParams): void {
+  private adjustTechniqueRelevanceForParameters(
+    techniques: ConsultingTechnique[],
+    params: OptionalParams
+  ): void {
     // Adjust technique relevance based on cost constraints
     if (params.costConstraints) {
       const { maxVibes, maxSpecs, maxCostDollars } = params.costConstraints;
-      const hasTightConstraints = (maxVibes !== undefined && maxVibes < 20) ||
+      const hasTightConstraints =
+        (maxVibes !== undefined && maxVibes < 20) ||
         (maxSpecs !== undefined && maxSpecs < 5) ||
         (maxCostDollars !== undefined && maxCostDollars < 10);
 
@@ -640,11 +689,15 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     }
   }
 
-  private adjustOptionFramingForParameters(options: ThreeOptionAnalysis, params: OptionalParams): void {
+  private adjustOptionFramingForParameters(
+    options: ThreeOptionAnalysis,
+    params: OptionalParams
+  ): void {
     // Adjust savings and effort based on cost constraints
     if (params.costConstraints) {
       const { maxVibes, maxSpecs, maxCostDollars } = params.costConstraints;
-      const hasTightConstraints = (maxVibes !== undefined && maxVibes < 20) ||
+      const hasTightConstraints =
+        (maxVibes !== undefined && maxVibes < 20) ||
         (maxSpecs !== undefined && maxSpecs < 5) ||
         (maxCostDollars !== undefined && maxCostDollars < 10);
 
@@ -682,16 +735,22 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
 
     // Recalculate ROI based on adjusted values
     const effortScores = { low: 1, medium: 2, high: 3 };
-    options.conservative.estimatedROI = options.conservative.quotaSavings / effortScores[options.conservative.implementationEffort];
-    options.balanced.estimatedROI = options.balanced.quotaSavings / effortScores[options.balanced.implementationEffort];
-    options.bold.estimatedROI = options.bold.quotaSavings / effortScores[options.bold.implementationEffort];
+    options.conservative.estimatedROI =
+      options.conservative.quotaSavings / effortScores[options.conservative.implementationEffort];
+    options.balanced.estimatedROI =
+      options.balanced.quotaSavings / effortScores[options.balanced.implementationEffort];
+    options.bold.estimatedROI =
+      options.bold.quotaSavings / effortScores[options.bold.implementationEffort];
   }
 
   /**
    * Main method that coordinates all consulting techniques to analyze the parsed intent
    * and generate comprehensive consulting analysis
    */
-  async analyzeWithTechniques(intent: ParsedIntent, techniques?: string[]): Promise<ConsultingAnalysis> {
+  async analyzeWithTechniques(
+    intent: ParsedIntent,
+    techniques?: string[]
+  ): Promise<ConsultingAnalysis> {
     // Validate inputs
     try {
       validateParsedIntent(intent);
@@ -734,17 +793,17 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         description: op.description,
         inputs: [],
         outputs: [],
-        quotaCost: op.estimatedQuotaCost
+        quotaCost: op.estimatedQuotaCost,
       })),
       dataFlow: [],
-      estimatedComplexity: intent.technicalRequirements.length
+      estimatedComplexity: intent.technicalRequirements.length,
     };
 
     const analysis: ConsultingAnalysis = {
       techniquesUsed: selectedTechniques,
       keyFindings: [],
       totalQuotaSavings: 0,
-      implementationComplexity: 'medium'
+      implementationComplexity: 'medium',
     };
 
     // Apply each selected technique
@@ -752,25 +811,33 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       switch (technique.name) {
         case 'MECE':
           analysis.meceAnalysis = this.applyMECE(workflow);
-          analysis.keyFindings.push(`MECE analysis identified ${analysis.meceAnalysis.categories.length} quota driver categories with ${analysis.meceAnalysis.totalCoverage}% coverage`);
+          analysis.keyFindings.push(
+            `MECE analysis identified ${analysis.meceAnalysis.categories.length} quota driver categories with ${analysis.meceAnalysis.totalCoverage}% coverage`
+          );
           break;
 
         case 'ValueDriverTree':
           analysis.valueDriverAnalysis = this.applyValueDriverTree(workflow);
           const topDriver = analysis.valueDriverAnalysis.primaryDrivers[0];
           if (topDriver) {
-            analysis.keyFindings.push(`Value driver analysis reveals ${topDriver.name} as primary cost driver with ${topDriver.savingsPotential} savings potential`);
+            analysis.keyFindings.push(
+              `Value driver analysis reveals ${topDriver.name} as primary cost driver with ${topDriver.savingsPotential} savings potential`
+            );
           }
           break;
 
         case 'ZeroBased':
           analysis.zeroBasedSolution = this.applyZeroBasedDesign(intent);
-          analysis.keyFindings.push(`Zero-based design challenges ${analysis.zeroBasedSolution.assumptionsChallenged.length} assumptions with ${analysis.zeroBasedSolution.potentialSavings}% potential savings`);
+          analysis.keyFindings.push(
+            `Zero-based design challenges ${analysis.zeroBasedSolution.assumptionsChallenged.length} assumptions with ${analysis.zeroBasedSolution.potentialSavings}% potential savings`
+          );
           break;
 
         case 'OptionFraming':
           analysis.threeOptionAnalysis = this.generateOptionFraming(workflow);
-          analysis.keyFindings.push(`Option framing provides Conservative (${analysis.threeOptionAnalysis.conservative.quotaSavings}%), Balanced (${analysis.threeOptionAnalysis.balanced.quotaSavings}%), and Bold (${analysis.threeOptionAnalysis.bold.quotaSavings}%) approaches`);
+          analysis.keyFindings.push(
+            `Option framing provides Conservative (${analysis.threeOptionAnalysis.conservative.quotaSavings}%), Balanced (${analysis.threeOptionAnalysis.balanced.quotaSavings}%), and Bold (${analysis.threeOptionAnalysis.bold.quotaSavings}%) approaches`
+          );
           break;
 
         case 'ImpactEffort':
@@ -780,29 +847,33 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
               type: 'caching',
               description: 'Implement caching layer for data operations',
               stepsAffected: workflow.steps.filter(s => s.type === 'data_retrieval').map(s => s.id),
-              estimatedSavings: { vibes: 0, specs: 0, percentage: 30 }
+              estimatedSavings: { vibes: 0, specs: 0, percentage: 30 },
             },
             {
               type: 'batching',
               description: 'Batch similar operations together',
               stepsAffected: workflow.steps.filter(s => s.type === 'processing').map(s => s.id),
-              estimatedSavings: { vibes: 0, specs: 0, percentage: 25 }
+              estimatedSavings: { vibes: 0, specs: 0, percentage: 25 },
             },
             {
               type: 'vibe_to_spec',
               description: 'Convert vibe operations to spec templates',
               stepsAffected: workflow.steps.filter(s => s.type === 'vibe').map(s => s.id),
-              estimatedSavings: { vibes: 0, specs: 0, percentage: 50 }
-            }
+              estimatedSavings: { vibes: 0, specs: 0, percentage: 50 },
+            },
           ];
           analysis.prioritizedOptimizations = this.applyImpactEffortMatrix(mockOptimizations);
           const quickWins = analysis.prioritizedOptimizations.highImpactLowEffort.length;
-          analysis.keyFindings.push(`Impact-effort analysis identified ${quickWins} high-impact, low-effort quick wins`);
+          analysis.keyFindings.push(
+            `Impact-effort analysis identified ${quickWins} high-impact, low-effort quick wins`
+          );
           break;
 
         case 'ValueProp':
           analysis.valueProposition = this.applyValuePropositionCanvas(intent);
-          analysis.keyFindings.push(`Value proposition addresses ${analysis.valueProposition.painPoints.length} pain points and creates ${analysis.valueProposition.gainCreators.length} value drivers`);
+          analysis.keyFindings.push(
+            `Value proposition addresses ${analysis.valueProposition.painPoints.length} pain points and creates ${analysis.valueProposition.gainCreators.length} value drivers`
+          );
           break;
       }
     }
@@ -814,26 +885,57 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     analysis.implementationComplexity = this.assessImplementationComplexity(analysis);
 
     // Add overall findings
-    analysis.keyFindings.unshift(`Applied ${selectedTechniques.length} consulting techniques (${selectedTechniques.map(t => t.name).join(', ')}) for comprehensive workflow analysis`);
+    analysis.keyFindings.unshift(
+      `Applied ${selectedTechniques.length} consulting techniques (${selectedTechniques.map(t => t.name).join(', ')}) for comprehensive workflow analysis`
+    );
 
     return analysis;
   }
 
   private filterTechniquesByNames(techniqueNames: string[]): ConsultingTechnique[] {
     const allTechniques: ConsultingTechnique[] = [
-      { name: 'MECE', relevanceScore: 0.9, applicableScenarios: ['quota optimization', 'workflow analysis'] },
-      { name: 'ValueDriverTree', relevanceScore: 0.8, applicableScenarios: ['cost analysis', 'optimization prioritization'] },
-      { name: 'ZeroBased', relevanceScore: 0.7, applicableScenarios: ['radical optimization', 'workflow redesign'] },
-      { name: 'OptionFraming', relevanceScore: 0.85, applicableScenarios: ['decision making', 'risk assessment'] },
-      { name: 'ImpactEffort', relevanceScore: 0.75, applicableScenarios: ['optimization prioritization', 'resource allocation'] },
-      { name: 'ValueProp', relevanceScore: 0.6, applicableScenarios: ['user value alignment', 'feature prioritization'] },
-      { name: 'Pyramid', relevanceScore: 0.5, applicableScenarios: ['structured communication', 'recommendation clarity'] }
+      {
+        name: 'MECE',
+        relevanceScore: 0.9,
+        applicableScenarios: ['quota optimization', 'workflow analysis'],
+      },
+      {
+        name: 'ValueDriverTree',
+        relevanceScore: 0.8,
+        applicableScenarios: ['cost analysis', 'optimization prioritization'],
+      },
+      {
+        name: 'ZeroBased',
+        relevanceScore: 0.7,
+        applicableScenarios: ['radical optimization', 'workflow redesign'],
+      },
+      {
+        name: 'OptionFraming',
+        relevanceScore: 0.85,
+        applicableScenarios: ['decision making', 'risk assessment'],
+      },
+      {
+        name: 'ImpactEffort',
+        relevanceScore: 0.75,
+        applicableScenarios: ['optimization prioritization', 'resource allocation'],
+      },
+      {
+        name: 'ValueProp',
+        relevanceScore: 0.6,
+        applicableScenarios: ['user value alignment', 'feature prioritization'],
+      },
+      {
+        name: 'Pyramid',
+        relevanceScore: 0.5,
+        applicableScenarios: ['structured communication', 'recommendation clarity'],
+      },
     ];
 
     return allTechniques.filter(technique =>
-      techniqueNames.some(name =>
-        name.toLowerCase() === technique.name.toLowerCase() ||
-        name.toLowerCase().includes(technique.name.toLowerCase())
+      techniqueNames.some(
+        name =>
+          name.toLowerCase() === technique.name.toLowerCase() ||
+          name.toLowerCase().includes(technique.name.toLowerCase())
       )
     );
   }
@@ -854,15 +956,19 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     }
 
     if (analysis.valueDriverAnalysis) {
-      const driverSavings = analysis.valueDriverAnalysis.primaryDrivers
-        .reduce((sum, driver) => sum + driver.savingsPotential, 0);
+      const driverSavings = analysis.valueDriverAnalysis.primaryDrivers.reduce(
+        (sum, driver) => sum + driver.savingsPotential,
+        0
+      );
       totalSavings += driverSavings;
       savingsCount++;
     }
 
     if (analysis.prioritizedOptimizations) {
-      const quickWinSavings = analysis.prioritizedOptimizations.highImpactLowEffort
-        .reduce((sum, opt) => sum + opt.quotaSavings, 0);
+      const quickWinSavings = analysis.prioritizedOptimizations.highImpactLowEffort.reduce(
+        (sum, opt) => sum + opt.quotaSavings,
+        0
+      );
       totalSavings += quickWinSavings;
       savingsCount++;
     }
@@ -877,9 +983,15 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     // Factor in zero-based solution risk
     if (analysis.zeroBasedSolution) {
       switch (analysis.zeroBasedSolution.implementationRisk) {
-        case 'high': complexityScore += 3; break;
-        case 'medium': complexityScore += 2; break;
-        case 'low': complexityScore += 1; break;
+        case 'high':
+          complexityScore += 3;
+          break;
+        case 'medium':
+          complexityScore += 2;
+          break;
+        case 'low':
+          complexityScore += 1;
+          break;
       }
     }
 
@@ -912,13 +1024,13 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
   ): Promise<EnhancedBusinessOpportunity> {
     // Generate base business opportunity analysis
     const businessOpportunity = await this.generateBusinessOpportunity(intent, params);
-    
+
     // Assess strategic fit with competitive positioning
     const strategicFit = this.assessStrategicFit(intent, competitiveAnalysis, params);
-    
+
     // Analyze market timing
     const marketTiming = this.analyzeMarketTiming(intent, competitiveAnalysis, params);
-    
+
     // Generate integrated insights
     const integratedInsights = this.generateIntegratedInsights(
       businessOpportunity,
@@ -927,7 +1039,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       strategicFit,
       marketTiming
     );
-    
+
     // Generate overall recommendation
     const overallRecommendation = this.generateOverallRecommendation(
       businessOpportunity,
@@ -945,13 +1057,16 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       strategicFit,
       marketTiming,
       integratedInsights,
-      overallRecommendation
+      overallRecommendation,
     };
   }
 
-  private async generateBusinessOpportunity(intent: ParsedIntent, params?: OptionalParams): Promise<BusinessOpportunity> {
+  private async generateBusinessOpportunity(
+    intent: ParsedIntent,
+    params?: OptionalParams
+  ): Promise<BusinessOpportunity> {
     const id = `opportunity-${Date.now()}`;
-    
+
     // Extract market validation from intent
     const marketValidation = {
       targetMarket: intent.dataSourcesNeeded,
@@ -959,7 +1074,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       customerSegments: this.extractCustomerSegments(intent),
       competitiveLandscape: intent.potentialRisks.map(risk => risk.description),
       marketTrends: this.identifyMarketTrends(intent),
-      validationSources: intent.dataSourcesNeeded
+      validationSources: intent.dataSourcesNeeded,
     };
 
     // Assess strategic alignment
@@ -968,7 +1083,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       strategicPriorities: ['Developer Experience', 'AI Integration', 'Workflow Optimization'],
       okrAlignment: this.assessOKRAlignment(intent),
       competitiveAdvantage: this.identifyCompetitiveAdvantages(intent),
-      alignmentScore: this.calculateAlignmentScore(intent)
+      alignmentScore: this.calculateAlignmentScore(intent),
     };
 
     // Generate financial projections
@@ -994,7 +1109,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       implementationPlan,
       successMetrics,
       confidenceLevel: this.calculateConfidenceLevel(intent, params),
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
@@ -1013,19 +1128,19 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
   ): StrategicFitAssessment {
     // Calculate alignment score based on multiple factors
     const alignmentScore = this.calculateStrategicAlignmentScore(intent, competitiveAnalysis);
-    
+
     // Identify competitive advantages
     const competitiveAdvantage = this.identifyCompetitiveAdvantages(intent, competitiveAnalysis);
-    
+
     // Analyze market gaps
     const marketGaps = this.analyzeMarketGaps(intent, competitiveAnalysis);
-    
+
     // Assess entry barriers
     const entryBarriers = this.assessEntryBarriers(intent, competitiveAnalysis);
-    
+
     // Identify success factors
     const successFactors = this.identifySuccessFactors(intent, competitiveAnalysis);
-    
+
     // Generate strategic recommendations
     const strategicRecommendations = this.generateStrategicRecommendations(
       intent,
@@ -1034,7 +1149,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       marketGaps,
       entryBarriers
     );
-    
+
     // Perform comprehensive fit analysis
     const fitAnalysis = this.performFitAnalysis(
       intent,
@@ -1052,7 +1167,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       entryBarriers,
       successFactors,
       strategicRecommendations,
-      fitAnalysis
+      fitAnalysis,
     };
   }
 
@@ -1068,14 +1183,14 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     const competitiveTiming = this.assessCompetitiveTiming(competitiveAnalysis);
     const internalReadiness = this.assessInternalReadiness(intent, params);
     const externalFactors = this.identifyExternalFactors(intent);
-    
+
     const timingScore = this.calculateTimingScore(
       marketReadiness,
       competitiveTiming,
       internalReadiness,
       externalFactors
     );
-    
+
     const timingRecommendation = this.generateTimingRecommendation(
       timingScore,
       marketReadiness,
@@ -1090,7 +1205,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       competitiveTiming,
       internalReadiness,
       externalFactors,
-      timingRecommendation
+      timingRecommendation,
     };
   }
 
@@ -1105,22 +1220,28 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         size: 1000000,
         characteristics: ['Technical', 'Efficiency-focused', 'Tool-savvy'],
         painPoints: intent.potentialRisks.map(risk => risk.description),
-        willingness_to_pay: 100
-      }
+        willingness_to_pay: 100,
+      },
     ];
   }
 
   private identifyMarketTrends(intent: ParsedIntent): string[] {
-    const trends = ['AI-driven development tools', 'Workflow automation', 'Developer productivity focus'];
-    
-    if (intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')) {
+    const trends = [
+      'AI-driven development tools',
+      'Workflow automation',
+      'Developer productivity focus',
+    ];
+
+    if (
+      intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')
+    ) {
       trends.push('AI integration in development workflows');
     }
-    
+
     if (intent.operationsRequired.some(op => op.type === 'vibe')) {
       trends.push('Code generation and AI assistance');
     }
-    
+
     return trends;
   }
 
@@ -1129,21 +1250,28 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       {
         objective: 'Improve Developer Productivity',
         keyResults: ['Reduce development time by 30%', 'Increase code quality scores'],
-        alignmentStrength: 'strong' as const
+        alignmentStrength: 'strong' as const,
       },
       {
         objective: 'Enhance AI Integration',
         keyResults: ['Deploy AI tools across development lifecycle'],
-        alignmentStrength: intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis') ? 'strong' as const : 'moderate' as const
-      }
+        alignmentStrength: intent.technicalRequirements.some(
+          req => req.type === 'processing' || req.type === 'analysis'
+        )
+          ? ('strong' as const)
+          : ('moderate' as const),
+      },
     ];
   }
 
-  private identifyCompetitiveAdvantages(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult): string[] {
+  private identifyCompetitiveAdvantages(
+    intent: ParsedIntent,
+    competitiveAnalysis?: CompetitorAnalysisResult
+  ): string[] {
     const advantages = [
       'Integrated development environment',
       'AI-powered workflow optimization',
-      'Comprehensive PM toolkit'
+      'Comprehensive PM toolkit',
     ];
 
     if (competitiveAnalysis?.marketPositioning.marketGaps) {
@@ -1159,29 +1287,33 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
 
   private calculateAlignmentScore(intent: ParsedIntent): number {
     let score = 70; // Base alignment score
-    
+
     // Boost for AI-related requirements (processing and analysis)
-    if (intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')) {
+    if (
+      intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')
+    ) {
       score += 15;
     }
-    
+
     // Boost for workflow optimization focus
-    if (intent.businessObjective.toLowerCase().includes('optimize') || 
-        intent.businessObjective.toLowerCase().includes('efficiency')) {
+    if (
+      intent.businessObjective.toLowerCase().includes('optimize') ||
+      intent.businessObjective.toLowerCase().includes('efficiency')
+    ) {
       score += 10;
     }
-    
+
     // Penalty for high complexity
     if (intent.technicalRequirements.length > 5) {
       score -= 5;
     }
-    
+
     return Math.min(Math.max(score, 0), 100);
   }
 
   private generateFinancialProjections(intent: ParsedIntent, params?: OptionalParams) {
     const baseRevenue = params?.costConstraints?.maxCostDollars || 50000;
-    
+
     return [
       {
         timeframe: 'Year 1',
@@ -1189,7 +1321,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         costs: baseRevenue * 0.7,
         profit: baseRevenue * 1.3,
         roi: 1.86,
-        assumptions: ['Market adoption rate: 15%', 'Customer retention: 85%']
+        assumptions: ['Market adoption rate: 15%', 'Customer retention: 85%'],
       },
       {
         timeframe: 'Year 2',
@@ -1197,8 +1329,8 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         costs: baseRevenue * 1.2,
         profit: baseRevenue * 2.8,
         roi: 2.33,
-        assumptions: ['Market adoption rate: 25%', 'Customer retention: 90%']
-      }
+        assumptions: ['Market adoption rate: 25%', 'Customer retention: 90%'],
+      },
     ];
   }
 
@@ -1208,24 +1340,28 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       description: risk.description,
       probability: risk.severity === 'high' ? 0.7 : risk.severity === 'medium' ? 0.4 : 0.2,
       impact: risk.severity === 'high' ? 8 : risk.severity === 'medium' ? 5 : 3,
-      riskScore: (risk.severity === 'high' ? 0.7 : risk.severity === 'medium' ? 0.4 : 0.2) * 
-                 (risk.severity === 'high' ? 8 : risk.severity === 'medium' ? 5 : 3)
+      riskScore:
+        (risk.severity === 'high' ? 0.7 : risk.severity === 'medium' ? 0.4 : 0.2) *
+        (risk.severity === 'high' ? 8 : risk.severity === 'medium' ? 5 : 3),
     }));
 
     const mitigationStrategies = risks.map(risk => ({
       riskCategory: risk.category,
       strategy: `Implement comprehensive testing and validation for ${risk.description}`,
       effectiveness: 0.8,
-      cost: 5000
+      cost: 5000,
     }));
 
-    const overallRiskLevel = risks.some(r => r.riskScore > 5) ? 'high' as const :
-                           risks.some(r => r.riskScore > 3) ? 'medium' as const : 'low' as const;
+    const overallRiskLevel = risks.some(r => r.riskScore > 5)
+      ? ('high' as const)
+      : risks.some(r => r.riskScore > 3)
+        ? ('medium' as const)
+        : ('low' as const);
 
     return {
       risks,
       mitigationStrategies,
-      overallRiskLevel
+      overallRiskLevel,
     };
   }
 
@@ -1238,7 +1374,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         deliverables: ['Technical architecture', 'Resource allocation', 'Risk mitigation plan'],
         resources: ['Senior Developer', 'Product Manager', 'UX Designer'],
         dependencies: ['Stakeholder approval', 'Budget allocation'],
-        milestones: ['Architecture review', 'Team formation', 'Project kickoff']
+        milestones: ['Architecture review', 'Team formation', 'Project kickoff'],
       },
       {
         phase: 2,
@@ -1247,8 +1383,8 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         deliverables: ['Core functionality', 'Integration tests', 'Documentation'],
         resources: ['Development Team', 'QA Engineer', 'Technical Writer'],
         dependencies: ['Phase 1 completion', 'Development environment setup'],
-        milestones: ['MVP completion', 'Integration testing', 'Performance validation']
-      }
+        milestones: ['MVP completion', 'Integration testing', 'Performance validation'],
+      },
     ];
   }
 
@@ -1260,7 +1396,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         target: 75,
         unit: 'percentage',
         measurementFrequency: 'weekly',
-        dataSource: 'Analytics platform'
+        dataSource: 'Analytics platform',
       },
       {
         name: 'Workflow Efficiency Improvement',
@@ -1268,66 +1404,77 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         target: 30,
         unit: 'percentage',
         measurementFrequency: 'monthly',
-        dataSource: 'Performance metrics'
-      }
+        dataSource: 'Performance metrics',
+      },
     ];
   }
 
-  private calculateConfidenceLevel(intent: ParsedIntent, params?: OptionalParams): 'high' | 'medium' | 'low' {
+  private calculateConfidenceLevel(
+    intent: ParsedIntent,
+    params?: OptionalParams
+  ): 'high' | 'medium' | 'low' {
     let confidenceScore = 60; // Lower base score
-    
+
     // Boost confidence for well-defined requirements
     if (intent.technicalRequirements.length >= 2) {
       confidenceScore += 15;
     }
-    
+
     // Boost confidence for clear business objective
     if (intent.businessObjective.length > 20) {
       confidenceScore += 10;
     }
-    
+
     // Reduce confidence for high-risk scenarios
     if (intent.potentialRisks.some(risk => risk.severity === 'high')) {
       confidenceScore -= 35;
     }
-    
+
     // Reduce confidence for empty requirements
     if (intent.technicalRequirements.length === 0) {
       confidenceScore -= 30;
     }
-    
+
     // Reduce confidence for multiple high risks
     const highRiskCount = intent.potentialRisks.filter(risk => risk.severity === 'high').length;
     if (highRiskCount > 1) {
       confidenceScore -= 15;
     }
-    
+
     if (confidenceScore >= 75) return 'high';
     if (confidenceScore >= 45) return 'medium';
     return 'low';
   }
 
-  private calculateStrategicAlignmentScore(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult): number {
+  private calculateStrategicAlignmentScore(
+    intent: ParsedIntent,
+    competitiveAnalysis?: CompetitorAnalysisResult
+  ): number {
     let score = 60; // Base score
-    
+
     // Strategic alignment factors
     if (intent.businessObjective.toLowerCase().includes('productivity')) score += 20;
     if (intent.businessObjective.toLowerCase().includes('efficiency')) score += 15;
-    if (intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')) score += 15;
-    
+    if (
+      intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')
+    )
+      score += 15;
+
     // Competitive positioning boost
     if (competitiveAnalysis?.marketPositioning.marketGaps.some(gap => gap.size === 'large')) {
       score += 10;
     }
-    
+
     return Math.min(score, 100);
   }
 
   private analyzeMarketGaps(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult) {
     const gaps = [];
-    
+
     // AI integration gap
-    if (intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')) {
+    if (
+      intent.technicalRequirements.some(req => req.type === 'processing' || req.type === 'analysis')
+    ) {
       gaps.push({
         gapType: 'feature' as const,
         description: 'AI-powered workflow optimization',
@@ -1336,10 +1483,10 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         opportunityScore: 85,
         addressabilityScore: 90,
         timeToMarket: '6-12 months',
-        resourceRequirements: ['AI expertise', 'Development team', 'Data infrastructure']
+        resourceRequirements: ['AI expertise', 'Development team', 'Data infrastructure'],
       });
     }
-    
+
     // Workflow automation gap
     gaps.push({
       gapType: 'use-case' as const,
@@ -1349,13 +1496,16 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       opportunityScore: 70,
       addressabilityScore: 80,
       timeToMarket: '3-6 months',
-      resourceRequirements: ['Product expertise', 'Integration capabilities']
+      resourceRequirements: ['Product expertise', 'Integration capabilities'],
     });
-    
+
     return gaps;
   }
 
-  private assessEntryBarriers(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult) {
+  private assessEntryBarriers(
+    intent: ParsedIntent,
+    competitiveAnalysis?: CompetitorAnalysisResult
+  ) {
     return [
       {
         type: 'technical' as const,
@@ -1364,7 +1514,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         overcomability: 75,
         timeToOvercome: '6-12 months',
         costToOvercome: 200000,
-        strategicImportance: 85
+        strategicImportance: 85,
       },
       {
         type: 'brand' as const,
@@ -1373,12 +1523,15 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         overcomability: 60,
         timeToOvercome: '12-18 months',
         costToOvercome: 150000,
-        strategicImportance: 70
-      }
+        strategicImportance: 70,
+      },
     ];
   }
 
-  private identifySuccessFactors(intent: ParsedIntent, competitiveAnalysis?: CompetitorAnalysisResult) {
+  private identifySuccessFactors(
+    intent: ParsedIntent,
+    competitiveAnalysis?: CompetitorAnalysisResult
+  ) {
     return [
       {
         factor: 'AI Integration Capability',
@@ -1387,7 +1540,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         capabilityGap: 20,
         developmentPlan: ['Hire AI specialists', 'Develop ML models', 'Create training datasets'],
         timeToAchieve: '6 months',
-        investmentRequired: 150000
+        investmentRequired: 150000,
       },
       {
         factor: 'Developer Experience Design',
@@ -1396,8 +1549,8 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         capabilityGap: 5,
         developmentPlan: ['UX research', 'Usability testing', 'Interface optimization'],
         timeToAchieve: '3 months',
-        investmentRequired: 75000
-      }
+        investmentRequired: 75000,
+      },
     ];
   }
 
@@ -1409,16 +1562,20 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     entryBarriers: any[]
   ) {
     const recommendations = [];
-    
+
     if (alignmentScore > 80 && marketGaps.some(gap => gap.size === 'large')) {
       recommendations.push({
         type: 'go' as const,
-        rationale: ['Strong strategic alignment', 'Large market opportunity', 'Competitive advantage potential'],
+        rationale: [
+          'Strong strategic alignment',
+          'Large market opportunity',
+          'Competitive advantage potential',
+        ],
         conditions: ['Secure AI expertise', 'Validate market demand'],
         timeline: '6-12 months',
         resourceRequirements: ['Development team', 'AI specialists', 'Product managers'],
         expectedOutcomes: ['Market leadership', 'Revenue growth', 'Competitive differentiation'],
-        riskMitigation: ['Phased rollout', 'Customer validation', 'Competitive monitoring']
+        riskMitigation: ['Phased rollout', 'Customer validation', 'Competitive monitoring'],
       });
     } else if (alignmentScore > 60) {
       recommendations.push({
@@ -1428,21 +1585,33 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         timeline: '3-6 months preparation',
         resourceRequirements: ['Strategy team', 'Market research', 'Capability development'],
         expectedOutcomes: ['Improved market fit', 'Reduced execution risk'],
-        riskMitigation: ['Market validation', 'Capability assessment', 'Competitive analysis']
+        riskMitigation: ['Market validation', 'Capability assessment', 'Competitive analysis'],
       });
     } else {
       // For low alignment scores, recommend pivot or delay
       recommendations.push({
         type: 'pivot' as const,
-        rationale: ['Low strategic alignment', 'Significant changes needed', 'Market opportunity unclear'],
-        conditions: ['Reassess strategic fit', 'Identify alternative approaches', 'Strengthen value proposition'],
+        rationale: [
+          'Low strategic alignment',
+          'Significant changes needed',
+          'Market opportunity unclear',
+        ],
+        conditions: [
+          'Reassess strategic fit',
+          'Identify alternative approaches',
+          'Strengthen value proposition',
+        ],
         timeline: '6-9 months preparation',
         resourceRequirements: ['Strategy team', 'Market research', 'Product development'],
         expectedOutcomes: ['Better market alignment', 'Clearer value proposition'],
-        riskMitigation: ['Thorough market validation', 'Stakeholder alignment', 'Iterative approach']
+        riskMitigation: [
+          'Thorough market validation',
+          'Stakeholder alignment',
+          'Iterative approach',
+        ],
       });
     }
-    
+
     return recommendations;
   }
 
@@ -1461,20 +1630,30 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         { name: 'Market Size', weight: 30, score: 80, rationale: 'Large developer market' },
         { name: 'Customer Need', weight: 25, score: 85, rationale: 'Strong productivity focus' },
         { name: 'Market Timing', weight: 20, score: 70, rationale: 'AI adoption growing' },
-        { name: 'Competition', weight: 25, score: 65, rationale: 'Moderate competitive intensity' }
+        { name: 'Competition', weight: 25, score: 65, rationale: 'Moderate competitive intensity' },
       ],
-      recommendation: 'Strong market fit with growth potential'
+      recommendation: 'Strong market fit with growth potential',
     };
 
     const strategicFit = {
       score: alignmentScore,
       confidence: 85,
       factors: [
-        { name: 'Mission Alignment', weight: 40, score: alignmentScore, rationale: 'Aligns with productivity mission' },
+        {
+          name: 'Mission Alignment',
+          weight: 40,
+          score: alignmentScore,
+          rationale: 'Aligns with productivity mission',
+        },
         { name: 'Capability Fit', weight: 35, score: 70, rationale: 'Good technical capabilities' },
-        { name: 'Resource Availability', weight: 25, score: 75, rationale: 'Adequate resources available' }
+        {
+          name: 'Resource Availability',
+          weight: 25,
+          score: 75,
+          rationale: 'Adequate resources available',
+        },
       ],
-      recommendation: alignmentScore > 80 ? 'Excellent strategic fit' : 'Good strategic alignment'
+      recommendation: alignmentScore > 80 ? 'Excellent strategic fit' : 'Good strategic alignment',
     };
 
     const capabilityFit = {
@@ -1482,11 +1661,11 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       confidence: 75,
       factors: successFactors.map(factor => ({
         name: factor.factor,
-        weight: factor.importance / 100 * 25,
+        weight: (factor.importance / 100) * 25,
         score: factor.currentCapability,
-        rationale: `Current capability: ${factor.currentCapability}%`
+        rationale: `Current capability: ${factor.currentCapability}%`,
       })),
-      recommendation: 'Capabilities adequate with development needed'
+      recommendation: 'Capabilities adequate with development needed',
     };
 
     const timingFit = {
@@ -1494,22 +1673,60 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       confidence: 70,
       factors: [
         { name: 'Market Readiness', weight: 40, score: 80, rationale: 'Market ready for AI tools' },
-        { name: 'Internal Readiness', weight: 35, score: 75, rationale: 'Good internal capabilities' },
-        { name: 'Competitive Timing', weight: 25, score: 70, rationale: 'Window of opportunity exists' }
+        {
+          name: 'Internal Readiness',
+          weight: 35,
+          score: 75,
+          rationale: 'Good internal capabilities',
+        },
+        {
+          name: 'Competitive Timing',
+          weight: 25,
+          score: 70,
+          rationale: 'Window of opportunity exists',
+        },
       ],
-      recommendation: 'Good timing for market entry'
+      recommendation: 'Good timing for market entry',
     };
 
     const overallFit = {
-      score: Math.round((marketFit.score + strategicFit.score + capabilityFit.score + timingFit.score) / 4),
-      confidence: Math.round((marketFit.confidence + strategicFit.confidence + capabilityFit.confidence + timingFit.confidence) / 4),
+      score: Math.round(
+        (marketFit.score + strategicFit.score + capabilityFit.score + timingFit.score) / 4
+      ),
+      confidence: Math.round(
+        (marketFit.confidence +
+          strategicFit.confidence +
+          capabilityFit.confidence +
+          timingFit.confidence) /
+          4
+      ),
       factors: [
-        { name: 'Market Fit', weight: 25, score: marketFit.score, rationale: marketFit.recommendation },
-        { name: 'Strategic Fit', weight: 30, score: strategicFit.score, rationale: strategicFit.recommendation },
-        { name: 'Capability Fit', weight: 25, score: capabilityFit.score, rationale: capabilityFit.recommendation },
-        { name: 'Timing Fit', weight: 20, score: timingFit.score, rationale: timingFit.recommendation }
+        {
+          name: 'Market Fit',
+          weight: 25,
+          score: marketFit.score,
+          rationale: marketFit.recommendation,
+        },
+        {
+          name: 'Strategic Fit',
+          weight: 30,
+          score: strategicFit.score,
+          rationale: strategicFit.recommendation,
+        },
+        {
+          name: 'Capability Fit',
+          weight: 25,
+          score: capabilityFit.score,
+          rationale: capabilityFit.recommendation,
+        },
+        {
+          name: 'Timing Fit',
+          weight: 20,
+          score: timingFit.score,
+          rationale: timingFit.recommendation,
+        },
       ],
-      recommendation: 'Proceed with strategic opportunity'
+      recommendation: 'Proceed with strategic opportunity',
     };
 
     return {
@@ -1522,8 +1739,8 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         'Strong market opportunity in developer productivity space',
         'AI integration capabilities need strengthening',
         'Competitive window exists for 12-18 months',
-        'Strategic alignment supports investment decision'
-      ]
+        'Strategic alignment supports investment decision',
+      ],
     };
   }
 
@@ -1538,31 +1755,32 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
           signal: 'Increasing developer productivity focus',
           strength: 'strong' as const,
           trend: 'increasing' as const,
-          impact: 85
+          impact: 85,
         },
         {
           type: 'technology' as const,
           signal: 'AI tool adoption in development',
           strength: 'strong' as const,
           trend: 'increasing' as const,
-          impact: 90
-        }
+          impact: 90,
+        },
       ],
-      readinessScore: 82
+      readinessScore: 82,
     };
   }
 
   private assessCompetitiveTiming(competitiveAnalysis?: CompetitorAnalysisResult) {
     return {
-      competitorMoves: competitiveAnalysis?.competitiveMatrix.competitors.flatMap(comp => 
-        comp.recentMoves.map(move => ({
-          competitor: comp.name,
-          move: move.description,
-          timing: move.date,
-          impact: move.impact === 'high' ? 80 : move.impact === 'medium' ? 50 : 20,
-          responseRequired: move.impact === 'high'
-        }))
-      ) || [],
+      competitorMoves:
+        competitiveAnalysis?.competitiveMatrix.competitors.flatMap(comp =>
+          comp.recentMoves.map(move => ({
+            competitor: comp.name,
+            move: move.description,
+            timing: move.date,
+            impact: move.impact === 'high' ? 80 : move.impact === 'medium' ? 50 : 20,
+            responseRequired: move.impact === 'high',
+          }))
+        ) || [],
       marketWindowSize: 'moderate' as const,
       firstMoverAdvantage: 70,
       competitiveResponse: [
@@ -1571,10 +1789,14 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
           probability: 0.6,
           timeframe: '12-18 months',
           impact: 70,
-          counterStrategy: ['Accelerate development', 'Enhance differentiation', 'Strengthen partnerships']
-        }
+          counterStrategy: [
+            'Accelerate development',
+            'Enhance differentiation',
+            'Strengthen partnerships',
+          ],
+        },
       ],
-      timingAdvantage: 65
+      timingAdvantage: 65,
     };
   }
 
@@ -1592,9 +1814,9 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
           requiredState: 'Advanced AI/ML capabilities',
           gapSize: 30,
           timeToClose: '6 months',
-          effort: 8
-        }
-      ]
+          effort: 8,
+        },
+      ],
     };
   }
 
@@ -1606,7 +1828,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         impact: 85,
         probability: 0.9,
         timeframe: '12 months',
-        mitigation: ['Stay current with AI developments', 'Build flexible architecture']
+        mitigation: ['Stay current with AI developments', 'Build flexible architecture'],
       },
       {
         category: 'economic' as const,
@@ -1614,18 +1836,27 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         impact: 70,
         probability: 0.8,
         timeframe: '24 months',
-        mitigation: ['Monitor market trends', 'Adjust pricing strategy']
-      }
+        mitigation: ['Monitor market trends', 'Adjust pricing strategy'],
+      },
     ];
   }
 
-  private calculateTimingScore(marketReadiness: any, competitiveTiming: any, internalReadiness: any, externalFactors: any[]): number {
+  private calculateTimingScore(
+    marketReadiness: any,
+    competitiveTiming: any,
+    internalReadiness: any,
+    externalFactors: any[]
+  ): number {
     const marketScore = marketReadiness.readinessScore;
     const competitiveScore = competitiveTiming.timingAdvantage;
     const internalScore = internalReadiness.overallReadiness;
-    const externalScore = externalFactors.reduce((sum, factor) => sum + factor.impact * factor.probability, 0) / externalFactors.length;
-    
-    return Math.round((marketScore * 0.3 + competitiveScore * 0.25 + internalScore * 0.25 + externalScore * 0.2));
+    const externalScore =
+      externalFactors.reduce((sum, factor) => sum + factor.impact * factor.probability, 0) /
+      externalFactors.length;
+
+    return Math.round(
+      marketScore * 0.3 + competitiveScore * 0.25 + internalScore * 0.25 + externalScore * 0.2
+    );
   }
 
   private generateTimingRecommendation(
@@ -1638,29 +1869,45 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     if (timingScore >= 80) {
       return {
         recommendation: 'launch-now' as const,
-        rationale: ['Optimal market conditions', 'Strong competitive position', 'High internal readiness'],
+        rationale: [
+          'Optimal market conditions',
+          'Strong competitive position',
+          'High internal readiness',
+        ],
         optimalTiming: 'Immediate launch recommended',
         conditions: ['Secure necessary resources', 'Finalize go-to-market strategy'],
         risks: ['Competitive response', 'Resource constraints'],
-        alternatives: ['Phased launch approach', 'Partnership strategy']
+        alternatives: ['Phased launch approach', 'Partnership strategy'],
       };
     } else if (timingScore >= 65) {
       return {
         recommendation: 'launch-soon' as const,
-        rationale: ['Good market conditions', 'Reasonable competitive window', 'Adequate preparation time'],
+        rationale: [
+          'Good market conditions',
+          'Reasonable competitive window',
+          'Adequate preparation time',
+        ],
         optimalTiming: '3-6 months',
         conditions: ['Address capability gaps', 'Strengthen market position'],
         risks: ['Market timing shift', 'Competitive preemption'],
-        alternatives: ['Accelerated timeline', 'Strategic partnerships']
+        alternatives: ['Accelerated timeline', 'Strategic partnerships'],
       };
     } else {
       return {
         recommendation: 'delay' as const,
-        rationale: ['Market not fully ready', 'Internal capabilities need development', 'Competitive risks high'],
+        rationale: [
+          'Market not fully ready',
+          'Internal capabilities need development',
+          'Competitive risks high',
+        ],
         optimalTiming: '6-12 months',
-        conditions: ['Develop capabilities', 'Monitor market evolution', 'Strengthen competitive position'],
+        conditions: [
+          'Develop capabilities',
+          'Monitor market evolution',
+          'Strengthen competitive position',
+        ],
         risks: ['Missing market window', 'Competitive advantage erosion'],
-        alternatives: ['Pivot strategy', 'Partnership approach', 'Niche market entry']
+        alternatives: ['Pivot strategy', 'Partnership approach', 'Niche market entry'],
       };
     }
   }
@@ -1680,20 +1927,30 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         type: 'market-competitive',
         insight: `Market opportunity of $${marketSizing.tam.value.toLocaleString()} TAM with ${competitiveAnalysis.competitiveMatrix.competitors.length} major competitors presents significant growth potential`,
         supportingData: [
-          { source: 'market-sizing', dataPoint: 'TAM', value: marketSizing.tam.value, context: 'Total addressable market size' },
-          { source: 'competitive-analysis', dataPoint: 'Competitor Count', value: competitiveAnalysis.competitiveMatrix.competitors.length, context: 'Number of direct competitors' }
+          {
+            source: 'market-sizing',
+            dataPoint: 'TAM',
+            value: marketSizing.tam.value,
+            context: 'Total addressable market size',
+          },
+          {
+            source: 'competitive-analysis',
+            dataPoint: 'Competitor Count',
+            value: competitiveAnalysis.competitiveMatrix.competitors.length,
+            context: 'Number of direct competitors',
+          },
         ],
         implications: [
           'Large market validates opportunity size',
           'Competitive landscape requires differentiation strategy',
-          'Market share capture potential exists'
+          'Market share capture potential exists',
         ],
         actionItems: [
           'Develop competitive differentiation strategy',
           'Focus on underserved market segments',
-          'Monitor competitive moves closely'
+          'Monitor competitive moves closely',
         ],
-        confidence: 85
+        confidence: 85,
       });
     }
 
@@ -1703,20 +1960,30 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         type: 'strategic-timing',
         insight: `Strategic alignment score of ${strategicFit.alignmentScore}% combined with timing score of ${marketTiming.timingScore}% indicates favorable conditions for investment`,
         supportingData: [
-          { source: 'strategic-fit', dataPoint: 'Alignment Score', value: strategicFit.alignmentScore, context: 'Strategic alignment percentage' },
-          { source: 'timing-analysis', dataPoint: 'Timing Score', value: marketTiming.timingScore, context: 'Market timing favorability' }
+          {
+            source: 'strategic-fit',
+            dataPoint: 'Alignment Score',
+            value: strategicFit.alignmentScore,
+            context: 'Strategic alignment percentage',
+          },
+          {
+            source: 'timing-analysis',
+            dataPoint: 'Timing Score',
+            value: marketTiming.timingScore,
+            context: 'Market timing favorability',
+          },
         ],
         implications: [
           'Strong strategic fit supports long-term success',
           'Market timing favors early entry',
-          'Internal capabilities align with opportunity'
+          'Internal capabilities align with opportunity',
         ],
         actionItems: [
           'Accelerate development timeline',
           'Secure necessary resources',
-          'Establish market entry strategy'
+          'Establish market entry strategy',
         ],
-        confidence: 80
+        confidence: 80,
       });
     }
 
@@ -1736,7 +2003,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
     const timingScore = marketTiming?.timingScore || 70;
     const marketScore = marketSizing ? 80 : 70;
     const competitiveScore = competitiveAnalysis ? 75 : 70;
-    
+
     const overallScore = (strategicScore + timingScore + marketScore + competitiveScore) / 4;
     const confidence = Math.min(90, overallScore);
 
@@ -1750,12 +2017,12 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         'Excellent strategic alignment',
         'Favorable market conditions',
         'Strong competitive position',
-        'Optimal timing for launch'
+        'Optimal timing for launch',
       ];
       conditions = [
         'Secure adequate funding',
         'Assemble experienced team',
-        'Establish go-to-market strategy'
+        'Establish go-to-market strategy',
       ];
     } else if (overallScore >= 70) {
       decision = 'conditional-go';
@@ -1763,13 +2030,13 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         'Good strategic fit',
         'Reasonable market opportunity',
         'Manageable competitive risks',
-        'Acceptable timing window'
+        'Acceptable timing window',
       ];
       conditions = [
         'Address identified capability gaps',
         'Validate market assumptions',
         'Develop risk mitigation strategies',
-        'Secure stakeholder alignment'
+        'Secure stakeholder alignment',
       ];
     } else if (overallScore >= 60) {
       decision = 'pivot';
@@ -1777,13 +2044,13 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         'Moderate strategic alignment',
         'Market opportunity exists but limited',
         'Competitive challenges present',
-        'Timing requires optimization'
+        'Timing requires optimization',
       ];
       conditions = [
         'Refine value proposition',
         'Identify niche market segments',
         'Strengthen competitive differentiation',
-        'Improve internal capabilities'
+        'Improve internal capabilities',
       ];
     } else {
       decision = 'delay';
@@ -1791,13 +2058,13 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         'Strategic alignment needs improvement',
         'Market conditions not optimal',
         'High competitive risks',
-        'Internal readiness insufficient'
+        'Internal readiness insufficient',
       ];
       conditions = [
         'Develop core capabilities',
         'Wait for better market conditions',
         'Strengthen competitive position',
-        'Reassess strategic priorities'
+        'Reassess strategic priorities',
       ];
     }
 
@@ -1808,7 +2075,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         timeline: '1 week',
         dependencies: ['Analysis completion'],
         deliverables: ['Stakeholder presentation', 'Decision documentation'],
-        successCriteria: ['Stakeholder alignment', 'Clear decision path']
+        successCriteria: ['Stakeholder alignment', 'Clear decision path'],
       },
       {
         step: 'Resource Planning',
@@ -1816,8 +2083,8 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         timeline: '2 weeks',
         dependencies: ['Stakeholder approval'],
         deliverables: ['Resource allocation plan', 'Timeline estimate'],
-        successCriteria: ['Resource commitment', 'Realistic timeline']
-      }
+        successCriteria: ['Resource commitment', 'Realistic timeline'],
+      },
     ];
 
     const resourceRequirements = [
@@ -1827,7 +2094,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         quantity: 5,
         unit: 'FTE',
         timeframe: '6 months',
-        criticality: 'critical' as const
+        criticality: 'critical' as const,
       },
       {
         type: 'financial' as const,
@@ -1835,8 +2102,8 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         quantity: 500000,
         unit: 'USD',
         timeframe: '12 months',
-        criticality: 'critical' as const
-      }
+        criticality: 'critical' as const,
+      },
     ];
 
     return {
@@ -1845,9 +2112,14 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       keyReasons,
       conditions,
       nextSteps,
-      timeline: decision === 'strong-go' ? '3-6 months' : decision === 'conditional-go' ? '6-9 months' : '9-12 months',
+      timeline:
+        decision === 'strong-go'
+          ? '3-6 months'
+          : decision === 'conditional-go'
+            ? '6-9 months'
+            : '9-12 months',
       resourceRequirements,
-      successProbability: confidence
+      successProbability: confidence,
     };
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Competitor Analysis Component
- * 
+ *
  * This component provides comprehensive competitor analysis capabilities including
  * competitive matrix generation, competitor identification and ranking algorithms.
  * It integrates with credible sources and provides structured competitive intelligence.
@@ -29,7 +29,7 @@ import {
   COMPETITIVE_ANALYSIS_DEFAULTS,
   SOURCE_RELIABILITY_THRESHOLDS,
   ValidationResult,
-  FreshnessStatus
+  FreshnessStatus,
 } from '../../models/competitive';
 import { ReferenceManager, createReferenceManager } from '../reference-manager';
 
@@ -48,7 +48,8 @@ export class CompetitorAnalyzer {
     maxCompetitors?: number;
     minCompetitors?: number;
   }) {
-    this.confidenceThreshold = options?.confidenceThreshold ?? COMPETITIVE_ANALYSIS_DEFAULTS.DEFAULT_CONFIDENCE_THRESHOLD;
+    this.confidenceThreshold =
+      options?.confidenceThreshold ?? COMPETITIVE_ANALYSIS_DEFAULTS.DEFAULT_CONFIDENCE_THRESHOLD;
     this.maxCompetitors = options?.maxCompetitors ?? COMPETITIVE_ANALYSIS_DEFAULTS.MAX_COMPETITORS;
     this.minCompetitors = options?.minCompetitors ?? COMPETITIVE_ANALYSIS_DEFAULTS.MIN_COMPETITORS;
     this.referenceManager = createReferenceManager();
@@ -66,7 +67,11 @@ export class CompetitorAnalyzer {
       const marketContext = this.extractMarketContext(args);
 
       // Identify competitors based on feature idea and market context
-      const competitors = await this.identifyCompetitors(args.feature_idea, marketContext, args.analysis_depth || 'standard');
+      const competitors = await this.identifyCompetitors(
+        args.feature_idea,
+        marketContext,
+        args.analysis_depth || 'standard'
+      );
 
       // Generate competitive matrix
       const competitiveMatrix = await this.generateCompetitiveMatrix(competitors, marketContext);
@@ -101,9 +106,8 @@ export class CompetitorAnalyzer {
         sourceAttribution,
         confidenceLevel,
         lastUpdated: new Date().toISOString(),
-        dataQuality
+        dataQuality,
       };
-
     } catch (error) {
       if (error instanceof CompetitiveAnalysisError) {
         throw error;
@@ -111,7 +115,11 @@ export class CompetitorAnalyzer {
       throw new CompetitiveAnalysisError(
         `Failed to analyze competitors: ${error instanceof Error ? error.message : 'Unknown error'}`,
         'ANALYSIS_TIMEOUT',
-        ['Try with a simpler feature description', 'Reduce analysis depth', 'Check market context validity'],
+        [
+          'Try with a simpler feature description',
+          'Reduce analysis depth',
+          'Check market context validity',
+        ],
         { originalError: error }
       );
     }
@@ -130,11 +138,11 @@ export class CompetitorAnalyzer {
     // company databases, and competitive intelligence sources
 
     const baseCompetitors = this.generateMockCompetitors(featureIdea, marketContext);
-    
+
     // Filter and rank competitors based on analysis depth
     const maxCompetitors = this.getMaxCompetitorsForDepth(analysisDepth);
     const rankedCompetitors = this.rankCompetitorsByRelevance(baseCompetitors, featureIdea);
-    
+
     return rankedCompetitors.slice(0, Math.min(maxCompetitors, this.maxCompetitors));
   }
 
@@ -152,14 +160,17 @@ export class CompetitorAnalyzer {
     const rankings = this.calculateCompetitorRankings(competitors, evaluationCriteria);
 
     // Identify differentiation opportunities
-    const differentiationOpportunities = this.identifyDifferentiationOpportunities(competitors, rankings);
+    const differentiationOpportunities = this.identifyDifferentiationOpportunities(
+      competitors,
+      rankings
+    );
 
     return {
       competitors,
       evaluationCriteria,
       rankings,
       differentiationOpportunities,
-      marketContext
+      marketContext,
     };
   }
 
@@ -179,7 +190,12 @@ export class CompetitorAnalyzer {
         weaknesses,
         opportunities,
         threats,
-        strategicImplications: this.generateStrategicImplications(strengths, weaknesses, opportunities, threats)
+        strategicImplications: this.generateStrategicImplications(
+          strengths,
+          weaknesses,
+          opportunities,
+          threats
+        ),
       };
     });
   }
@@ -201,13 +217,16 @@ export class CompetitorAnalyzer {
     const marketGaps = this.identifyMarketGaps(competitorPositions, positioningMap);
 
     // Generate positioning recommendations
-    const recommendedPositioning = this.generatePositioningRecommendations(marketGaps, competitorPositions);
+    const recommendedPositioning = this.generatePositioningRecommendations(
+      marketGaps,
+      competitorPositions
+    );
 
     return {
       positioningMap,
       competitorPositions,
       marketGaps,
-      recommendedPositioning
+      recommendedPositioning,
     };
   }
 
@@ -222,7 +241,9 @@ export class CompetitorAnalyzer {
     const recommendations: StrategyRecommendation[] = [];
 
     // Differentiation recommendations
-    recommendations.push(...this.generateDifferentiationRecommendations(competitiveMatrix, marketPositioning));
+    recommendations.push(
+      ...this.generateDifferentiationRecommendations(competitiveMatrix, marketPositioning)
+    );
 
     // Blue ocean recommendations
     recommendations.push(...this.generateBlueOceanRecommendations(marketPositioning));
@@ -242,16 +263,20 @@ export class CompetitorAnalyzer {
       throw new CompetitiveAnalysisError(
         'Feature idea must be at least 10 characters long',
         'VALIDATION_FAILED',
-        ['Provide a more detailed feature description', 'Include specific functionality or value proposition']
+        [
+          'Provide a more detailed feature description',
+          'Include specific functionality or value proposition',
+        ]
       );
     }
 
-    if (args.analysis_depth && !['quick', 'standard', 'comprehensive'].includes(args.analysis_depth)) {
-      throw new CompetitiveAnalysisError(
-        'Invalid analysis depth specified',
-        'VALIDATION_FAILED',
-        ['Use one of: quick, standard, comprehensive']
-      );
+    if (
+      args.analysis_depth &&
+      !['quick', 'standard', 'comprehensive'].includes(args.analysis_depth)
+    ) {
+      throw new CompetitiveAnalysisError('Invalid analysis depth specified', 'VALIDATION_FAILED', [
+        'Use one of: quick, standard, comprehensive',
+      ]);
     }
   }
 
@@ -262,27 +287,43 @@ export class CompetitorAnalyzer {
       targetSegment: args.market_context?.target_segment ?? 'General Market',
       marketMaturity: 'growth', // Default assumption
       regulatoryEnvironment: [],
-      technologyTrends: this.extractTechnologyTrends(args.feature_idea)
+      technologyTrends: this.extractTechnologyTrends(args.feature_idea),
     };
   }
 
   private inferIndustryFromFeature(featureIdea: string): string {
     // Simple keyword-based industry inference
     const keywords = featureIdea.toLowerCase();
-    
-    if (keywords.includes('fintech') || keywords.includes('payment') || keywords.includes('banking')) {
+
+    if (
+      keywords.includes('fintech') ||
+      keywords.includes('payment') ||
+      keywords.includes('banking')
+    ) {
       return 'Financial Services';
     }
-    if (keywords.includes('health') || keywords.includes('medical') || keywords.includes('healthcare')) {
+    if (
+      keywords.includes('health') ||
+      keywords.includes('medical') ||
+      keywords.includes('healthcare')
+    ) {
       return 'Healthcare';
     }
-    if (keywords.includes('ecommerce') || keywords.includes('retail') || keywords.includes('shopping')) {
+    if (
+      keywords.includes('ecommerce') ||
+      keywords.includes('retail') ||
+      keywords.includes('shopping')
+    ) {
       return 'E-commerce';
     }
-    if (keywords.includes('saas') || keywords.includes('software') || keywords.includes('platform')) {
+    if (
+      keywords.includes('saas') ||
+      keywords.includes('software') ||
+      keywords.includes('platform')
+    ) {
       return 'Software';
     }
-    
+
     return 'Technology';
   }
 
@@ -290,7 +331,11 @@ export class CompetitorAnalyzer {
     const trends: string[] = [];
     const keywords = featureIdea.toLowerCase();
 
-    if (keywords.includes('ai') || keywords.includes('machine learning') || keywords.includes('artificial intelligence')) {
+    if (
+      keywords.includes('ai') ||
+      keywords.includes('machine learning') ||
+      keywords.includes('artificial intelligence')
+    ) {
       trends.push('Artificial Intelligence');
     }
     if (keywords.includes('mobile') || keywords.includes('app')) {
@@ -314,29 +359,73 @@ export class CompetitorAnalyzer {
     // Industry-specific competitor templates
     if (industry === 'Financial Services') {
       baseCompetitors.push(
-        { name: 'FinTech Leader A', marketShare: 25, strengths: ['Strong brand', 'Regulatory compliance'] },
-        { name: 'Traditional Bank B', marketShare: 35, strengths: ['Large customer base', 'Trust'] },
-        { name: 'Startup Disruptor C', marketShare: 8, strengths: ['Innovation', 'User experience'] },
+        {
+          name: 'FinTech Leader A',
+          marketShare: 25,
+          strengths: ['Strong brand', 'Regulatory compliance'],
+        },
+        {
+          name: 'Traditional Bank B',
+          marketShare: 35,
+          strengths: ['Large customer base', 'Trust'],
+        },
+        {
+          name: 'Startup Disruptor C',
+          marketShare: 8,
+          strengths: ['Innovation', 'User experience'],
+        },
         { name: 'Payment Processor D', marketShare: 12, strengths: ['Global reach', 'Security'] },
-        { name: 'Digital Wallet E', marketShare: 6, strengths: ['Mobile-first', 'User experience'] },
+        {
+          name: 'Digital Wallet E',
+          marketShare: 6,
+          strengths: ['Mobile-first', 'User experience'],
+        },
         { name: 'Enterprise Solution F', marketShare: 14, strengths: ['B2B focus', 'Integration'] }
       );
     } else if (industry === 'Healthcare') {
       baseCompetitors.push(
-        { name: 'HealthTech Giant A', marketShare: 30, strengths: ['Clinical expertise', 'Compliance'] },
-        { name: 'Digital Health B', marketShare: 15, strengths: ['User engagement', 'Mobile platform'] },
-        { name: 'Enterprise Solution C', marketShare: 20, strengths: ['Integration capabilities', 'Security'] },
-        { name: 'Telemedicine Platform D', marketShare: 10, strengths: ['Remote care', 'Accessibility'] },
-        { name: 'Health Records System E', marketShare: 12, strengths: ['Data management', 'Interoperability'] },
+        {
+          name: 'HealthTech Giant A',
+          marketShare: 30,
+          strengths: ['Clinical expertise', 'Compliance'],
+        },
+        {
+          name: 'Digital Health B',
+          marketShare: 15,
+          strengths: ['User engagement', 'Mobile platform'],
+        },
+        {
+          name: 'Enterprise Solution C',
+          marketShare: 20,
+          strengths: ['Integration capabilities', 'Security'],
+        },
+        {
+          name: 'Telemedicine Platform D',
+          marketShare: 10,
+          strengths: ['Remote care', 'Accessibility'],
+        },
+        {
+          name: 'Health Records System E',
+          marketShare: 12,
+          strengths: ['Data management', 'Interoperability'],
+        },
         { name: 'AI Diagnostics F', marketShare: 8, strengths: ['AI technology', 'Accuracy'] },
-        { name: 'Wearables Company G', marketShare: 5, strengths: ['Consumer devices', 'Data collection'] }
+        {
+          name: 'Wearables Company G',
+          marketShare: 5,
+          strengths: ['Consumer devices', 'Data collection'],
+        }
       );
     } else {
       // Generic technology competitors
       baseCompetitors.push(
         { name: 'Market Leader A', marketShare: 40, strengths: ['Market presence', 'Resources'] },
         { name: 'Innovative Challenger B', marketShare: 20, strengths: ['Technology', 'Agility'] },
-        { name: 'Niche Player C', marketShare: 10, strengths: ['Specialization', 'Customer focus'] },
+        {
+          name: 'Niche Player C',
+          marketShare: 10,
+          strengths: ['Specialization', 'Customer focus'],
+        },
         { name: 'Enterprise Vendor D', marketShare: 15, strengths: ['B2B expertise', 'Support'] },
         { name: 'Startup Disruptor E', marketShare: 5, strengths: ['Innovation', 'Speed'] },
         { name: 'Platform Provider F', marketShare: 8, strengths: ['Ecosystem', 'Integrations'] },
@@ -355,7 +444,7 @@ export class CompetitorAnalyzer {
       targetMarket: [marketContext.targetSegment],
       recentMoves: this.generateRecentMoves(),
       employeeCount: Math.floor(Math.random() * 5000) + 100,
-      foundedYear: 2010 + Math.floor(Math.random() * 10)
+      foundedYear: 2010 + Math.floor(Math.random() * 10),
     }));
   }
 
@@ -364,15 +453,18 @@ export class CompetitorAnalyzer {
     const weaknessMap: { [key: string]: string[] } = {
       'Strong brand': ['High pricing', 'Slow innovation'],
       'Large customer base': ['Legacy systems', 'Slow decision making'],
-      'Innovation': ['Limited resources', 'Market validation'],
+      Innovation: ['Limited resources', 'Market validation'],
       'Regulatory compliance': ['Slow to market', 'High operational costs'],
       'User experience': ['Limited enterprise features', 'Scalability concerns'],
-      'Clinical expertise': ['Complex user interface', 'High implementation costs']
+      'Clinical expertise': ['Complex user interface', 'High implementation costs'],
     };
 
     const weaknesses: string[] = [];
     strengths.forEach(strength => {
-      const possibleWeaknesses = weaknessMap[strength] || ['Resource constraints', 'Market positioning'];
+      const possibleWeaknesses = weaknessMap[strength] || [
+        'Resource constraints',
+        'Market positioning',
+      ];
       weaknesses.push(possibleWeaknesses[Math.floor(Math.random() * possibleWeaknesses.length)]);
     });
 
@@ -385,7 +477,7 @@ export class CompetitorAnalyzer {
       'User management',
       'Analytics dashboard',
       'API integration',
-      'Mobile application'
+      'Mobile application',
     ];
 
     // Add feature-specific capabilities
@@ -403,12 +495,12 @@ export class CompetitorAnalyzer {
   private generatePricingInfo(industry: string): any {
     const models = ['subscription', 'freemium', 'usage-based', 'tiered'];
     const model = models[Math.floor(Math.random() * models.length)];
-    
+
     const basePrices: { [key: string]: number } = {
       'Financial Services': 99,
-      'Healthcare': 149,
-      'Software': 49,
-      'E-commerce': 29
+      Healthcare: 149,
+      Software: 49,
+      'E-commerce': 29,
     };
 
     return {
@@ -416,33 +508,39 @@ export class CompetitorAnalyzer {
       startingPrice: basePrices[industry] || 49,
       currency: 'USD',
       billingCycle: 'monthly',
-      valueProposition: `${industry} solution with competitive pricing`
+      valueProposition: `${industry} solution with competitive pricing`,
     };
   }
 
   private generateRecentMoves(): any[] {
     const moveTypes = ['product-launch', 'partnership', 'funding', 'expansion'];
     const moves = [];
-    
+
     for (let i = 0; i < Math.floor(Math.random() * 3) + 1; i++) {
       moves.push({
-        date: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        date: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split('T')[0],
         type: moveTypes[Math.floor(Math.random() * moveTypes.length)],
         description: 'Recent strategic initiative',
         impact: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
-        strategicImplication: 'Market positioning adjustment'
+        strategicImplication: 'Market positioning adjustment',
       });
     }
-    
+
     return moves;
   }
 
   private getMaxCompetitorsForDepth(depth: 'quick' | 'standard' | 'comprehensive'): number {
     switch (depth) {
-      case 'quick': return 3;
-      case 'standard': return 5;
-      case 'comprehensive': return 8;
-      default: return 5;
+      case 'quick':
+        return 3;
+      case 'standard':
+        return 5;
+      case 'comprehensive':
+        return 8;
+      default:
+        return 5;
     }
   }
 
@@ -457,11 +555,15 @@ export class CompetitorAnalyzer {
 
   private calculateRelevanceScore(competitor: Competitor, featureIdea: string): number {
     let score = competitor.marketShare; // Base score on market share
-    
+
     // Boost score for feature alignment
     const featureKeywords = featureIdea.toLowerCase().split(' ');
-    const competitorText = (competitor.keyFeatures.join(' ') + ' ' + competitor.strengths.join(' ')).toLowerCase();
-    
+    const competitorText = (
+      competitor.keyFeatures.join(' ') +
+      ' ' +
+      competitor.strengths.join(' ')
+    ).toLowerCase();
+
     featureKeywords.forEach(keyword => {
       if (competitorText.includes(keyword)) {
         score += 10;
@@ -477,37 +579,37 @@ export class CompetitorAnalyzer {
         name: 'Market Share',
         weight: 0.25,
         description: 'Current market position and customer base',
-        measurementType: 'quantitative'
+        measurementType: 'quantitative',
       },
       {
         name: 'Product Features',
-        weight: 0.20,
+        weight: 0.2,
         description: 'Breadth and depth of product capabilities',
-        measurementType: 'qualitative'
+        measurementType: 'qualitative',
       },
       {
         name: 'Innovation',
-        weight: 0.20,
+        weight: 0.2,
         description: 'Technology advancement and R&D investment',
-        measurementType: 'qualitative'
+        measurementType: 'qualitative',
       },
       {
         name: 'Customer Satisfaction',
         weight: 0.15,
         description: 'User reviews and retention rates',
-        measurementType: 'quantitative'
+        measurementType: 'quantitative',
       },
       {
         name: 'Financial Strength',
-        weight: 0.20,
+        weight: 0.2,
         description: 'Revenue growth and funding status',
-        measurementType: 'quantitative'
-      }
+        measurementType: 'quantitative',
+      },
     ];
 
     // Adjust weights based on market maturity
     if (marketContext.marketMaturity === 'emerging') {
-      baseCriteria.find(c => c.name === 'Innovation')!.weight = 0.30;
+      baseCriteria.find(c => c.name === 'Innovation')!.weight = 0.3;
       baseCriteria.find(c => c.name === 'Market Share')!.weight = 0.15;
     }
 
@@ -533,7 +635,7 @@ export class CompetitorAnalyzer {
         overallScore: Math.round(totalScore * 100) / 100,
         criteriaScores,
         rank: 0, // Will be set after sorting
-        competitiveAdvantage: this.identifyCompetitiveAdvantage(competitor, criteriaScores)
+        competitiveAdvantage: this.identifyCompetitiveAdvantage(competitor, criteriaScores),
       };
     });
 
@@ -546,7 +648,10 @@ export class CompetitorAnalyzer {
     return rankings;
   }
 
-  private scoreCompetitorOnCriterion(competitor: Competitor, criterion: EvaluationCriterion): number {
+  private scoreCompetitorOnCriterion(
+    competitor: Competitor,
+    criterion: EvaluationCriterion
+  ): number {
     // Simplified scoring logic - in reality this would use more sophisticated analysis
     switch (criterion.name) {
       case 'Market Share':
@@ -564,9 +669,12 @@ export class CompetitorAnalyzer {
     }
   }
 
-  private identifyCompetitiveAdvantage(competitor: Competitor, scores: { [key: string]: number }): string[] {
+  private identifyCompetitiveAdvantage(
+    competitor: Competitor,
+    scores: { [key: string]: number }
+  ): string[] {
     const advantages: string[] = [];
-    
+
     Object.entries(scores).forEach(([criterion, score]) => {
       if (score > 0.7) {
         advantages.push(`Strong ${criterion.toLowerCase()}`);
@@ -581,17 +689,20 @@ export class CompetitorAnalyzer {
     rankings: CompetitorRanking[]
   ): string[] {
     const opportunities: string[] = [];
-    
+
     // Analyze common weaknesses
     const allWeaknesses = competitors.flatMap(c => c.weaknesses);
-    const weaknessCounts = allWeaknesses.reduce((acc, weakness) => {
-      acc[weakness] = (acc[weakness] || 0) + 1;
-      return acc;
-    }, {} as { [key: string]: number });
+    const weaknessCounts = allWeaknesses.reduce(
+      (acc, weakness) => {
+        acc[weakness] = (acc[weakness] || 0) + 1;
+        return acc;
+      },
+      {} as { [key: string]: number }
+    );
 
     // Identify most common weaknesses as opportunities
     Object.entries(weaknessCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
       .forEach(([weakness]) => {
         opportunities.push(`Address industry-wide ${weakness.toLowerCase()}`);
@@ -606,7 +717,7 @@ export class CompetitorAnalyzer {
 
   private analyzeSWOTCategory(competitor: Competitor, category: string): SWOTItem[] {
     const items: SWOTItem[] = [];
-    
+
     switch (category) {
       case 'strengths':
         competitor.strengths.forEach(strength => {
@@ -614,7 +725,7 @@ export class CompetitorAnalyzer {
             description: `Strong ${strength.toLowerCase()} capabilities`,
             impact: 'high',
             confidence: 0.8,
-            sourceReference: 'Market analysis'
+            sourceReference: 'Market analysis',
           });
         });
         break;
@@ -624,7 +735,7 @@ export class CompetitorAnalyzer {
             description: `Limited ${weakness.toLowerCase()} performance`,
             impact: 'medium',
             confidence: 0.7,
-            sourceReference: 'Competitive research'
+            sourceReference: 'Competitive research',
           });
         });
         break;
@@ -633,13 +744,13 @@ export class CompetitorAnalyzer {
           description: 'Market expansion potential in underserved segments',
           impact: 'high',
           confidence: 0.6,
-          sourceReference: 'Industry trends'
+          sourceReference: 'Industry trends',
         });
         items.push({
           description: 'Technology advancement opportunities',
           impact: 'medium',
           confidence: 0.7,
-          sourceReference: 'Technology analysis'
+          sourceReference: 'Technology analysis',
         });
         break;
       case 'threats':
@@ -647,13 +758,13 @@ export class CompetitorAnalyzer {
           description: 'Increased competitive pressure from new entrants',
           impact: 'medium',
           confidence: 0.7,
-          sourceReference: 'Market dynamics'
+          sourceReference: 'Market dynamics',
         });
         items.push({
           description: 'Regulatory changes affecting market conditions',
           impact: 'medium',
           confidence: 0.6,
-          sourceReference: 'Regulatory analysis'
+          sourceReference: 'Regulatory analysis',
         });
         break;
     }
@@ -668,17 +779,17 @@ export class CompetitorAnalyzer {
     threats: SWOTItem[]
   ): string[] {
     const implications: string[] = [];
-    
+
     if (strengths.length > weaknesses.length) {
       implications.push('Strong competitive position with growth potential');
     }
     if (opportunities.length > threats.length) {
       implications.push('Favorable market conditions for expansion');
     }
-    
+
     implications.push('Monitor competitive moves closely');
     implications.push('Focus on differentiation strategies');
-    
+
     return implications;
   }
 
@@ -688,20 +799,20 @@ export class CompetitorAnalyzer {
         name: 'Price',
         lowEnd: 'Low Cost',
         highEnd: 'Premium',
-        importance: 0.3
+        importance: 0.3,
       },
       {
         name: 'Features',
         lowEnd: 'Basic',
         highEnd: 'Comprehensive',
-        importance: 0.4
+        importance: 0.4,
       },
       {
         name: 'Target Market',
         lowEnd: 'SMB',
         highEnd: 'Enterprise',
-        importance: 0.3
-      }
+        importance: 0.3,
+      },
     ];
   }
 
@@ -711,7 +822,7 @@ export class CompetitorAnalyzer {
   ): CompetitorPosition[] {
     return competitors.map(competitor => {
       const coordinates: { [key: string]: number } = {};
-      
+
       axes.forEach(axis => {
         coordinates[axis.name] = this.calculateAxisPosition(competitor, axis);
       });
@@ -719,7 +830,7 @@ export class CompetitorAnalyzer {
       return {
         competitorName: competitor.name,
         coordinates,
-        marketSegment: competitor.targetMarket[0] || 'General'
+        marketSegment: competitor.targetMarket[0] || 'General',
       };
     });
   }
@@ -743,14 +854,14 @@ export class CompetitorAnalyzer {
     axes: PositioningAxis[]
   ): MarketGap[] {
     const gaps: MarketGap[] = [];
-    
+
     // Simplified gap identification
     gaps.push({
       description: 'Mid-market segment with balanced features and pricing',
       size: 'medium',
       difficulty: 'moderate',
       timeToMarket: '6-12 months',
-      potentialValue: 50000000
+      potentialValue: 50000000,
     });
 
     gaps.push({
@@ -758,7 +869,7 @@ export class CompetitorAnalyzer {
       size: 'large',
       difficulty: 'hard',
       timeToMarket: '12-18 months',
-      potentialValue: 100000000
+      potentialValue: 100000000,
     });
 
     return gaps;
@@ -772,7 +883,7 @@ export class CompetitorAnalyzer {
       'Target underserved mid-market segment',
       'Differentiate through superior user experience',
       'Focus on specific industry verticals',
-      'Leverage technology advantages for competitive pricing'
+      'Leverage technology advantages for competitive pricing',
     ];
   }
 
@@ -780,92 +891,109 @@ export class CompetitorAnalyzer {
     matrix: CompetitiveMatrix,
     positioning: MarketPositioning
   ): StrategyRecommendation[] {
-    return [{
-      type: 'differentiation',
-      title: 'Feature-Based Differentiation',
-      description: 'Develop unique capabilities that competitors lack',
-      rationale: [
-        'Identified competitive gaps in market positioning',
-        'Competitor weaknesses present differentiation opportunities',
-        'Market analysis reveals unmet customer needs'
-      ],
-      implementation: [
-        {
-          step: 1,
-          action: 'Identify key feature gaps',
-          timeline: '2-4 weeks',
-          dependencies: ['Market research completion'],
-          successMetrics: ['Gap analysis report', 'Feature prioritization matrix']
-        }
-      ],
-      expectedOutcome: 'Competitive advantage through unique features',
-      riskLevel: 'medium',
-      timeframe: '6-12 months',
-      resourceRequirements: ['Product development team', 'Market research budget']
-    }];
+    return [
+      {
+        type: 'differentiation',
+        title: 'Feature-Based Differentiation',
+        description: 'Develop unique capabilities that competitors lack',
+        rationale: [
+          'Identified competitive gaps in market positioning',
+          'Competitor weaknesses present differentiation opportunities',
+          'Market analysis reveals unmet customer needs',
+        ],
+        implementation: [
+          {
+            step: 1,
+            action: 'Identify key feature gaps',
+            timeline: '2-4 weeks',
+            dependencies: ['Market research completion'],
+            successMetrics: ['Gap analysis report', 'Feature prioritization matrix'],
+          },
+        ],
+        expectedOutcome: 'Competitive advantage through unique features',
+        riskLevel: 'medium',
+        timeframe: '6-12 months',
+        resourceRequirements: ['Product development team', 'Market research budget'],
+      },
+    ];
   }
 
-  private generateBlueOceanRecommendations(positioning: MarketPositioning): StrategyRecommendation[] {
-    return [{
-      type: 'blue-ocean',
-      title: 'Create New Market Space',
-      description: 'Identify uncontested market opportunities',
-      rationale: ['Market gaps identified', 'Limited competition in specific segments'],
-      implementation: [
-        {
-          step: 1,
-          action: 'Validate market opportunity',
-          timeline: '4-6 weeks',
-          dependencies: ['Customer research'],
-          successMetrics: ['Market validation report', 'Customer interviews completed']
-        }
-      ],
-      expectedOutcome: 'First-mover advantage in new market segment',
-      riskLevel: 'high',
-      timeframe: '12-24 months',
-      resourceRequirements: ['Innovation team', 'Significant R&D investment']
-    }];
+  private generateBlueOceanRecommendations(
+    positioning: MarketPositioning
+  ): StrategyRecommendation[] {
+    return [
+      {
+        type: 'blue-ocean',
+        title: 'Create New Market Space',
+        description: 'Identify uncontested market opportunities',
+        rationale: ['Market gaps identified', 'Limited competition in specific segments'],
+        implementation: [
+          {
+            step: 1,
+            action: 'Validate market opportunity',
+            timeline: '4-6 weeks',
+            dependencies: ['Customer research'],
+            successMetrics: ['Market validation report', 'Customer interviews completed'],
+          },
+        ],
+        expectedOutcome: 'First-mover advantage in new market segment',
+        riskLevel: 'high',
+        timeframe: '12-24 months',
+        resourceRequirements: ['Innovation team', 'Significant R&D investment'],
+      },
+    ];
   }
 
   private generateFocusRecommendations(
     swotAnalysis: SWOTAnalysis[],
     positioning: MarketPositioning
   ): StrategyRecommendation[] {
-    return [{
-      type: 'focus',
-      title: 'Niche Market Focus Strategy',
-      description: 'Focus on specific customer segments with specialized needs',
-      rationale: ['Opportunity for specialization', 'Lower competition in niche markets'],
-      implementation: [
-        {
-          step: 1,
-          action: 'Define target niche',
-          timeline: '2-3 weeks',
-          dependencies: ['Customer segmentation analysis'],
-          successMetrics: ['Niche definition document', 'Target customer profiles']
-        }
-      ],
-      expectedOutcome: 'Market leadership in focused segment',
-      riskLevel: 'low',
-      timeframe: '3-6 months',
-      resourceRequirements: ['Specialized sales team', 'Targeted marketing budget']
-    }];
+    return [
+      {
+        type: 'focus',
+        title: 'Niche Market Focus Strategy',
+        description: 'Focus on specific customer segments with specialized needs',
+        rationale: ['Opportunity for specialization', 'Lower competition in niche markets'],
+        implementation: [
+          {
+            step: 1,
+            action: 'Define target niche',
+            timeline: '2-3 weeks',
+            dependencies: ['Customer segmentation analysis'],
+            successMetrics: ['Niche definition document', 'Target customer profiles'],
+          },
+        ],
+        expectedOutcome: 'Market leadership in focused segment',
+        riskLevel: 'low',
+        timeframe: '3-6 months',
+        resourceRequirements: ['Specialized sales team', 'Targeted marketing budget'],
+      },
+    ];
   }
 
-  private generateSourceAttribution(competitors: Competitor[], marketContext: MarketContext): SourceReference[] {
+  private generateSourceAttribution(
+    competitors: Competitor[],
+    marketContext: MarketContext
+  ): SourceReference[] {
     // Use the reference manager to generate credible sources
     return this.referenceManager.generateSourceAttribution(marketContext.industry, 'competitive');
   }
 
-  private assessDataQuality(competitors: Competitor[], sources: SourceReference[]): DataQualityCheck {
+  private assessDataQuality(
+    competitors: Competitor[],
+    sources: SourceReference[]
+  ): DataQualityCheck {
     // Use reference manager to validate source collection
     const sourceValidation = this.referenceManager.validateSourceCollection(sources);
-    
-    const sourceReliability = sources.reduce((sum, source) => sum + source.reliability, 0) / sources.length;
+
+    const sourceReliability =
+      sources.reduce((sum, source) => sum + source.reliability, 0) / sources.length;
     const dataFreshness = sources.every(source => {
       const freshness = this.referenceManager.checkDataFreshness(source);
       return freshness.ageInDays < 90;
-    }) ? 0.9 : 0.6;
+    })
+      ? 0.9
+      : 0.6;
     const methodologyRigor = competitors.length >= this.minCompetitors ? 0.8 : 0.5;
     const overallConfidence = (sourceReliability + dataFreshness + methodologyRigor) / 3;
 
@@ -874,25 +1002,25 @@ export class CompetitorAnalyzer {
         metric: 'Source Reliability',
         score: sourceReliability,
         description: 'Credibility of information sources',
-        impact: 'critical'
+        impact: 'critical',
       },
       {
         metric: 'Data Freshness',
         score: dataFreshness,
         description: 'Recency of competitive intelligence',
-        impact: 'important'
+        impact: 'important',
       },
       {
         metric: 'Analysis Completeness',
         score: methodologyRigor,
         description: 'Comprehensiveness of competitive analysis',
-        impact: 'important'
-      }
+        impact: 'important',
+      },
     ];
 
     // Combine recommendations from source validation and analysis
     const recommendations: string[] = [...sourceValidation.recommendations];
-    
+
     if (sourceReliability < SOURCE_RELIABILITY_THRESHOLDS.MEDIUM) {
       recommendations.push('Seek additional authoritative sources');
     }
@@ -915,7 +1043,7 @@ export class CompetitorAnalyzer {
       methodologyRigor,
       overallConfidence,
       qualityIndicators,
-      recommendations: [...new Set(recommendations)] // Remove duplicates
+      recommendations: [...new Set(recommendations)], // Remove duplicates
     };
   }
 
@@ -940,7 +1068,9 @@ export class CompetitorAnalyzer {
 
     // Check minimum competitors
     if (result.competitiveMatrix.competitors.length < this.minCompetitors) {
-      warnings.push(`Only ${result.competitiveMatrix.competitors.length} competitors identified (minimum: ${this.minCompetitors})`);
+      warnings.push(
+        `Only ${result.competitiveMatrix.competitors.length} competitors identified (minimum: ${this.minCompetitors})`
+      );
       qualityScore -= 0.2;
       dataGaps.push('Insufficient competitor coverage');
     }
@@ -965,7 +1095,7 @@ export class CompetitorAnalyzer {
       warnings,
       recommendations,
       dataGaps,
-      qualityScore
+      qualityScore,
     };
   }
 }
@@ -996,7 +1126,9 @@ export function formatCompetitiveAnalysisResult(result: CompetitorAnalysisResult
   // Competitive Matrix
   sections.push('## Competitive Matrix\n');
   result.competitiveMatrix.rankings.forEach(ranking => {
-    sections.push(`**${ranking.rank}. ${ranking.competitorName}** (Score: ${ranking.overallScore})`);
+    sections.push(
+      `**${ranking.rank}. ${ranking.competitorName}** (Score: ${ranking.overallScore})`
+    );
     sections.push(`- Competitive Advantages: ${ranking.competitiveAdvantage.join(', ')}\n`);
   });
 

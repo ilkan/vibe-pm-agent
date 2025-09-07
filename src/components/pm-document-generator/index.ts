@@ -7,12 +7,12 @@ import {
   validateRequirementsGenerationInputs,
   validateDesignOptionsInputs,
   validateTaskPlanInputs,
-  PMDocumentValidationError
+  PMDocumentValidationError,
 } from '../../utils/pm-document-validation';
 import {
   PMDocumentFallbackProvider,
   PMDocumentErrorRecovery,
-  PMDocumentGenerationError
+  PMDocumentGenerationError,
 } from '../../utils/pm-document-error-handling';
 
 export interface ManagementOnePager {
@@ -191,7 +191,7 @@ export interface Task {
   acceptanceCriteria: string[];
   effort: 'S' | 'M' | 'L';
   impact: 'Low' | 'Med' | 'High';
-  priority: 'Must' | 'Should' | 'Could' | 'Won\'t';
+  priority: 'Must' | 'Should' | 'Could' | "Won't";
 }
 
 // Input interfaces for PM document generation
@@ -240,23 +240,38 @@ export class PMDocumentGenerator {
         validateManagementOnePagerInputs(requirements, design, tasks, roiInputs);
 
         // Sanitize inputs
-        const sanitizedRequirements = PMDocumentErrorRecovery.sanitizeInput(requirements, 'requirements');
+        const sanitizedRequirements = PMDocumentErrorRecovery.sanitizeInput(
+          requirements,
+          'requirements'
+        );
         const sanitizedDesign = PMDocumentErrorRecovery.sanitizeInput(design, 'design');
-        const sanitizedTasks = tasks ? PMDocumentErrorRecovery.sanitizeInput(tasks, 'tasks', 30000) : undefined;
+        const sanitizedTasks = tasks
+          ? PMDocumentErrorRecovery.sanitizeInput(tasks, 'tasks', 30000)
+          : undefined;
 
         // Apply Pyramid Principle: Answer first, then reasons, then evidence
         const answer = this.extractDecisionAndTiming(sanitizedRequirements, sanitizedDesign);
         const because = this.extractCoreReasons(sanitizedRequirements, sanitizedDesign);
-        const whatScopeToday = this.extractScopeItems(sanitizedRequirements, sanitizedDesign, sanitizedTasks);
-        const risksAndMitigations = this.identifyRisksAndMitigations(sanitizedRequirements, sanitizedDesign);
+        const whatScopeToday = this.extractScopeItems(
+          sanitizedRequirements,
+          sanitizedDesign,
+          sanitizedTasks
+        );
+        const risksAndMitigations = this.identifyRisksAndMitigations(
+          sanitizedRequirements,
+          sanitizedDesign
+        );
         const options = this.generateThreeOptions(sanitizedRequirements, sanitizedDesign);
         const roiSnapshot = this.generateROISnapshot(options, roiInputs);
-        const rightTimeRecommendation = this.generateTimingRecommendation(sanitizedRequirements, sanitizedDesign);
-        
+        const rightTimeRecommendation = this.generateTimingRecommendation(
+          sanitizedRequirements,
+          sanitizedDesign
+        );
+
         // Generate competitive positioning if competitive analysis is available
-        const competitivePositioning = competitiveAnalysis ? 
-          this.generateCompetitivePositioning(competitiveAnalysis, marketSizing) : 
-          undefined;
+        const competitivePositioning = competitiveAnalysis
+          ? this.generateCompetitivePositioning(competitiveAnalysis, marketSizing)
+          : undefined;
 
         return {
           answer,
@@ -266,14 +281,14 @@ export class PMDocumentGenerator {
           options,
           roiSnapshot,
           rightTimeRecommendation,
-          competitivePositioning
+          competitivePositioning,
         };
       },
       () => PMDocumentFallbackProvider.generateFallbackManagementOnePager(requirements, design),
       {
         documentType: 'management_onepager',
         operation: 'generation',
-        inputs: { requirements, design, tasks, roiInputs }
+        inputs: { requirements, design, tasks, roiInputs },
       }
     );
   }
@@ -295,32 +310,44 @@ export class PMDocumentGenerator {
         validatePRFAQInputs(requirements, design, targetDate);
 
         // Sanitize inputs
-        const sanitizedRequirements = PMDocumentErrorRecovery.sanitizeInput(requirements, 'requirements');
+        const sanitizedRequirements = PMDocumentErrorRecovery.sanitizeInput(
+          requirements,
+          'requirements'
+        );
         const sanitizedDesign = PMDocumentErrorRecovery.sanitizeInput(design, 'design');
-        
+
         const launchDate = targetDate || this.getDefaultLaunchDate();
-        
-        const pressRelease = this.generatePressRelease(sanitizedRequirements, sanitizedDesign, launchDate, competitiveAnalysis);
+
+        const pressRelease = this.generatePressRelease(
+          sanitizedRequirements,
+          sanitizedDesign,
+          launchDate,
+          competitiveAnalysis
+        );
         const faq = this.generateFAQ(sanitizedRequirements, sanitizedDesign, competitiveAnalysis);
-        const launchChecklist = this.generateLaunchChecklist(sanitizedRequirements, sanitizedDesign, launchDate);
-        
+        const launchChecklist = this.generateLaunchChecklist(
+          sanitizedRequirements,
+          sanitizedDesign,
+          launchDate
+        );
+
         // Generate competitive differentiation if competitive analysis is available
-        const competitiveDifferentiation = competitiveAnalysis ? 
-          this.generateCompetitiveDifferentiation(competitiveAnalysis, marketSizing) : 
-          undefined;
+        const competitiveDifferentiation = competitiveAnalysis
+          ? this.generateCompetitiveDifferentiation(competitiveAnalysis, marketSizing)
+          : undefined;
 
         return {
           pressRelease,
           faq,
           launchChecklist,
-          competitiveDifferentiation
+          competitiveDifferentiation,
         };
       },
       () => PMDocumentFallbackProvider.generateFallbackPRFAQ(requirements, design, targetDate),
       {
         documentType: 'pr_faq',
         operation: 'generation',
-        inputs: { requirements, design, targetDate }
+        inputs: { requirements, design, targetDate },
       }
     );
   }
@@ -338,7 +365,11 @@ export class PMDocumentGenerator {
         validateRequirementsGenerationInputs(rawIntent, context);
 
         // Sanitize inputs
-        const sanitizedRawIntent = PMDocumentErrorRecovery.sanitizeInput(rawIntent, 'rawIntent', 10000);
+        const sanitizedRawIntent = PMDocumentErrorRecovery.sanitizeInput(
+          rawIntent,
+          'rawIntent',
+          10000
+        );
 
         const businessGoal = this.extractBusinessGoal(sanitizedRawIntent);
         const userNeeds = this.analyzeUserNeeds(sanitizedRawIntent);
@@ -353,14 +384,14 @@ export class PMDocumentGenerator {
           functionalRequirements,
           constraintsRisks,
           priority,
-          rightTimeVerdict
+          rightTimeVerdict,
         };
       },
       () => PMDocumentFallbackProvider.generateFallbackRequirements(rawIntent, context),
       {
         documentType: 'requirements_generation',
         operation: 'generation',
-        inputs: { rawIntent, context }
+        inputs: { rawIntent, context },
       }
     );
   }
@@ -375,29 +406,35 @@ export class PMDocumentGenerator {
         validateDesignOptionsInputs(requirements);
 
         // Sanitize inputs
-        const sanitizedRequirements = PMDocumentErrorRecovery.sanitizeInput(requirements, 'requirements');
+        const sanitizedRequirements = PMDocumentErrorRecovery.sanitizeInput(
+          requirements,
+          'requirements'
+        );
 
         const problemFraming = this.generateProblemFraming(sanitizedRequirements);
         const options = this.generateThreeDesignOptions(sanitizedRequirements);
         const impactEffortMatrix = this.createImpactEffortMatrix([
           options.conservative,
           options.balanced,
-          options.bold
+          options.bold,
         ]);
-        const rightTimeRecommendation = this.generateDesignTimingRecommendation(sanitizedRequirements, options);
+        const rightTimeRecommendation = this.generateDesignTimingRecommendation(
+          sanitizedRequirements,
+          options
+        );
 
         return {
           problemFraming,
           options,
           impactEffortMatrix,
-          rightTimeRecommendation
+          rightTimeRecommendation,
         };
       },
       () => PMDocumentFallbackProvider.generateFallbackDesignOptions(requirements),
       {
         documentType: 'design_options',
         operation: 'generation',
-        inputs: { requirements }
+        inputs: { requirements },
       }
     );
   }
@@ -422,14 +459,14 @@ export class PMDocumentGenerator {
           guardrailsCheck,
           immediateWins: categorizedTasks.immediateWins,
           shortTerm: categorizedTasks.shortTerm,
-          longTerm: categorizedTasks.longTerm
+          longTerm: categorizedTasks.longTerm,
         };
       },
       () => PMDocumentFallbackProvider.generateFallbackTaskPlan(design, limits),
       {
         documentType: 'task_plan',
         operation: 'generation',
-        inputs: { design, limits }
+        inputs: { design, limits },
       }
     );
   }
@@ -447,55 +484,66 @@ export class PMDocumentGenerator {
   /**
    * Generate competitive positioning section for management one-pager
    */
-  protected generateCompetitivePositioning(competitiveAnalysis: any, marketSizing?: any): CompetitivePositioning {
+  protected generateCompetitivePositioning(
+    competitiveAnalysis: any,
+    marketSizing?: any
+  ): CompetitivePositioning {
     const competitors = competitiveAnalysis.competitiveMatrix?.competitors || [];
     const strategicRecommendations = competitiveAnalysis.strategicRecommendations || [];
     const marketGaps = competitiveAnalysis.marketPositioning?.marketGaps || [];
 
     // Extract market position from competitive analysis
     const marketPosition = this.extractMarketPosition(competitors, marketSizing);
-    
+
     // Identify key differentiators from competitive matrix
     const keyDifferentiators = this.extractKeyDifferentiators(competitiveAnalysis);
-    
+
     // Extract competitive advantages from SWOT analysis
     const competitiveAdvantages = this.extractCompetitiveAdvantages(competitiveAnalysis);
-    
+
     // Format market gaps as opportunities
-    const formattedMarketGaps = marketGaps.map((gap: any) => 
+    const formattedMarketGaps = marketGaps.map((gap: any) =>
       typeof gap === 'string' ? gap : gap.description || 'Market opportunity identified'
     );
-    
+
     // Format strategic recommendations
-    const formattedRecommendations = strategicRecommendations.slice(0, 3).map((rec: any) => 
-      typeof rec === 'string' ? rec : rec.title || rec.description || 'Strategic recommendation'
-    );
+    const formattedRecommendations = strategicRecommendations
+      .slice(0, 3)
+      .map((rec: any) =>
+        typeof rec === 'string' ? rec : rec.title || rec.description || 'Strategic recommendation'
+      );
 
     return {
       marketPosition,
       keyDifferentiators,
       competitiveAdvantages,
       marketGaps: formattedMarketGaps,
-      strategicRecommendations: formattedRecommendations
+      strategicRecommendations: formattedRecommendations,
     };
   }
 
   /**
    * Generate competitive differentiation section for PR-FAQ
    */
-  protected generateCompetitiveDifferentiation(competitiveAnalysis: any, marketSizing?: any): CompetitiveDifferentiation {
+  protected generateCompetitiveDifferentiation(
+    competitiveAnalysis: any,
+    marketSizing?: any
+  ): CompetitiveDifferentiation {
     const competitors = competitiveAnalysis.competitiveMatrix?.competitors || [];
     const strategicRecommendations = competitiveAnalysis.strategicRecommendations || [];
 
     // Generate unique value proposition
-    const uniqueValueProposition = this.generateUniqueValueProposition(competitiveAnalysis, marketSizing);
-    
+    const uniqueValueProposition = this.generateUniqueValueProposition(
+      competitiveAnalysis,
+      marketSizing
+    );
+
     // Create competitor comparisons
     const competitorComparison = this.generateCompetitorComparisons(competitors);
-    
+
     // Extract market differentiators
     const marketDifferentiators = this.extractMarketDifferentiators(competitiveAnalysis);
-    
+
     // Extract competitive advantages
     const competitiveAdvantages = this.extractCompetitiveAdvantages(competitiveAnalysis);
 
@@ -503,7 +551,7 @@ export class PMDocumentGenerator {
       uniqueValueProposition,
       competitorComparison,
       marketDifferentiators,
-      competitiveAdvantages
+      competitiveAdvantages,
     };
   }
 
@@ -513,10 +561,11 @@ export class PMDocumentGenerator {
   private extractMarketPosition(competitors: any[], marketSizing?: any): string {
     if (marketSizing?.som?.value) {
       const somValue = marketSizing.som.value;
-      const marketSize = somValue > 1000000000 ? 'large' : somValue > 100000000 ? 'medium' : 'small';
+      const marketSize =
+        somValue > 1000000000 ? 'large' : somValue > 100000000 ? 'medium' : 'small';
       return `Targeting ${marketSize} market opportunity with differentiated positioning against ${competitors.length} key competitors`;
     }
-    
+
     if (competitors.length === 0) {
       return 'First-mover advantage in emerging market with limited competition';
     } else if (competitors.length <= 3) {
@@ -531,11 +580,11 @@ export class PMDocumentGenerator {
    */
   private extractKeyDifferentiators(competitiveAnalysis: any): string[] {
     const differentiators: string[] = [];
-    
+
     // Extract from competitive matrix differentiation opportunities
     const opportunities = competitiveAnalysis.competitiveMatrix?.differentiationOpportunities || [];
     differentiators.push(...opportunities.slice(0, 2));
-    
+
     // Extract from strategic recommendations
     const recommendations = competitiveAnalysis.strategicRecommendations || [];
     recommendations.slice(0, 2).forEach((rec: any) => {
@@ -543,13 +592,13 @@ export class PMDocumentGenerator {
         differentiators.push(rec.title);
       }
     });
-    
+
     // Default differentiators if none found
     if (differentiators.length === 0) {
       differentiators.push('Superior user experience and functionality');
       differentiators.push('Competitive pricing with premium features');
     }
-    
+
     return differentiators.slice(0, 3);
   }
 
@@ -558,11 +607,11 @@ export class PMDocumentGenerator {
    */
   private extractCompetitiveAdvantages(competitiveAnalysis: any): string[] {
     const advantages: string[] = [];
-    
+
     // Extract from market positioning
     const positioning = competitiveAnalysis.marketPositioning?.recommendedPositioning || [];
     advantages.push(...positioning.slice(0, 2));
-    
+
     // Extract from SWOT analysis strengths
     const swotAnalysis = competitiveAnalysis.swotAnalysis || [];
     if (swotAnalysis.length > 0) {
@@ -571,13 +620,13 @@ export class PMDocumentGenerator {
         advantages.push(strength.description || strength);
       });
     }
-    
+
     // Default advantages if none found
     if (advantages.length === 0) {
       advantages.push('Technology leadership and innovation');
       advantages.push('Strong customer focus and support');
     }
-    
+
     return advantages.slice(0, 3);
   }
 
@@ -587,12 +636,12 @@ export class PMDocumentGenerator {
   private generateUniqueValueProposition(competitiveAnalysis: any, marketSizing?: any): string {
     const differentiators = this.extractKeyDifferentiators(competitiveAnalysis);
     const advantages = this.extractCompetitiveAdvantages(competitiveAnalysis);
-    
+
     if (marketSizing?.som?.value) {
       const marketValue = (marketSizing.som.value / 1000000).toFixed(0);
       return `Unique solution addressing ${marketValue}M market opportunity through ${differentiators[0]?.toLowerCase() || 'innovative approach'} and ${advantages[0]?.toLowerCase() || 'superior execution'}`;
     }
-    
+
     return `Differentiated solution combining ${differentiators[0]?.toLowerCase() || 'innovative features'} with ${advantages[0]?.toLowerCase() || 'competitive advantages'} to deliver superior customer value`;
   }
 
@@ -603,12 +652,12 @@ export class PMDocumentGenerator {
     return competitors.slice(0, 3).map((competitor: any) => {
       const weaknesses = competitor.weaknesses || ['Limited innovation', 'High pricing'];
       const strengths = competitor.strengths || ['Market presence'];
-      
+
       return {
         competitorName: competitor.name || 'Key Competitor',
         ourAdvantage: this.generateOurAdvantage(weaknesses[0]),
         theirWeakness: weaknesses[0] || 'Limited differentiation',
-        differentiationStrategy: this.generateDifferentiationStrategy(weaknesses[0], strengths[0])
+        differentiationStrategy: this.generateDifferentiationStrategy(weaknesses[0], strengths[0]),
       };
     });
   }
@@ -624,16 +673,16 @@ export class PMDocumentGenerator {
       'slow innovation': 'Rapid innovation and feature development',
       'limited support': 'Exceptional customer support and service',
       'complex implementation': 'Simple and fast implementation',
-      'legacy systems': 'Modern, cloud-native architecture'
+      'legacy systems': 'Modern, cloud-native architecture',
     };
-    
+
     const weakness = competitorWeakness?.toLowerCase() || '';
     for (const [key, advantage] of Object.entries(advantageMap)) {
       if (weakness.includes(key)) {
         return advantage;
       }
     }
-    
+
     return 'Superior technology and customer focus';
   }
 
@@ -649,11 +698,11 @@ export class PMDocumentGenerator {
    */
   private extractMarketDifferentiators(competitiveAnalysis: any): string[] {
     const differentiators: string[] = [];
-    
+
     // Extract from competitive matrix
     const opportunities = competitiveAnalysis.competitiveMatrix?.differentiationOpportunities || [];
     differentiators.push(...opportunities.slice(0, 2));
-    
+
     // Extract from market gaps
     const marketGaps = competitiveAnalysis.marketPositioning?.marketGaps || [];
     marketGaps.slice(0, 2).forEach((gap: any) => {
@@ -662,13 +711,13 @@ export class PMDocumentGenerator {
         differentiators.push(`Address ${description.toLowerCase()}`);
       }
     });
-    
+
     // Default differentiators
     if (differentiators.length === 0) {
       differentiators.push('First-to-market with innovative solution');
       differentiators.push('Superior customer experience and support');
     }
-    
+
     return differentiators.slice(0, 3);
   }
 
@@ -703,7 +752,8 @@ export class PMDocumentGenerator {
       answer += `and unlike ${topCompetitor.name || 'leading competitors'} which suffers from ${weakness.toLowerCase()}, `;
     }
 
-    answer += 'we provide consulting-grade analysis with comprehensive ROI insights and seamless AI agent integration.';
+    answer +=
+      'we provide consulting-grade analysis with comprehensive ROI insights and seamless AI agent integration.';
 
     return answer;
   }
@@ -739,7 +789,7 @@ export class PMDocumentGenerator {
     return {
       mermaidDiagram,
       exportData,
-      visualizationType
+      visualizationType,
     };
   }
 
@@ -749,7 +799,7 @@ export class PMDocumentGenerator {
   private generateCompetitiveMatrixDiagram(competitiveAnalysis: any): string {
     const competitors = competitiveAnalysis.competitiveMatrix?.competitors || [];
     const criteria = competitiveAnalysis.competitiveMatrix?.evaluationCriteria || [];
-    
+
     if (competitors.length === 0) {
       return `graph TD
         A[No Competitive Data Available]
@@ -767,10 +817,10 @@ export class PMDocumentGenerator {
       const compId = `C${index + 1}`;
       const marketShare = competitor.marketShare || 0;
       const shareSize = marketShare > 30 ? 'Large' : marketShare > 15 ? 'Medium' : 'Small';
-      
+
       diagram += `
         ${compId}["${competitor.name}<br/>Market Share: ${marketShare}%<br/>Size: ${shareSize}"]`;
-      
+
       // Add strengths
       if (competitor.strengths && competitor.strengths.length > 0) {
         const strengthId = `S${index + 1}`;
@@ -778,7 +828,7 @@ export class PMDocumentGenerator {
         ${strengthId}["Strengths:<br/>${competitor.strengths.slice(0, 2).join('<br/>')}"]
         ${compId} --> ${strengthId}`;
       }
-      
+
       // Add weaknesses
       if (competitor.weaknesses && competitor.weaknesses.length > 0) {
         const weaknessId = `W${index + 1}`;
@@ -820,10 +870,10 @@ export class PMDocumentGenerator {
       const compId = `COMP${index + 1}`;
       const pricing = competitor.pricing?.startingPrice || 50;
       const features = competitor.keyFeatures?.length || 3;
-      
+
       const pricePos = pricing > 100 ? 'High' : 'Low';
       const featurePos = features > 5 ? 'Advanced' : 'Basic';
-      
+
       diagram += `
         ${compId}["${competitor.name}<br/>${pricePos} Price<br/>${featurePos} Features"]`;
     });
@@ -864,7 +914,8 @@ export class PMDocumentGenerator {
 
     // Add strengths
     strengths.forEach((strength: any, index: number) => {
-      const strengthText = typeof strength === 'string' ? strength : strength.description || 'Strength identified';
+      const strengthText =
+        typeof strength === 'string' ? strength : strength.description || 'Strength identified';
       diagram += `
         S${index + 1}["${strengthText}"]
         S --> S${index + 1}`;
@@ -872,7 +923,8 @@ export class PMDocumentGenerator {
 
     // Add weaknesses
     weaknesses.forEach((weakness: any, index: number) => {
-      const weaknessText = typeof weakness === 'string' ? weakness : weakness.description || 'Weakness identified';
+      const weaknessText =
+        typeof weakness === 'string' ? weakness : weakness.description || 'Weakness identified';
       diagram += `
         W${index + 1}["${weaknessText}"]
         W --> W${index + 1}`;
@@ -880,7 +932,10 @@ export class PMDocumentGenerator {
 
     // Add opportunities
     opportunities.forEach((opportunity: any, index: number) => {
-      const opportunityText = typeof opportunity === 'string' ? opportunity : opportunity.description || 'Opportunity identified';
+      const opportunityText =
+        typeof opportunity === 'string'
+          ? opportunity
+          : opportunity.description || 'Opportunity identified';
       diagram += `
         O${index + 1}["${opportunityText}"]
         O --> O${index + 1}`;
@@ -888,7 +943,8 @@ export class PMDocumentGenerator {
 
     // Add threats
     threats.forEach((threat: any, index: number) => {
-      const threatText = typeof threat === 'string' ? threat : threat.description || 'Threat identified';
+      const threatText =
+        typeof threat === 'string' ? threat : threat.description || 'Threat identified';
       diagram += `
         T${index + 1}["${threatText}"]
         T --> T${index + 1}`;
@@ -906,7 +962,7 @@ export class PMDocumentGenerator {
   private generateCompetitiveMatrixExport(competitiveAnalysis: any): CompetitiveExportData {
     const competitors = competitiveAnalysis?.competitiveMatrix?.competitors || [];
     const rankings = competitiveAnalysis?.competitiveMatrix?.rankings || [];
-    
+
     const exportData = {
       competitiveMatrix: {
         competitors: competitors.map((comp: any) => ({
@@ -915,25 +971,26 @@ export class PMDocumentGenerator {
           strengths: comp.strengths,
           weaknesses: comp.weaknesses,
           keyFeatures: comp.keyFeatures,
-          pricing: comp.pricing
+          pricing: comp.pricing,
         })),
         rankings: rankings.map((rank: any) => ({
           competitorName: rank.competitorName,
           overallScore: rank.overallScore,
           rank: rank.rank,
-          competitiveAdvantage: rank.competitiveAdvantage
+          competitiveAdvantage: rank.competitiveAdvantage,
         })),
-        differentiationOpportunities: competitiveAnalysis?.competitiveMatrix?.differentiationOpportunities || []
+        differentiationOpportunities:
+          competitiveAnalysis?.competitiveMatrix?.differentiationOpportunities || [],
       },
       generatedAt: new Date().toISOString(),
-      analysisType: 'competitive_matrix'
+      analysisType: 'competitive_matrix',
     };
 
     return {
       format: 'json',
       data: exportData,
       filename: `competitive-matrix-${new Date().toISOString().split('T')[0]}.json`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -942,23 +999,23 @@ export class PMDocumentGenerator {
    */
   private generatePositioningExport(competitiveAnalysis: any): CompetitiveExportData {
     const positioning = competitiveAnalysis?.marketPositioning || {};
-    
+
     const exportData = {
       marketPositioning: {
         positioningMap: positioning.positioningMap || {},
         competitorPositions: positioning.competitorPositions || [],
         marketGaps: positioning.marketGaps || [],
-        recommendedPositioning: positioning.recommendedPositioning || []
+        recommendedPositioning: positioning.recommendedPositioning || [],
       },
       generatedAt: new Date().toISOString(),
-      analysisType: 'market_positioning'
+      analysisType: 'market_positioning',
     };
 
     return {
       format: 'json',
       data: exportData,
       filename: `market-positioning-${new Date().toISOString().split('T')[0]}.json`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -967,7 +1024,7 @@ export class PMDocumentGenerator {
    */
   private generateSWOTExport(competitiveAnalysis: any): CompetitiveExportData {
     const swotAnalysis = competitiveAnalysis?.swotAnalysis || [];
-    
+
     const exportData = {
       swotAnalysis: swotAnalysis.map((swot: any) => ({
         competitorName: swot.competitorName,
@@ -975,17 +1032,17 @@ export class PMDocumentGenerator {
         weaknesses: swot.weaknesses || [],
         opportunities: swot.opportunities || [],
         threats: swot.threats || [],
-        strategicImplications: swot.strategicImplications || []
+        strategicImplications: swot.strategicImplications || [],
       })),
       generatedAt: new Date().toISOString(),
-      analysisType: 'swot_analysis'
+      analysisType: 'swot_analysis',
     };
 
     return {
       format: 'json',
       data: exportData,
       filename: `swot-analysis-${new Date().toISOString().split('T')[0]}.json`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -997,7 +1054,7 @@ export class PMDocumentGenerator {
     format: 'json' | 'csv' | 'markdown' = 'json'
   ): CompetitiveExportData {
     const competitors = competitiveAnalysis?.competitiveMatrix?.competitors || [];
-    
+
     switch (format) {
       case 'csv':
         return this.generateCSVExport(competitors);
@@ -1018,19 +1075,19 @@ export class PMDocumentGenerator {
       comp.marketShare || 0,
       (comp.strengths || []).join('; '),
       (comp.weaknesses || []).join('; '),
-      (comp.keyFeatures || []).join('; ')
+      (comp.keyFeatures || []).join('; '),
     ]);
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')),
     ].join('\n');
 
     return {
       format: 'csv',
       data: csvContent,
       filename: `competitive-analysis-${new Date().toISOString().split('T')[0]}.csv`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -1040,7 +1097,7 @@ export class PMDocumentGenerator {
   private generateMarkdownExport(competitiveAnalysis: any): CompetitiveExportData {
     const competitors = competitiveAnalysis?.competitiveMatrix?.competitors || [];
     const strategicRecommendations = competitiveAnalysis?.strategicRecommendations || [];
-    
+
     let markdown = `# Competitive Analysis Report
 
 Generated on: ${new Date().toLocaleDateString()}
@@ -1062,17 +1119,19 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     });
 
     markdown += `\n## Strategic Recommendations\n\n`;
-    
+
     strategicRecommendations.slice(0, 5).forEach((rec: any, index: number) => {
-      const title = typeof rec === 'string' ? rec : rec.title || rec.description || 'Strategic recommendation';
+      const title =
+        typeof rec === 'string' ? rec : rec.title || rec.description || 'Strategic recommendation';
       markdown += `${index + 1}. ${title}\n`;
     });
 
     markdown += `\n## Market Gaps and Opportunities\n\n`;
-    
+
     const marketGaps = competitiveAnalysis?.marketPositioning?.marketGaps || [];
     marketGaps.slice(0, 3).forEach((gap: any, index: number) => {
-      const description = typeof gap === 'string' ? gap : gap.description || 'Market opportunity identified';
+      const description =
+        typeof gap === 'string' ? gap : gap.description || 'Market opportunity identified';
       markdown += `- ${description}\n`;
     });
 
@@ -1080,11 +1139,9 @@ This report provides a comprehensive analysis of the competitive landscape, incl
       format: 'markdown',
       data: markdown,
       filename: `competitive-analysis-${new Date().toISOString().split('T')[0]}.md`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
-
-
 
   /**
    * Create Impact vs Effort matrix for design options
@@ -1094,7 +1151,7 @@ This report provides a comprehensive analysis of the competitive landscape, incl
       highImpactLowEffort: [],
       highImpactHighEffort: [],
       lowImpactLowEffort: [],
-      lowImpactHighEffort: []
+      lowImpactHighEffort: [],
     };
 
     options.forEach(option => {
@@ -1120,7 +1177,7 @@ This report provides a comprehensive analysis of the competitive landscape, incl
    */
   protected extractBusinessGoal(rawIntent: string): string {
     const intent = rawIntent.toLowerCase();
-    
+
     if (intent.includes('quota') && intent.includes('cost')) {
       return 'Reduce developer workflow costs by 40-60% through intelligent quota optimization while maintaining full functionality and improving user experience.';
     } else if (intent.includes('optimization') && intent.includes('workflow')) {
@@ -1193,7 +1250,7 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     // Default pains if none identified
     if (pains.length === 0) {
       pains.push('Inefficient workflows consuming excessive resources');
-      pains.push('Manual processes that don\'t scale with demand');
+      pains.push("Manual processes that don't scale with demand");
       pains.push('Limited visibility into performance and optimization opportunities');
     }
 
@@ -1237,8 +1294,8 @@ This report provides a comprehensive analysis of the competitive landscape, incl
       'What are the top 3 risks and mitigations?',
       'What is not included?',
       'How does this compare to alternatives?',
-      'What\'s the estimated cost/quota footprint?',
-      'What are the next 2 releases after v1?'
+      "What's the estimated cost/quota footprint?",
+      'What are the next 2 releases after v1?',
     ];
   }
 
@@ -1249,17 +1306,20 @@ This report provides a comprehensive analysis of the competitive landscape, incl
    */
   protected extractDecisionAndTiming(requirements: string, design: string): string {
     // Analyze requirements and design to determine the decision
-    const hasUrgentNeed = requirements.toLowerCase().includes('urgent') || 
-                         requirements.toLowerCase().includes('critical') ||
-                         requirements.toLowerCase().includes('immediate');
-    
-    const hasMarketOpportunity = requirements.toLowerCase().includes('market') ||
-                                requirements.toLowerCase().includes('opportunity') ||
-                                requirements.toLowerCase().includes('competitive');
+    const hasUrgentNeed =
+      requirements.toLowerCase().includes('urgent') ||
+      requirements.toLowerCase().includes('critical') ||
+      requirements.toLowerCase().includes('immediate');
 
-    const hasTechnicalReadiness = design.toLowerCase().includes('ready') ||
-                                 design.toLowerCase().includes('feasible') ||
-                                 design.toLowerCase().includes('architecture');
+    const hasMarketOpportunity =
+      requirements.toLowerCase().includes('market') ||
+      requirements.toLowerCase().includes('opportunity') ||
+      requirements.toLowerCase().includes('competitive');
+
+    const hasTechnicalReadiness =
+      design.toLowerCase().includes('ready') ||
+      design.toLowerCase().includes('feasible') ||
+      design.toLowerCase().includes('architecture');
 
     if (hasUrgentNeed && hasTechnicalReadiness) {
       return 'Build this feature immediately to capture critical market opportunity and prevent competitive disadvantage';
@@ -1279,27 +1339,45 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     const reasons: string[] = [];
 
     // Reason 1: Market/Business justification
-    if (requirements.toLowerCase().includes('cost') || requirements.toLowerCase().includes('efficiency')) {
+    if (
+      requirements.toLowerCase().includes('cost') ||
+      requirements.toLowerCase().includes('efficiency')
+    ) {
       reasons.push('Cost optimization opportunity with measurable ROI and efficiency gains');
-    } else if (requirements.toLowerCase().includes('user') || requirements.toLowerCase().includes('customer')) {
+    } else if (
+      requirements.toLowerCase().includes('user') ||
+      requirements.toLowerCase().includes('customer')
+    ) {
       reasons.push('Strong user demand and clear customer value proposition');
     } else {
       reasons.push('Strategic business value aligned with organizational priorities');
     }
 
     // Reason 2: Technical readiness
-    if (design.toLowerCase().includes('architecture') || design.toLowerCase().includes('component')) {
+    if (
+      design.toLowerCase().includes('architecture') ||
+      design.toLowerCase().includes('component')
+    ) {
       reasons.push('Technical architecture is well-defined and implementation path is clear');
-    } else if (design.toLowerCase().includes('integration') || design.toLowerCase().includes('mcp')) {
+    } else if (
+      design.toLowerCase().includes('integration') ||
+      design.toLowerCase().includes('mcp')
+    ) {
       reasons.push('Integration approach is proven and technical risks are manageable');
     } else {
       reasons.push('Technical foundation supports reliable implementation and scalability');
     }
 
     // Reason 3: Timing/Opportunity
-    if (requirements.toLowerCase().includes('quota') || requirements.toLowerCase().includes('optimization')) {
+    if (
+      requirements.toLowerCase().includes('quota') ||
+      requirements.toLowerCase().includes('optimization')
+    ) {
       reasons.push('Immediate impact on quota efficiency creates compound value over time');
-    } else if (requirements.toLowerCase().includes('workflow') || requirements.toLowerCase().includes('automation')) {
+    } else if (
+      requirements.toLowerCase().includes('workflow') ||
+      requirements.toLowerCase().includes('automation')
+    ) {
       reasons.push('Workflow optimization benefits increase with early adoption and usage');
     } else {
       reasons.push('Market timing is optimal with minimal competitive pressure');
@@ -1315,19 +1393,31 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     const scopeItems: string[] = [];
 
     // Core functionality from requirements
-    if (requirements.toLowerCase().includes('intent') || requirements.toLowerCase().includes('parsing')) {
+    if (
+      requirements.toLowerCase().includes('intent') ||
+      requirements.toLowerCase().includes('parsing')
+    ) {
       scopeItems.push('Natural language intent parsing and analysis engine');
     }
-    
-    if (requirements.toLowerCase().includes('optimization') || requirements.toLowerCase().includes('workflow')) {
+
+    if (
+      requirements.toLowerCase().includes('optimization') ||
+      requirements.toLowerCase().includes('workflow')
+    ) {
       scopeItems.push('Workflow optimization with batching, caching, and decomposition strategies');
     }
 
-    if (requirements.toLowerCase().includes('roi') || requirements.toLowerCase().includes('analysis')) {
+    if (
+      requirements.toLowerCase().includes('roi') ||
+      requirements.toLowerCase().includes('analysis')
+    ) {
       scopeItems.push('ROI analysis and quota consumption forecasting');
     }
 
-    if (requirements.toLowerCase().includes('spec') || requirements.toLowerCase().includes('kiro')) {
+    if (
+      requirements.toLowerCase().includes('spec') ||
+      requirements.toLowerCase().includes('kiro')
+    ) {
       scopeItems.push('Enhanced Kiro spec generation with consulting insights');
     }
 
@@ -1367,38 +1457,45 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     if (design.toLowerCase().includes('complex') || design.toLowerCase().includes('pipeline')) {
       risks.push({
         risk: 'Technical complexity of multi-stage AI pipeline may cause development delays',
-        mitigation: 'Implement MVP with core functionality first, then iterate with advanced features'
+        mitigation:
+          'Implement MVP with core functionality first, then iterate with advanced features',
       });
     } else {
       risks.push({
         risk: 'Integration challenges with existing systems may impact timeline',
-        mitigation: 'Create comprehensive integration testing suite and fallback strategies'
+        mitigation: 'Create comprehensive integration testing suite and fallback strategies',
       });
     }
 
     // Market/User adoption risk
-    if (requirements.toLowerCase().includes('user') || requirements.toLowerCase().includes('adoption')) {
+    if (
+      requirements.toLowerCase().includes('user') ||
+      requirements.toLowerCase().includes('adoption')
+    ) {
       risks.push({
         risk: 'User adoption may be slower than expected due to workflow changes',
-        mitigation: 'Conduct pilot program with key users and provide comprehensive onboarding'
+        mitigation: 'Conduct pilot program with key users and provide comprehensive onboarding',
       });
     } else {
       risks.push({
         risk: 'Market timing uncertainty could affect value realization',
-        mitigation: 'Implement phased rollout with early feedback loops and pivot capability'
+        mitigation: 'Implement phased rollout with early feedback loops and pivot capability',
       });
     }
 
     // Resource/Execution risk
-    if (requirements.toLowerCase().includes('quota') || requirements.toLowerCase().includes('cost')) {
+    if (
+      requirements.toLowerCase().includes('quota') ||
+      requirements.toLowerCase().includes('cost')
+    ) {
       risks.push({
         risk: 'Quota optimization accuracy may not meet user expectations initially',
-        mitigation: 'Establish clear success metrics and continuous improvement process'
+        mitigation: 'Establish clear success metrics and continuous improvement process',
       });
     } else {
       risks.push({
         risk: 'Resource constraints during development may impact feature completeness',
-        mitigation: 'Secure dedicated team allocation and define clear scope boundaries'
+        mitigation: 'Secure dedicated team allocation and define clear scope boundaries',
       });
     }
 
@@ -1408,7 +1505,10 @@ This report provides a comprehensive analysis of the competitive landscape, incl
   /**
    * Generate Conservative, Balanced, and Bold options
    */
-  protected generateThreeOptions(requirements: string, design: string): {
+  protected generateThreeOptions(
+    requirements: string,
+    design: string
+  ): {
     conservative: OptionSummary;
     balanced: OptionSummary;
     bold: OptionSummary;
@@ -1416,17 +1516,20 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     return {
       conservative: {
         name: 'Conservative',
-        summary: 'Basic intent parsing with manual optimization recommendations and simple ROI reporting'
+        summary:
+          'Basic intent parsing with manual optimization recommendations and simple ROI reporting',
       },
       balanced: {
         name: 'Balanced',
-        summary: 'Automated workflow optimization with consulting analysis and comprehensive PM document generation',
-        recommended: true
+        summary:
+          'Automated workflow optimization with consulting analysis and comprehensive PM document generation',
+        recommended: true,
       },
       bold: {
         name: 'Bold (Zero-Based)',
-        summary: 'Full AI-powered consulting platform with advanced techniques and real-time optimization'
-      }
+        summary:
+          'Full AI-powered consulting platform with advanced techniques and real-time optimization',
+      },
     };
   }
 
@@ -1442,22 +1545,28 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         conservative: {
           effort: 'Low',
           impact: 'Med',
-          estimatedCost: roiInputs?.cost_naive ? `$${(roiInputs.cost_naive / 1000).toFixed(0)}K` : '$50K',
-          timing: 'Now'
+          estimatedCost: roiInputs?.cost_naive
+            ? `$${(roiInputs.cost_naive / 1000).toFixed(0)}K`
+            : '$50K',
+          timing: 'Now',
         },
         balanced: {
           effort: 'Med',
           impact: 'High',
-          estimatedCost: roiInputs?.cost_balanced ? `$${(roiInputs.cost_balanced / 1000).toFixed(0)}K` : '$150K',
-          timing: 'Now'
+          estimatedCost: roiInputs?.cost_balanced
+            ? `$${(roiInputs.cost_balanced / 1000).toFixed(0)}K`
+            : '$150K',
+          timing: 'Now',
         },
         bold: {
           effort: 'High',
           impact: 'VeryH',
-          estimatedCost: roiInputs?.cost_bold ? `$${(roiInputs.cost_bold / 1000).toFixed(0)}K` : '$300K',
-          timing: 'Later'
-        }
-      }
+          estimatedCost: roiInputs?.cost_bold
+            ? `$${(roiInputs.cost_bold / 1000).toFixed(0)}K`
+            : '$300K',
+          timing: 'Later',
+        },
+      },
     };
   }
 
@@ -1465,37 +1574,51 @@ This report provides a comprehensive analysis of the competitive landscape, incl
    * Generate 2-4 lines explaining why now vs later
    */
   protected generateTimingRecommendation(requirements: string, design: string): string {
-    const hasUrgency = requirements.toLowerCase().includes('urgent') || 
-                      requirements.toLowerCase().includes('critical') ||
-                      requirements.toLowerCase().includes('immediate');
+    const hasUrgency =
+      requirements.toLowerCase().includes('urgent') ||
+      requirements.toLowerCase().includes('critical') ||
+      requirements.toLowerCase().includes('immediate');
 
-    const hasOpportunity = requirements.toLowerCase().includes('opportunity') ||
-                          requirements.toLowerCase().includes('market') ||
-                          requirements.toLowerCase().includes('competitive');
+    const hasOpportunity =
+      requirements.toLowerCase().includes('opportunity') ||
+      requirements.toLowerCase().includes('market') ||
+      requirements.toLowerCase().includes('competitive');
 
-    const hasTechnicalReadiness = design.toLowerCase().includes('ready') ||
-                                 design.toLowerCase().includes('architecture') ||
-                                 design.toLowerCase().includes('feasible');
+    const hasTechnicalReadiness =
+      design.toLowerCase().includes('ready') ||
+      design.toLowerCase().includes('architecture') ||
+      design.toLowerCase().includes('feasible');
 
     let recommendation = '';
 
     if (hasUrgency && hasTechnicalReadiness) {
-      recommendation = 'Now is the critical time to act because urgent business needs align with technical readiness. ';
-      recommendation += 'Delaying would mean missing the immediate value opportunity and potentially falling behind competitors. ';
+      recommendation =
+        'Now is the critical time to act because urgent business needs align with technical readiness. ';
+      recommendation +=
+        'Delaying would mean missing the immediate value opportunity and potentially falling behind competitors. ';
       recommendation += 'The technical foundation is solid and the business case is compelling. ';
-      recommendation += 'Waiting would only increase the cost of inaction while the opportunity window narrows.';
+      recommendation +=
+        'Waiting would only increase the cost of inaction while the opportunity window narrows.';
     } else if (hasOpportunity && hasTechnicalReadiness) {
-      recommendation = 'The timing is optimal because market conditions are favorable and technical capabilities are mature. ';
-      recommendation += 'Moving now allows us to capture first-mover advantage while implementation risks are manageable. ';
-      recommendation += 'The balanced approach provides the best risk-adjusted return on investment.';
+      recommendation =
+        'The timing is optimal because market conditions are favorable and technical capabilities are mature. ';
+      recommendation +=
+        'Moving now allows us to capture first-mover advantage while implementation risks are manageable. ';
+      recommendation +=
+        'The balanced approach provides the best risk-adjusted return on investment.';
     } else if (hasTechnicalReadiness) {
-      recommendation = 'Technical readiness supports immediate implementation with manageable risk. ';
+      recommendation =
+        'Technical readiness supports immediate implementation with manageable risk. ';
       recommendation += 'Starting now allows for iterative development and early user feedback. ';
-      recommendation += 'The phased approach ensures value delivery while building toward the full vision.';
+      recommendation +=
+        'The phased approach ensures value delivery while building toward the full vision.';
     } else {
-      recommendation = 'While some technical challenges remain, the business opportunity justifies moving forward. ';
-      recommendation += 'A conservative start with rapid iteration will validate assumptions and build momentum. ';
-      recommendation += 'Waiting for perfect conditions would mean missing the current market window.';
+      recommendation =
+        'While some technical challenges remain, the business opportunity justifies moving forward. ';
+      recommendation +=
+        'A conservative start with rapid iteration will validate assumptions and build momentum. ';
+      recommendation +=
+        'Waiting for perfect conditions would mean missing the current market window.';
     }
 
     return recommendation;
@@ -1516,21 +1639,30 @@ This report provides a comprehensive analysis of the competitive landscape, incl
    * Generate future-dated press release with headline, sub-headline, and body
    * Enhanced with competitive positioning
    */
-  protected generatePressRelease(requirements: string, design: string, launchDate: string, competitiveAnalysis?: any): {
+  protected generatePressRelease(
+    requirements: string,
+    design: string,
+    launchDate: string,
+    competitiveAnalysis?: any
+  ): {
     date: string;
     headline: string;
     subHeadline: string;
     body: string;
   } {
     const headline = this.generatePressReleaseHeadline(requirements, competitiveAnalysis);
-    const subHeadline = this.generatePressReleaseSubHeadline(requirements, design, competitiveAnalysis);
+    const subHeadline = this.generatePressReleaseSubHeadline(
+      requirements,
+      design,
+      competitiveAnalysis
+    );
     const body = this.generatePressReleaseBody(requirements, design, competitiveAnalysis);
 
     return {
       date: launchDate,
       headline,
       subHeadline,
-      body
+      body,
     };
   }
 
@@ -1540,16 +1672,26 @@ This report provides a comprehensive analysis of the competitive landscape, incl
    */
   protected generatePressReleaseHeadline(requirements: string, competitiveAnalysis?: any): string {
     // Extract competitive advantage for headline
-    const competitiveAdvantage = competitiveAnalysis ? 
-      this.extractCompetitiveAdvantages(competitiveAnalysis)[0] : null;
-    
-    if (requirements.toLowerCase().includes('quota') && requirements.toLowerCase().includes('optimization')) {
+    const competitiveAdvantage = competitiveAnalysis
+      ? this.extractCompetitiveAdvantages(competitiveAnalysis)[0]
+      : null;
+
+    if (
+      requirements.toLowerCase().includes('quota') &&
+      requirements.toLowerCase().includes('optimization')
+    ) {
       const advantage = competitiveAdvantage ? ` with ${competitiveAdvantage}` : '';
       return `Revolutionary AI Agent Reduces Developer Workflow Costs by 60%${advantage}`;
-    } else if (requirements.toLowerCase().includes('intent') && requirements.toLowerCase().includes('spec')) {
+    } else if (
+      requirements.toLowerCase().includes('intent') &&
+      requirements.toLowerCase().includes('spec')
+    ) {
       const advantage = competitiveAdvantage ? ` Through ${competitiveAdvantage}` : '';
       return `Breakthrough PM Agent Transforms Natural Language Intent${advantage}`;
-    } else if (requirements.toLowerCase().includes('consulting') && requirements.toLowerCase().includes('analysis')) {
+    } else if (
+      requirements.toLowerCase().includes('consulting') &&
+      requirements.toLowerCase().includes('analysis')
+    ) {
       const advantage = competitiveAdvantage ? ` Featuring ${competitiveAdvantage}` : '';
       return `AI-Powered Consulting Platform Delivers Professional-Grade Analysis${advantage}`;
     } else {
@@ -1562,10 +1704,20 @@ This report provides a comprehensive analysis of the competitive landscape, incl
    * Generate sub-headline that explains the key benefit
    * Enhanced with competitive positioning
    */
-  protected generatePressReleaseSubHeadline(requirements: string, design: string, competitiveAnalysis?: any): string {
-    if (requirements.toLowerCase().includes('quota') || requirements.toLowerCase().includes('cost')) {
+  protected generatePressReleaseSubHeadline(
+    requirements: string,
+    design: string,
+    competitiveAnalysis?: any
+  ): string {
+    if (
+      requirements.toLowerCase().includes('quota') ||
+      requirements.toLowerCase().includes('cost')
+    ) {
       return 'Advanced AI system applies consulting-grade analysis to minimize quota consumption while maintaining all required functionality';
-    } else if (design.toLowerCase().includes('mcp') || design.toLowerCase().includes('integration')) {
+    } else if (
+      design.toLowerCase().includes('mcp') ||
+      design.toLowerCase().includes('integration')
+    ) {
       return 'Seamless MCP integration enables AI agents to optimize workflows with professional consulting techniques';
     } else {
       return 'Intelligent automation combines natural language processing with business analysis to deliver optimized specifications';
@@ -1576,39 +1728,62 @@ This report provides a comprehensive analysis of the competitive landscape, incl
    * Generate press release body with problem, solution, why now, customer quote, and availability
    * Enhanced with competitive differentiation
    */
-  protected generatePressReleaseBody(requirements: string, design: string, competitiveAnalysis?: any): string {
+  protected generatePressReleaseBody(
+    requirements: string,
+    design: string,
+    competitiveAnalysis?: any
+  ): string {
     let body = '';
 
     // Problem statement
-    if (requirements.toLowerCase().includes('quota') || requirements.toLowerCase().includes('cost')) {
-      body += 'Today we announced the PM Agent Intent-to-Spec Optimizer, solving the critical problem of excessive quota consumption that has plagued developer workflows. ';
+    if (
+      requirements.toLowerCase().includes('quota') ||
+      requirements.toLowerCase().includes('cost')
+    ) {
+      body +=
+        'Today we announced the PM Agent Intent-to-Spec Optimizer, solving the critical problem of excessive quota consumption that has plagued developer workflows. ';
     } else {
-      body += 'Today we announced the PM Agent Intent-to-Spec Optimizer, addressing the widespread challenge of inefficient workflow design and manual optimization processes. ';
+      body +=
+        'Today we announced the PM Agent Intent-to-Spec Optimizer, addressing the widespread challenge of inefficient workflow design and manual optimization processes. ';
     }
 
     // Solution
-    if (requirements.toLowerCase().includes('consulting') || requirements.toLowerCase().includes('analysis')) {
-      body += 'Our breakthrough solution applies 2-3 professional consulting techniques from a comprehensive arsenal to automatically optimize workflows while preserving all functionality. ';
+    if (
+      requirements.toLowerCase().includes('consulting') ||
+      requirements.toLowerCase().includes('analysis')
+    ) {
+      body +=
+        'Our breakthrough solution applies 2-3 professional consulting techniques from a comprehensive arsenal to automatically optimize workflows while preserving all functionality. ';
     } else {
-      body += 'Our innovative solution transforms natural language intent into optimized Kiro specifications using advanced AI and business analysis techniques. ';
+      body +=
+        'Our innovative solution transforms natural language intent into optimized Kiro specifications using advanced AI and business analysis techniques. ';
     }
 
     // Why now
-    if (requirements.toLowerCase().includes('urgent') || requirements.toLowerCase().includes('critical')) {
-      body += 'With rising infrastructure costs and increasing demand for efficiency, now is the critical time for intelligent workflow optimization. ';
+    if (
+      requirements.toLowerCase().includes('urgent') ||
+      requirements.toLowerCase().includes('critical')
+    ) {
+      body +=
+        'With rising infrastructure costs and increasing demand for efficiency, now is the critical time for intelligent workflow optimization. ';
     } else {
-      body += 'As organizations seek to maximize developer productivity while controlling costs, automated optimization has become essential. ';
+      body +=
+        'As organizations seek to maximize developer productivity while controlling costs, automated optimization has become essential. ';
     }
 
     // Customer quote
-    body += '"This tool has completely transformed how we approach workflow automation," said Sarah Chen, Senior Engineering Manager at TechFlow Solutions. ';
-    body += '"We\'ve reduced our quota consumption by over 50% while actually improving functionality. The ROI analysis alone has saved us countless hours of manual calculation." ';
+    body +=
+      '"This tool has completely transformed how we approach workflow automation," said Sarah Chen, Senior Engineering Manager at TechFlow Solutions. ';
+    body +=
+      '"We\'ve reduced our quota consumption by over 50% while actually improving functionality. The ROI analysis alone has saved us countless hours of manual calculation." ';
 
     // Availability
     if (design.toLowerCase().includes('mcp') || design.toLowerCase().includes('server')) {
-      body += 'The PM Agent is available now through MCP server integration, enabling seamless adoption across existing AI agent workflows.';
+      body +=
+        'The PM Agent is available now through MCP server integration, enabling seamless adoption across existing AI agent workflows.';
     } else {
-      body += 'The PM Agent is available now for immediate integration into developer workflows and automation pipelines.';
+      body +=
+        'The PM Agent is available now for immediate integration into developer workflows and automation pipelines.';
     }
 
     return body;
@@ -1618,13 +1793,17 @@ This report provides a comprehensive analysis of the competitive landscape, incl
    * Generate FAQ with exactly the 10 required questions and structured answers
    * Enhanced with competitive differentiation
    */
-  protected generateFAQ(requirements: string, design: string, competitiveAnalysis?: any): FAQItem[] {
+  protected generateFAQ(
+    requirements: string,
+    design: string,
+    competitiveAnalysis?: any
+  ): FAQItem[] {
     const questions = this.generateRequiredFAQQuestions();
     const answers = this.generateFAQAnswers(requirements, design, competitiveAnalysis);
 
     return questions.map((question, index) => ({
       question,
-      answer: answers[index] || 'Answer to be provided based on specific implementation details.'
+      answer: answers[index] || 'Answer to be provided based on specific implementation details.',
     }));
   }
 
@@ -1632,18 +1811,23 @@ This report provides a comprehensive analysis of the competitive landscape, incl
    * Generate answers for the 10 required FAQ questions
    * Enhanced with competitive insights
    */
-  protected generateFAQAnswers(requirements: string, design: string, competitiveAnalysis?: any): string[] {
+  protected generateFAQAnswers(
+    requirements: string,
+    design: string,
+    competitiveAnalysis?: any
+  ): string[] {
     return [
       // Who is the customer?
       'Developers, engineering teams, and organizations using Kiro who want to optimize their workflow efficiency and reduce quota consumption while maintaining full functionality.',
 
       // What problem are we solving now?
-      requirements.toLowerCase().includes('quota') 
+      requirements.toLowerCase().includes('quota')
         ? 'Excessive vibe and spec quota consumption due to inefficient workflow design, lack of optimization expertise, and manual processes that lead to redundant operations and cost overruns.'
         : 'Inefficient workflow design and manual optimization processes that consume excessive resources and require specialized expertise to improve.',
 
       // Why now and why not later?
-      requirements.toLowerCase().includes('urgent') || requirements.toLowerCase().includes('critical')
+      requirements.toLowerCase().includes('urgent') ||
+      requirements.toLowerCase().includes('critical')
         ? 'Rising infrastructure costs and increasing demand for efficiency make this critical now. Waiting means continued waste and competitive disadvantage as others optimize their operations.'
         : 'Market conditions are optimal with proven technical foundation. Early adoption provides compound benefits as usage scales, while delaying means missing the current opportunity window.',
 
@@ -1668,14 +1852,18 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         : 'Low operational overhead with processing costs offset by significant quota savings. Expected positive ROI within 30-60 days of implementation.',
 
       // What are the next 2 releases after v1?
-      'v2: Advanced consulting techniques (Value Driver Tree, Zero-Based Design), real-time optimization monitoring, and custom technique configuration. v3: Multi-platform support, team collaboration features, and enterprise analytics dashboard.'
+      'v2: Advanced consulting techniques (Value Driver Tree, Zero-Based Design), real-time optimization monitoring, and custom technique configuration. v3: Multi-platform support, team collaboration features, and enterprise analytics dashboard.',
     ];
   }
 
   /**
    * Generate launch checklist with scope freeze, owners, timeline, dependencies
    */
-  protected generateLaunchChecklist(requirements: string, design: string, launchDate: string): ChecklistItem[] {
+  protected generateLaunchChecklist(
+    requirements: string,
+    design: string,
+    launchDate: string
+  ): ChecklistItem[] {
     const launchDateObj = new Date(launchDate);
     const milestones = this.generateLaunchMilestones(launchDateObj);
 
@@ -1685,22 +1873,22 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         task: 'Scope freeze and requirements lock',
         owner: 'Product Team',
         dueDate: milestones.scopeFreeze,
-        dependencies: ['Stakeholder alignment', 'Technical feasibility confirmation']
+        dependencies: ['Stakeholder alignment', 'Technical feasibility confirmation'],
       },
-      
+
       // Development milestones
       {
         task: 'Complete MVP development (core optimization engine)',
         owner: 'Engineering Team',
         dueDate: milestones.mvpComplete,
-        dependencies: ['Scope freeze', 'Technical architecture approval']
+        dependencies: ['Scope freeze', 'Technical architecture approval'],
       },
 
       {
         task: 'Implement MCP server integration and tool handlers',
         owner: 'Engineering Team',
         dueDate: milestones.integrationComplete,
-        dependencies: ['MVP development', 'MCP protocol testing']
+        dependencies: ['MVP development', 'MCP protocol testing'],
       },
 
       // Testing and validation
@@ -1708,14 +1896,14 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         task: 'Complete comprehensive testing suite (unit, integration, performance)',
         owner: 'QA Team',
         dueDate: milestones.testingComplete,
-        dependencies: ['Integration complete', 'Test data preparation']
+        dependencies: ['Integration complete', 'Test data preparation'],
       },
 
       {
         task: 'Conduct pilot testing with 3-5 key customers',
         owner: 'Product Team',
         dueDate: milestones.pilotComplete,
-        dependencies: ['Testing complete', 'Customer recruitment']
+        dependencies: ['Testing complete', 'Customer recruitment'],
       },
 
       // Documentation and training
@@ -1723,14 +1911,14 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         task: 'Complete user documentation and onboarding materials',
         owner: 'Technical Writing Team',
         dueDate: milestones.docsComplete,
-        dependencies: ['Pilot feedback', 'Feature finalization']
+        dependencies: ['Pilot feedback', 'Feature finalization'],
       },
 
       {
         task: 'Prepare launch communications and marketing materials',
         owner: 'Marketing Team',
         dueDate: milestones.marketingReady,
-        dependencies: ['Documentation complete', 'Success metrics defined']
+        dependencies: ['Documentation complete', 'Success metrics defined'],
       },
 
       // Launch preparation
@@ -1738,14 +1926,14 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         task: 'Production deployment and monitoring setup',
         owner: 'DevOps Team',
         dueDate: milestones.deploymentReady,
-        dependencies: ['All testing complete', 'Infrastructure provisioning']
+        dependencies: ['All testing complete', 'Infrastructure provisioning'],
       },
 
       {
         task: 'Final launch readiness review and go/no-go decision',
         owner: 'Leadership Team',
         dueDate: milestones.launchReview,
-        dependencies: ['All previous tasks', 'Success criteria validation']
+        dependencies: ['All previous tasks', 'Success criteria validation'],
       },
 
       // Launch
@@ -1753,8 +1941,8 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         task: 'Official product launch and announcement',
         owner: 'Product Team',
         dueDate: launchDate,
-        dependencies: ['Launch readiness approval', 'Communications ready']
-      }
+        dependencies: ['Launch readiness approval', 'Communications ready'],
+      },
     ];
   }
 
@@ -1773,15 +1961,33 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     launchReview: string;
   } {
     const milestones = {
-      scopeFreeze: new Date(launchDate.getTime() - 75 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 75 days before
-      mvpComplete: new Date(launchDate.getTime() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 60 days before
-      integrationComplete: new Date(launchDate.getTime() - 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 45 days before
-      testingComplete: new Date(launchDate.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days before
-      pilotComplete: new Date(launchDate.getTime() - 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 21 days before
-      docsComplete: new Date(launchDate.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 14 days before
-      marketingReady: new Date(launchDate.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 10 days before
-      deploymentReady: new Date(launchDate.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days before
-      launchReview: new Date(launchDate.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 3 days before
+      scopeFreeze: new Date(launchDate.getTime() - 75 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 75 days before
+      mvpComplete: new Date(launchDate.getTime() - 60 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 60 days before
+      integrationComplete: new Date(launchDate.getTime() - 45 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 45 days before
+      testingComplete: new Date(launchDate.getTime() - 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 30 days before
+      pilotComplete: new Date(launchDate.getTime() - 21 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 21 days before
+      docsComplete: new Date(launchDate.getTime() - 14 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 14 days before
+      marketingReady: new Date(launchDate.getTime() - 10 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 10 days before
+      deploymentReady: new Date(launchDate.getTime() - 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 7 days before
+      launchReview: new Date(launchDate.getTime() - 3 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 3 days before
     };
 
     return milestones;
@@ -1852,27 +2058,36 @@ This report provides a comprehensive analysis of the competitive landscape, incl
   /**
    * Identify constraints and risks from intent and context
    */
-  protected identifyConstraintsAndRisks(rawIntent: string, context?: RequirementsContext): string[] {
+  protected identifyConstraintsAndRisks(
+    rawIntent: string,
+    context?: RequirementsContext
+  ): string[] {
     const constraintsRisks: string[] = [];
     const intent = rawIntent.toLowerCase();
 
     // Budget constraints
     if (context?.budget) {
-      constraintsRisks.push(`Budget constraint of $${context.budget.toLocaleString()} limits scope and timeline`);
+      constraintsRisks.push(
+        `Budget constraint of $${context.budget.toLocaleString()} limits scope and timeline`
+      );
     } else if (intent.includes('budget') || intent.includes('cost')) {
       constraintsRisks.push('Budget limitations may impact feature completeness and timeline');
     }
 
     // Quota constraints
     if (context?.quotas?.maxVibes || context?.quotas?.maxSpecs) {
-      constraintsRisks.push(`Quota limits (${context.quotas.maxVibes || 'unlimited'} vibes, ${context.quotas.maxSpecs || 'unlimited'} specs) constrain processing capacity`);
+      constraintsRisks.push(
+        `Quota limits (${context.quotas.maxVibes || 'unlimited'} vibes, ${context.quotas.maxSpecs || 'unlimited'} specs) constrain processing capacity`
+      );
     } else if (intent.includes('quota') || intent.includes('limit')) {
       constraintsRisks.push('Quota consumption limits may restrict optimization capabilities');
     }
 
     // Timeline constraints
     if (context?.deadlines) {
-      constraintsRisks.push(`Timeline constraint (${context.deadlines}) may require scope reduction or phased delivery`);
+      constraintsRisks.push(
+        `Timeline constraint (${context.deadlines}) may require scope reduction or phased delivery`
+      );
     } else if (intent.includes('urgent') || intent.includes('deadline')) {
       constraintsRisks.push('Aggressive timeline may impact quality or require reduced scope');
     }
@@ -1927,85 +2142,88 @@ This report provides a comprehensive analysis of the competitive landscape, incl
       if (reqLower.includes('parse') && reqLower.includes('intent')) {
         must.push({
           requirement: req,
-          justification: 'Core capability without which the system cannot function'
+          justification: 'Core capability without which the system cannot function',
         });
-      } else if (reqLower.includes('optimize') && (reqLower.includes('workflow') || reqLower.includes('resource'))) {
+      } else if (
+        reqLower.includes('optimize') &&
+        (reqLower.includes('workflow') || reqLower.includes('resource'))
+      ) {
         must.push({
           requirement: req,
-          justification: 'Primary value proposition that justifies the entire system'
+          justification: 'Primary value proposition that justifies the entire system',
         });
       } else if (reqLower.includes('generate') && reqLower.includes('spec')) {
         must.push({
           requirement: req,
-          justification: 'Essential output format required for user workflow integration'
+          justification: 'Essential output format required for user workflow integration',
         });
       } else if (reqLower.includes('mcp') || reqLower.includes('integration')) {
         must.push({
           requirement: req,
-          justification: 'Required for system to be usable in target environment'
+          justification: 'Required for system to be usable in target environment',
         });
 
-      // Should Have - Important for user satisfaction and value
+        // Should Have - Important for user satisfaction and value
       } else if (reqLower.includes('roi') || reqLower.includes('analysis')) {
         should.push({
           requirement: req,
-          justification: 'Critical for user decision-making and value demonstration'
+          justification: 'Critical for user decision-making and value demonstration',
         });
       } else if (reqLower.includes('consulting') || reqLower.includes('business')) {
         should.push({
           requirement: req,
-          justification: 'Differentiating feature that provides professional-grade value'
+          justification: 'Differentiating feature that provides professional-grade value',
         });
       } else if (reqLower.includes('accurate') || reqLower.includes('reliable')) {
         should.push({
           requirement: req,
-          justification: 'Essential for user trust and system credibility'
+          justification: 'Essential for user trust and system credibility',
         });
       } else if (reqLower.includes('document') || reqLower.includes('report')) {
         should.push({
           requirement: req,
-          justification: 'Important for stakeholder communication and adoption'
+          justification: 'Important for stakeholder communication and adoption',
         });
 
-      // Could Have - Nice to have but not essential for MVP
+        // Could Have - Nice to have but not essential for MVP
       } else if (reqLower.includes('scale') || reqLower.includes('volume')) {
         could.push({
           requirement: req,
-          justification: 'Nice to have for future growth but not essential for MVP'
+          justification: 'Nice to have for future growth but not essential for MVP',
         });
       } else if (reqLower.includes('performance') || reqLower.includes('fast')) {
         could.push({
           requirement: req,
-          justification: 'Desirable for user experience but acceptable if basic performance met'
+          justification: 'Desirable for user experience but acceptable if basic performance met',
         });
       } else if (reqLower.includes('intuitive') || reqLower.includes('easy')) {
         could.push({
           requirement: req,
-          justification: 'Improves adoption but core functionality more important'
+          justification: 'Improves adoption but core functionality more important',
         });
 
-      // Won't Have - Out of scope for initial release
+        // Won't Have - Out of scope for initial release
       } else if (reqLower.includes('real-time') || reqLower.includes('collaboration')) {
         wont.push({
           requirement: req,
-          justification: 'Out of scope for initial release, focus on core optimization'
+          justification: 'Out of scope for initial release, focus on core optimization',
         });
       } else if (reqLower.includes('custom') || reqLower.includes('enterprise')) {
         wont.push({
           requirement: req,
-          justification: 'Enterprise features deferred to future releases'
+          justification: 'Enterprise features deferred to future releases',
         });
       } else {
         // Default categorization based on keywords
         if (reqLower.includes('provide') || reqLower.includes('deliver')) {
           should.push({
             requirement: req,
-            justification: 'Important for overall value delivery and user satisfaction'
+            justification: 'Important for overall value delivery and user satisfaction',
           });
         } else {
           could.push({
             requirement: req,
-            justification: 'Valuable addition but not critical for core functionality'
+            justification: 'Valuable addition but not critical for core functionality',
           });
         }
       }
@@ -2015,7 +2233,7 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     if (must.length === 0 && requirements.length > 0) {
       must.push({
         requirement: requirements[0],
-        justification: 'Core system capability required for basic functionality'
+        justification: 'Core system capability required for basic functionality',
       });
     }
 
@@ -2025,7 +2243,10 @@ This report provides a comprehensive analysis of the competitive landscape, incl
   /**
    * Generate Go/No-Go timing decision based on value and timing analysis
    */
-  protected generateRightTimeVerdict(rawIntent: string, context?: RequirementsContext): {
+  protected generateRightTimeVerdict(
+    rawIntent: string,
+    context?: RequirementsContext
+  ): {
     decision: 'do_now' | 'do_later';
     reasoning: string;
   } {
@@ -2080,7 +2301,8 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         reasoning += 'Current conditions favor immediate implementation with manageable risk.';
       }
     } else {
-      reasoning += 'Waiting allows for better preparation and risk mitigation, improving success probability.';
+      reasoning +=
+        'Waiting allows for better preparation and risk mitigation, improving success probability.';
     }
 
     return { decision, reasoning: reasoning.trim() };
@@ -2097,33 +2319,46 @@ This report provides a comprehensive analysis of the competitive landscape, incl
 
     // Identify the core problem
     if (req.includes('quota') && req.includes('cost')) {
-      framing += 'Current developer workflows consume excessive quotas due to inefficient patterns and lack of optimization expertise. ';
-      framing += 'Rising infrastructure costs and increasing demand for efficiency make this a critical business problem. ';
+      framing +=
+        'Current developer workflows consume excessive quotas due to inefficient patterns and lack of optimization expertise. ';
+      framing +=
+        'Rising infrastructure costs and increasing demand for efficiency make this a critical business problem. ';
     } else if (req.includes('manual') && req.includes('optimization')) {
-      framing += 'Manual workflow optimization requires specialized expertise and consumes significant developer time. ';
-      framing += 'The lack of automated optimization tools creates bottlenecks and inconsistent results. ';
+      framing +=
+        'Manual workflow optimization requires specialized expertise and consumes significant developer time. ';
+      framing +=
+        'The lack of automated optimization tools creates bottlenecks and inconsistent results. ';
     } else if (req.includes('intent') && req.includes('spec')) {
-      framing += 'Developers struggle to translate natural language requirements into efficient Kiro specifications. ';
-      framing += 'The gap between intent and optimized implementation leads to suboptimal resource utilization. ';
+      framing +=
+        'Developers struggle to translate natural language requirements into efficient Kiro specifications. ';
+      framing +=
+        'The gap between intent and optimized implementation leads to suboptimal resource utilization. ';
     } else {
-      framing += 'Current workflows lack intelligent optimization and consume more resources than necessary. ';
-      framing += 'The absence of professional-grade analysis tools limits efficiency improvements. ';
+      framing +=
+        'Current workflows lack intelligent optimization and consume more resources than necessary. ';
+      framing +=
+        'The absence of professional-grade analysis tools limits efficiency improvements. ';
     }
 
     // Why now timing
     if (req.includes('urgent') || req.includes('critical')) {
-      framing += 'Immediate action is required now to prevent further resource waste and competitive disadvantage. ';
+      framing +=
+        'Immediate action is required now to prevent further resource waste and competitive disadvantage. ';
     } else if (req.includes('opportunity') || req.includes('market')) {
-      framing += 'Market timing and opportunity conditions are favorable with proven technical approaches available for implementation. ';
+      framing +=
+        'Market timing and opportunity conditions are favorable with proven technical approaches available for implementation. ';
     } else {
-      framing += 'Technical foundation is mature and user demand is validated, making now the optimal time to act. ';
+      framing +=
+        'Technical foundation is mature and user demand is validated, making now the optimal time to act. ';
     }
 
     // Business impact
     if (req.includes('roi') || req.includes('savings')) {
-      framing += 'The compound effect of optimization savings makes early implementation highly valuable. ';
+      framing +=
+        'The compound effect of optimization savings makes early implementation highly valuable. ';
     } else {
-      framing += 'Early adoption provides competitive advantage and establishes market leadership position.';
+      framing +=
+        'Early adoption provides competitive advantage and establishes market leadership position.';
     }
 
     return framing.trim();
@@ -2146,46 +2381,48 @@ This report provides a comprehensive analysis of the competitive landscape, incl
       keyTradeoffs: [
         'Lower implementation risk but limited automation capabilities',
         'Faster initial delivery but requires more manual intervention',
-        'Proven technology stack but less sophisticated analysis'
+        'Proven technology stack but less sophisticated analysis',
       ],
       impact: 'Medium',
       effort: 'Low',
       majorRisks: [
         'May not meet user expectations for automation level',
         'Limited scalability as usage grows',
-        'Competitive disadvantage due to basic feature set'
-      ]
+        'Competitive disadvantage due to basic feature set',
+      ],
     };
 
     // Balanced option - optimal risk/reward balance
     const balanced: DesignOption = {
       name: 'Balanced',
-      summary: 'Automated workflow optimization with consulting techniques and comprehensive ROI analysis',
+      summary:
+        'Automated workflow optimization with consulting techniques and comprehensive ROI analysis',
       keyTradeoffs: [
         'Good balance of features and implementation complexity',
         'Moderate development timeline with high user value',
-        'Professional-grade analysis with manageable technical risk'
+        'Professional-grade analysis with manageable technical risk',
       ],
       impact: 'High',
       effort: 'Medium',
       majorRisks: [
         'Integration complexity may cause minor delays',
         'Consulting technique accuracy requires fine-tuning',
-        'User adoption depends on clear value demonstration'
-      ]
+        'User adoption depends on clear value demonstration',
+      ],
     };
 
     // Bold option - maximum impact, higher risk
-    let boldSummary = 'Full AI-powered consulting platform with advanced techniques and real-time optimization';
+    let boldSummary =
+      'Full AI-powered consulting platform with advanced techniques and real-time optimization';
     let boldTradeoffs = [
       'Maximum impact and competitive differentiation',
       'Comprehensive feature set with professional-grade capabilities',
-      'Future-proof architecture supporting advanced use cases'
+      'Future-proof architecture supporting advanced use cases',
     ];
     let boldRisks = [
       'High technical complexity may extend development timeline',
       'Advanced features may overwhelm initial users',
-      'Significant resource investment with execution risk'
+      'Significant resource investment with execution risk',
     ];
 
     // Customize bold option based on requirements
@@ -2194,19 +2431,20 @@ This report provides a comprehensive analysis of the competitive landscape, incl
       boldTradeoffs = [
         'Challenges all assumptions for maximum optimization potential',
         'Breakthrough approach that could redefine industry standards',
-        'Highest possible ROI if successfully implemented'
+        'Highest possible ROI if successfully implemented',
       ];
       boldRisks = [
         'Unproven approach with significant technical and market risk',
         'May require fundamental changes to user workflows',
-        'Long development cycle with uncertain outcomes'
+        'Long development cycle with uncertain outcomes',
       ];
     } else if (req.includes('ai') || req.includes('machine learning')) {
-      boldSummary = 'Advanced AI platform with machine learning optimization and predictive analytics';
+      boldSummary =
+        'Advanced AI platform with machine learning optimization and predictive analytics';
       boldTradeoffs = [
         'Cutting-edge AI capabilities for superior optimization',
         'Self-improving system that gets better with usage',
-        'Market-leading differentiation through advanced technology'
+        'Market-leading differentiation through advanced technology',
       ];
     }
 
@@ -2216,7 +2454,7 @@ This report provides a comprehensive analysis of the competitive landscape, incl
       keyTradeoffs: boldTradeoffs,
       impact: 'High',
       effort: 'High',
-      majorRisks: boldRisks
+      majorRisks: boldRisks,
     };
 
     return { conservative, balanced, bold };
@@ -2233,24 +2471,44 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     let recommendation = '';
 
     // Analyze requirements for timing signals
-    const hasUrgency = req.includes('urgent') || req.includes('critical') || req.includes('immediate');
-    const hasComplexity = req.includes('complex') || req.includes('advanced') || req.includes('sophisticated');
-    const hasRiskTolerance = req.includes('bold') || req.includes('innovative') || req.includes('breakthrough') || req.includes('leadership') || req.includes('revolutionary') || (req.includes('risk') && req.includes('appetite'));
-    const hasResourceConstraints = req.includes('tight') || req.includes('limited') || (req.includes('budget') && !req.includes('significant')) || (req.includes('timeline') && req.includes('tight'));
+    const hasUrgency =
+      req.includes('urgent') || req.includes('critical') || req.includes('immediate');
+    const hasComplexity =
+      req.includes('complex') || req.includes('advanced') || req.includes('sophisticated');
+    const hasRiskTolerance =
+      req.includes('bold') ||
+      req.includes('innovative') ||
+      req.includes('breakthrough') ||
+      req.includes('leadership') ||
+      req.includes('revolutionary') ||
+      (req.includes('risk') && req.includes('appetite'));
+    const hasResourceConstraints =
+      req.includes('tight') ||
+      req.includes('limited') ||
+      (req.includes('budget') && !req.includes('significant')) ||
+      (req.includes('timeline') && req.includes('tight'));
 
     if (hasUrgency && !hasComplexity) {
-      recommendation = 'Conservative approach is recommended now due to urgent timeline requirements. ';
+      recommendation =
+        'Conservative approach is recommended now due to urgent timeline requirements. ';
       recommendation += 'This delivers immediate value while minimizing implementation risk. ';
-      recommendation += 'Future iterations can add advanced features once core functionality is proven.';
+      recommendation +=
+        'Future iterations can add advanced features once core functionality is proven.';
     } else if (hasRiskTolerance && !hasResourceConstraints) {
-      recommendation = 'Bold approach is justified given the appetite for innovation and breakthrough results. ';
-      recommendation += 'The potential for market leadership and revolutionary impact outweighs the higher implementation risk. ';
-      recommendation += 'Strong technical foundation and adequate timeline support this ambitious approach.';
+      recommendation =
+        'Bold approach is justified given the appetite for innovation and breakthrough results. ';
+      recommendation +=
+        'The potential for market leadership and revolutionary impact outweighs the higher implementation risk. ';
+      recommendation +=
+        'Strong technical foundation and adequate timeline support this ambitious approach.';
     } else {
-      recommendation = 'Balanced approach is recommended as the optimal choice for current conditions. ';
+      recommendation =
+        'Balanced approach is recommended as the optimal choice for current conditions. ';
       recommendation += 'It provides high impact while managing implementation risk effectively. ';
-      recommendation += 'This approach delivers professional-grade capabilities with reasonable timeline and resource requirements. ';
-      recommendation += 'The risk-adjusted ROI is superior to both conservative and bold alternatives.';
+      recommendation +=
+        'This approach delivers professional-grade capabilities with reasonable timeline and resource requirements. ';
+      recommendation +=
+        'The risk-adjusted ROI is superior to both conservative and bold alternatives.';
     }
 
     return recommendation;
@@ -2265,19 +2523,20 @@ This report provides a comprehensive analysis of the competitive landscape, incl
     const defaultLimits = {
       maxVibes: limits?.maxVibes || 1000,
       maxSpecs: limits?.maxSpecs || 50,
-      budgetUSD: limits?.budgetUSD || 100000
+      budgetUSD: limits?.budgetUSD || 100000,
     };
 
     return {
       id: '0',
       name: 'Guardrails Check',
-      description: 'Validate that project limits are not exceeded before proceeding with implementation',
+      description:
+        'Validate that project limits are not exceeded before proceeding with implementation',
       acceptanceCriteria: [
         'Estimated quota consumption stays within defined limits',
         'Budget requirements are confirmed and approved',
         'Technical complexity is manageable with available resources',
         'Timeline expectations are realistic and achievable',
-        'Team capacity is confirmed for the planned scope'
+        'Team capacity is confirmed for the planned scope',
       ],
       effort: 'S',
       impact: 'High',
@@ -2289,8 +2548,8 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         `Total project cost < $${defaultLimits.budgetUSD.toLocaleString()} budget allocation`,
         'Technical dependencies are identified and resolved',
         'Team availability confirmed for project timeline',
-        'Risk mitigation strategies are in place for major risks'
-      ]
+        'Risk mitigation strategies are in place for major risks',
+      ],
     };
   }
 
@@ -2307,16 +2566,17 @@ This report provides a comprehensive analysis of the competitive landscape, incl
       tasks.push({
         id: (taskId++).toString(),
         name: 'Setup project architecture and core components',
-        description: 'Create foundational project structure with core interfaces and component definitions',
+        description:
+          'Create foundational project structure with core interfaces and component definitions',
         acceptanceCriteria: [
           'Project directory structure is created',
           'Core interfaces are defined and documented',
           'Component architecture is implemented',
-          'Basic configuration files are in place'
+          'Basic configuration files are in place',
         ],
         effort: 'M',
         impact: 'High',
-        priority: 'Must'
+        priority: 'Must',
       });
     }
 
@@ -2330,11 +2590,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
           'All data models are defined with proper typing',
           'Interface contracts are documented',
           'Validation logic is implemented',
-          'Unit tests for models are created'
+          'Unit tests for models are created',
         ],
         effort: 'M',
         impact: 'High',
-        priority: 'Must'
+        priority: 'Must',
       });
     }
 
@@ -2348,11 +2608,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
           'Intent parser can extract structured data from natural language',
           'Business objective identification is functional',
           'Technical requirements extraction works correctly',
-          'Comprehensive test coverage is achieved'
+          'Comprehensive test coverage is achieved',
         ],
         effort: 'L',
         impact: 'High',
-        priority: 'Must'
+        priority: 'Must',
       });
     }
 
@@ -2366,11 +2626,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
           'Batching strategy is implemented and tested',
           'Caching layer is functional with proper invalidation',
           'Workflow decomposition logic works correctly',
-          'Optimization effectiveness is measurable'
+          'Optimization effectiveness is measurable',
         ],
         effort: 'L',
         impact: 'High',
-        priority: 'Must'
+        priority: 'Must',
       });
     }
 
@@ -2384,11 +2644,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
           'Multiple consulting techniques are supported',
           'Analysis quality meets professional standards',
           'Technique selection logic is effective',
-          'Output formatting is consistent and clear'
+          'Output formatting is consistent and clear',
         ],
         effort: 'L',
         impact: 'Med',
-        priority: 'Should'
+        priority: 'Should',
       });
     }
 
@@ -2402,11 +2662,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
           'Quota consumption estimation is accurate within 15%',
           'ROI calculations include multiple scenarios',
           'Forecasting models are validated with test data',
-          'Reporting format is clear and actionable'
+          'Reporting format is clear and actionable',
         ],
         effort: 'M',
         impact: 'High',
-        priority: 'Should'
+        priority: 'Should',
       });
     }
 
@@ -2420,11 +2680,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
           'MCP server is functional and discoverable',
           'All tool handlers are implemented and tested',
           'Protocol compliance is verified',
-          'Error handling is comprehensive'
+          'Error handling is comprehensive',
         ],
         effort: 'M',
         impact: 'High',
-        priority: 'Must'
+        priority: 'Must',
       });
     }
 
@@ -2438,11 +2698,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
           'Management one-pager generation is functional',
           'PR-FAQ format compliance is verified',
           'Requirements with MoSCoW prioritization work correctly',
-          'Document quality meets professional standards'
+          'Document quality meets professional standards',
         ],
         effort: 'L',
         impact: 'Med',
-        priority: 'Could'
+        priority: 'Could',
       });
     }
 
@@ -2455,11 +2715,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         'Unit test coverage exceeds 80%',
         'Integration tests cover all major workflows',
         'Performance tests validate response times',
-        'Error scenarios are thoroughly tested'
+        'Error scenarios are thoroughly tested',
       ],
       effort: 'M',
       impact: 'Med',
-      priority: 'Should'
+      priority: 'Should',
     });
 
     // Documentation tasks
@@ -2471,11 +2731,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         'User guide covers all major features',
         'API documentation is complete and accurate',
         'Setup and configuration guides are clear',
-        'Troubleshooting section addresses common issues'
+        'Troubleshooting section addresses common issues',
       ],
       effort: 'M',
       impact: 'Med',
-      priority: 'Should'
+      priority: 'Should',
     });
 
     // Performance optimization tasks
@@ -2487,11 +2747,11 @@ This report provides a comprehensive analysis of the competitive landscape, incl
         'Response times meet performance targets',
         'Memory usage is optimized',
         'Concurrent request handling is efficient',
-        'Scalability bottlenecks are identified and resolved'
+        'Scalability bottlenecks are identified and resolved',
       ],
       effort: 'L',
       impact: 'Med',
-      priority: 'Could'
+      priority: 'Could',
     });
 
     return tasks;
@@ -2513,15 +2773,20 @@ This report provides a comprehensive analysis of the competitive landscape, incl
       // Immediate Wins (1-3 tasks): Must-have, small effort, high impact
       if (task.priority === 'Must' && task.effort === 'S') {
         immediateWins.push(task);
-      } else if (task.priority === 'Must' && task.effort === 'M' && task.impact === 'High' && immediateWins.length < 3) {
+      } else if (
+        task.priority === 'Must' &&
+        task.effort === 'M' &&
+        task.impact === 'High' &&
+        immediateWins.length < 3
+      ) {
         immediateWins.push(task);
       }
-      
+
       // Long-Term (2-4 tasks): Large effort or Could-have priority
       else if (task.effort === 'L' || task.priority === 'Could') {
         longTerm.push(task);
       }
-      
+
       // Short-Term (3-6 tasks): Everything else
       else {
         shortTerm.push(task);
@@ -2530,7 +2795,7 @@ This report provides a comprehensive analysis of the competitive landscape, incl
 
     // Ensure we have appropriate distribution
     // Move tasks between phases if needed to meet requirements
-    
+
     // Ensure at least 1 immediate win
     if (immediateWins.length === 0 && shortTerm.length > 0) {
       const firstShortTerm = shortTerm.shift()!;
@@ -2563,9 +2828,10 @@ This report provides a comprehensive analysis of the competitive landscape, incl
 
     // Limit long-term to 4 (but keep at least performance task if it exists)
     while (longTerm.length > 4) {
-      const taskToRemove = longTerm.findIndex(task => 
-        !task.name.toLowerCase().includes('performance') && 
-        !task.name.toLowerCase().includes('scalability')
+      const taskToRemove = longTerm.findIndex(
+        task =>
+          !task.name.toLowerCase().includes('performance') &&
+          !task.name.toLowerCase().includes('scalability')
       );
       if (taskToRemove >= 0) {
         longTerm.splice(taskToRemove, 1);

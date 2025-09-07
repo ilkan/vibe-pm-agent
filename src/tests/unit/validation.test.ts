@@ -1,22 +1,23 @@
 // Unit tests for validation utilities
 
-import { 
-  validateRawIntent, 
-  validateOptionalParams, 
+import {
+  validateRawIntent,
+  validateOptionalParams,
   validateParsedIntent,
   validateWorkflow,
   validateConsultingTechniques,
   validateStringArray,
   validatePositiveNumber,
   validateNonEmptyString,
-  ValidationError 
+  ValidationError,
 } from '../../utils/validation';
 import { OptionalParams, ParsedIntent, Workflow, ConsultingTechnique } from '../../models';
 
 describe('Validation Utilities', () => {
   describe('validateRawIntent', () => {
     it('should accept valid intent strings', () => {
-      const validIntent = 'I want to create a user authentication system with login and registration';
+      const validIntent =
+        'I want to create a user authentication system with login and registration';
       expect(() => validateRawIntent(validIntent)).not.toThrow();
     });
 
@@ -50,9 +51,9 @@ describe('Validation Utilities', () => {
         costConstraints: {
           maxVibes: 50,
           maxSpecs: 10,
-          maxCostDollars: 25.00
+          maxCostDollars: 25.0,
         },
-        performanceSensitivity: 'high'
+        performanceSensitivity: 'high',
       };
 
       expect(() => validateOptionalParams(validParams)).not.toThrow();
@@ -60,7 +61,7 @@ describe('Validation Utilities', () => {
 
     it('should reject negative user volume', () => {
       const invalidParams: OptionalParams = {
-        expectedUserVolume: -1
+        expectedUserVolume: -1,
       };
 
       expect(() => validateOptionalParams(invalidParams)).toThrow(ValidationError);
@@ -68,7 +69,7 @@ describe('Validation Utilities', () => {
 
     it('should reject invalid performance sensitivity', () => {
       const invalidParams: OptionalParams = {
-        performanceSensitivity: 'invalid' as any
+        performanceSensitivity: 'invalid' as any,
       };
 
       expect(() => validateOptionalParams(invalidParams)).toThrow(ValidationError);
@@ -77,8 +78,8 @@ describe('Validation Utilities', () => {
     it('should reject negative cost constraints', () => {
       const invalidParams: OptionalParams = {
         costConstraints: {
-          maxVibes: -1
-        }
+          maxVibes: -1,
+        },
       };
 
       expect(() => validateOptionalParams(invalidParams)).toThrow(ValidationError);
@@ -86,7 +87,7 @@ describe('Validation Utilities', () => {
 
     it('should reject unreasonably high user volume', () => {
       const invalidParams: OptionalParams = {
-        expectedUserVolume: 2000000
+        expectedUserVolume: 2000000,
       };
 
       expect(() => validateOptionalParams(invalidParams)).toThrow(ValidationError);
@@ -95,8 +96,8 @@ describe('Validation Utilities', () => {
     it('should reject unreasonably high cost constraints', () => {
       const invalidParams: OptionalParams = {
         costConstraints: {
-          maxVibes: 20000
-        }
+          maxVibes: 20000,
+        },
       };
 
       expect(() => validateOptionalParams(invalidParams)).toThrow(ValidationError);
@@ -106,20 +107,24 @@ describe('Validation Utilities', () => {
   describe('validateParsedIntent', () => {
     const validParsedIntent: ParsedIntent = {
       businessObjective: 'Create user authentication system',
-      technicalRequirements: [{
-        type: 'processing',
-        description: 'Handle user login',
-        complexity: 'medium',
-        quotaImpact: 'moderate'
-      }],
+      technicalRequirements: [
+        {
+          type: 'processing',
+          description: 'Handle user login',
+          complexity: 'medium',
+          quotaImpact: 'moderate',
+        },
+      ],
       dataSourcesNeeded: ['user_data'],
-      operationsRequired: [{
-        id: 'op-1',
-        type: 'processing',
-        description: 'User authentication',
-        estimatedQuotaCost: 3
-      }],
-      potentialRisks: []
+      operationsRequired: [
+        {
+          id: 'op-1',
+          type: 'processing',
+          description: 'User authentication',
+          estimatedQuotaCost: 3,
+        },
+      ],
+      potentialRisks: [],
     };
 
     it('should accept valid parsed intent', () => {
@@ -144,12 +149,14 @@ describe('Validation Utilities', () => {
     it('should reject operations with invalid types', () => {
       const invalidIntent: ParsedIntent = {
         ...validParsedIntent,
-        operationsRequired: [{
-          id: 'op-1',
-          type: 'invalid' as any,
-          description: 'Test',
-          estimatedQuotaCost: 1
-        }]
+        operationsRequired: [
+          {
+            id: 'op-1',
+            type: 'invalid' as any,
+            description: 'Test',
+            estimatedQuotaCost: 1,
+          },
+        ],
       };
       expect(() => validateParsedIntent(invalidIntent)).toThrow(ValidationError);
     });
@@ -157,12 +164,14 @@ describe('Validation Utilities', () => {
     it('should reject operations with negative quota cost', () => {
       const invalidIntent: ParsedIntent = {
         ...validParsedIntent,
-        operationsRequired: [{
-          id: 'op-1',
-          type: 'processing',
-          description: 'Test',
-          estimatedQuotaCost: -1
-        }]
+        operationsRequired: [
+          {
+            id: 'op-1',
+            type: 'processing',
+            description: 'Test',
+            estimatedQuotaCost: -1,
+          },
+        ],
       };
       expect(() => validateParsedIntent(invalidIntent)).toThrow(ValidationError);
     });
@@ -171,16 +180,18 @@ describe('Validation Utilities', () => {
   describe('validateWorkflow', () => {
     const validWorkflow: Workflow = {
       id: 'workflow-1',
-      steps: [{
-        id: 'step-1',
-        type: 'processing',
-        description: 'Process data',
-        inputs: [],
-        outputs: [],
-        quotaCost: 2
-      }],
+      steps: [
+        {
+          id: 'step-1',
+          type: 'processing',
+          description: 'Process data',
+          inputs: [],
+          outputs: [],
+          quotaCost: 2,
+        },
+      ],
       dataFlow: [],
-      estimatedComplexity: 1
+      estimatedComplexity: 1,
     };
 
     it('should accept valid workflow', () => {
@@ -200,14 +211,16 @@ describe('Validation Utilities', () => {
     it('should reject workflow with invalid step type', () => {
       const invalidWorkflow = {
         ...validWorkflow,
-        steps: [{
-          id: 'step-1',
-          type: 'invalid' as any,
-          description: 'Test',
-          inputs: [],
-          outputs: [],
-          quotaCost: 1
-        }]
+        steps: [
+          {
+            id: 'step-1',
+            type: 'invalid' as any,
+            description: 'Test',
+            inputs: [],
+            outputs: [],
+            quotaCost: 1,
+          },
+        ],
       };
       expect(() => validateWorkflow(invalidWorkflow)).toThrow(ValidationError);
     });
@@ -219,11 +232,13 @@ describe('Validation Utilities', () => {
   });
 
   describe('validateConsultingTechniques', () => {
-    const validTechniques: ConsultingTechnique[] = [{
-      name: 'MECE',
-      relevanceScore: 0.8,
-      applicableScenarios: ['analysis']
-    }];
+    const validTechniques: ConsultingTechnique[] = [
+      {
+        name: 'MECE',
+        relevanceScore: 0.8,
+        applicableScenarios: ['analysis'],
+      },
+    ];
 
     it('should accept valid consulting techniques', () => {
       expect(() => validateConsultingTechniques(validTechniques)).not.toThrow();
@@ -234,20 +249,24 @@ describe('Validation Utilities', () => {
     });
 
     it('should reject techniques with invalid names', () => {
-      const invalidTechniques: ConsultingTechnique[] = [{
-        name: 'Invalid' as any,
-        relevanceScore: 0.5,
-        applicableScenarios: ['test']
-      }];
+      const invalidTechniques: ConsultingTechnique[] = [
+        {
+          name: 'Invalid' as any,
+          relevanceScore: 0.5,
+          applicableScenarios: ['test'],
+        },
+      ];
       expect(() => validateConsultingTechniques(invalidTechniques)).toThrow(ValidationError);
     });
 
     it('should reject techniques with invalid relevance scores', () => {
-      const invalidTechniques: ConsultingTechnique[] = [{
-        name: 'MECE',
-        relevanceScore: 1.5,
-        applicableScenarios: ['test']
-      }];
+      const invalidTechniques: ConsultingTechnique[] = [
+        {
+          name: 'MECE',
+          relevanceScore: 1.5,
+          applicableScenarios: ['test'],
+        },
+      ];
       expect(() => validateConsultingTechniques(invalidTechniques)).toThrow(ValidationError);
     });
   });

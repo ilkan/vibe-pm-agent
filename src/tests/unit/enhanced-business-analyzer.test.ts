@@ -4,13 +4,13 @@
  */
 
 import { BusinessAnalyzer } from '../../components/business-analyzer';
-import { 
-  ParsedIntent, 
-  MarketSizingResult, 
+import {
+  ParsedIntent,
+  MarketSizingResult,
   CompetitorAnalysisResult,
   EnhancedBusinessOpportunity,
   StrategicFitAssessment,
-  MarketTimingAnalysis
+  MarketTimingAnalysis,
 } from '../../models';
 
 describe('Enhanced Business Analyzer', () => {
@@ -21,7 +21,7 @@ describe('Enhanced Business Analyzer', () => {
 
   beforeEach(() => {
     analyzer = new BusinessAnalyzer();
-    
+
     mockIntent = {
       businessObjective: 'Optimize development workflow efficiency',
       operationsRequired: [
@@ -29,41 +29,38 @@ describe('Enhanced Business Analyzer', () => {
           id: 'op1',
           type: 'vibe',
           description: 'Generate code components',
-          estimatedQuotaCost: 50
+          estimatedQuotaCost: 50,
         },
         {
           id: 'op2',
           type: 'spec',
           description: 'Create technical specifications',
-          estimatedQuotaCost: 20
-        }
+          estimatedQuotaCost: 20,
+        },
       ],
       technicalRequirements: [
         {
           type: 'processing',
           description: 'AI-powered code generation',
           complexity: 'medium',
-          quotaImpact: 'significant'
+          quotaImpact: 'significant',
         },
         {
           type: 'analysis',
           description: 'Workflow optimization',
           complexity: 'low',
-          quotaImpact: 'moderate'
-        }
+          quotaImpact: 'moderate',
+        },
       ],
-      dataSourcesNeeded: [
-        'Development metrics API',
-        'Code repository data'
-      ],
+      dataSourcesNeeded: ['Development metrics API', 'Code repository data'],
       potentialRisks: [
         {
           type: 'excessive_loops',
           description: 'AI model accuracy concerns',
           severity: 'medium',
-          likelihood: 0.3
-        }
-      ]
+          likelihood: 0.3,
+        },
+      ],
     };
 
     mockMarketSizing = {
@@ -76,7 +73,7 @@ describe('Enhanced Business Analyzer', () => {
         dataQuality: 'high',
         calculationDate: '2024-01-01',
         geographicScope: ['North America', 'Europe'],
-        marketSegments: ['Enterprise', 'SMB']
+        marketSegments: ['Enterprise', 'SMB'],
       },
       sam: {
         value: 5000000000,
@@ -87,7 +84,7 @@ describe('Enhanced Business Analyzer', () => {
         dataQuality: 'high',
         calculationDate: '2024-01-01',
         geographicScope: ['North America'],
-        marketSegments: ['Enterprise']
+        marketSegments: ['Enterprise'],
       },
       som: {
         value: 500000000,
@@ -98,7 +95,7 @@ describe('Enhanced Business Analyzer', () => {
         dataQuality: 'medium',
         calculationDate: '2024-01-01',
         geographicScope: ['North America'],
-        marketSegments: ['Enterprise']
+        marketSegments: ['Enterprise'],
       },
       methodology: [
         {
@@ -108,8 +105,8 @@ describe('Enhanced Business Analyzer', () => {
           reliability: 0.9,
           calculationSteps: [],
           limitations: ['Market definition assumptions'],
-          confidence: 0.85
-        }
+          confidence: 0.85,
+        },
       ],
       scenarios: [
         {
@@ -120,8 +117,8 @@ describe('Enhanced Business Analyzer', () => {
           som: 400000000,
           probability: 0.3,
           keyAssumptions: ['Slower adoption', 'Economic headwinds'],
-          riskFactors: ['Market saturation', 'Competitive pressure']
-        }
+          riskFactors: ['Market saturation', 'Competitive pressure'],
+        },
       ],
       confidenceIntervals: [],
       sourceAttribution: [],
@@ -131,8 +128,8 @@ describe('Enhanced Business Analyzer', () => {
         marketBarriers: ['Technical complexity', 'Integration challenges'],
         seasonality: [],
         cyclicalFactors: ['Economic cycles'],
-        disruptiveForces: ['New AI technologies']
-      }
+        disruptiveForces: ['New AI technologies'],
+      },
     };
 
     mockCompetitiveAnalysis = {
@@ -149,7 +146,7 @@ describe('Enhanced Business Analyzer', () => {
               startingPrice: 29,
               currency: 'USD',
               billingCycle: 'monthly',
-              valueProposition: 'Comprehensive development suite'
+              valueProposition: 'Comprehensive development suite',
             },
             targetMarket: ['Enterprise developers'],
             recentMoves: [
@@ -158,18 +155,18 @@ describe('Enhanced Business Analyzer', () => {
                 type: 'product-launch',
                 description: 'AI code assistant launch',
                 impact: 'high',
-                strategicImplication: 'Increased AI competition'
-              }
-            ]
-          }
+                strategicImplication: 'Increased AI competition',
+              },
+            ],
+          },
         ],
         evaluationCriteria: [
           {
             name: 'AI Capabilities',
             weight: 30,
             description: 'Quality of AI-powered features',
-            measurementType: 'qualitative'
-          }
+            measurementType: 'qualitative',
+          },
         ],
         rankings: [
           {
@@ -177,8 +174,8 @@ describe('Enhanced Business Analyzer', () => {
             overallScore: 75,
             criteriaScores: { 'AI Capabilities': 70 },
             rank: 1,
-            competitiveAdvantage: ['Market presence', 'Feature completeness']
-          }
+            competitiveAdvantage: ['Market presence', 'Feature completeness'],
+          },
         ],
         differentiationOpportunities: ['Better AI integration', 'Workflow optimization'],
         marketContext: {
@@ -187,8 +184,8 @@ describe('Enhanced Business Analyzer', () => {
           targetSegment: 'Professional Developers',
           marketMaturity: 'growth',
           regulatoryEnvironment: [],
-          technologyTrends: ['AI/ML', 'Cloud-native development']
-        }
+          technologyTrends: ['AI/ML', 'Cloud-native development'],
+        },
       },
       swotAnalysis: [],
       marketPositioning: {
@@ -200,10 +197,10 @@ describe('Enhanced Business Analyzer', () => {
             size: 'large',
             difficulty: 'moderate',
             timeToMarket: '6-12 months',
-            potentialValue: 100000000
-          }
+            potentialValue: 100000000,
+          },
         ],
-        recommendedPositioning: ['AI-first development platform']
+        recommendedPositioning: ['AI-first development platform'],
       },
       strategicRecommendations: [],
       sourceAttribution: [],
@@ -215,8 +212,8 @@ describe('Enhanced Business Analyzer', () => {
         methodologyRigor: 0.8,
         overallConfidence: 0.85,
         qualityIndicators: [],
-        recommendations: []
-      }
+        recommendations: [],
+      },
     };
   });
 
@@ -242,10 +239,16 @@ describe('Enhanced Business Analyzer', () => {
       const result = await analyzer.analyzeEnhancedBusinessOpportunity(mockIntent);
 
       expect(result.businessOpportunity.marketValidation).toBeDefined();
-      expect(result.businessOpportunity.marketValidation.targetMarket).toContain('Development metrics API');
-      expect(result.businessOpportunity.marketValidation.marketNeed).toBe(mockIntent.businessObjective);
+      expect(result.businessOpportunity.marketValidation.targetMarket).toContain(
+        'Development metrics API'
+      );
+      expect(result.businessOpportunity.marketValidation.marketNeed).toBe(
+        mockIntent.businessObjective
+      );
       expect(result.businessOpportunity.marketValidation.customerSegments).toHaveLength(1);
-      expect(result.businessOpportunity.marketValidation.customerSegments[0].name).toBe('Development Teams');
+      expect(result.businessOpportunity.marketValidation.customerSegments[0].name).toBe(
+        'Development Teams'
+      );
     });
 
     it('should assess strategic alignment correctly', async () => {
@@ -254,7 +257,9 @@ describe('Enhanced Business Analyzer', () => {
       expect(result.businessOpportunity.strategicAlignment).toBeDefined();
       expect(result.businessOpportunity.strategicAlignment.alignmentScore).toBeGreaterThan(70);
       expect(result.businessOpportunity.strategicAlignment.okrAlignment).toHaveLength(2);
-      expect(result.businessOpportunity.strategicAlignment.competitiveAdvantage).toContain('AI-powered workflow optimization');
+      expect(result.businessOpportunity.strategicAlignment.competitiveAdvantage).toContain(
+        'AI-powered workflow optimization'
+      );
     });
 
     it('should generate financial projections', async () => {
@@ -314,7 +319,9 @@ describe('Enhanced Business Analyzer', () => {
       );
 
       expect(result.overallRecommendation).toBeDefined();
-      expect(['strong-go', 'conditional-go', 'pivot', 'delay', 'no-go']).toContain(result.overallRecommendation.decision);
+      expect(['strong-go', 'conditional-go', 'pivot', 'delay', 'no-go']).toContain(
+        result.overallRecommendation.decision
+      );
       expect(result.overallRecommendation.confidence).toBeGreaterThan(0);
       expect(result.overallRecommendation.keyReasons).toBeDefined();
       expect(result.overallRecommendation.nextSteps).toHaveLength(2);
@@ -389,7 +396,7 @@ describe('Enhanced Business Analyzer', () => {
       // Test with productivity-focused intent
       const productivityIntent = {
         ...mockIntent,
-        businessObjective: 'Improve developer productivity through AI automation'
+        businessObjective: 'Improve developer productivity through AI automation',
       };
 
       const result = analyzer.assessStrategicFit(productivityIntent, mockCompetitiveAnalysis);
@@ -406,9 +413,9 @@ describe('Enhanced Business Analyzer', () => {
             type: 'data_retrieval' as const,
             description: 'File storage',
             complexity: 'low' as const,
-            quotaImpact: 'minimal' as const
-          }
-        ]
+            quotaImpact: 'minimal' as const,
+          },
+        ],
       };
 
       const result = analyzer.assessStrategicFit(lowAlignmentIntent);
@@ -464,7 +471,7 @@ describe('Enhanced Business Analyzer', () => {
   describe('Integration with Existing Analysis', () => {
     it('should maintain compatibility with existing consulting analysis', async () => {
       const consultingAnalysis = await analyzer.analyzeWithTechniques(mockIntent);
-      
+
       expect(consultingAnalysis).toBeDefined();
       expect(consultingAnalysis.techniquesUsed).toBeDefined();
       expect(consultingAnalysis.keyFindings).toBeDefined();
@@ -486,11 +493,16 @@ describe('Enhanced Business Analyzer', () => {
         costConstraints: {
           maxVibes: 10,
           maxSpecs: 5,
-          maxCostDollars: 1000
-        }
+          maxCostDollars: 1000,
+        },
       };
 
-      const result = await analyzer.analyzeEnhancedBusinessOpportunity(mockIntent, undefined, undefined, params);
+      const result = await analyzer.analyzeEnhancedBusinessOpportunity(
+        mockIntent,
+        undefined,
+        undefined,
+        params
+      );
 
       expect(result).toBeDefined();
       expect(result.businessOpportunity.financialProjections[0].revenue).toBeLessThan(10000);
@@ -501,7 +513,7 @@ describe('Enhanced Business Analyzer', () => {
     it('should handle empty technical requirements', async () => {
       const emptyIntent = {
         ...mockIntent,
-        technicalRequirements: []
+        technicalRequirements: [],
       };
 
       const result = await analyzer.analyzeEnhancedBusinessOpportunity(emptyIntent);
@@ -513,19 +525,19 @@ describe('Enhanced Business Analyzer', () => {
       const highRiskIntent = {
         ...mockIntent,
         potentialRisks: [
-          { 
-            type: 'excessive_loops' as const, 
-            description: 'Critical system failure', 
+          {
+            type: 'excessive_loops' as const,
+            description: 'Critical system failure',
             severity: 'high' as const,
-            likelihood: 0.8
+            likelihood: 0.8,
           },
-          { 
-            type: 'unnecessary_vibes' as const, 
-            description: 'Data security breach', 
+          {
+            type: 'unnecessary_vibes' as const,
+            description: 'Data security breach',
             severity: 'high' as const,
-            likelihood: 0.7
-          }
-        ]
+            likelihood: 0.7,
+          },
+        ],
       };
 
       const result = await analyzer.analyzeEnhancedBusinessOpportunity(highRiskIntent);
@@ -540,7 +552,7 @@ describe('Enhanced Business Analyzer', () => {
         technicalRequirements: [],
         dataSourcesNeeded: [],
         operationsRequired: [],
-        potentialRisks: []
+        potentialRisks: [],
       };
 
       const result = analyzer.assessStrategicFit(lowAlignmentIntent);

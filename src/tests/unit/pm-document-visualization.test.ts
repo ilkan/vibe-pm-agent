@@ -7,7 +7,7 @@ import { PMDocumentGenerator } from '../../components/pm-document-generator';
 
 describe('PMDocumentGenerator Visualization and Export', () => {
   let generator: PMDocumentGenerator;
-  
+
   const mockCompetitiveAnalysis = {
     competitiveMatrix: {
       competitors: [
@@ -17,7 +17,7 @@ describe('PMDocumentGenerator Visualization and Export', () => {
           strengths: ['Strong brand', 'Large user base'],
           weaknesses: ['High pricing', 'Limited features'],
           keyFeatures: ['Feature 1', 'Feature 2', 'Feature 3'],
-          pricing: { startingPrice: 150, model: 'subscription' }
+          pricing: { startingPrice: 150, model: 'subscription' },
         },
         {
           name: 'Competitor B',
@@ -25,83 +25,81 @@ describe('PMDocumentGenerator Visualization and Export', () => {
           strengths: ['Innovation', 'User experience'],
           weaknesses: ['Limited resources', 'Market validation'],
           keyFeatures: ['Feature A', 'Feature B'],
-          pricing: { startingPrice: 75, model: 'freemium' }
-        }
+          pricing: { startingPrice: 75, model: 'freemium' },
+        },
       ],
       rankings: [
         {
           competitorName: 'Competitor A',
           overallScore: 8.5,
           rank: 1,
-          competitiveAdvantage: ['Market leadership', 'Brand recognition']
+          competitiveAdvantage: ['Market leadership', 'Brand recognition'],
         },
         {
           competitorName: 'Competitor B',
           overallScore: 7.2,
           rank: 2,
-          competitiveAdvantage: ['Innovation focus', 'User experience']
-        }
+          competitiveAdvantage: ['Innovation focus', 'User experience'],
+        },
       ],
       differentiationOpportunities: [
         'Address industry-wide high pricing',
-        'Focus on underserved market segments'
-      ]
+        'Focus on underserved market segments',
+      ],
     },
     marketPositioning: {
       positioningMap: {
-        axes: ['Price', 'Features']
+        axes: ['Price', 'Features'],
       },
       competitorPositions: [
         {
           competitorName: 'Competitor A',
-          coordinates: { Price: 0.8, Features: 0.7 }
-        }
+          coordinates: { Price: 0.8, Features: 0.7 },
+        },
       ],
       marketGaps: [
         { description: 'Mid-market segment with balanced features and pricing' },
-        { description: 'Premium features at competitive pricing' }
+        { description: 'Premium features at competitive pricing' },
       ],
       recommendedPositioning: [
         'Target underserved mid-market segment',
-        'Differentiate through superior user experience'
-      ]
+        'Differentiate through superior user experience',
+      ],
     },
     swotAnalysis: [
       {
         competitorName: 'Our Solution',
         strengths: [
           { description: 'Technology leadership and innovation' },
-          { description: 'Strong customer focus and support' }
+          { description: 'Strong customer focus and support' },
         ],
-        weaknesses: [
-          { description: 'Limited market presence' }
-        ],
+        weaknesses: [{ description: 'Limited market presence' }],
         opportunities: [
           { description: 'Market expansion potential' },
-          { description: 'Technology advancement opportunities' }
+          { description: 'Technology advancement opportunities' },
         ],
         threats: [
           { description: 'Increased competitive pressure' },
-          { description: 'Regulatory changes' }
+          { description: 'Regulatory changes' },
         ],
         strategicImplications: [
           'Focus on differentiation strategies',
-          'Monitor competitive moves closely'
-        ]
-      }
+          'Monitor competitive moves closely',
+        ],
+      },
     ],
     strategicRecommendations: [
       {
         type: 'differentiation',
         title: 'Feature-Based Differentiation',
-        description: 'Develop unique capabilities that competitors lack'
+        description: 'Develop unique capabilities that competitors lack',
       },
       {
         type: 'focus',
         title: 'Niche Market Focus',
-        description: 'Target specific customer segments'
-      }
-    ]
+        description: 'Target specific customer segments',
+      },
+    ],
   };
 
   beforeEach(() => {
@@ -122,7 +120,10 @@ describe('PMDocumentGenerator Visualization and Export', () => {
     });
 
     test('should generate positioning map visualization', () => {
-      const result = generator.generateCompetitiveVisualization(mockCompetitiveAnalysis, 'positioning');
+      const result = generator.generateCompetitiveVisualization(
+        mockCompetitiveAnalysis,
+        'positioning'
+      );
 
       expect(result.visualizationType).toBe('positioning');
       expect(result.mermaidDiagram).toContain('graph LR');
@@ -158,7 +159,7 @@ describe('PMDocumentGenerator Visualization and Export', () => {
       const emptyAnalysis = {
         competitiveMatrix: { competitors: [] },
         marketPositioning: {},
-        swotAnalysis: []
+        swotAnalysis: [],
       };
 
       const result = generator.generateCompetitiveVisualization(emptyAnalysis, 'matrix');
@@ -183,7 +184,10 @@ describe('PMDocumentGenerator Visualization and Export', () => {
     });
 
     test('should generate valid positioning map diagram structure', () => {
-      const result = generator.generateCompetitiveVisualization(mockCompetitiveAnalysis, 'positioning');
+      const result = generator.generateCompetitiveVisualization(
+        mockCompetitiveAnalysis,
+        'positioning'
+      );
       const diagram = result.mermaidDiagram;
 
       expect(diagram).toContain('graph LR');
@@ -220,9 +224,9 @@ describe('PMDocumentGenerator Visualization and Export', () => {
             marketShare: 10 - i,
             strengths: ['Strength 1'],
             weaknesses: ['Weakness 1'],
-            keyFeatures: ['Feature 1']
-          }))
-        }
+            keyFeatures: ['Feature 1'],
+          })),
+        },
       };
 
       const result = generator.generateCompetitiveVisualization(largeAnalysis, 'matrix');
@@ -279,10 +283,10 @@ describe('PMDocumentGenerator Visualization and Export', () => {
               marketShare: 25,
               strengths: ['Strong, reliable brand', 'Large user base'],
               weaknesses: ['High pricing', 'Limited features'],
-              keyFeatures: ['Feature 1', 'Feature 2']
-            }
-          ]
-        }
+              keyFeatures: ['Feature 1', 'Feature 2'],
+            },
+          ],
+        },
       };
 
       const result = generator.exportCompetitiveData(analysisWithSpecialChars, 'csv');
@@ -294,13 +298,15 @@ describe('PMDocumentGenerator Visualization and Export', () => {
     test('should generate proper markdown table structure', () => {
       const result = generator.exportCompetitiveData(mockCompetitiveAnalysis, 'markdown');
       const lines = result.data.split('\n');
-      
-      const tableHeaderIndex = lines.findIndex((line: string) => line.includes('| Competitor | Market Share |'));
+
+      const tableHeaderIndex = lines.findIndex((line: string) =>
+        line.includes('| Competitor | Market Share |')
+      );
       expect(tableHeaderIndex).toBeGreaterThan(-1);
-      
+
       const separatorLine = lines[tableHeaderIndex + 1];
       expect(separatorLine).toContain('|------------|');
-      
+
       const dataLine = lines[tableHeaderIndex + 2];
       expect(dataLine).toContain('| Competitor A | 25% |');
     });
@@ -363,7 +369,7 @@ describe('PMDocumentGenerator Visualization and Export', () => {
   describe('error handling and edge cases', () => {
     test('should handle missing competitor data gracefully', () => {
       const emptyAnalysis = {
-        competitiveMatrix: { competitors: [] }
+        competitiveMatrix: { competitors: [] },
       };
 
       const result = generator.exportCompetitiveData(emptyAnalysis, 'json');
@@ -385,11 +391,11 @@ describe('PMDocumentGenerator Visualization and Export', () => {
         competitiveMatrix: {
           competitors: [
             {
-              name: 'Incomplete Competitor'
+              name: 'Incomplete Competitor',
               // Missing other properties
-            }
-          ]
-        }
+            },
+          ],
+        },
       };
 
       const result = generator.exportCompetitiveData(incompleteAnalysis, 'csv');
@@ -407,9 +413,9 @@ describe('PMDocumentGenerator Visualization and Export', () => {
             strengths: [],
             weaknesses: [],
             opportunities: [],
-            threats: []
-          }
-        ]
+            threats: [],
+          },
+        ],
       };
 
       const result = generator.generateCompetitiveVisualization(emptySwotAnalysis, 'swot');

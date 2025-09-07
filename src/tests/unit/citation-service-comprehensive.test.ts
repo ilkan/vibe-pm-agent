@@ -4,7 +4,12 @@
  */
 
 import { CitationService } from '../../components/citation-service';
-import { Citation, CitationStyle, CitationConfidence, CitationPackage } from '../../models/citations';
+import {
+  Citation,
+  CitationStyle,
+  CitationConfidence,
+  CitationPackage,
+} from '../../models/citations';
 
 describe('CitationService - Comprehensive Tests', () => {
   let citationService: CitationService;
@@ -21,7 +26,7 @@ describe('CitationService - Comprehensive Tests', () => {
         publisher: 'Research Corp',
         publicationDate: '2024-01-15',
         credibilityRating: 'A',
-        sourceType: 'industry_report'
+        sourceType: 'industry_report',
       });
 
       expect(citation.id).toBeDefined();
@@ -36,21 +41,21 @@ describe('CitationService - Comprehensive Tests', () => {
         title: 'Gartner Report',
         url: 'https://gartner.com/report',
         publisher: 'Gartner',
-        credibilityRating: 'A'
+        credibilityRating: 'A',
       });
 
       const mediumCredCitation = citationService.createCitation({
         title: 'Industry Blog',
         url: 'https://blog.com/post',
         publisher: 'Tech Blog',
-        credibilityRating: 'B'
+        credibilityRating: 'B',
       });
 
       const lowCredCitation = citationService.createCitation({
         title: 'Forum Post',
         url: 'https://forum.com/post',
         publisher: 'User Forum',
-        credibilityRating: 'C'
+        credibilityRating: 'C',
       });
 
       expect(highCredCitation.confidence).toBe('high');
@@ -63,7 +68,7 @@ describe('CitationService - Comprehensive Tests', () => {
         citationService.createCitation({
           title: 'Invalid URL Test',
           url: 'not-a-url',
-          publisher: 'Test Publisher'
+          publisher: 'Test Publisher',
         });
       }).toThrow('Invalid URL format');
     });
@@ -72,7 +77,7 @@ describe('CitationService - Comprehensive Tests', () => {
       const citation = citationService.createCitation({
         title: 'Undated Report',
         url: 'https://example.com/undated',
-        publisher: 'Unknown Date Corp'
+        publisher: 'Unknown Date Corp',
       });
 
       expect(citation.publicationDate).toBeNull();
@@ -91,13 +96,13 @@ describe('CitationService - Comprehensive Tests', () => {
         publicationDate: '2024-01-15',
         credibilityRating: 'A',
         sourceType: 'industry_report',
-        authors: ['Dr. Jane Smith', 'Prof. John Doe']
+        authors: ['Dr. Jane Smith', 'Prof. John Doe'],
       });
     });
 
     it('should format citations in APA style', () => {
       const formatted = citationService.formatCitation(testCitation, 'apa');
-      
+
       expect(formatted).toContain('Smith, J., & Doe, J.');
       expect(formatted).toContain('(2024)');
       expect(formatted).toContain('AI Market Analysis 2024');
@@ -107,7 +112,7 @@ describe('CitationService - Comprehensive Tests', () => {
 
     it('should format citations in inline style', () => {
       const formatted = citationService.formatCitation(testCitation, 'inline');
-      
+
       expect(formatted).toMatch(/\[.*\]/); // Should be in brackets
       expect(formatted).toContain('AI Market Analysis 2024');
       expect(formatted).toContain('2024');
@@ -115,7 +120,7 @@ describe('CitationService - Comprehensive Tests', () => {
 
     it('should format citations in footnote style', () => {
       const formatted = citationService.formatCitation(testCitation, 'footnote');
-      
+
       expect(formatted).toMatch(/^\d+\./); // Should start with number and period
       expect(formatted).toContain('AI Market Analysis 2024');
       expect(formatted).toContain('Market Research Inc');
@@ -126,7 +131,7 @@ describe('CitationService - Comprehensive Tests', () => {
         title: 'Anonymous Report',
         url: 'https://example.com/anon',
         publisher: 'Anonymous Corp',
-        publicationDate: '2024-01-01'
+        publicationDate: '2024-01-01',
       });
 
       const formatted = citationService.formatCitation(noAuthorCitation, 'apa');
@@ -143,22 +148,22 @@ describe('CitationService - Comprehensive Tests', () => {
           url: 'https://gartner.com/mq',
           publisher: 'Gartner',
           sourceType: 'industry_report',
-          credibilityRating: 'A'
+          credibilityRating: 'A',
         }),
         citationService.createCitation({
           title: 'Company SEC Filing',
           url: 'https://sec.gov/filing',
           publisher: 'SEC',
           sourceType: 'financial_data',
-          credibilityRating: 'A'
+          credibilityRating: 'A',
         }),
         citationService.createCitation({
           title: 'Customer Survey Results',
           url: 'https://survey.com/results',
           publisher: 'Survey Corp',
           sourceType: 'customer_research',
-          credibilityRating: 'B'
-        })
+          credibilityRating: 'B',
+        }),
       ];
 
       const citationPackage = citationService.createCitationPackage(citations);
@@ -176,14 +181,14 @@ describe('CitationService - Comprehensive Tests', () => {
           title: 'McKinsey Report',
           publisher: 'McKinsey',
           credibilityRating: 'A',
-          publicationDate: '2024-01-01'
+          publicationDate: '2024-01-01',
         }),
         citationService.createCitation({
           title: 'Forrester Analysis',
           publisher: 'Forrester',
           credibilityRating: 'A',
-          publicationDate: '2024-02-01'
-        })
+          publicationDate: '2024-02-01',
+        }),
       ];
 
       const mixedQualityCitations = [
@@ -192,14 +197,16 @@ describe('CitationService - Comprehensive Tests', () => {
           title: 'Blog Post',
           publisher: 'Random Blog',
           credibilityRating: 'C',
-          publicationDate: '2023-01-01'
-        })
+          publicationDate: '2023-01-01',
+        }),
       ];
 
       const highQualityPackage = citationService.createCitationPackage(highQualityCitations);
       const mixedQualityPackage = citationService.createCitationPackage(mixedQualityCitations);
 
-      expect(highQualityPackage.overallConfidence).toBeGreaterThan(mixedQualityPackage.overallConfidence);
+      expect(highQualityPackage.overallConfidence).toBeGreaterThan(
+        mixedQualityPackage.overallConfidence
+      );
       expect(highQualityPackage.overallConfidence).toBeGreaterThan(80);
     });
 
@@ -209,8 +216,8 @@ describe('CitationService - Comprehensive Tests', () => {
           title: 'Single Industry Report',
           publisher: 'Research Corp',
           sourceType: 'industry_report',
-          credibilityRating: 'B'
-        })
+          credibilityRating: 'B',
+        }),
       ];
 
       const citationPackage = citationService.createCitationPackage(limitedCitations);
@@ -274,19 +281,23 @@ describe('CitationService - Comprehensive Tests', () => {
   describe('Citation Search and Retrieval', () => {
     beforeEach(() => {
       // Add test citations to the service
-      citationService.addCitation(citationService.createCitation({
-        title: 'AI Market Report 2024',
-        publisher: 'Gartner',
-        sourceType: 'industry_report',
-        tags: ['AI', 'market', 'technology']
-      }));
+      citationService.addCitation(
+        citationService.createCitation({
+          title: 'AI Market Report 2024',
+          publisher: 'Gartner',
+          sourceType: 'industry_report',
+          tags: ['AI', 'market', 'technology'],
+        })
+      );
 
-      citationService.addCitation(citationService.createCitation({
-        title: 'Customer Satisfaction Survey',
-        publisher: 'Survey Corp',
-        sourceType: 'customer_research',
-        tags: ['customer', 'satisfaction', 'survey']
-      }));
+      citationService.addCitation(
+        citationService.createCitation({
+          title: 'Customer Satisfaction Survey',
+          publisher: 'Survey Corp',
+          sourceType: 'customer_research',
+          tags: ['customer', 'satisfaction', 'survey'],
+        })
+      );
     });
 
     it('should search citations by title', () => {
@@ -323,7 +334,7 @@ describe('CitationService - Comprehensive Tests', () => {
       const citation = citationService.createCitation({
         title: 'Test Export',
         publisher: 'Test Publisher',
-        url: 'https://test.com'
+        url: 'https://test.com',
       });
 
       citationService.addCitation(citation);
@@ -338,7 +349,7 @@ describe('CitationService - Comprehensive Tests', () => {
         title: 'Test BibTeX Export',
         publisher: 'Academic Publisher',
         url: 'https://academic.com',
-        authors: ['Dr. Test Author']
+        authors: ['Dr. Test Author'],
       });
 
       citationService.addCitation(citation);
@@ -350,12 +361,14 @@ describe('CitationService - Comprehensive Tests', () => {
     });
 
     it('should import citations from JSON format', () => {
-      const jsonData = JSON.stringify([{
-        title: 'Imported Citation',
-        publisher: 'Import Publisher',
-        url: 'https://import.com',
-        credibilityRating: 'B'
-      }]);
+      const jsonData = JSON.stringify([
+        {
+          title: 'Imported Citation',
+          publisher: 'Import Publisher',
+          url: 'https://import.com',
+          credibilityRating: 'B',
+        },
+      ]);
 
       const importedCount = citationService.importCitations(jsonData, 'json');
       expect(importedCount).toBe(1);
@@ -372,7 +385,7 @@ describe('CitationService - Comprehensive Tests', () => {
         citationService.createCitation({
           title: 'Bad URL Test',
           url: 'htp://malformed-url',
-          publisher: 'Test'
+          publisher: 'Test',
         });
       }).toThrow();
     });
@@ -382,7 +395,7 @@ describe('CitationService - Comprehensive Tests', () => {
         citationService.createCitation({
           title: '',
           publisher: '',
-          url: ''
+          url: '',
         });
       }).toThrow('Title and publisher are required');
     });
@@ -391,13 +404,13 @@ describe('CitationService - Comprehensive Tests', () => {
       const citation1 = citationService.createCitation({
         title: 'Duplicate Test',
         publisher: 'Test Publisher',
-        url: 'https://test.com/duplicate'
+        url: 'https://test.com/duplicate',
       });
 
       const citation2 = citationService.createCitation({
         title: 'Duplicate Test',
         publisher: 'Test Publisher',
-        url: 'https://test.com/duplicate'
+        url: 'https://test.com/duplicate',
       });
 
       citationService.addCitation(citation1);
@@ -412,7 +425,7 @@ describe('CitationService - Comprehensive Tests', () => {
         title: 'Very Old Report',
         publisher: 'Historical Publisher',
         url: 'https://old.com',
-        publicationDate: '1990-01-01'
+        publicationDate: '1990-01-01',
       });
 
       expect(oldCitation.recencyScore).toBeLessThan(10);
@@ -422,7 +435,7 @@ describe('CitationService - Comprehensive Tests', () => {
     it('should handle missing metadata gracefully', () => {
       const minimalCitation = citationService.createCitation({
         title: 'Minimal Citation',
-        publisher: 'Basic Publisher'
+        publisher: 'Basic Publisher',
       });
 
       expect(minimalCitation.url).toBeNull();

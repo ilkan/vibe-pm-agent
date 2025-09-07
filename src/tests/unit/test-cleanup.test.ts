@@ -22,14 +22,16 @@ describe('Test Cleanup Utilities', () => {
       expect(isTestGeneratedFile('comprehensive-workflow-test-requirements.md')).toBe(true);
       expect(isTestGeneratedFile('custom-pattern-requirements.md')).toBe(true);
       expect(isTestGeneratedFile('design-format-test-design.md')).toBe(true);
-      
+
       // Files with timestamps
       expect(isTestGeneratedFile('auth-system-design-2025-09-05T07-46-01.md')).toBe(true);
       expect(isTestGeneratedFile('test-inclusion-requirements-2025-09-05T07-46-01.md')).toBe(true);
-      
+
       // Backup files
-      expect(isTestGeneratedFile('test-inclusion-requirements-2025-09-05T07-46-01.md.backup')).toBe(true);
-      
+      expect(isTestGeneratedFile('test-inclusion-requirements-2025-09-05T07-46-01.md.backup')).toBe(
+        true
+      );
+
       // Common test patterns
       expect(isTestGeneratedFile('test1-feature.md')).toBe(true);
       expect(isTestGeneratedFile('sample-requirements.md')).toBe(true);
@@ -58,7 +60,7 @@ describe('Test Cleanup Utilities', () => {
 
   describe('cleanupTestSteeringFiles', () => {
     const testDir = '.kiro/steering-test-cleanup';
-    
+
     beforeEach(async () => {
       // Create test directory
       await fs.mkdir(testDir, { recursive: true });
@@ -80,7 +82,7 @@ describe('Test Cleanup Utilities', () => {
         'auth-system-test-design.md',
         'product.md', // Protected file
         'structure.md', // Protected file
-        'legitimate-feature.md' // Should not be cleaned
+        'legitimate-feature.md', // Should not be cleaned
       ];
 
       for (const file of testFiles) {
@@ -89,7 +91,7 @@ describe('Test Cleanup Utilities', () => {
 
       // Run cleanup (won't work on our test dir, but we can test the logic)
       const result = await cleanupTestSteeringFiles();
-      
+
       // Verify the function runs without error
       expect(result).toHaveProperty('cleaned');
       expect(result).toHaveProperty('errors');

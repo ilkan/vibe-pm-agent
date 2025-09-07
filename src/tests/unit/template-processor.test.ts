@@ -2,7 +2,11 @@
  * Unit tests for TemplateProcessor component
  */
 
-import { TemplateProcessor, TemplatePlaceholders, ContentExtractionConfig } from '../../components/template-processor';
+import {
+  TemplateProcessor,
+  TemplatePlaceholders,
+  ContentExtractionConfig,
+} from '../../components/template-processor';
 
 describe('TemplateProcessor', () => {
   let processor: TemplateProcessor;
@@ -16,7 +20,7 @@ describe('TemplateProcessor', () => {
       const template = 'Hello {name}, welcome to {project}!';
       const placeholders: TemplatePlaceholders = {
         name: 'John',
-        project: 'Kiro'
+        project: 'Kiro',
       };
 
       const result = processor.processTemplate(template, placeholders);
@@ -24,19 +28,19 @@ describe('TemplateProcessor', () => {
     });
 
     it('should handle multiple occurrences of same placeholder', () => {
-      const template = '{name} loves {name}\'s work on {name}';
+      const template = "{name} loves {name}'s work on {name}";
       const placeholders: TemplatePlaceholders = {
-        name: 'Alice'
+        name: 'Alice',
       };
 
       const result = processor.processTemplate(template, placeholders);
-      expect(result).toBe('Alice loves Alice\'s work on Alice');
+      expect(result).toBe("Alice loves Alice's work on Alice");
     });
 
     it('should handle missing placeholders gracefully', () => {
       const template = 'Hello {name}, your {missing} is ready';
       const placeholders: TemplatePlaceholders = {
-        name: 'Bob'
+        name: 'Bob',
       };
 
       const result = processor.processTemplate(template, placeholders);
@@ -46,7 +50,7 @@ describe('TemplateProcessor', () => {
     it('should handle special regex characters in placeholders', () => {
       const template = 'Pattern: {regex_pattern}';
       const placeholders: TemplatePlaceholders = {
-        regex_pattern: '.*+?^${}()|[]\\/'
+        regex_pattern: '.*+?^${}()|[]\\/',
       };
 
       const result = processor.processTemplate(template, placeholders);
@@ -56,7 +60,7 @@ describe('TemplateProcessor', () => {
     it('should handle empty placeholders', () => {
       const template = 'Start{empty}End';
       const placeholders: TemplatePlaceholders = {
-        empty: ''
+        empty: '',
       };
 
       const result = processor.processTemplate(template, placeholders);
@@ -119,7 +123,7 @@ Deep content here.
 Content for subsection 2.`;
 
       const sections = processor.extractSections(document);
-      
+
       expect(sections).toHaveLength(4);
       expect(sections[0].title).toBe('Main Title');
       expect(sections[0].level).toBe(1);
@@ -131,14 +135,14 @@ Content for subsection 2.`;
 
     it('should handle document without headers', () => {
       const document = 'Just plain text content without any headers.';
-      
+
       const sections = processor.extractSections(document);
       expect(sections).toHaveLength(0);
     });
 
     it('should handle empty document', () => {
       const document = '';
-      
+
       const sections = processor.extractSections(document);
       expect(sections).toHaveLength(0);
     });
@@ -433,25 +437,22 @@ Just regular content without tasks.`;
   describe('generateFileReferences', () => {
     it('should generate file references in correct format', () => {
       const files = ['spec/requirements.md', 'spec/design.md', 'spec/tasks.md'];
-      
+
       const references = processor.generateFileReferences(files);
-      
+
       expect(references).toEqual([
         '#[[file:spec/requirements.md]]',
         '#[[file:spec/design.md]]',
-        '#[[file:spec/tasks.md]]'
+        '#[[file:spec/tasks.md]]',
       ]);
     });
 
     it('should filter out empty files', () => {
       const files = ['spec/requirements.md', '', '  ', 'spec/design.md'];
-      
+
       const references = processor.generateFileReferences(files);
-      
-      expect(references).toEqual([
-        '#[[file:spec/requirements.md]]',
-        '#[[file:spec/design.md]]'
-      ]);
+
+      expect(references).toEqual(['#[[file:spec/requirements.md]]', '#[[file:spec/design.md]]']);
     });
 
     it('should handle empty array', () => {
@@ -462,11 +463,8 @@ Just regular content without tasks.`;
 
   describe('formatFileReferences', () => {
     it('should format references as markdown', () => {
-      const references = [
-        '#[[file:spec/requirements.md]]',
-        '#[[file:spec/design.md]]'
-      ];
-      
+      const references = ['#[[file:spec/requirements.md]]', '#[[file:spec/design.md]]'];
+
       const formatted = processor.formatFileReferences(references);
       expect(formatted).toBe('#[[file:spec/requirements.md]]\n#[[file:spec/design.md]]');
     });
@@ -481,9 +479,9 @@ Just regular content without tasks.`;
     it('should use custom configuration', () => {
       const config: ContentExtractionConfig = {
         maxSectionLength: 100,
-        preserveMarkdown: false
+        preserveMarkdown: false,
       };
-      
+
       const customProcessor = new TemplateProcessor(config);
       expect(customProcessor.getConfig().maxSectionLength).toBe(100);
       expect(customProcessor.getConfig().preserveMarkdown).toBe(false);

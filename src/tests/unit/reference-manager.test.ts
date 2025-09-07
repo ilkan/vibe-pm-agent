@@ -1,6 +1,6 @@
 /**
  * Unit Tests for Reference Manager Component
- * 
+ *
  * Tests the reference manager for McKinsey, Gartner, and WEF sources,
  * including source validation and citation formatting as specified in requirements 1.5 and 1.6.
  */
@@ -9,13 +9,13 @@ import {
   ReferenceManager,
   createReferenceManager,
   validateAndFormatSources,
-  checkSourceUpdates
+  checkSourceUpdates,
 } from '../../components/reference-manager';
 import {
   SourceReference,
   FreshnessStatus,
   UpdateRecommendation,
-  ValidationResult
+  ValidationResult,
 } from '../../models/competitive';
 
 describe('Reference Manager', () => {
@@ -27,7 +27,8 @@ describe('Reference Manager', () => {
 
   describe('Source Validation (Requirement 1.5)', () => {
     it('should validate McKinsey sources as credible', () => {
-      const mcKinseyUrl = 'https://mckinsey.com/industries/technology/our-insights/tech-trends-2024';
+      const mcKinseyUrl =
+        'https://mckinsey.com/industries/technology/our-insights/tech-trends-2024';
       const mcKinseyName = 'McKinsey Global Institute Report';
 
       expect(referenceManager.validateSource(mcKinseyUrl)).toBe(true);
@@ -55,7 +56,7 @@ describe('Reference Manager', () => {
         'https://bcg.com/publications/industry-insights',
         'https://bain.com/insights/market-analysis',
         'https://deloitte.com/research/technology-trends',
-        'https://forrester.com/research/technology-market'
+        'https://forrester.com/research/technology-market',
       ];
 
       trustedSources.forEach(source => {
@@ -68,7 +69,7 @@ describe('Reference Manager', () => {
         'https://random-blog.com/market-analysis',
         'https://unknown-site.net/industry-report',
         'Personal opinion blog',
-        'Unverified market research'
+        'Unverified market research',
       ];
 
       untrustedSources.forEach(source => {
@@ -85,16 +86,16 @@ describe('Reference Manager', () => {
         publishDate: '2024-01-15',
         accessDate: '2024-02-01',
         reliability: 0.95,
-        relevance: 0.90,
+        relevance: 0.9,
         dataFreshness: {
           status: 'fresh',
           ageInDays: 15,
           recommendedUpdateFrequency: 90,
-          lastValidated: '2024-02-01'
+          lastValidated: '2024-02-01',
         },
         citationFormat: 'McKinsey & Company (2024). Technology Trends 2024.',
         keyFindings: ['AI adoption trends', 'Digital transformation insights'],
-        limitations: ['Limited geographic scope']
+        limitations: ['Limited geographic scope'],
       };
 
       expect(referenceManager.validateSource(validSource)).toBe(true);
@@ -125,7 +126,7 @@ describe('Reference Manager', () => {
           organization: 'World Economic Forum',
           publishDate: 'invalid-date',
           reliability: 0.8,
-        }
+        },
       ];
 
       invalidSources.forEach(source => {
@@ -144,20 +145,22 @@ describe('Reference Manager', () => {
         publishDate: '2024-01-15',
         accessDate: '2024-02-01',
         reliability: 0.95,
-        relevance: 0.90,
+        relevance: 0.9,
         url: 'https://mckinsey.com/test-report',
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const citation = referenceManager.formatCitation(mcKinseySource);
-      
+
       expect(citation).toContain('McKinsey & Company');
       expect(citation).toContain('2024');
       expect(citation).toContain('The Future of Technology in Business');
-      expect(citation).toMatch(/McKinsey & Company \(2024\)\. The Future of Technology in Business\. Retrieved from https:\/\/mckinsey\.com\/test-report/);
+      expect(citation).toMatch(
+        /McKinsey & Company \(2024\)\. The Future of Technology in Business\. Retrieved from https:\/\/mckinsey\.com\/test-report/
+      );
     });
 
     it('should format Gartner citations correctly', () => {
@@ -168,20 +171,22 @@ describe('Reference Manager', () => {
         organization: 'Gartner Inc.',
         publishDate: '2024-02-01',
         accessDate: '2024-02-15',
-        reliability: 0.90,
+        reliability: 0.9,
         relevance: 0.95,
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const citation = referenceManager.formatCitation(gartnerSource);
-      
+
       expect(citation).toContain('Gartner');
       expect(citation).toContain('2024');
       expect(citation).toContain('Magic Quadrant for CRM Platforms');
-      expect(citation).toMatch(/Gartner \(2024\)\. Magic Quadrant for CRM Platforms\. Gartner Research\./);
+      expect(citation).toMatch(
+        /Gartner \(2024\)\. Magic Quadrant for CRM Platforms\. Gartner Research\./
+      );
     });
 
     it('should format WEF citations correctly', () => {
@@ -193,20 +198,22 @@ describe('Reference Manager', () => {
         publishDate: '2024-01-30',
         accessDate: '2024-02-10',
         reliability: 0.85,
-        relevance: 0.80,
+        relevance: 0.8,
         url: 'https://weforum.org/reports/tech-governance-2024',
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const citation = referenceManager.formatCitation(wefSource);
-      
+
       expect(citation).toContain('World Economic Forum');
       expect(citation).toContain('2024');
       expect(citation).toContain('Global Technology Governance Report 2024');
-      expect(citation).toMatch(/World Economic Forum \(2024\)\. Global Technology Governance Report 2024\. Retrieved from https:\/\/weforum\.org\/reports\/tech-governance-2024/);
+      expect(citation).toMatch(
+        /World Economic Forum \(2024\)\. Global Technology Governance Report 2024\. Retrieved from https:\/\/weforum\.org\/reports\/tech-governance-2024/
+      );
     });
 
     it('should generate generic citations for unknown source types', () => {
@@ -217,17 +224,17 @@ describe('Reference Manager', () => {
         organization: 'Research Institute',
         publishDate: '2024-01-01',
         accessDate: '2024-02-01',
-        reliability: 0.70,
+        reliability: 0.7,
         relevance: 0.75,
         url: 'https://research-institute.com/report',
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const citation = referenceManager.formatCitation(genericSource);
-      
+
       expect(citation).toContain('Research Institute');
       expect(citation).toContain('2024');
       expect(citation).toContain('Industry Analysis Report');
@@ -238,7 +245,7 @@ describe('Reference Manager', () => {
   describe('Data Freshness Tracking', () => {
     it('should correctly assess fresh data', () => {
       const freshDate = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 15 days ago
-      
+
       const freshSource: SourceReference = {
         id: 'fresh-test',
         type: 'mckinsey',
@@ -247,23 +254,25 @@ describe('Reference Manager', () => {
         publishDate: freshDate,
         accessDate: new Date().toISOString().split('T')[0],
         reliability: 0.95,
-        relevance: 0.90,
+        relevance: 0.9,
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const freshness = referenceManager.checkDataFreshness(freshSource);
-      
+
       expect(freshness.status).toBe('fresh');
       expect(freshness.ageInDays).toBe(15);
       expect(freshness.recommendedUpdateFrequency).toBe(90);
     });
 
     it('should correctly assess stale data', () => {
-      const staleDate = new Date(Date.now() - 200 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 200 days ago
-      
+      const staleDate = new Date(Date.now() - 200 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0]; // 200 days ago
+
       const staleSource: SourceReference = {
         id: 'stale-test',
         type: 'gartner',
@@ -271,23 +280,25 @@ describe('Reference Manager', () => {
         organization: 'Gartner Inc.',
         publishDate: staleDate,
         accessDate: new Date().toISOString().split('T')[0],
-        reliability: 0.90,
+        reliability: 0.9,
         relevance: 0.85,
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const freshness = referenceManager.checkDataFreshness(staleSource);
-      
+
       expect(freshness.status).toBe('stale');
       expect(freshness.ageInDays).toBe(200);
     });
 
     it('should correctly assess outdated data', () => {
-      const outdatedDate = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 400 days ago
-      
+      const outdatedDate = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0]; // 400 days ago
+
       const outdatedSource: SourceReference = {
         id: 'outdated-test',
         type: 'wef',
@@ -296,22 +307,22 @@ describe('Reference Manager', () => {
         publishDate: outdatedDate,
         accessDate: new Date().toISOString().split('T')[0],
         reliability: 0.85,
-        relevance: 0.70,
+        relevance: 0.7,
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const freshness = referenceManager.checkDataFreshness(outdatedSource);
-      
+
       expect(freshness.status).toBe('outdated');
       expect(freshness.ageInDays).toBe(400);
     });
 
     it('should have different freshness thresholds for different source types', () => {
       const testDate = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 45 days ago
-      
+
       const mcKinseySource: SourceReference = {
         id: 'mckinsey-freshness',
         type: 'mckinsey',
@@ -320,23 +331,23 @@ describe('Reference Manager', () => {
         publishDate: testDate,
         accessDate: new Date().toISOString().split('T')[0],
         reliability: 0.95,
-        relevance: 0.90,
+        relevance: 0.9,
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const wefSource: SourceReference = {
         ...mcKinseySource,
         id: 'wef-freshness',
         type: 'wef',
-        organization: 'World Economic Forum'
+        organization: 'World Economic Forum',
       };
 
       const mcKinseyFreshness = referenceManager.checkDataFreshness(mcKinseySource);
       const wefFreshness = referenceManager.checkDataFreshness(wefSource);
-      
+
       // McKinsey should be 'recent' at 45 days, WEF should be 'fresh'
       expect(mcKinseyFreshness.status).toBe('recent');
       expect(wefFreshness.status).toBe('fresh');
@@ -353,15 +364,15 @@ describe('Reference Manager', () => {
         publishDate: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         accessDate: new Date().toISOString().split('T')[0],
         reliability: 0.95,
-        relevance: 0.90,
+        relevance: 0.9,
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const recommendations = referenceManager.suggestUpdates([outdatedSource]);
-      
+
       expect(recommendations.length).toBeGreaterThan(0);
       expect(recommendations[0].type).toBe('data-refresh');
       expect(recommendations[0].priority).toBe('high');
@@ -376,16 +387,16 @@ describe('Reference Manager', () => {
         organization: 'Gartner Inc.',
         publishDate: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         accessDate: new Date().toISOString().split('T')[0],
-        reliability: 0.90,
+        reliability: 0.9,
         relevance: 0.85,
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const recommendations = referenceManager.suggestUpdates([staleSource]);
-      
+
       expect(recommendations.length).toBeGreaterThan(0);
       const verificationRec = recommendations.find(r => r.type === 'source-verification');
       expect(verificationRec).toBeDefined();
@@ -400,16 +411,16 @@ describe('Reference Manager', () => {
         organization: 'Some Research Firm',
         publishDate: new Date().toISOString().split('T')[0],
         accessDate: new Date().toISOString().split('T')[0],
-        reliability: 0.70,
-        relevance: 0.80,
+        reliability: 0.7,
+        relevance: 0.8,
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const recommendations = referenceManager.suggestUpdates([nonAuthoritativeSource]);
-      
+
       const authRec = recommendations.find(r => r.type === 'methodology-update');
       expect(authRec).toBeDefined();
       expect(authRec!.description).toContain('authoritative sources');
@@ -426,11 +437,11 @@ describe('Reference Manager', () => {
           publishDate: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           accessDate: new Date().toISOString().split('T')[0],
           reliability: 0.95,
-          relevance: 0.90,
+          relevance: 0.9,
           dataFreshness: {} as FreshnessStatus,
           citationFormat: '',
           keyFindings: [],
-          limitations: []
+          limitations: [],
         },
         {
           id: 'stale',
@@ -439,17 +450,17 @@ describe('Reference Manager', () => {
           organization: 'Research Firm',
           publishDate: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           accessDate: new Date().toISOString().split('T')[0],
-          reliability: 0.70,
+          reliability: 0.7,
           relevance: 0.75,
           dataFreshness: {} as FreshnessStatus,
           citationFormat: '',
           keyFindings: [],
-          limitations: []
-        }
+          limitations: [],
+        },
       ];
 
       const recommendations = referenceManager.suggestUpdates(sources);
-      
+
       // High priority recommendations should come first
       expect(recommendations[0].priority).toBe('high');
       if (recommendations.length > 1) {
@@ -470,7 +481,9 @@ describe('Reference Manager', () => {
       expect(mcKinseyRef.organization).toBe('McKinsey & Company');
       expect(mcKinseyRef.title).toBe('Technology Transformation in Financial Services');
       expect(mcKinseyRef.reliability).toBe(0.95);
-      expect(mcKinseyRef.url).toBe('https://mckinsey.com/industries/financial-services/tech-transformation');
+      expect(mcKinseyRef.url).toBe(
+        'https://mckinsey.com/industries/financial-services/tech-transformation'
+      );
     });
 
     it('should create Gartner source references correctly', () => {
@@ -482,7 +495,7 @@ describe('Reference Manager', () => {
       expect(gartnerRef.type).toBe('gartner');
       expect(gartnerRef.organization).toBe('Gartner Inc.');
       expect(gartnerRef.title).toBe('Magic Quadrant for Enterprise Software Platforms');
-      expect(gartnerRef.reliability).toBe(0.90);
+      expect(gartnerRef.reliability).toBe(0.9);
     });
 
     it('should create WEF source references correctly', () => {
@@ -505,11 +518,11 @@ describe('Reference Manager', () => {
       const highQualitySources: SourceReference[] = [
         referenceManager.createMcKinseyReference('Industry Report 1', '2024-01-15'),
         referenceManager.createGartnerReference('Technology Analysis', '2024-01-20'),
-        referenceManager.createWEFReference('Global Trends Report', '2024-01-25')
+        referenceManager.createWEFReference('Global Trends Report', '2024-01-25'),
       ];
 
       const validation = referenceManager.validateSourceCollection(highQualitySources);
-      
+
       expect(validation.isValid).toBe(true);
       expect(validation.confidence).toBeGreaterThanOrEqual(0.8);
       // Allow for some warnings as the validation logic may flag certain conditions
@@ -530,12 +543,12 @@ describe('Reference Manager', () => {
           dataFreshness: {} as FreshnessStatus,
           citationFormat: '',
           keyFindings: [],
-          limitations: []
-        }
+          limitations: [],
+        },
       ];
 
       const validation = referenceManager.validateSourceCollection(lowQualitySources);
-      
+
       expect(validation.isValid).toBe(false);
       expect(validation.confidence).toBeLessThan(0.5);
       expect(validation.warnings.length).toBeGreaterThan(0);
@@ -551,30 +564,32 @@ describe('Reference Manager', () => {
         publishDate: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         accessDate: new Date().toISOString().split('T')[0],
         reliability: 0.65,
-        relevance: 0.70,
+        relevance: 0.7,
         dataFreshness: {} as FreshnessStatus,
         citationFormat: '',
         keyFindings: [],
-        limitations: []
+        limitations: [],
       };
 
       const validation = referenceManager.validateSourceCollection([mediocreSource]);
-      
+
       expect(validation.recommendations.length).toBeGreaterThan(0);
-      expect(validation.recommendations.some(r => 
-        r.toLowerCase().includes('mckinsey') || r.toLowerCase().includes('gartner')
-      )).toBe(true);
+      expect(
+        validation.recommendations.some(
+          r => r.toLowerCase().includes('mckinsey') || r.toLowerCase().includes('gartner')
+        )
+      ).toBe(true);
     });
   });
 
   describe('Source Attribution Generation', () => {
     it('should generate appropriate sources for competitive analysis', () => {
       const sources = referenceManager.generateSourceAttribution('Technology', 'competitive');
-      
+
       expect(sources.length).toBeGreaterThan(0);
       expect(sources.some(s => s.type === 'mckinsey')).toBe(true);
       expect(sources.some(s => s.type === 'gartner')).toBe(true);
-      
+
       sources.forEach(source => {
         expect(source.title).toContain('Technology');
         expect(source.reliability).toBeGreaterThan(0.7);
@@ -583,11 +598,11 @@ describe('Reference Manager', () => {
 
     it('should generate appropriate sources for market sizing', () => {
       const sources = referenceManager.generateSourceAttribution('Healthcare', 'market-sizing');
-      
+
       expect(sources.length).toBeGreaterThan(0);
       expect(sources.some(s => s.type === 'mckinsey')).toBe(true);
       expect(sources.some(s => s.type === 'wef')).toBe(true);
-      
+
       sources.forEach(source => {
         expect(source.title).toContain('Healthcare');
       });
@@ -595,10 +610,13 @@ describe('Reference Manager', () => {
 
     it('should generate industry-specific source titles', () => {
       const industries = ['Financial Services', 'Healthcare', 'Manufacturing', 'Retail'];
-      
+
       industries.forEach(industry => {
-        const sources = referenceManager.generateSourceAttribution(industry, 'business-opportunity');
-        
+        const sources = referenceManager.generateSourceAttribution(
+          industry,
+          'business-opportunity'
+        );
+
         expect(sources.length).toBeGreaterThan(0);
         expect(sources.some(s => s.title.includes(industry))).toBe(true);
       });
@@ -618,20 +636,20 @@ describe('Reference Manager', () => {
           publishDate: '2024-01-01',
           accessDate: '2024-02-01',
           reliability: 0.95,
-          relevance: 0.90,
+          relevance: 0.9,
           dataFreshness: {} as FreshnessStatus,
           citationFormat: '',
           keyFindings: [],
-          limitations: []
-        }
+          limitations: [],
+        },
       ];
 
       const result = validateAndFormatSources(testSources);
-      
+
       expect(result.validSources.length).toBe(2); // Only valid sources
       expect(result.formattedCitations.length).toBe(2);
       expect(result.validationResult.isValid).toBe(true);
-      
+
       result.formattedCitations.forEach(citation => {
         expect(typeof citation).toBe('string');
         expect(citation.length).toBeGreaterThan(10);
@@ -648,16 +666,16 @@ describe('Reference Manager', () => {
           publishDate: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           accessDate: new Date().toISOString().split('T')[0],
           reliability: 0.95,
-          relevance: 0.90,
+          relevance: 0.9,
           dataFreshness: {} as FreshnessStatus,
           citationFormat: '',
           keyFindings: [],
-          limitations: []
-        }
+          limitations: [],
+        },
       ];
 
       const updates = checkSourceUpdates(testSources);
-      
+
       expect(updates.length).toBeGreaterThan(0);
       expect(updates[0].type).toBe('data-refresh');
       expect(updates[0].priority).toBe('high');
@@ -667,7 +685,7 @@ describe('Reference Manager', () => {
   describe('Factory Function', () => {
     it('should create ReferenceManager instance correctly', () => {
       const manager = createReferenceManager();
-      
+
       expect(manager).toBeInstanceOf(ReferenceManager);
       expect(manager.validateSource('https://mckinsey.com/test')).toBe(true);
       expect(manager.validateSource('https://random-site.com/test')).toBe(false);

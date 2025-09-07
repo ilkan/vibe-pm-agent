@@ -3,7 +3,10 @@
  */
 
 import { SteeringService } from '../../components/steering-service';
-import { SteeringUserInteraction, SteeringUserPreferences } from '../../components/steering-user-interaction';
+import {
+  SteeringUserInteraction,
+  SteeringUserPreferences,
+} from '../../components/steering-user-interaction';
 import { DocumentType } from '../../models/steering';
 import { SteeringFileOptions } from '../../models/mcp';
 import * as fs from 'fs/promises';
@@ -16,7 +19,7 @@ describe('SteeringUserInteraction Integration', () => {
   beforeEach(async () => {
     // Create temporary steering directory for tests
     testSteeringDir = path.join(__dirname, '../../temp-steering-test');
-    
+
     try {
       await fs.mkdir(testSteeringDir, { recursive: true });
     } catch (error) {
@@ -29,8 +32,8 @@ describe('SteeringUserInteraction Integration', () => {
       userPreferences: {
         autoCreate: false,
         showPreview: true,
-        showSummary: true
-      }
+        showSummary: true,
+      },
     });
   });
 
@@ -65,7 +68,7 @@ This is a test requirements document for user interaction testing.
         create_steering_files: true,
         feature_name: 'user-interaction-test',
         inclusion_rule: 'fileMatch',
-        file_match_pattern: 'requirements*|spec*'
+        file_match_pattern: 'requirements*|spec*',
       };
 
       // Update user preferences
@@ -74,11 +77,14 @@ This is a test requirements document for user interaction testing.
         showPreview: false,
         namingPreferences: {
           useFeaturePrefix: true,
-          useTimestamp: false
-        }
+          useTimestamp: false,
+        },
       });
 
-      const result = await steeringService.createFromRequirements(mockRequirements, steeringOptions);
+      const result = await steeringService.createFromRequirements(
+        mockRequirements,
+        steeringOptions
+      );
 
       expect(result.created).toBe(true);
       expect(result.userInteractionRequired).toBe(true);
@@ -90,9 +96,12 @@ This is a test requirements document for user interaction testing.
       const createdFile = result.results[0];
       expect(createdFile.success).toBe(true);
       expect(createdFile.fullPath).toBeDefined();
-      
+
       if (createdFile.fullPath) {
-        const fileExists = await fs.access(createdFile.fullPath).then(() => true).catch(() => false);
+        const fileExists = await fs
+          .access(createdFile.fullPath)
+          .then(() => true)
+          .catch(() => false);
         expect(fileExists).toBe(true);
 
         // Verify file content includes user preferences
@@ -116,19 +125,19 @@ Simple test architecture for user interaction testing.
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'declined-test'
+        feature_name: 'declined-test',
       };
 
       // Set preferences to not auto-create for design documents
       steeringService.updateUserPreferences({
-        autoCreate: false
+        autoCreate: false,
       });
 
       // Mock the user interaction to simulate declining
       const userInteraction = new SteeringUserInteraction({ autoCreate: false });
       jest.spyOn(userInteraction, 'promptForSteeringFileCreation').mockResolvedValue({
         createFiles: false,
-        rememberPreferences: false
+        rememberPreferences: false,
       });
 
       // Replace the service's user interaction with our mocked one
@@ -160,13 +169,13 @@ Implement comprehensive user interaction system.
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'preview-test',
-        inclusion_rule: 'manual'
+        inclusion_rule: 'manual',
       };
 
       // Set preferences to show preview
       steeringService.updateUserPreferences({
         autoCreate: true,
-        showPreview: true
+        showPreview: true,
       });
 
       const result = await steeringService.createFromOnePager(mockOnePager, steeringOptions);
@@ -174,28 +183,33 @@ Implement comprehensive user interaction system.
       expect(result.created).toBe(true);
       expect(result.warnings).toBeDefined();
       expect(result.summary).toBeDefined();
-      expect(result.summary?.usageRecommendations.some(rec => 
-        rec.includes('Manual inclusion files can be activated using #filename')
-      )).toBe(true);
+      expect(
+        result.summary?.usageRecommendations.some(rec =>
+          rec.includes('Manual inclusion files can be activated using #filename')
+        )
+      ).toBe(true);
     });
 
     it('should generate comprehensive summary with multiple files', async () => {
       const mockContent = 'Test content for summary generation';
-      
+
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'summary-test'
+        feature_name: 'summary-test',
       };
 
       // Enable auto-create to avoid prompts
       steeringService.updateUserPreferences({
         autoCreate: true,
-        showSummary: true
+        showSummary: true,
       });
 
       // Create multiple steering files
       const reqResult = await steeringService.createFromRequirements(mockContent, steeringOptions);
-      const designResult = await steeringService.createFromDesignOptions(mockContent, steeringOptions);
+      const designResult = await steeringService.createFromDesignOptions(
+        mockContent,
+        steeringOptions
+      );
 
       expect(reqResult.created).toBe(true);
       expect(designResult.created).toBe(true);
@@ -221,7 +235,7 @@ Implement comprehensive user interaction system.
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'custom-naming-test'
+        feature_name: 'custom-naming-test',
       };
 
       // Set custom naming preferences
@@ -230,8 +244,8 @@ Implement comprehensive user interaction system.
         namingPreferences: {
           useFeaturePrefix: true,
           useTimestamp: false,
-          customPrefix: 'custom-prefix'
-        }
+          customPrefix: 'custom-prefix',
+        },
       });
 
       const result = await steeringService.createFromTaskPlan(mockTaskPlan, steeringOptions);
@@ -243,12 +257,12 @@ Implement comprehensive user interaction system.
 
     it('should preserve user preferences across multiple operations', async () => {
       const mockContent = 'Test content for preference persistence';
-      
+
       const initialPreferences: Partial<SteeringUserPreferences> = {
         autoCreate: true,
         defaultInclusionRule: 'always',
         showPreview: false,
-        showSummary: false
+        showSummary: false,
       };
 
       steeringService.updateUserPreferences(initialPreferences);
@@ -262,12 +276,12 @@ Implement comprehensive user interaction system.
       // Create multiple steering files
       const result1 = await steeringService.createFromRequirements(mockContent, {
         create_steering_files: true,
-        feature_name: 'persistence-test-1'
+        feature_name: 'persistence-test-1',
       });
 
       const result2 = await steeringService.createFromDesignOptions(mockContent, {
         create_steering_files: true,
-        feature_name: 'persistence-test-2'
+        feature_name: 'persistence-test-2',
       });
 
       // Both should succeed with consistent preferences
@@ -284,20 +298,22 @@ Implement comprehensive user interaction system.
   describe('Error Handling in User Interaction', () => {
     it('should handle file system errors gracefully', async () => {
       const mockContent = 'Test content for error handling';
-      
+
       // Create service with invalid directory to trigger errors
       const invalidService = new SteeringService({
         steeringDirectory: '/invalid/path/that/does/not/exist',
-        userPreferences: { autoCreate: true }
+        userPreferences: { autoCreate: true },
       });
 
       const result = await invalidService.createFromRequirements(mockContent, {
         create_steering_files: true,
-        feature_name: 'error-test'
+        feature_name: 'error-test',
       });
 
       expect(result.created).toBe(false);
-      expect(result.message).toMatch(/Failed to create|User declined|Steering file creation skipped/);
+      expect(result.message).toMatch(
+        /Failed to create|User declined|Steering file creation skipped/
+      );
       expect(result.warnings.length).toBeGreaterThan(0);
     });
 
@@ -306,12 +322,12 @@ Implement comprehensive user interaction system.
 
       steeringService.updateUserPreferences({
         autoCreate: true,
-        showPreview: true
+        showPreview: true,
       });
 
       const result = await steeringService.createFromPRFAQ(malformedContent, {
         create_steering_files: true,
-        feature_name: 'malformed-test'
+        feature_name: 'malformed-test',
       });
 
       // Should handle malformed content gracefully - might succeed with warnings or fail

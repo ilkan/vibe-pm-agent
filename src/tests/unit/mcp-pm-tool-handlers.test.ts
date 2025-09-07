@@ -1,13 +1,13 @@
 // Unit tests for new PM-focused MCP tool handlers
 
 import { PMAgentMCPServer } from '../../mcp/server';
-import { 
+import {
   ManagementOnePagerArgs,
   PRFAQArgs,
   RequirementsArgs,
   DesignOptionsArgs,
   TaskPlanArgs,
-  MCPToolContext
+  MCPToolContext,
 } from '../../models/mcp';
 
 describe('PM-Focused MCP Tool Handlers', () => {
@@ -21,7 +21,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
       sessionId: 'test-session-123',
       timestamp: Date.now(),
       requestId: 'req-123',
-      traceId: 'trace-123'
+      traceId: 'trace-123',
     };
   });
 
@@ -38,8 +38,8 @@ describe('PM-Focused MCP Tool Handlers', () => {
         roi_inputs: {
           cost_naive: 100000,
           cost_balanced: 60000,
-          cost_bold: 30000
-        }
+          cost_bold: 30000,
+        },
       };
 
       const result = await server.handleGenerateManagementOnePager(args, mockContext);
@@ -57,7 +57,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
     test('should handle missing optional parameters', async () => {
       const args: ManagementOnePagerArgs = {
         requirements: 'System must provide quota optimization',
-        design: 'Basic MCP server architecture'
+        design: 'Basic MCP server architecture',
       };
 
       const result = await server.handleGenerateManagementOnePager(args, mockContext);
@@ -72,7 +72,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
       const args: PRFAQArgs = {
         requirements: 'System must provide urgent quota optimization for developer workflows',
         design: 'MCP server architecture with multi-stage pipeline',
-        target_date: '2024-06-15'
+        target_date: '2024-06-15',
       };
 
       const result = await server.handleGeneratePRFAQ(args, mockContext);
@@ -90,7 +90,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
     test('should use default date when target_date not provided', async () => {
       const args: PRFAQArgs = {
         requirements: 'System must provide quota optimization',
-        design: 'Basic MCP server architecture'
+        design: 'Basic MCP server architecture',
       };
 
       const result = await server.handleGeneratePRFAQ(args, mockContext);
@@ -103,16 +103,17 @@ describe('PM-Focused MCP Tool Handlers', () => {
   describe('handleGenerateRequirements', () => {
     test('should generate requirements with context', async () => {
       const args: RequirementsArgs = {
-        raw_intent: 'I want to optimize my workflow to reduce quota consumption and improve efficiency',
+        raw_intent:
+          'I want to optimize my workflow to reduce quota consumption and improve efficiency',
         context: {
           roadmap_theme: 'Developer Experience',
           budget: 100000,
           quotas: {
             maxVibes: 1000,
-            maxSpecs: 50
+            maxSpecs: 50,
           },
-          deadlines: 'Q1 2024 launch target'
-        }
+          deadlines: 'Q1 2024 launch target',
+        },
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -130,7 +131,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
 
     test('should generate requirements without context', async () => {
       const args: RequirementsArgs = {
-        raw_intent: 'I want to optimize my workflow'
+        raw_intent: 'I want to optimize my workflow',
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -143,7 +144,8 @@ describe('PM-Focused MCP Tool Handlers', () => {
   describe('handleGenerateDesignOptions', () => {
     test('should generate design options with valid requirements', async () => {
       const args: DesignOptionsArgs = {
-        requirements: 'System must provide urgent quota optimization with consulting-grade analysis and PM document generation capabilities'
+        requirements:
+          'System must provide urgent quota optimization with consulting-grade analysis and PM document generation capabilities',
       };
 
       const result = await server.handleGenerateDesignOptions(args, mockContext);
@@ -164,12 +166,13 @@ describe('PM-Focused MCP Tool Handlers', () => {
   describe('handleGenerateTaskPlan', () => {
     test('should generate task plan with limits', async () => {
       const args: TaskPlanArgs = {
-        design: 'MCP server architecture with multi-stage pipeline, PM document generation, and comprehensive testing framework',
+        design:
+          'MCP server architecture with multi-stage pipeline, PM document generation, and comprehensive testing framework',
         limits: {
           max_vibes: 1000,
           max_specs: 50,
-          budget_usd: 100000
-        }
+          budget_usd: 100000,
+        },
       };
 
       const result = await server.handleGenerateTaskPlan(args, mockContext);
@@ -188,7 +191,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
 
     test('should generate task plan without limits', async () => {
       const args: TaskPlanArgs = {
-        design: 'Basic MCP server architecture'
+        design: 'Basic MCP server architecture',
       };
 
       const result = await server.handleGenerateTaskPlan(args, mockContext);
@@ -202,7 +205,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
     test('should handle errors gracefully in management one-pager generation', async () => {
       const args: ManagementOnePagerArgs = {
         requirements: '',
-        design: ''
+        design: '',
       };
 
       const result = await server.handleGenerateManagementOnePager(args, mockContext);
@@ -215,7 +218,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
     test('should handle errors gracefully in PR-FAQ generation', async () => {
       const args: PRFAQArgs = {
         requirements: '',
-        design: ''
+        design: '',
       };
 
       const result = await server.handleGeneratePRFAQ(args, mockContext);
@@ -226,7 +229,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
 
     test('should handle errors gracefully in requirements generation', async () => {
       const args: RequirementsArgs = {
-        raw_intent: ''
+        raw_intent: '',
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);
@@ -240,7 +243,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
     test('should return markdown format for management one-pager', async () => {
       const args: ManagementOnePagerArgs = {
         requirements: 'Test requirements',
-        design: 'Test design'
+        design: 'Test design',
       };
 
       const result = await server.handleGenerateManagementOnePager(args, mockContext);
@@ -253,7 +256,7 @@ describe('PM-Focused MCP Tool Handlers', () => {
 
     test('should return json format for requirements', async () => {
       const args: RequirementsArgs = {
-        raw_intent: 'Test intent'
+        raw_intent: 'Test intent',
       };
 
       const result = await server.handleGenerateRequirements(args, mockContext);

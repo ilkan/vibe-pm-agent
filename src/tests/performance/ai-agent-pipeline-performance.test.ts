@@ -2,11 +2,7 @@
 
 import { AIAgentPipeline } from '../../pipeline/ai-agent-pipeline';
 import { PMAgentMCPServer } from '../../mcp/server';
-import { 
-  OptimizeIntentArgs,
-  MCPToolContext,
-  MCPServerOptions
-} from '../../models/mcp';
+import { OptimizeIntentArgs, MCPToolContext, MCPServerOptions } from '../../models/mcp';
 
 describe('AI Agent Pipeline Performance Benchmarks', () => {
   let pipeline: AIAgentPipeline;
@@ -15,9 +11,9 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
   beforeEach(() => {
     const options: MCPServerOptions = {
       enableLogging: false,
-      enableMetrics: true
+      enableMetrics: true,
     };
-    
+
     pipeline = new AIAgentPipeline();
     server = new PMAgentMCPServer(options);
   });
@@ -27,13 +23,13 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
       const requestCount = 10;
       const maxConcurrency = 3;
       const startTime = Date.now();
-      
+
       const requests = Array.from({ length: requestCount }, (_, index) => ({
         intent: `Create microservice ${index + 1} for data processing with validation and caching`,
         parameters: {
           expectedUserVolume: 1000,
-          performanceSensitivity: 'medium' as const
-        }
+          performanceSensitivity: 'medium' as const,
+        },
       }));
 
       // Process requests in batches to control concurrency
@@ -45,12 +41,12 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
           const context: MCPToolContext = {
             toolName: 'optimize_intent',
             sessionId: `throughput-test-${i + batchIndex}`,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           };
-          
+
           return server.handleOptimizeIntent(args, context);
         });
-        
+
         const batchResults = await Promise.all(batchPromises);
         results.push(...batchResults);
       }
@@ -69,7 +65,7 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
         Total Time: ${totalTime}ms
         Average Time per Request: ${averageTimePerRequest.toFixed(2)}ms
         Requests per Second: ${requestsPerSecond.toFixed(3)}
-        Success Rate: ${(results.filter(r => !r.isError).length / requestCount * 100).toFixed(1)}%`);
+        Success Rate: ${((results.filter(r => !r.isError).length / requestCount) * 100).toFixed(1)}%`);
     });
 
     it('should maintain performance under memory pressure', async () => {
@@ -88,11 +84,16 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
       `;
 
       // Create large intents to test memory handling
-      const largeIntents = Array.from({ length: 3 }, (_, index) => 
-        largeIntentBase + ` Additional requirements for system ${index + 1}: ` + 
-        Array.from({ length: 10 }, (_, reqIndex) => 
-          `Requirement ${reqIndex + 1} with detailed specifications and complex business logic.`
-        ).join(' ')
+      const largeIntents = Array.from(
+        { length: 3 },
+        (_, index) =>
+          largeIntentBase +
+          ` Additional requirements for system ${index + 1}: ` +
+          Array.from(
+            { length: 10 },
+            (_, reqIndex) =>
+              `Requirement ${reqIndex + 1} with detailed specifications and complex business logic.`
+          ).join(' ')
       );
 
       const results: any[] = [];
@@ -100,20 +101,20 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
 
       for (let i = 0; i < largeIntents.length; i++) {
         const initialMemory = process.memoryUsage();
-        
+
         const args: OptimizeIntentArgs = {
           intent: largeIntents[i],
           parameters: {
             expectedUserVolume: 10000,
             costConstraints: { maxCostDollars: 2000 },
-            performanceSensitivity: 'high'
-          }
+            performanceSensitivity: 'high',
+          },
         };
 
         const context: MCPToolContext = {
           toolName: 'optimize_intent',
           sessionId: `memory-pressure-test-${i + 1}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
         const startTime = Date.now();
@@ -127,7 +128,7 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
           success: !result.isError,
           executionTime,
           memoryIncrease,
-          intentLength: largeIntents[i].length
+          intentLength: largeIntents[i].length,
         });
 
         memoryUsages.push(finalMemory.heapUsed);
@@ -139,7 +140,8 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
       }
 
       // Performance assertions
-      const avgExecutionTime = results.reduce((sum, r) => sum + r.executionTime, 0) / results.length;
+      const avgExecutionTime =
+        results.reduce((sum, r) => sum + r.executionTime, 0) / results.length;
       const maxMemoryIncrease = Math.max(...results.map(r => r.memoryIncrease));
       const successRate = results.filter(r => r.success).length / results.length;
 
@@ -162,20 +164,22 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
           name: 'Simple',
           intent: 'Create a basic REST API for user authentication',
           targetLatency: 8000, // 8 seconds
-          volume: 100
+          volume: 100,
         },
         {
           name: 'Medium',
-          intent: 'Build a content management system with user roles, file uploads, and search functionality',
+          intent:
+            'Build a content management system with user roles, file uploads, and search functionality',
           targetLatency: 12000, // 12 seconds
-          volume: 1000
+          volume: 1000,
         },
         {
           name: 'Complex',
-          intent: 'Create an enterprise resource planning system with inventory, accounting, HR, and CRM modules',
+          intent:
+            'Create an enterprise resource planning system with inventory, accounting, HR, and CRM modules',
           targetLatency: 20000, // 20 seconds
-          volume: 10000
-        }
+          volume: 10000,
+        },
       ];
 
       const results: any[] = [];
@@ -189,14 +193,14 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
             intent: testCase.intent,
             parameters: {
               expectedUserVolume: testCase.volume,
-              performanceSensitivity: 'medium'
-            }
+              performanceSensitivity: 'medium',
+            },
           };
 
           const context: MCPToolContext = {
             toolName: 'optimize_intent',
             sessionId: `latency-test-${testCase.name.toLowerCase()}-${i + 1}`,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           };
 
           const startTime = Date.now();
@@ -217,7 +221,7 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
           maxLatency,
           minLatency,
           targetLatency: testCase.targetLatency,
-          meetsTarget: avgLatency <= testCase.targetLatency
+          meetsTarget: avgLatency <= testCase.targetLatency,
         });
 
         // Performance assertions
@@ -250,20 +254,20 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
               intent: `${baseIntent} - Load test ${iteration + 1}-${index + 1}`,
               parameters: {
                 expectedUserVolume: 2000,
-                performanceSensitivity: 'medium'
-              }
+                performanceSensitivity: 'medium',
+              },
             };
 
             const context: MCPToolContext = {
               toolName: 'optimize_intent',
               sessionId: `load-test-${concurrency}-${iteration + 1}-${index + 1}`,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             };
 
             const startTime = Date.now();
             return server.handleOptimizeIntent(args, context).then(result => ({
               result,
-              latency: Date.now() - startTime
+              latency: Date.now() - startTime,
             }));
           });
 
@@ -285,7 +289,7 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
           avgLatency,
           latencyStdDev,
           minLatency: Math.min(...latencies),
-          maxLatency: Math.max(...latencies)
+          maxLatency: Math.max(...latencies),
         });
 
         // Consistency assertions
@@ -335,18 +339,18 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
         parameters: {
           expectedUserVolume: 50000,
           costConstraints: { maxCostDollars: 5000 },
-          performanceSensitivity: 'high'
-        }
+          performanceSensitivity: 'high',
+        },
       };
 
       const context: MCPToolContext = {
         toolName: 'optimize_intent',
         sessionId: 'cpu-intensive-test',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       const result = await server.handleOptimizeIntent(args, context);
-      
+
       const endCpuUsage = process.cpuUsage(startCpuUsage);
       const executionTime = Date.now() - startTime;
       const cpuEfficiency = (endCpuUsage.user + endCpuUsage.system) / (executionTime * 1000); // CPU time / wall time
@@ -365,7 +369,7 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
     it('should handle garbage collection efficiently', async () => {
       const iterations = 5;
       const gcStats: any[] = [];
-      
+
       // Enable GC monitoring if available
       let gcCount = 0;
       if (global.gc) {
@@ -384,14 +388,14 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
           intent: `Create data processing service ${i + 1} with complex transformations and validations`,
           parameters: {
             expectedUserVolume: 5000,
-            performanceSensitivity: 'medium'
-          }
+            performanceSensitivity: 'medium',
+          },
         };
 
         const context: MCPToolContext = {
           toolName: 'optimize_intent',
           sessionId: `gc-test-${i + 1}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
         const result = await server.handleOptimizeIntent(args, context);
@@ -405,7 +409,7 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
           heapUsedBefore: initialMemory.heapUsed,
           heapUsedAfter: finalMemory.heapUsed,
           heapIncrease: finalMemory.heapUsed - initialMemory.heapUsed,
-          gcTriggered
+          gcTriggered,
         });
 
         // Periodic cleanup
@@ -415,7 +419,8 @@ describe('AI Agent Pipeline Performance Benchmarks', () => {
       }
 
       // Analyze GC efficiency
-      const avgHeapIncrease = gcStats.reduce((sum, stat) => sum + stat.heapIncrease, 0) / iterations;
+      const avgHeapIncrease =
+        gcStats.reduce((sum, stat) => sum + stat.heapIncrease, 0) / iterations;
       const totalGcCount = gcStats.reduce((sum, stat) => sum + stat.gcTriggered, 0);
 
       expect(avgHeapIncrease).toBeLessThan(50 * 1024 * 1024); // Average heap increase should be reasonable

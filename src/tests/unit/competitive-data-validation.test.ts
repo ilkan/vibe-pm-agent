@@ -6,7 +6,7 @@ import {
   DataQualityValidator,
   CompetitiveDataValidationError,
   GracefulDegradationManager,
-  defaultDataQualityValidator
+  defaultDataQualityValidator,
 } from '../../utils/competitive-data-validation';
 
 import {
@@ -16,7 +16,7 @@ import {
   CompetitiveAnalysisError,
   MarketSizingError,
   COMPETITIVE_ANALYSIS_DEFAULTS,
-  SOURCE_RELIABILITY_THRESHOLDS
+  SOURCE_RELIABILITY_THRESHOLDS,
 } from '../../models/competitive';
 
 describe('DataQualityValidator', () => {
@@ -32,7 +32,7 @@ describe('DataQualityValidator', () => {
       const marketContext = {
         industry: 'SaaS',
         geography: ['North America', 'Europe'],
-        target_segment: 'Software Development Teams'
+        target_segment: 'Software Development Teams',
       };
 
       const result = validator.validateCompetitiveAnalysisInput(featureIdea, marketContext);
@@ -57,18 +57,20 @@ describe('DataQualityValidator', () => {
 
     it('should handle missing market context gracefully', () => {
       const featureIdea = 'AI-powered project management tool for software development teams';
-      
+
       const result = validator.validateCompetitiveAnalysisInput(featureIdea);
 
       expect(result.isValid).toBe(true);
       expect(result.confidence).toBeLessThan(1.0);
       expect(result.dataGaps).toContain('Market context not provided');
-      expect(result.recommendations).toContain('Provide industry, geography, and target segment for more accurate analysis');
+      expect(result.recommendations).toContain(
+        'Provide industry, geography, and target segment for more accurate analysis'
+      );
     });
 
     it('should warn about very long feature descriptions', () => {
       const longFeatureIdea = 'A'.repeat(2500);
-      
+
       const result = validator.validateCompetitiveAnalysisInput(longFeatureIdea);
 
       expect(result.isValid).toBe(true);
@@ -77,12 +79,15 @@ describe('DataQualityValidator', () => {
     });
 
     it('should detect generic feature descriptions', () => {
-      const genericFeatureIdea = 'Build a better app for users to improve their experience with enhanced features and optimized platform';
-      
+      const genericFeatureIdea =
+        'Build a better app for users to improve their experience with enhanced features and optimized platform';
+
       const result = validator.validateCompetitiveAnalysisInput(genericFeatureIdea);
 
       expect(result.isValid).toBe(true);
-      expect(result.warnings).toContain('Feature description appears generic and may limit competitive analysis depth');
+      expect(result.warnings).toContain(
+        'Feature description appears generic and may limit competitive analysis depth'
+      );
       expect(result.confidence).toBeLessThan(1.0);
     });
   });
@@ -93,11 +98,15 @@ describe('DataQualityValidator', () => {
       const marketDefinition = {
         industry: 'SaaS',
         geography: ['North America'],
-        customer_segments: ['SMB', 'Enterprise']
+        customer_segments: ['SMB', 'Enterprise'],
       };
       const sizingMethods = ['top-down', 'bottom-up'];
 
-      const result = validator.validateMarketSizingInput(featureIdea, marketDefinition, sizingMethods);
+      const result = validator.validateMarketSizingInput(
+        featureIdea,
+        marketDefinition,
+        sizingMethods
+      );
 
       expect(result.isValid).toBe(true);
       expect(result.confidence).toBeGreaterThanOrEqual(0.8);
@@ -106,7 +115,7 @@ describe('DataQualityValidator', () => {
 
     it('should throw error for missing market definition', () => {
       const featureIdea = 'AI-powered project management tool';
-      
+
       expect(() => {
         validator.validateMarketSizingInput(featureIdea, null, ['top-down']);
       }).toThrow(MarketSizingError);
@@ -115,9 +124,9 @@ describe('DataQualityValidator', () => {
     it('should throw error for missing industry', () => {
       const featureIdea = 'AI-powered project management tool';
       const marketDefinition = {
-        geography: ['North America']
+        geography: ['North America'],
       };
-      
+
       expect(() => {
         validator.validateMarketSizingInput(featureIdea, marketDefinition, ['top-down']);
       }).toThrow(MarketSizingError);
@@ -126,9 +135,9 @@ describe('DataQualityValidator', () => {
     it('should throw error for invalid sizing methods', () => {
       const featureIdea = 'AI-powered project management tool';
       const marketDefinition = {
-        industry: 'SaaS'
+        industry: 'SaaS',
       };
-      
+
       expect(() => {
         validator.validateMarketSizingInput(featureIdea, marketDefinition, ['invalid-method']);
       }).toThrow(MarketSizingError);
@@ -137,10 +146,12 @@ describe('DataQualityValidator', () => {
     it('should warn about single sizing method', () => {
       const featureIdea = 'AI-powered project management tool';
       const marketDefinition = {
-        industry: 'SaaS'
+        industry: 'SaaS',
       };
-      
-      const result = validator.validateMarketSizingInput(featureIdea, marketDefinition, ['top-down']);
+
+      const result = validator.validateMarketSizingInput(featureIdea, marketDefinition, [
+        'top-down',
+      ]);
 
       expect(result.isValid).toBe(true);
       expect(result.warnings).toContain('Using only one sizing method may limit accuracy');
@@ -150,10 +161,13 @@ describe('DataQualityValidator', () => {
     it('should handle missing geography gracefully', () => {
       const featureIdea = 'AI-powered project management tool';
       const marketDefinition = {
-        industry: 'SaaS'
+        industry: 'SaaS',
       };
-      
-      const result = validator.validateMarketSizingInput(featureIdea, marketDefinition, ['top-down', 'bottom-up']);
+
+      const result = validator.validateMarketSizingInput(featureIdea, marketDefinition, [
+        'top-down',
+        'bottom-up',
+      ]);
 
       expect(result.isValid).toBe(true);
       expect(result.dataGaps).toContain('Geographic scope not specified');
@@ -178,11 +192,11 @@ describe('DataQualityValidator', () => {
                 model: 'subscription',
                 startingPrice: 99,
                 currency: 'USD',
-                valueProposition: 'Enterprise-grade solution'
+                valueProposition: 'Enterprise-grade solution',
               },
               targetMarket: ['Enterprise'],
-              recentMoves: []
-            }
+              recentMoves: [],
+            },
           ],
           evaluationCriteria: [],
           rankings: [],
@@ -193,8 +207,8 @@ describe('DataQualityValidator', () => {
             targetSegment: 'Enterprise',
             marketMaturity: 'growth',
             regulatoryEnvironment: [],
-            technologyTrends: []
-          }
+            technologyTrends: [],
+          },
         },
         swotAnalysis: [
           {
@@ -203,14 +217,14 @@ describe('DataQualityValidator', () => {
             weaknesses: [{ description: 'High pricing', impact: 'medium', confidence: 0.7 }],
             opportunities: [],
             threats: [],
-            strategicImplications: []
-          }
+            strategicImplications: [],
+          },
         ],
         marketPositioning: {
           positioningMap: [],
           competitorPositions: [],
           marketGaps: [],
-          recommendedPositioning: []
+          recommendedPositioning: [],
         },
         strategicRecommendations: [
           {
@@ -224,14 +238,14 @@ describe('DataQualityValidator', () => {
                 action: 'Research SMB needs',
                 timeline: '2 weeks',
                 dependencies: [],
-                successMetrics: ['Survey completion']
-              }
+                successMetrics: ['Survey completion'],
+              },
             ],
             expectedOutcome: 'Market entry',
             riskLevel: 'medium',
             timeframe: '6 months',
-            resourceRequirements: ['Marketing team']
-          }
+            resourceRequirements: ['Marketing team'],
+          },
         ],
         sourceAttribution: [
           {
@@ -247,12 +261,12 @@ describe('DataQualityValidator', () => {
               status: 'fresh',
               ageInDays: 30,
               recommendedUpdateFrequency: 90,
-              lastValidated: '2024-01-15'
+              lastValidated: '2024-01-15',
             },
             citationFormat: 'Gartner (2024)',
             keyFindings: ['Market growing at 15%'],
-            limitations: []
-          }
+            limitations: [],
+          },
         ],
         confidenceLevel: 'high',
         lastUpdated: '2024-01-15',
@@ -262,8 +276,8 @@ describe('DataQualityValidator', () => {
           methodologyRigor: 0.7,
           overallConfidence: 0.8,
           qualityIndicators: [],
-          recommendations: []
-        }
+          recommendations: [],
+        },
       };
     });
 
@@ -282,7 +296,9 @@ describe('DataQualityValidator', () => {
       const qualityCheck = validator.validateCompetitiveAnalysisResult(mockResult);
 
       expect(qualityCheck.overallConfidence).toBeLessThan(0.7);
-      expect(qualityCheck.recommendations).toContain('Expand competitor research to identify market players');
+      expect(qualityCheck.recommendations).toContain(
+        'Expand competitor research to identify market players'
+      );
     });
 
     it('should handle result with insufficient competitor data', () => {
@@ -297,17 +313,19 @@ describe('DataQualityValidator', () => {
             model: 'subscription',
             startingPrice: 0,
             currency: 'USD',
-            valueProposition: ''
+            valueProposition: '',
           },
           targetMarket: [],
-          recentMoves: []
-        }
+          recentMoves: [],
+        },
       ];
 
       const qualityCheck = validator.validateCompetitiveAnalysisResult(mockResult);
 
       expect(qualityCheck.overallConfidence).toBeLessThan(0.85);
-      expect(qualityCheck.recommendations).toContain('Gather more detailed information on key competitors');
+      expect(qualityCheck.recommendations).toContain(
+        'Gather more detailed information on key competitors'
+      );
     });
 
     it('should handle result with no source attribution', () => {
@@ -316,7 +334,9 @@ describe('DataQualityValidator', () => {
       const qualityCheck = validator.validateCompetitiveAnalysisResult(mockResult);
 
       expect(qualityCheck.sourceReliability).toBe(0);
-      expect(qualityCheck.recommendations).toContain('Add credible source references to support analysis');
+      expect(qualityCheck.recommendations).toContain(
+        'Add credible source references to support analysis'
+      );
     });
   });
 
@@ -334,7 +354,7 @@ describe('DataQualityValidator', () => {
           dataQuality: 'high',
           calculationDate: '2024-01-15',
           geographicScope: ['North America'],
-          marketSegments: ['Enterprise']
+          marketSegments: ['Enterprise'],
         },
         sam: {
           value: 1000000000,
@@ -345,18 +365,18 @@ describe('DataQualityValidator', () => {
           dataQuality: 'high',
           calculationDate: '2024-01-15',
           geographicScope: ['North America'],
-          marketSegments: ['Enterprise']
+          marketSegments: ['Enterprise'],
         },
         som: {
           value: 100000000,
           currency: 'USD',
           timeframe: '2024',
-          growthRate: 0.10,
+          growthRate: 0.1,
           methodology: 'value-theory',
           dataQuality: 'medium',
           calculationDate: '2024-01-15',
           geographicScope: ['North America'],
-          marketSegments: ['Enterprise']
+          marketSegments: ['Enterprise'],
         },
         methodology: [
           {
@@ -366,8 +386,8 @@ describe('DataQualityValidator', () => {
             reliability: 0.9,
             calculationSteps: [],
             limitations: [],
-            confidence: 0.8
-          }
+            confidence: 0.8,
+          },
         ],
         scenarios: [],
         confidenceIntervals: [
@@ -376,8 +396,8 @@ describe('DataQualityValidator', () => {
             lowerBound: 8000000000,
             upperBound: 12000000000,
             confidenceLevel: 0.95,
-            methodology: 'statistical'
-          }
+            methodology: 'statistical',
+          },
         ],
         sourceAttribution: [
           {
@@ -393,12 +413,12 @@ describe('DataQualityValidator', () => {
               status: 'fresh',
               ageInDays: 15,
               recommendedUpdateFrequency: 90,
-              lastValidated: '2024-01-15'
+              lastValidated: '2024-01-15',
             },
             citationFormat: 'Gartner (2024)',
             keyFindings: ['Market size $10B'],
-            limitations: []
-          }
+            limitations: [],
+          },
         ],
         assumptions: [
           {
@@ -406,16 +426,16 @@ describe('DataQualityValidator', () => {
             description: 'Market grows at 15% annually',
             value: 0.15,
             confidence: 0.8,
-            impact: 'high'
-          }
+            impact: 'high',
+          },
         ],
         marketDynamics: {
           growthDrivers: [],
           marketBarriers: [],
           seasonality: [],
           cyclicalFactors: [],
-          disruptiveForces: []
-        }
+          disruptiveForces: [],
+        },
       };
     });
 
@@ -433,7 +453,9 @@ describe('DataQualityValidator', () => {
       const qualityCheck = validator.validateMarketSizingResult(mockResult);
 
       expect(qualityCheck.overallConfidence).toBeLessThan(0.85);
-      const logicIndicator = qualityCheck.qualityIndicators.find(i => i.metric === 'Market Size Logic');
+      const logicIndicator = qualityCheck.qualityIndicators.find(
+        i => i.metric === 'Market Size Logic'
+      );
       expect(logicIndicator?.score).toBeLessThan(0.5);
     });
 
@@ -442,7 +464,9 @@ describe('DataQualityValidator', () => {
 
       const qualityCheck = validator.validateMarketSizingResult(mockResult);
 
-      expect(qualityCheck.recommendations).toContain('Use multiple sizing methodologies for validation');
+      expect(qualityCheck.recommendations).toContain(
+        'Use multiple sizing methodologies for validation'
+      );
     });
 
     it('should handle missing assumptions', () => {
@@ -450,7 +474,9 @@ describe('DataQualityValidator', () => {
 
       const qualityCheck = validator.validateMarketSizingResult(mockResult);
 
-      expect(qualityCheck.recommendations).toContain('Document key market assumptions for transparency');
+      expect(qualityCheck.recommendations).toContain(
+        'Document key market assumptions for transparency'
+      );
     });
 
     it('should handle invalid confidence intervals', () => {
@@ -460,13 +486,15 @@ describe('DataQualityValidator', () => {
           lowerBound: 12000000000, // Lower > Upper (invalid)
           upperBound: 8000000000,
           confidenceLevel: 0.95,
-          methodology: 'statistical'
-        }
+          methodology: 'statistical',
+        },
       ];
 
       const qualityCheck = validator.validateMarketSizingResult(mockResult);
 
-      expect(qualityCheck.recommendations).toContain('Review and correct invalid confidence intervals');
+      expect(qualityCheck.recommendations).toContain(
+        'Review and correct invalid confidence intervals'
+      );
     });
   });
 });
@@ -479,7 +507,9 @@ describe('GracefulDegradationManager', () => {
       expect(result.canProceed).toBe(false);
       expect(result.degradedAnalysis).toBe(true);
       expect(result.adjustedConfidence).toBe(0);
-      expect(result.recommendations).toContain('No competitors identified. Cannot perform competitive analysis.');
+      expect(result.recommendations).toContain(
+        'No competitors identified. Cannot perform competitive analysis.'
+      );
     });
 
     it('should handle insufficient competitors', () => {
@@ -496,7 +526,7 @@ describe('GracefulDegradationManager', () => {
       const competitors = [
         { name: 'Competitor 1' },
         { name: 'Competitor 2' },
-        { name: 'Competitor 3' }
+        { name: 'Competitor 3' },
       ];
       const result = GracefulDegradationManager.handleInsufficientCompetitorData(competitors, 3);
 
@@ -511,8 +541,11 @@ describe('GracefulDegradationManager', () => {
     it('should handle severely insufficient data', () => {
       const availableData = {}; // No data
       const requiredFields = ['industry', 'totalMarketSize', 'customerSegments'];
-      
-      const result = GracefulDegradationManager.handleInsufficientMarketData(availableData, requiredFields);
+
+      const result = GracefulDegradationManager.handleInsufficientMarketData(
+        availableData,
+        requiredFields
+      );
 
       expect(result.canProceed).toBe(false);
       expect(result.degradedAnalysis).toBe(true);
@@ -523,11 +556,14 @@ describe('GracefulDegradationManager', () => {
     it('should handle partial data with some methodologies available', () => {
       const availableData = {
         industry: 'SaaS',
-        totalMarketSize: 1000000000
+        totalMarketSize: 1000000000,
       };
       const requiredFields = ['industry', 'totalMarketSize', 'customerSegments'];
-      
-      const result = GracefulDegradationManager.handleInsufficientMarketData(availableData, requiredFields);
+
+      const result = GracefulDegradationManager.handleInsufficientMarketData(
+        availableData,
+        requiredFields
+      );
 
       expect(result.canProceed).toBe(true);
       expect(result.degradedAnalysis).toBe(true);
@@ -542,11 +578,14 @@ describe('GracefulDegradationManager', () => {
         customerSegments: ['SMB', 'Enterprise'],
         pricingData: { average: 100 },
         valueProposition: 'High value',
-        customerWillingness: 0.8
+        customerWillingness: 0.8,
       };
       const requiredFields = ['industry', 'totalMarketSize', 'customerSegments'];
-      
-      const result = GracefulDegradationManager.handleInsufficientMarketData(availableData, requiredFields);
+
+      const result = GracefulDegradationManager.handleInsufficientMarketData(
+        availableData,
+        requiredFields
+      );
 
       expect(result.canProceed).toBe(true);
       expect(result.degradedAnalysis).toBe(false);
@@ -573,12 +612,12 @@ describe('GracefulDegradationManager', () => {
             status: 'stale',
             ageInDays: 400, // Very stale
             recommendedUpdateFrequency: 90,
-            lastValidated: '2022-01-01'
+            lastValidated: '2022-01-01',
           },
           citationFormat: 'Gartner (2022)',
           keyFindings: [],
-          limitations: []
-        }
+          limitations: [],
+        },
       ];
 
       const result = GracefulDegradationManager.handleStaleData(staleSources, 90);
@@ -587,7 +626,9 @@ describe('GracefulDegradationManager', () => {
       expect(result.degradedAnalysis).toBe(true);
       expect(result.adjustedConfidence).toBe(0.4);
       expect(result.staleSourceCount).toBe(1);
-      expect(result.recommendations).toContain('Most data sources are stale. Analysis reliability is significantly reduced.');
+      expect(result.recommendations).toContain(
+        'Most data sources are stale. Analysis reliability is significantly reduced.'
+      );
     });
 
     it('should handle fresh data', () => {
@@ -605,12 +646,12 @@ describe('GracefulDegradationManager', () => {
             status: 'fresh',
             ageInDays: 15, // Very fresh
             recommendedUpdateFrequency: 90,
-            lastValidated: '2024-01-15'
+            lastValidated: '2024-01-15',
           },
           citationFormat: 'Gartner (2024)',
           keyFindings: [],
-          limitations: []
-        }
+          limitations: [],
+        },
       ];
 
       const result = GracefulDegradationManager.handleStaleData(freshSources, 90);

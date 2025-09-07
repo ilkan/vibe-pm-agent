@@ -1,6 +1,6 @@
 /**
  * Integration tests for AI Agent Pipeline steering file generation
- * 
+ *
  * Tests the integration between the AI Agent Pipeline and the SteeringService
  * to ensure PM documents are properly converted to steering files.
  */
@@ -19,7 +19,7 @@ describe('AI Agent Pipeline Steering Integration', () => {
   beforeEach(async () => {
     pipeline = new AIAgentPipeline();
     testSteeringDir = path.join(process.cwd(), 'test-steering');
-    
+
     // Ensure test directory exists
     try {
       await fs.mkdir(testSteeringDir, { recursive: true });
@@ -30,7 +30,7 @@ describe('AI Agent Pipeline Steering Integration', () => {
 
   afterEach(async () => {
     await pipeline.cleanup();
-    
+
     // Clean up test steering files
     try {
       await fs.rm(testSteeringDir, { recursive: true, force: true });
@@ -87,7 +87,7 @@ Q: How does the new system work?
 A: It uses modern OAuth standards...`,
           launchChecklist: `# Launch Checklist
 - [ ] Security audit complete
-- [ ] User documentation updated`
+- [ ] User documentation updated`,
         },
 
         taskPlan: `# Implementation Plan
@@ -97,14 +97,14 @@ A: It uses modern OAuth standards...`,
 
 ## Phase 2: Implementation  
 - [ ] 1. Implement OAuth flow
-- [ ] 2. Add user interface`
+- [ ] 2. Add user interface`,
       };
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'user-authentication',
         inclusion_rule: 'fileMatch',
-        overwrite_existing: false
+        overwrite_existing: false,
       };
 
       const result = await pipeline.createSteeringFilesFromDocuments(
@@ -116,25 +116,27 @@ A: It uses modern OAuth standards...`,
       expect(result.created).toBe(true);
       expect(result.results).toHaveLength(5); // All 5 document types
       expect(result.summary).toContain('Successfully created');
-      
+
       // Verify each document type was processed
       const documentTypes = ['requirements', 'design', 'one-pager', 'PR-FAQ', 'task plan'];
       documentTypes.forEach(docType => {
-        const hasResult = result.results.some(r => r.message.toLowerCase().includes(docType.toLowerCase()));
+        const hasResult = result.results.some(r =>
+          r.message.toLowerCase().includes(docType.toLowerCase())
+        );
         expect(hasResult).toBe(true);
       });
     });
 
     it('should handle missing documents gracefully', async () => {
       const pmDocuments = {
-        requirements: '# Basic Requirements\nSome requirements here'
+        requirements: '# Basic Requirements\nSome requirements here',
         // Only requirements, missing other document types
       };
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
         feature_name: 'partial-feature',
-        inclusion_rule: 'fileMatch'
+        inclusion_rule: 'fileMatch',
       };
 
       const result = await pipeline.createSteeringFilesFromDocuments(
@@ -150,12 +152,12 @@ A: It uses modern OAuth standards...`,
 
     it('should skip steering file creation when not requested', async () => {
       const pmDocuments = {
-        requirements: '# Requirements\nSome content'
+        requirements: '# Requirements\nSome content',
       };
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: false,
-        feature_name: 'skip-test'
+        feature_name: 'skip-test',
       };
 
       const result = await pipeline.createSteeringFilesFromDocuments(
@@ -171,18 +173,18 @@ A: It uses modern OAuth standards...`,
 
     it('should handle steering file creation errors gracefully', async () => {
       const pmDocuments = {
-        requirements: 'valid content' // Use valid content but mock the service to fail
+        requirements: 'valid content', // Use valid content but mock the service to fail
       };
 
       // Mock SteeringService to throw error for this test
       const originalCreateFromRequirements = SteeringService.prototype.createFromRequirements;
-      SteeringService.prototype.createFromRequirements = jest.fn().mockRejectedValue(
-        new Error('Test steering service error')
-      );
+      SteeringService.prototype.createFromRequirements = jest
+        .fn()
+        .mockRejectedValue(new Error('Test steering service error'));
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'error-test'
+        feature_name: 'error-test',
       };
 
       const result = await pipeline.createSteeringFilesFromDocuments(
@@ -254,9 +256,9 @@ A: It uses modern OAuth standards...`,
             create_steering_files: true,
             feature_name: 'oauth-auth',
             inclusion_rule: 'fileMatch',
-            overwrite_existing: false
-          }
-        }
+            overwrite_existing: false,
+          },
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
@@ -288,9 +290,9 @@ A: It uses modern OAuth standards...`,
           requirements: true,
           steeringOptions: {
             create_steering_files: false,
-            feature_name: 'notifications'
-          }
-        }
+            feature_name: 'notifications',
+          },
+        },
       };
 
       const result = await pipeline.processIntent(rawIntent, params);
@@ -311,19 +313,19 @@ A: It uses modern OAuth standards...`,
             userStory: 'As a new user, I want to register easily',
             acceptanceCriteria: [
               'WHEN user provides valid email THEN system SHALL create account',
-              'WHEN user provides invalid email THEN system SHALL show error'
-            ]
-          }
-        ]
+              'WHEN user provides invalid email THEN system SHALL show error',
+            ],
+          },
+        ],
       };
 
       const pmDocuments = {
-        requirements: requirementsObj
+        requirements: requirementsObj,
       };
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'format-test'
+        feature_name: 'format-test',
       };
 
       const result = await pipeline.createSteeringFilesFromDocuments(
@@ -344,24 +346,24 @@ A: It uses modern OAuth standards...`,
             name: 'Basic Auth',
             summary: 'Simple username/password',
             impact: 'Medium',
-            effort: 'Low'
+            effort: 'Low',
           },
           balanced: {
             name: 'OAuth',
             summary: 'Third-party authentication',
             impact: 'High',
-            effort: 'Medium'
-          }
-        }
+            effort: 'Medium',
+          },
+        },
       };
 
       const pmDocuments = {
-        designOptions: designObj
+        designOptions: designObj,
       };
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'design-format-test'
+        feature_name: 'design-format-test',
       };
 
       const result = await pipeline.createSteeringFilesFromDocuments(
@@ -379,17 +381,17 @@ A: It uses modern OAuth standards...`,
     it('should handle SteeringService errors without failing pipeline', async () => {
       // Mock SteeringService to throw error
       const originalCreateFromRequirements = SteeringService.prototype.createFromRequirements;
-      SteeringService.prototype.createFromRequirements = jest.fn().mockRejectedValue(
-        new Error('Steering service error')
-      );
+      SteeringService.prototype.createFromRequirements = jest
+        .fn()
+        .mockRejectedValue(new Error('Steering service error'));
 
       const pmDocuments = {
-        requirements: '# Test Requirements'
+        requirements: '# Test Requirements',
       };
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'error-handling-test'
+        feature_name: 'error-handling-test',
       };
 
       const result = await pipeline.createSteeringFilesFromDocuments(
@@ -408,12 +410,12 @@ A: It uses modern OAuth standards...`,
 
     it('should handle malformed document objects gracefully', async () => {
       const pmDocuments = {
-        requirements: { invalid: 'structure' } as any
+        requirements: { invalid: 'structure' } as any,
       };
 
       const steeringOptions: SteeringFileOptions = {
         create_steering_files: true,
-        feature_name: 'malformed-test'
+        feature_name: 'malformed-test',
       };
 
       const result = await pipeline.createSteeringFilesFromDocuments(

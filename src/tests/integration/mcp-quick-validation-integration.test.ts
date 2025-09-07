@@ -9,13 +9,13 @@ describe('MCP Quick Validation Integration', () => {
 
   beforeEach(() => {
     server = new PMAgentMCPServer({ enableLogging: false });
-    
+
     mockContext = {
       toolName: 'validate_idea_quick',
       sessionId: 'integration-test-session',
       timestamp: Date.now(),
       requestId: 'req-integration-123',
-      traceId: 'trace-integration-123'
+      traceId: 'trace-integration-123',
     };
   });
 
@@ -38,8 +38,8 @@ describe('MCP Quick Validation Integration', () => {
         context: {
           urgency: 'medium',
           budget_range: 'medium',
-          team_size: 2
-        }
+          team_size: 2,
+        },
       };
 
       // Act
@@ -65,8 +65,8 @@ describe('MCP Quick Validation Integration', () => {
         context: {
           urgency: 'high',
           budget_range: 'small',
-          team_size: 1
-        }
+          team_size: 1,
+        },
       };
 
       // Act
@@ -90,8 +90,8 @@ describe('MCP Quick Validation Integration', () => {
         context: {
           urgency: 'high',
           budget_range: 'small',
-          team_size: 2
-        }
+          team_size: 2,
+        },
       };
 
       // Act
@@ -113,8 +113,8 @@ describe('MCP Quick Validation Integration', () => {
         context: {
           urgency: 'medium',
           budget_range: 'medium',
-          team_size: 3
-        }
+          team_size: 3,
+        },
       };
 
       // Act
@@ -136,8 +136,8 @@ describe('MCP Quick Validation Integration', () => {
         context: {
           urgency: 'low',
           budget_range: 'large',
-          team_size: 5
-        }
+          team_size: 5,
+        },
       };
 
       // Act
@@ -154,7 +154,7 @@ describe('MCP Quick Validation Integration', () => {
     it('should handle validation without context gracefully', async () => {
       // Arrange
       const args: ValidateIdeaQuickArgs = {
-        idea: 'I want to automate our invoice processing workflow to reduce manual data entry and improve accuracy'
+        idea: 'I want to automate our invoice processing workflow to reduce manual data entry and improve accuracy',
       };
 
       // Act
@@ -176,8 +176,8 @@ describe('MCP Quick Validation Integration', () => {
         context: {
           urgency: 'medium',
           budget_range: 'medium',
-          team_size: 3
-        }
+          team_size: 3,
+        },
       };
 
       // Act
@@ -186,18 +186,18 @@ describe('MCP Quick Validation Integration', () => {
       // Assert
       expect(result.isError).toBeFalsy();
       const responseText = result.content[0].text!;
-      
+
       // Should contain all three options
       expect(responseText).toContain('Option A:');
       expect(responseText).toContain('Option B:');
       expect(responseText).toContain('Option C:');
-      
+
       // Should contain trade-offs for each option
       expect(responseText).toContain('**Trade-offs:**');
-      
+
       // Should contain next steps for each option
       expect(responseText).toContain('**Next Step:**');
-      
+
       // Should contain separators between options
       expect(responseText).toContain('---');
     });
@@ -209,8 +209,8 @@ describe('MCP Quick Validation Integration', () => {
         context: {
           urgency: 'high',
           budget_range: 'small',
-          team_size: 1
-        }
+          team_size: 1,
+        },
       };
 
       // Act
@@ -220,7 +220,7 @@ describe('MCP Quick Validation Integration', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('text');
-      
+
       // This should likely fail due to being too vague
       const responseText = result.content[0].text!;
       expect(responseText).toContain('**Verdict:**');
@@ -237,8 +237,8 @@ describe('MCP Quick Validation Integration', () => {
         context: {
           urgency: 'medium',
           budget_range: 'medium',
-          team_size: 4
-        }
+          team_size: 4,
+        },
       };
 
       const startTime = Date.now();
@@ -262,8 +262,8 @@ describe('MCP Quick Validation Integration', () => {
         context: {
           urgency: 'low',
           budget_range: 'medium',
-          team_size: 3
-        }
+          team_size: 3,
+        },
       };
 
       // Act
@@ -271,7 +271,7 @@ describe('MCP Quick Validation Integration', () => {
 
       // Assert
       const responseText = result.content[0].text!;
-      
+
       // Check markdown structure
       expect(responseText).toMatch(/^# Quick Validation Result/);
       expect(responseText).toContain('**Verdict:**');
@@ -280,7 +280,7 @@ describe('MCP Quick Validation Integration', () => {
       expect(responseText).toMatch(/### Option [ABC]:/);
       expect(responseText).toContain('**Trade-offs:**');
       expect(responseText).toContain('**Next Step:**');
-      
+
       // Check that options are properly separated
       const optionMatches = responseText.match(/### Option [ABC]:/g);
       expect(optionMatches).toHaveLength(3);
@@ -289,7 +289,7 @@ describe('MCP Quick Validation Integration', () => {
     it('should include all required fields in response', async () => {
       // Arrange
       const args: ValidateIdeaQuickArgs = {
-        idea: 'Implement automated testing for our web application'
+        idea: 'Implement automated testing for our web application',
       };
 
       // Act

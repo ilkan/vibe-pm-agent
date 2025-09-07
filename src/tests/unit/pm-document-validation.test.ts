@@ -7,14 +7,16 @@ import {
   validateDesignOptionsInputs,
   validateTaskPlanInputs,
   validateStructuredDocument,
-  PMDocumentValidationError
+  PMDocumentValidationError,
 } from '../../utils/pm-document-validation';
 import { ROIInputs, RequirementsContext, TaskLimits } from '../../components/pm-document-generator';
 
 describe('PM Document Validation', () => {
   describe('validateManagementOnePagerInputs', () => {
-    const validRequirements = 'This is a comprehensive requirements document that describes the user needs and business objectives for our new feature.';
-    const validDesign = 'This is a detailed design document that outlines the architecture and implementation approach for the system.';
+    const validRequirements =
+      'This is a comprehensive requirements document that describes the user needs and business objectives for our new feature.';
+    const validDesign =
+      'This is a detailed design document that outlines the architecture and implementation approach for the system.';
 
     it('should pass with valid inputs', () => {
       expect(() => {
@@ -23,11 +25,12 @@ describe('PM Document Validation', () => {
     });
 
     it('should pass with valid inputs including tasks and ROI', () => {
-      const validTasks = 'Task 1: Implement core functionality\nTask 2: Add validation\nTask 3: Write tests';
+      const validTasks =
+        'Task 1: Implement core functionality\nTask 2: Add validation\nTask 3: Write tests';
       const validROI: ROIInputs = {
         cost_naive: 50000,
         cost_balanced: 150000,
-        cost_bold: 300000
+        cost_bold: 300000,
       };
 
       expect(() => {
@@ -88,7 +91,7 @@ describe('PM Document Validation', () => {
 
     it('should throw error for invalid ROI inputs', () => {
       const invalidROI: ROIInputs = {
-        cost_naive: -1000 // negative cost
+        cost_naive: -1000, // negative cost
       };
 
       expect(() => {
@@ -98,7 +101,7 @@ describe('PM Document Validation', () => {
 
     it('should throw error for unreasonably high ROI costs', () => {
       const invalidROI: ROIInputs = {
-        cost_naive: 20000000 // $20M - too high
+        cost_naive: 20000000, // $20M - too high
       };
 
       expect(() => {
@@ -109,7 +112,7 @@ describe('PM Document Validation', () => {
     it('should throw error for illogical ROI cost relationships', () => {
       const invalidROI: ROIInputs = {
         cost_naive: 10000,
-        cost_balanced: 100000 // 10x naive cost - too high
+        cost_balanced: 100000, // 10x naive cost - too high
       };
 
       expect(() => {
@@ -119,8 +122,10 @@ describe('PM Document Validation', () => {
   });
 
   describe('validatePRFAQInputs', () => {
-    const validRequirements = 'This is a comprehensive requirements document that describes the user needs and business objectives for our new feature.';
-    const validDesign = 'This is a detailed design document that outlines the architecture and implementation approach for the system.';
+    const validRequirements =
+      'This is a comprehensive requirements document that describes the user needs and business objectives for our new feature.';
+    const validDesign =
+      'This is a detailed design document that outlines the architecture and implementation approach for the system.';
 
     it('should pass with valid inputs', () => {
       expect(() => {
@@ -178,7 +183,8 @@ describe('PM Document Validation', () => {
   });
 
   describe('validateRequirementsGenerationInputs', () => {
-    const validRawIntent = 'I want to build a system that optimizes developer workflows and reduces quota consumption through intelligent analysis.';
+    const validRawIntent =
+      'I want to build a system that optimizes developer workflows and reduces quota consumption through intelligent analysis.';
 
     it('should pass with valid raw intent', () => {
       expect(() => {
@@ -192,9 +198,9 @@ describe('PM Document Validation', () => {
         budget: 500000,
         quotas: {
           maxVibes: 10000,
-          maxSpecs: 1000
+          maxSpecs: 1000,
         },
-        deadlines: 'Q2 2025 launch target'
+        deadlines: 'Q2 2025 launch target',
       };
 
       expect(() => {
@@ -237,7 +243,7 @@ describe('PM Document Validation', () => {
 
     it('should throw error for invalid context budget', () => {
       const invalidContext: RequirementsContext = {
-        budget: -1000 // negative budget
+        budget: -1000, // negative budget
       };
 
       expect(() => {
@@ -247,7 +253,7 @@ describe('PM Document Validation', () => {
 
     it('should throw error for unreasonably high budget', () => {
       const invalidContext: RequirementsContext = {
-        budget: 200000000 // $200M - too high
+        budget: 200000000, // $200M - too high
       };
 
       expect(() => {
@@ -258,8 +264,8 @@ describe('PM Document Validation', () => {
     it('should throw error for invalid quota values', () => {
       const invalidContext: RequirementsContext = {
         quotas: {
-          maxVibes: -100 // negative vibes
-        }
+          maxVibes: -100, // negative vibes
+        },
       };
 
       expect(() => {
@@ -270,8 +276,8 @@ describe('PM Document Validation', () => {
     it('should throw error for unreasonably high quota values', () => {
       const invalidContext: RequirementsContext = {
         quotas: {
-          maxVibes: 200000 // too high
-        }
+          maxVibes: 200000, // too high
+        },
       };
 
       expect(() => {
@@ -281,7 +287,8 @@ describe('PM Document Validation', () => {
   });
 
   describe('validateDesignOptionsInputs', () => {
-    const validRequirements = 'This is a comprehensive requirements document that describes the user needs and business objectives for our new feature.';
+    const validRequirements =
+      'This is a comprehensive requirements document that describes the user needs and business objectives for our new feature.';
 
     it('should pass with valid requirements', () => {
       expect(() => {
@@ -310,7 +317,8 @@ describe('PM Document Validation', () => {
   });
 
   describe('validateTaskPlanInputs', () => {
-    const validDesign = 'This is a detailed design document that outlines the architecture and implementation approach for the system.';
+    const validDesign =
+      'This is a detailed design document that outlines the architecture and implementation approach for the system.';
 
     it('should pass with valid design', () => {
       expect(() => {
@@ -322,7 +330,7 @@ describe('PM Document Validation', () => {
       const validLimits: TaskLimits = {
         maxVibes: 5000,
         maxSpecs: 500,
-        budgetUSD: 250000
+        budgetUSD: 250000,
       };
 
       expect(() => {
@@ -351,7 +359,7 @@ describe('PM Document Validation', () => {
 
     it('should throw error for invalid limits', () => {
       const invalidLimits: TaskLimits = {
-        maxVibes: -100 // negative vibes
+        maxVibes: -100, // negative vibes
       };
 
       expect(() => {
@@ -361,7 +369,7 @@ describe('PM Document Validation', () => {
 
     it('should throw error for unreasonably high limits', () => {
       const invalidLimits: TaskLimits = {
-        budgetUSD: 200000000 // $200M - too high
+        budgetUSD: 200000000, // $200M - too high
       };
 
       expect(() => {
@@ -373,7 +381,7 @@ describe('PM Document Validation', () => {
   describe('validateStructuredDocument', () => {
     it('should pass with valid structured document', () => {
       const structuredDoc = `# Title\n\nThis is a paragraph.\n\n## Section\n\n- List item 1\n- List item 2`;
-      
+
       expect(() => {
         validateStructuredDocument(structuredDoc, 'test', 'document');
       }).not.toThrow();
@@ -392,8 +400,9 @@ describe('PM Document Validation', () => {
     });
 
     it('should pass with unstructured but valid document', () => {
-      const unstructuredDoc = 'This is a long paragraph without any structure but it contains enough content to be meaningful for analysis and processing.';
-      
+      const unstructuredDoc =
+        'This is a long paragraph without any structure but it contains enough content to be meaningful for analysis and processing.';
+
       expect(() => {
         validateStructuredDocument(unstructuredDoc, 'test', 'document');
       }).not.toThrow();
@@ -402,8 +411,12 @@ describe('PM Document Validation', () => {
 
   describe('PMDocumentValidationError', () => {
     it('should create error with document type and field', () => {
-      const error = new PMDocumentValidationError('Test message', 'management_onepager', 'requirements');
-      
+      const error = new PMDocumentValidationError(
+        'Test message',
+        'management_onepager',
+        'requirements'
+      );
+
       expect(error.message).toBe('Test message');
       expect(error.documentType).toBe('management_onepager');
       expect(error.field).toBe('requirements');
@@ -412,7 +425,7 @@ describe('PM Document Validation', () => {
 
     it('should create error without document type and field', () => {
       const error = new PMDocumentValidationError('Test message');
-      
+
       expect(error.message).toBe('Test message');
       expect(error.documentType).toBeUndefined();
       expect(error.field).toBeUndefined();
@@ -422,46 +435,59 @@ describe('PM Document Validation', () => {
   describe('Content validation warnings', () => {
     it('should log warning for generic requirements content', () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-      const genericRequirements = 'Build a system that does something useful for users and provides value to the business.';
-      
+      const genericRequirements =
+        'Build a system that does something useful for users and provides value to the business.';
+
       expect(() => {
-        validateManagementOnePagerInputs(genericRequirements, 'This is a detailed technical architecture with components and interfaces.');
+        validateManagementOnePagerInputs(
+          genericRequirements,
+          'This is a detailed technical architecture with components and interfaces.'
+        );
       }).not.toThrow();
-      
+
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Warning: Requirements document for management_onepager appears to be generic')
+        expect.stringContaining(
+          'Warning: Requirements document for management_onepager appears to be generic'
+        )
       );
-      
+
       consoleSpy.mockRestore();
     });
 
     it('should log warning for generic design content', () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-      const genericDesign = 'Standard architecture with typical design patterns and basic implementation approach.';
-      
+      const genericDesign =
+        'Standard architecture with typical design patterns and basic implementation approach.';
+
       expect(() => {
-        validateManagementOnePagerInputs('This is a comprehensive requirements document with user stories and acceptance criteria.', genericDesign);
+        validateManagementOnePagerInputs(
+          'This is a comprehensive requirements document with user stories and acceptance criteria.',
+          genericDesign
+        );
       }).not.toThrow();
-      
+
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Warning: Design document for management_onepager appears to be generic')
+        expect.stringContaining(
+          'Warning: Design document for management_onepager appears to be generic'
+        )
       );
-      
+
       consoleSpy.mockRestore();
     });
 
     it('should log warning for unstructured long document', () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-      const longUnstructured = 'This is a very long document without any structure like headers or lists. '.repeat(50);
-      
+      const longUnstructured =
+        'This is a very long document without any structure like headers or lists. '.repeat(50);
+
       expect(() => {
         validateStructuredDocument(longUnstructured, 'test', 'document');
       }).not.toThrow();
-      
+
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('Warning: document for test appears to lack structure')
       );
-      
+
       consoleSpy.mockRestore();
     });
   });

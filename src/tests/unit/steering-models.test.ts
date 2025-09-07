@@ -12,7 +12,7 @@ import {
   ConflictInfo,
   SteeringFileTemplate,
   SteeringFileGenerationOptions,
-  SteeringFileStats
+  SteeringFileStats,
 } from '../../models/steering';
 
 describe('Steering File Models', () => {
@@ -34,7 +34,7 @@ describe('Steering File Models', () => {
   describe('InclusionRule type', () => {
     it('should accept valid inclusion rule values', () => {
       const validRules: InclusionRule[] = ['always', 'fileMatch', 'manual'];
-      
+
       validRules.forEach(rule => {
         expect(['always', 'fileMatch', 'manual']).toContain(rule);
       });
@@ -48,7 +48,7 @@ describe('Steering File Models', () => {
         generatedBy: 'vibe-pm-agent',
         generatedAt: '2024-01-01T00:00:00.000Z',
         featureName: 'test-feature',
-        documentType: DocumentType.REQUIREMENTS
+        documentType: DocumentType.REQUIREMENTS,
       };
 
       expect(frontMatter.inclusion).toBe('always');
@@ -66,7 +66,7 @@ describe('Steering File Models', () => {
         generatedAt: '2024-01-01T00:00:00.000Z',
         featureName: 'test-feature',
         documentType: DocumentType.DESIGN,
-        description: 'Test description'
+        description: 'Test description',
       };
 
       expect(frontMatter.fileMatchPattern).toBe('*.md');
@@ -81,7 +81,7 @@ describe('Steering File Models', () => {
         projectName: 'my-project',
         relatedFiles: ['requirements.md', 'design.md'],
         inclusionRule: 'fileMatch',
-        fileMatchPattern: 'auth*'
+        fileMatchPattern: 'auth*',
       };
 
       expect(context.featureName).toBe('user-authentication');
@@ -95,7 +95,7 @@ describe('Steering File Models', () => {
       const context: SteeringContext = {
         featureName: 'minimal-feature',
         relatedFiles: [],
-        inclusionRule: 'always'
+        inclusionRule: 'always',
       };
 
       expect(context.featureName).toBe('minimal-feature');
@@ -111,7 +111,7 @@ describe('Steering File Models', () => {
         generatedBy: 'vibe-pm-agent',
         generatedAt: '2024-01-01T00:00:00.000Z',
         featureName: 'test-feature',
-        documentType: DocumentType.REQUIREMENTS
+        documentType: DocumentType.REQUIREMENTS,
       };
 
       const steeringFile: SteeringFile = {
@@ -119,7 +119,7 @@ describe('Steering File Models', () => {
         frontMatter,
         content: '# Test Content',
         references: ['#[[file:design.md]]'],
-        fullPath: '.kiro/steering/test-feature-requirements.md'
+        fullPath: '.kiro/steering/test-feature-requirements.md',
       };
 
       expect(steeringFile.filename).toBe('test-feature-requirements.md');
@@ -138,7 +138,7 @@ describe('Steering File Models', () => {
         action: 'created',
         message: 'File created successfully',
         fullPath: '.kiro/steering/test-file.md',
-        warnings: ['Minor formatting issue']
+        warnings: ['Minor formatting issue'],
       };
 
       expect(result.success).toBe(true);
@@ -154,7 +154,7 @@ describe('Steering File Models', () => {
         success: false,
         filename: 'test-file.md',
         action: 'skipped',
-        message: 'File already exists'
+        message: 'File already exists',
       };
 
       expect(result.success).toBe(false);
@@ -164,13 +164,13 @@ describe('Steering File Models', () => {
 
     it('should validate action types', () => {
       const validActions = ['created', 'updated', 'versioned', 'skipped'];
-      
+
       validActions.forEach(action => {
         const result: SaveResult = {
           success: true,
           filename: 'test.md',
           action: action as any,
-          message: 'Test'
+          message: 'Test',
         };
         expect(validActions).toContain(result.action);
       });
@@ -184,7 +184,7 @@ describe('Steering File Models', () => {
         existingFile: '.kiro/steering/existing-file.md',
         suggestedAction: 'version',
         reason: 'File already exists with different content',
-        suggestedFilename: 'existing-file-v2.md'
+        suggestedFilename: 'existing-file-v2.md',
       };
 
       expect(conflictInfo.exists).toBe(true);
@@ -197,7 +197,7 @@ describe('Steering File Models', () => {
     it('should create conflict info without conflict', () => {
       const conflictInfo: ConflictInfo = {
         exists: false,
-        suggestedAction: 'skip'
+        suggestedAction: 'skip',
       };
 
       expect(conflictInfo.exists).toBe(false);
@@ -206,11 +206,11 @@ describe('Steering File Models', () => {
 
     it('should validate suggested action types', () => {
       const validActions = ['update', 'version', 'rename', 'skip'];
-      
+
       validActions.forEach(action => {
         const conflictInfo: ConflictInfo = {
           exists: true,
-          suggestedAction: action as any
+          suggestedAction: action as any,
         };
         expect(validActions).toContain(conflictInfo.suggestedAction);
       });
@@ -225,7 +225,7 @@ describe('Steering File Models', () => {
         defaultFileMatchPattern: 'requirements*',
         template: '# {featureName}\n\n{content}',
         requiredPlaceholders: ['featureName', 'content'],
-        validateContent: (content: string) => content.length > 0
+        validateContent: (content: string) => content.length > 0,
       };
 
       expect(template.documentType).toBe(DocumentType.REQUIREMENTS);
@@ -243,7 +243,7 @@ describe('Steering File Models', () => {
         documentType: DocumentType.DESIGN,
         defaultInclusionRule: 'always',
         template: '# Design\n\n{content}',
-        requiredPlaceholders: ['content']
+        requiredPlaceholders: ['content'],
       };
 
       expect(template.documentType).toBe(DocumentType.DESIGN);
@@ -261,7 +261,7 @@ describe('Steering File Models', () => {
         includeReferences: true,
         namingStrategy: 'feature-based',
         filenamePrefix: 'pm-',
-        overwriteExisting: false
+        overwriteExisting: false,
       };
 
       expect(options.autoSave).toBe(true);
@@ -277,7 +277,7 @@ describe('Steering File Models', () => {
         autoSave: false,
         promptForConfirmation: true,
         includeReferences: false,
-        overwriteExisting: true
+        overwriteExisting: true,
       };
 
       expect(options.autoSave).toBe(false);
@@ -288,14 +288,14 @@ describe('Steering File Models', () => {
 
     it('should validate naming strategy types', () => {
       const validStrategies = ['feature-based', 'timestamp-based', 'custom'];
-      
+
       validStrategies.forEach(strategy => {
         const options: SteeringFileGenerationOptions = {
           autoSave: true,
           promptForConfirmation: false,
           includeReferences: true,
           namingStrategy: strategy as any,
-          overwriteExisting: false
+          overwriteExisting: false,
         };
         expect(validStrategies).toContain(options.namingStrategy);
       });
@@ -309,13 +309,16 @@ describe('Steering File Models', () => {
         filesUpdated: 2,
         conflictsEncountered: 1,
         documentTypesProcessed: [DocumentType.REQUIREMENTS, DocumentType.DESIGN],
-        processingTimeMs: 1500
+        processingTimeMs: 1500,
       };
 
       expect(stats.filesCreated).toBe(5);
       expect(stats.filesUpdated).toBe(2);
       expect(stats.conflictsEncountered).toBe(1);
-      expect(stats.documentTypesProcessed).toEqual([DocumentType.REQUIREMENTS, DocumentType.DESIGN]);
+      expect(stats.documentTypesProcessed).toEqual([
+        DocumentType.REQUIREMENTS,
+        DocumentType.DESIGN,
+      ]);
       expect(stats.processingTimeMs).toBe(1500);
     });
 
@@ -325,7 +328,7 @@ describe('Steering File Models', () => {
         filesUpdated: 0,
         conflictsEncountered: 0,
         documentTypesProcessed: [],
-        processingTimeMs: 0
+        processingTimeMs: 0,
       };
 
       expect(stats.filesCreated).toBe(0);
@@ -340,13 +343,13 @@ describe('Steering File Models', () => {
     it('should enforce required fields in interfaces', () => {
       // This test ensures TypeScript compilation catches missing required fields
       // The actual validation happens at compile time
-      
+
       const createFrontMatter = (): FrontMatter => ({
         inclusion: 'always',
         generatedBy: 'test',
         generatedAt: '2024-01-01T00:00:00.000Z',
         featureName: 'test',
-        documentType: DocumentType.REQUIREMENTS
+        documentType: DocumentType.REQUIREMENTS,
       });
 
       const frontMatter = createFrontMatter();
@@ -359,13 +362,13 @@ describe('Steering File Models', () => {
         relatedFiles: [],
         inclusionRule: 'fileMatch',
         fileMatchPattern: '*.ts',
-        description: 'Test context'
+        description: 'Test context',
       };
 
       const contextMinimal: SteeringContext = {
         featureName: 'test',
         relatedFiles: [],
-        inclusionRule: 'always'
+        inclusionRule: 'always',
       };
 
       expect(contextWithOptionals.fileMatchPattern).toBe('*.ts');
