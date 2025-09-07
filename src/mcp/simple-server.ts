@@ -6,7 +6,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { SteeringService } from '../components/steering-service';
 import { CitationService } from '../components/citation-service';
-import { WebResearchService, ResearchQuery } from '../components/web-research-service';
+import { PureWebScraper } from '../components/pure-web-scraper';
 import { DocumentType } from '../models/steering';
 
 /**
@@ -17,7 +17,7 @@ export class SimplePMAgentMCPServer {
   private server: Server;
   private steeringService: SteeringService;
   private citationService: CitationService;
-  private webResearchService: WebResearchService;
+  private pureWebScraper: PureWebScraper;
 
   constructor() {
     this.server = new Server(
@@ -49,7 +49,7 @@ export class SimplePMAgentMCPServer {
     });
 
     this.citationService = new CitationService();
-    this.webResearchService = new WebResearchService();
+    this.pureWebScraper = new PureWebScraper();
 
     this.setupHandlers();
   }
@@ -1136,48 +1136,26 @@ Development teams will receive detailed specifications through Kiro Spec Mode, w
   }
 
   /**
-   * Generate real citations and market data through web research
+   * Generate citations from PURE web scraping - ZERO MOCK DATA
    */
   private async generateCitations(idea: string, context: any): Promise<string> {
     try {
-      const researchQuery: ResearchQuery = {
-        topic: idea,
-        industry: context.industry || 'technology',
-        timeframe: '2024',
-        dataTypes: ['market_size', 'competition', 'trends', 'financial'],
-      };
-
-      const research = await this.webResearchService.conductMarketResearch(researchQuery);
+      // Search and scrape real websites - NO MOCK DATA
+      const searchQuery = `${idea} ${context.industry || ''} market size revenue analysis`;
+      const scrapedResults = await this.pureWebScraper.searchAndScrape(searchQuery);
       
-      if (research.citations.length === 0) {
-        return this.generateFallbackCitations(idea, context);
-      }
-
-      const citations = research.citations.map((citation, index) => 
-        `[${index + 1}] ${citation.title} - ${citation.source} (${citation.date || '2024'})\n    ${citation.url}`
-      );
-
-      let marketDataSection = '';
-      if (research.marketData.length > 0) {
-        marketDataSection = `\n## Market Data Insights\n\n${research.marketData
-          .slice(0, 5)
-          .map(data => `• **${data.metric}:** ${data.value} (Source: ${data.source})`)
-          .join('\n')}\n`;
-      }
-
-      return `${marketDataSection}
-## References
-
-${citations.join('\n\n')}
-
-## Research Summary
-${research.summary}
-
-*Citations and market data gathered through real-time web research on ${new Date().toISOString().split('T')[0]}*`;
-
+      // Generate citations from ONLY real scraped data
+      return this.pureWebScraper.generateRealCitations(scrapedResults);
+      
     } catch (error) {
-      console.warn('Web research failed, using fallback citations:', error);
-      return this.generateFallbackCitations(idea, context);
+      // If scraping fails, return empty - NO MOCK DATA
+      return `
+## Web Research Unavailable
+
+Real-time web scraping failed. No market data available at this time.
+Please conduct manual research for current market information.
+
+*No mock or estimated data provided.*`;
     }
   }
 
@@ -1196,36 +1174,23 @@ ${research.summary}
   }
 
   /**
-   * Generate real citations for business case analysis
+   * Generate business case citations from PURE web scraping - ZERO MOCK DATA
    */
   private async generateBusinessCaseCitations(inputs: any): Promise<string> {
     try {
-      const researchQuery: ResearchQuery = {
-        topic: 'ROI analysis financial modeling business case',
-        industry: 'business_consulting',
-        timeframe: '2024',
-        dataTypes: ['financial', 'trends'],
-      };
-
-      const research = await this.webResearchService.conductMarketResearch(researchQuery);
+      const searchQuery = 'ROI analysis financial modeling business case methodology';
+      const scrapedResults = await this.pureWebScraper.searchAndScrape(searchQuery);
       
-      if (research.citations.length === 0) {
-        return this.generateFallbackBusinessCitations();
-      }
-
-      const citations = research.citations.slice(0, 5).map((citation, index) => 
-        `[${index + 1}] ${citation.title} - ${citation.source} (${citation.date || '2024'})\n    ${citation.url}`
-      );
-
-      return `
-## References
-
-${citations.join('\n\n')}
-
-*Financial analysis based on current industry data and real-time research conducted on ${new Date().toISOString().split('T')[0]}*`;
-
+      return this.pureWebScraper.generateRealCitations(scrapedResults);
+      
     } catch (error) {
-      return this.generateFallbackBusinessCitations();
+      return `
+## Financial Research Unavailable
+
+Real-time financial data scraping failed. No current financial benchmarks available.
+Please use standard financial modeling practices or conduct manual research.
+
+*No mock financial data provided.*`;
     }
   }
 
