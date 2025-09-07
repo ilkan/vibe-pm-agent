@@ -6,6 +6,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { SteeringService } from '../components/steering-service';
 import { CitationService } from '../components/citation-service';
+import { WebResearchService, ResearchQuery } from '../components/web-research-service';
 import { DocumentType } from '../models/steering';
 
 /**
@@ -16,6 +17,7 @@ export class SimplePMAgentMCPServer {
   private server: Server;
   private steeringService: SteeringService;
   private citationService: CitationService;
+  private webResearchService: WebResearchService;
 
   constructor() {
     this.server = new Server(
@@ -47,6 +49,7 @@ export class SimplePMAgentMCPServer {
     });
 
     this.citationService = new CitationService();
+    this.webResearchService = new WebResearchService();
 
     this.setupHandlers();
   }
@@ -351,7 +354,7 @@ ${this.assessBusinessRisks(idea, marketContext)}
 3. Assess technical feasibility and resource requirements
 4. Create stakeholder communication materials
 
-${this.generateCitations(idea, marketContext)}`;
+${await this.generateCitations(idea, marketContext)}`;
 
     // Create steering file if requested
     let steeringResult = null;
@@ -437,7 +440,7 @@ ${this.defineImplementationPhases(financialInputs)}
 3. Establish clear success metrics and monitoring systems
 4. Plan for iterative improvement based on user feedback
 
-${this.generateBusinessCaseCitations(financialInputs)}`;
+${await this.generateBusinessCaseCitations(financialInputs)}`;
 
     // Create steering file if requested
     let steeringResult = null;
@@ -1133,89 +1136,111 @@ Development teams will receive detailed specifications through Kiro Spec Mode, w
   }
 
   /**
-   * Generate relevant citations for business analysis
+   * Generate real citations and market data through web research
    */
-  private generateCitations(idea: string, context: any): string {
-    const citations: string[] = [];
+  private async generateCitations(idea: string, context: any): Promise<string> {
+    try {
+      const researchQuery: ResearchQuery = {
+        topic: idea,
+        industry: context.industry || 'technology',
+        timeframe: '2024',
+        dataTypes: ['market_size', 'competition', 'trends', 'financial'],
+      };
 
-    // Industry-specific citations
-    if (context.industry) {
-      switch (context.industry.toLowerCase()) {
-        case 'fitness_technology':
-        case 'fitness technology':
-        case 'fitness':
-          citations.push(
-            '[1] Global Fitness App Market Report 2024, Grand View Research',
-            '[2] "The Future of Fitness Technology," McKinsey Digital, 2024',
-            '[3] Wearable Technology Market Analysis, Statista, 2024'
-          );
-          break;
-        case 'developer tools':
-        case 'developer_tools':
-          citations.push(
-            '[1] Developer Tools Market Size Report, MarketsandMarkets, 2024',
-            '[2] "State of Developer Productivity," GitHub, 2024',
-            '[3] Software Development Tools Market Analysis, Gartner, 2024'
-          );
-          break;
-        default:
-          citations.push(
-            '[1] Industry Market Analysis Report, IBISWorld, 2024',
-            '[2] Digital Transformation Trends, McKinsey Global Institute, 2024'
-          );
+      const research = await this.webResearchService.conductMarketResearch(researchQuery);
+      
+      if (research.citations.length === 0) {
+        return this.generateFallbackCitations(idea, context);
       }
-    }
 
-    // Technology-specific citations
-    if (idea.toLowerCase().includes('ai') || idea.toLowerCase().includes('artificial intelligence')) {
-      citations.push('[4] "AI Market Trends and Opportunities," PwC AI Analysis, 2024');
-    }
+      const citations = research.citations.map((citation, index) => 
+        `[${index + 1}] ${citation.title} - ${citation.source} (${citation.date || '2024'})\n    ${citation.url}`
+      );
 
-    if (idea.toLowerCase().includes('mobile') || idea.toLowerCase().includes('app')) {
-      citations.push('[5] Mobile App Development Market Report, App Annie, 2024');
-    }
+      let marketDataSection = '';
+      if (research.marketData.length > 0) {
+        marketDataSection = `\n## Market Data Insights\n\n${research.marketData
+          .slice(0, 5)
+          .map(data => `• **${data.metric}:** ${data.value} (Source: ${data.source})`)
+          .join('\n')}\n`;
+      }
 
-    if (idea.toLowerCase().includes('flutter')) {
-      citations.push('[6] "Cross-Platform Development with Flutter," Google Developer Survey, 2024');
-    }
-
-    // Business strategy citations
-    citations.push(
-      '[7] "Strategic Business Planning Framework," Harvard Business Review, 2024',
-      '[8] ROI Analysis Best Practices, Deloitte Consulting, 2024'
-    );
-
-    // Competition analysis citations
-    if (context.competition) {
-      citations.push('[9] Competitive Analysis Methodology, Boston Consulting Group, 2024');
-    }
-
-    return `
+      return `${marketDataSection}
 ## References
 
-${citations.join('\n')}
+${citations.join('\n\n')}
 
-*Note: Citations are generated based on industry best practices and market research methodologies. Specific data points should be validated through primary research.*`;
+## Research Summary
+${research.summary}
+
+*Citations and market data gathered through real-time web research on ${new Date().toISOString().split('T')[0]}*`;
+
+    } catch (error) {
+      console.warn('Web research failed, using fallback citations:', error);
+      return this.generateFallbackCitations(idea, context);
+    }
   }
 
   /**
-   * Generate citations for business case analysis
+   * Fallback citations when web research fails
    */
-  private generateBusinessCaseCitations(inputs: any): string {
-    const citations = [
-      '[1] "ROI Calculation Best Practices," CFO Magazine, 2024',
-      '[2] Financial Modeling for Technology Projects, McKinsey & Company, 2024',
-      '[3] "NPV Analysis in Software Development," Harvard Business Review, 2024',
-      '[4] Risk Assessment Framework, Deloitte Risk Advisory, 2024',
-      '[5] "Success Metrics for Digital Products," Product Management Institute, 2024'
-    ];
-
+  private generateFallbackCitations(idea: string, context: any): string {
     return `
 ## References
 
-${citations.join('\n')}
+[1] Industry analysis based on standard market research methodologies
+[2] Competitive landscape assessment using public information
+[3] Financial projections based on industry benchmarks
 
-*Financial projections based on industry benchmarks and standard ROI calculation methodologies.*`;
+*Note: Real-time web research was unavailable. Citations represent standard industry analysis frameworks. For current market data, please conduct primary research.*`;
+  }
+
+  /**
+   * Generate real citations for business case analysis
+   */
+  private async generateBusinessCaseCitations(inputs: any): Promise<string> {
+    try {
+      const researchQuery: ResearchQuery = {
+        topic: 'ROI analysis financial modeling business case',
+        industry: 'business_consulting',
+        timeframe: '2024',
+        dataTypes: ['financial', 'trends'],
+      };
+
+      const research = await this.webResearchService.conductMarketResearch(researchQuery);
+      
+      if (research.citations.length === 0) {
+        return this.generateFallbackBusinessCitations();
+      }
+
+      const citations = research.citations.slice(0, 5).map((citation, index) => 
+        `[${index + 1}] ${citation.title} - ${citation.source} (${citation.date || '2024'})\n    ${citation.url}`
+      );
+
+      return `
+## References
+
+${citations.join('\n\n')}
+
+*Financial analysis based on current industry data and real-time research conducted on ${new Date().toISOString().split('T')[0]}*`;
+
+    } catch (error) {
+      return this.generateFallbackBusinessCitations();
+    }
+  }
+
+  /**
+   * Fallback business case citations
+   */
+  private generateFallbackBusinessCitations(): string {
+    return `
+## References
+
+[1] Standard ROI calculation methodologies from financial industry practices
+[2] Business case analysis frameworks from management consulting
+[3] Financial modeling best practices for technology projects
+
+*Note: Real-time research unavailable. Analysis based on standard financial methodologies.*`;
   }
 
   private interpretSignal(level: string): string {
