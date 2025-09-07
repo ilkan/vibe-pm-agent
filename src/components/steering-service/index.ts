@@ -513,7 +513,8 @@ export class SteeringService {
       return false;
     }
     
-    return options?.create_steering_files ?? false;
+    // Default to true if create_steering_files is not explicitly set to false
+    return options?.create_steering_files !== false;
   }
 
   private buildSteeringContext(

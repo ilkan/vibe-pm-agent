@@ -274,8 +274,10 @@ export class SteeringUserInteraction {
   }
 
   private shouldAutoCreateForDocumentType(documentType: DocumentType): boolean {
-    // Auto-create for requirements and design, prompt for others
-    return documentType === DocumentType.REQUIREMENTS || documentType === DocumentType.DESIGN;
+    // Auto-create for requirements, design, and onepager documents
+    return documentType === DocumentType.REQUIREMENTS || 
+           documentType === DocumentType.DESIGN || 
+           documentType === DocumentType.ONEPAGER;
   }
 
   private buildDefaultOptions(documentType: DocumentType, featureName: string): SteeringFileOptions {
