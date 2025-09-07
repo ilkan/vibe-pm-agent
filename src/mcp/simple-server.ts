@@ -37,6 +37,11 @@ export class SimplePMAgentMCPServer {
         namingStrategy: 'feature-based',
         overwriteExisting: false,
       },
+      userPreferences: {
+        autoCreate: true,  // Enable auto-creation for MCP context
+        showPreview: false, // Disable preview prompts for MCP
+        showSummary: false  // Disable summary display for MCP
+      }
     });
 
     this.setupHandlers();
@@ -346,11 +351,15 @@ ${this.assessBusinessRisks(idea, marketContext)}
     let steeringResult = null;
     if (steeringOptions.create_steering_files !== false) {
       try {
+        console.log('Creating steering file with options:', steeringOptions);
         // Use ONEPAGER type for business analysis documents
         steeringResult = await this.steeringService.createFromOnePager(analysis, steeringOptions);
+        console.log('Steering result:', steeringResult);
       } catch (error) {
         console.warn('Failed to create steering file:', error);
       }
+    } else {
+      console.log('Steering file creation skipped, options:', steeringOptions);
     }
 
     const response = {

@@ -12,7 +12,7 @@ afterEach(async () => {
   try {
     await cleanupAfterTest();
   } catch (error) {
-    console.warn('Test cleanup warning:', error.message);
+    console.warn('Test cleanup warning:', error instanceof Error ? error.message : error);
   }
 });
 
@@ -25,6 +25,6 @@ afterAll(async () => {
   try {
     await cleanupAfterTest();
   } catch (error) {
-    console.warn('Final cleanup warning:', error.message);
+    console.warn('Final cleanup warning:', error instanceof Error ? error.message : error);
   }
 });

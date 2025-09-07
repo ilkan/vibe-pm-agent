@@ -202,7 +202,7 @@ export async function cleanupMemoryLeaks(): Promise<void> {
   
   // Clear any remaining intervals/timeouts
   const highestTimeoutId = setTimeout(() => {}, 0);
-  for (let i = 0; i < highestTimeoutId; i++) {
+  for (let i = 0; i < Number(highestTimeoutId); i++) {
     clearTimeout(i);
     clearInterval(i);
   }
@@ -231,7 +231,7 @@ export async function cleanupTestEvidence(): Promise<{
   for (const pattern of evidencePatterns) {
     try {
       const glob = await import('glob');
-      const files = glob.globSync(pattern);
+      const files = glob.sync(pattern);
       
       for (const file of files) {
         try {
