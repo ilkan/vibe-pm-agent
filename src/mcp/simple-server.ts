@@ -351,15 +351,11 @@ ${this.assessBusinessRisks(idea, marketContext)}
     let steeringResult = null;
     if (steeringOptions.create_steering_files !== false) {
       try {
-        console.log('Creating steering file with options:', steeringOptions);
         // Use ONEPAGER type for business analysis documents
         steeringResult = await this.steeringService.createFromOnePager(analysis, steeringOptions);
-        console.log('Steering result:', steeringResult);
       } catch (error) {
-        console.warn('Failed to create steering file:', error);
+        // Silently handle steering file creation errors
       }
-    } else {
-      console.log('Steering file creation skipped, options:', steeringOptions);
     }
 
     const response = {
@@ -444,7 +440,7 @@ ${this.defineImplementationPhases(financialInputs)}
           steeringOptions
         );
       } catch (error) {
-        console.warn('Failed to create steering file:', error);
+        // Silently handle steering file creation errors
       }
     }
 
@@ -508,7 +504,7 @@ ${this.defineImplementationPhases(financialInputs)}
           );
         }
       } catch (error) {
-        console.warn('Failed to create steering file:', error);
+        // Silently handle steering file creation errors
       }
     }
 
@@ -568,7 +564,7 @@ ${this.makeStrategicRecommendation(featureConcept, companyContext)}`;
       try {
         steeringResult = await this.steeringService.createFromOnePager(alignment, steeringOptions);
       } catch (error) {
-        console.warn('Failed to create steering file:', error);
+        // Silently handle steering file creation errors
       }
     }
 
