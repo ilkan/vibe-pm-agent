@@ -1,42 +1,60 @@
-// Citation integration utilities for MCP tools
+// Enhanced Citation integration utilities for MCP tools
 
 import { CitationService } from '../components/citation-service';
+import { SourceValidationEngine } from '../components/source-validation-engine';
+import { QualityAssessmentSystem } from '../components/quality-assessment-system';
+import { ConfidenceScoringEngine } from '../components/confidence-scoring-engine';
 import {
   Citation,
   CitationSearchCriteria,
   CitationContext,
   ReferenceCollection,
   CitationMetrics,
+  EnhancedCitation,
 } from '../models/citations';
 import { CitationOptions } from '../models/mcp';
 
 /**
- * Citation integration helper for MCP tools
+ * Enhanced citation integration result with validation and quality data
+ */
+export interface EnhancedCitationResult {
+  citations: EnhancedCitation[];
+  bibliography: string;
+  citationContexts: CitationContext[];
+  metrics: CitationMetrics;
+  enhancedContent: string;
+  qualityReport: any; // QualityReport from quality assessment system
+  confidenceScores: any; // ConfidenceScore from confidence scoring engine
+  validationResults: any[]; // ValidationResult from source validation engine
+}
+
+/**
+ * Enhanced Citation integration helper for MCP tools with validation and quality assessment
  */
 export class CitationIntegration {
   private citationService: CitationService;
+  private sourceValidationEngine: SourceValidationEngine;
+  private qualityAssessmentSystem: QualityAssessmentSystem;
+  private confidenceScoringEngine: ConfidenceScoringEngine;
 
   constructor() {
     this.citationService = new CitationService();
+    this.sourceValidationEngine = new SourceValidationEngine();
+    this.qualityAssessmentSystem = new QualityAssessmentSystem();
+    this.confidenceScoringEngine = new ConfidenceScoringEngine();
   }
 
   /**
-   * Find and integrate citations for a specific document type and content
+   * Find and integrate enhanced citations with validation and quality assessment
    */
   async integrateCitations(
     documentType: string,
     content: string,
     options: CitationOptions = {},
     industry?: string
-  ): Promise<{
-    citations: Citation[];
-    bibliography: string;
-    citationContexts: CitationContext[];
-    metrics: CitationMetrics;
-    enhancedContent: string;
-  }> {
+  ): Promise<EnhancedCitationResult> {
     // Set default options
-    const citationOptions: Required<CitationOptions> = {
+    const citationOptions = {
       include_citations: options.include_citations ?? true,
       minimum_citations: options.minimum_citations ?? 3,
       minimum_confidence: options.minimum_confidence ?? 'medium',
@@ -45,6 +63,15 @@ export class CitationIntegration {
       citation_style: options.citation_style ?? 'business',
       include_bibliography: options.include_bibliography ?? true,
       max_citation_age_months: options.max_citation_age_months ?? 24,
+      // Enhanced validation options with defaults
+      validate_sources: options.validate_sources ?? true,
+      assess_quality: options.assess_quality ?? true,
+      calculate_confidence: options.calculate_confidence ?? true,
+      find_alternatives: options.find_alternatives ?? false,
+      minimum_quality_score: options.minimum_quality_score ?? 60,
+      show_confidence_indicators: options.show_confidence_indicators ?? false,
+      include_quality_report: options.include_quality_report ?? false,
+      filter_low_quality: options.filter_low_quality ?? false,
     };
 
     if (!citationOptions.include_citations) {
@@ -54,6 +81,9 @@ export class CitationIntegration {
         citationContexts: [],
         metrics: this.citationService.calculateCitationMetrics([]),
         enhancedContent: content,
+        qualityReport: await this.qualityAssessmentSystem.assessCitationQuality([]),
+        confidenceScores: this.confidenceScoringEngine.aggregateDocumentConfidence([]),
+        validationResults: [],
       };
     }
 
@@ -75,43 +105,74 @@ export class CitationIntegration {
     };
 
     // Find relevant citations
-    const citations = await this.citationService.findRelevantCitations(searchCriteria);
+    const baseCitations = await this.citationService.findRelevantCitations(searchCriteria);
 
     // Ensure minimum citation count
-    const selectedCitations = citations.slice(
+    const selectedBaseCitations = baseCitations.slice(
       0,
-      Math.max(citationOptions.minimum_citations, citations.length)
+      Math.max(citationOptions.minimum_citations, baseCitations.length)
     );
 
+    // Validate and enhance citations with quality assessment
+    const validationResults = await this.sourceValidationEngine.validateCitations(selectedBaseCitations);
+    const enhancedCitations = await Promise.all(
+      selectedBaseCitations.map(citation => this.sourceValidationEngine.createEnhancedCitation(citation))
+    );
+
+    // Filter out citations that fail validation if required
+    const validatedCitations = enhancedCitations.filter(citation => {
+      if (citationOptions.minimum_confidence === 'high') {
+        return citation.validationStatus.credibilityAssessment.confidenceLevel === 'high';
+      }
+      if (citationOptions.minimum_confidence === 'medium') {
+        return ['high', 'medium'].includes(citation.validationStatus.credibilityAssessment.confidenceLevel);
+      }
+      return true; // Include all for 'low' confidence requirement
+    });
+
     // Create citation contexts based on content analysis
-    const citationContexts = this.createCitationContexts(content, selectedCitations, documentType);
+    const citationContexts = this.createCitationContexts(content, validatedCitations, documentType);
 
     // Generate bibliography
     const bibliography = citationOptions.include_bibliography
       ? this.citationService.generateBibliography(
-          selectedCitations,
+          validatedCitations,
           citationOptions.citation_style as 'business' | 'apa'
         )
       : '';
 
-    // Calculate metrics
-    const metrics = this.citationService.calculateCitationMetrics(selectedCitations);
+    // Calculate enhanced metrics
+    const metrics = this.citationService.calculateCitationMetrics(validatedCitations);
 
-    // Enhance content with inline citations
+    // Perform quality assessment
+    const qualityReport = await this.qualityAssessmentSystem.assessCitationQuality(validatedCitations);
+
+    // Calculate confidence scores for the document
+    const claims = this.extractClaimsFromContent(content, documentType);
+    const claimConfidences = claims.map(claim => 
+      this.confidenceScoringEngine.calculateClaimConfidence(claim, validatedCitations)
+    );
+    const confidenceScores = this.confidenceScoringEngine.aggregateDocumentConfidence(claimConfidences);
+
+    // Enhance content with inline citations and confidence indicators
     const enhancedContent = this.enhanceContentWithCitations(
       content,
-      selectedCitations,
+      validatedCitations,
       citationContexts,
       citationOptions.citation_style,
-      citationOptions.include_bibliography ? bibliography : ''
+      citationOptions.include_bibliography ? bibliography : '',
+      confidenceScores
     );
 
     return {
-      citations: selectedCitations,
+      citations: validatedCitations,
       bibliography,
       citationContexts,
       metrics,
       enhancedContent,
+      qualityReport,
+      confidenceScores,
+      validationResults,
     };
   }
 
@@ -273,14 +334,45 @@ export class CitationIntegration {
   }
 
   /**
-   * Enhance content with inline citations and bibliography
+   * Extract claims from content for confidence scoring
+   */
+  private extractClaimsFromContent(content: string, documentType: string): string[] {
+    const claims: string[] = [];
+    
+    // Split content into sentences and identify claim-like statements
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
+    
+    // Look for quantitative claims (containing numbers or percentages)
+    const quantitativeClaims = sentences.filter(sentence => 
+      /\d+%|\d+\.\d+%|\$\d+|\d+x|increase|decrease|growth|reduction/i.test(sentence)
+    );
+    claims.push(...quantitativeClaims.slice(0, 5)); // Limit to top 5
+    
+    // Look for comparative claims
+    const comparativeClaims = sentences.filter(sentence =>
+      /better|worse|faster|slower|more|less|higher|lower|superior|inferior/i.test(sentence)
+    );
+    claims.push(...comparativeClaims.slice(0, 3)); // Limit to top 3
+    
+    // Look for definitive statements
+    const definitiveClaims = sentences.filter(sentence =>
+      /will|must|should|proven|demonstrated|shows|indicates|reveals/i.test(sentence)
+    );
+    claims.push(...definitiveClaims.slice(0, 3)); // Limit to top 3
+    
+    return [...new Set(claims)]; // Remove duplicates
+  }
+
+  /**
+   * Enhance content with inline citations, bibliography, and confidence indicators
    */
   private enhanceContentWithCitations(
     content: string,
-    citations: Citation[],
+    citations: EnhancedCitation[],
     contexts: CitationContext[],
     style: 'business' | 'apa' | 'inline',
-    bibliography: string
+    bibliography: string,
+    confidenceScores?: any
   ): string {
     let enhancedContent = content;
 
@@ -306,6 +398,12 @@ export class CitationIntegration {
       }
     });
 
+    // Add confidence scoring summary if available
+    if (confidenceScores && confidenceScores.overallConfidence > 0) {
+      const confidenceSection = this.generateConfidenceSection(confidenceScores);
+      enhancedContent += `\n\n${confidenceSection}`;
+    }
+
     // Add bibliography at the end if requested
     if (bibliography) {
       enhancedContent += `\n\n${bibliography}`;
@@ -322,63 +420,167 @@ export class CitationIntegration {
   }
 
   /**
-   * Validate citation quality for a document
+   * Enhanced citation quality validation using quality assessment system
    */
-  validateCitationQuality(
+  async validateCitationQuality(
     citations: Citation[],
     documentType: string
-  ): {
+  ): Promise<{
     isValid: boolean;
     issues: string[];
     recommendations: string[];
     qualityScore: number;
-  } {
-    const requirements = this.getCitationRequirements(documentType);
-    const metrics = this.citationService.calculateCitationMetrics(citations);
-    const issues: string[] = [];
-    const recommendations: string[] = [];
-
-    // Check minimum citation count
-    if (citations.length < requirements.minimum_citations) {
-      issues.push(
-        `Insufficient citations: ${citations.length} found, ${requirements.minimum_citations} required`
-      );
-      recommendations.push(
-        `Add ${requirements.minimum_citations - citations.length} more relevant citations`
-      );
-    }
-
-    // Check confidence levels
-    const lowConfidenceCitations = citations.filter(c => c.confidence === 'low').length;
-    if (lowConfidenceCitations > citations.length * 0.3) {
-      issues.push('Too many low-confidence citations');
-      recommendations.push('Replace low-confidence sources with more authoritative references');
-    }
-
-    // Check recency
-    if (metrics.recency_score < 60) {
-      issues.push('Citations are too old');
-      recommendations.push('Include more recent sources from the last 12-18 months');
-    }
-
-    // Check diversity
-    if (metrics.diversity_score < 40) {
-      issues.push('Limited source diversity');
-      recommendations.push(
-        'Include citations from different types of sources (academic, industry, consulting)'
-      );
-    }
-
-    // Calculate overall quality score
-    const qualityScore = Math.round(
-      metrics.credibility_score * 0.4 + metrics.recency_score * 0.3 + metrics.diversity_score * 0.3
-    );
+    qualityReport: any;
+  }> {
+    // Use the enhanced quality assessment system
+    const qualityReport = await this.qualityAssessmentSystem.assessCitationQuality(citations);
+    
+    const issues = qualityReport.qualityGaps.map(gap => gap.description);
+    const recommendations = qualityReport.recommendations.map(rec => rec.description);
 
     return {
-      isValid: issues.length === 0,
+      isValid: qualityReport.complianceStatus === 'compliant',
       issues,
       recommendations,
-      qualityScore,
+      qualityScore: qualityReport.overallScore,
+      qualityReport,
+    };
+  }
+
+  /**
+   * Generate confidence section for enhanced content
+   */
+  private generateConfidenceSection(confidenceScores: any): string {
+    const confidence = confidenceScores.overallConfidence;
+    let confidenceLevel = 'Low';
+    let confidenceColor = '🔴';
+    
+    if (confidence >= 80) {
+      confidenceLevel = 'High';
+      confidenceColor = '🟢';
+    } else if (confidence >= 60) {
+      confidenceLevel = 'Medium';
+      confidenceColor = '🟡';
+    }
+
+    let section = `## Evidence Confidence Assessment\n\n`;
+    section += `${confidenceColor} **Overall Confidence: ${confidenceLevel} (${confidence}%)**\n\n`;
+    
+    if (confidenceScores.weakestClaims && confidenceScores.weakestClaims.length > 0) {
+      section += `**Areas for Improvement:**\n`;
+      confidenceScores.weakestClaims.slice(0, 2).forEach((claim: any) => {
+        section += `- ${claim.claim}: ${claim.confidence}% confidence\n`;
+      });
+      section += `\n`;
+    }
+
+    if (confidenceScores.strongestClaims && confidenceScores.strongestClaims.length > 0) {
+      section += `**Well-Supported Claims:**\n`;
+      confidenceScores.strongestClaims.slice(0, 2).forEach((claim: any) => {
+        section += `- ${claim.claim}: ${claim.confidence}% confidence\n`;
+      });
+      section += `\n`;
+    }
+
+    section += `*Confidence scores are based on source quality, evidence strength, methodology transparency, and data recency.*\n`;
+    
+    return section;
+  }
+
+  /**
+   * Get enhanced citation requirements with validation criteria
+   */
+  getEnhancedCitationRequirements(documentType: string) {
+    const baseRequirements = this.citationService.getCitationRequirements(documentType);
+    
+    return {
+      ...baseRequirements,
+      validation: {
+        requireAccessibilityCheck: true,
+        requireCredibilityAssessment: true,
+        requireComplianceCheck: true,
+        minimumQualityScore: 70,
+        maximumBrokenLinks: 0,
+      },
+      confidence: {
+        minimumOverallConfidence: 60,
+        requireConfidenceScoring: true,
+        showConfidenceIndicators: true,
+      },
+    };
+  }
+
+  /**
+   * Batch process citations with enhanced validation
+   */
+  async batchProcessCitations(
+    citations: Citation[],
+    options: {
+      validateSources?: boolean;
+      assessQuality?: boolean;
+      calculateConfidence?: boolean;
+      findAlternatives?: boolean;
+    } = {}
+  ): Promise<{
+    enhancedCitations: EnhancedCitation[];
+    validationResults: any[];
+    qualityReport: any;
+    processingStats: {
+      totalProcessed: number;
+      validationsPassed: number;
+      validationsFailed: number;
+      averageQualityScore: number;
+      processingTime: number;
+    };
+  }> {
+    const startTime = Date.now();
+    const defaultOptions = {
+      validateSources: true,
+      assessQuality: true,
+      calculateConfidence: true,
+      findAlternatives: false,
+      ...options,
+    };
+
+    let enhancedCitations: EnhancedCitation[] = [];
+    let validationResults: any[] = [];
+    let qualityReport: any = null;
+
+    // Validate sources if requested
+    if (defaultOptions.validateSources) {
+      validationResults = await this.sourceValidationEngine.validateCitations(citations);
+      enhancedCitations = await Promise.all(
+        citations.map(citation => this.sourceValidationEngine.createEnhancedCitation(citation))
+      );
+    } else {
+      enhancedCitations = citations as EnhancedCitation[];
+    }
+
+    // Assess quality if requested
+    if (defaultOptions.assessQuality) {
+      qualityReport = await this.qualityAssessmentSystem.assessCitationQuality(citations);
+    }
+
+    // Calculate processing statistics
+    const validationsPassed = validationResults.filter(result => 
+      result.accessibilityStatus.isAccessible && 
+      result.credibilityAssessment.confidenceLevel !== 'low'
+    ).length;
+
+    const averageQualityScore = qualityReport ? qualityReport.overallScore : 0;
+    const processingTime = Date.now() - startTime;
+
+    return {
+      enhancedCitations,
+      validationResults,
+      qualityReport,
+      processingStats: {
+        totalProcessed: citations.length,
+        validationsPassed,
+        validationsFailed: citations.length - validationsPassed,
+        averageQualityScore,
+        processingTime,
+      },
     };
   }
 }

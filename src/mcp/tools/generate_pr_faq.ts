@@ -85,9 +85,11 @@ ${prfaq.faq_markdown}
 
 ${prfaq.launch_checklist_markdown}`;
 
-    // Integrate citations if requested
+    // Integrate enhanced citations if requested
     let enhancedContent = combinedContent;
     let citationMetrics;
+    let qualityReport;
+    let confidenceScores;
     if (args.citation_options?.include_citations !== false) {
       const citationResult = await citationIntegration.integrateCitations(
         'pr_faq',
@@ -96,11 +98,15 @@ ${prfaq.launch_checklist_markdown}`;
       );
       enhancedContent = citationResult.enhancedContent;
       citationMetrics = citationResult.metrics;
+      qualityReport = citationResult.qualityReport;
+      confidenceScores = citationResult.confidenceScores;
 
-      MCPLogger.info('Citations integrated into PR-FAQ', context, {
+      MCPLogger.info('Enhanced citations integrated into PR-FAQ', context, {
         totalCitations: citationMetrics.total_citations,
         credibilityScore: citationMetrics.credibility_score,
         recencyScore: citationMetrics.recency_score,
+        qualityScore: qualityReport.overallScore,
+        overallConfidence: confidenceScores.overallConfidence,
       });
     }
 
@@ -149,6 +155,9 @@ ${prfaq.launch_checklist_markdown}`;
             recency_score: citationMetrics.recency_score,
             diversity_score: citationMetrics.diversity_score,
             bibliography_included: args.citation_options?.include_bibliography !== false,
+            quality_score: qualityReport?.overallScore || 0,
+            overall_confidence: confidenceScores?.overallConfidence || 0,
+            compliance_status: qualityReport?.complianceStatus || 'unknown',
           }
         : undefined,
     });
