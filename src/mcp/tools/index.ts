@@ -34,6 +34,18 @@ import {
 
 import { generatePRFAQ, generatePRFAQSchema, generatePRFAQDescription } from './generate_pr_faq';
 
+import {
+  enhanceCitations,
+  enhanceCitationsSchema,
+  enhanceCitationsDescription,
+} from './enhance_citations';
+
+import {
+  validateAndAuditCitations,
+  validateAndAuditCitationsSchema,
+  validateAndAuditCitationsDescription,
+} from './validate_and_audit_citations';
+
 // Re-export for external use
 export {
   generateRequirements,
@@ -51,6 +63,12 @@ export {
   generatePRFAQ,
   generatePRFAQSchema,
   generatePRFAQDescription,
+  enhanceCitations,
+  enhanceCitationsSchema,
+  enhanceCitationsDescription,
+  validateAndAuditCitations,
+  validateAndAuditCitationsSchema,
+  validateAndAuditCitationsDescription,
 };
 
 /**
@@ -81,6 +99,16 @@ export const MCP_TOOLS_REGISTRY = {
     handler: generatePRFAQ,
     schema: generatePRFAQSchema,
     description: generatePRFAQDescription,
+  },
+  enhance_citations: {
+    handler: enhanceCitations,
+    schema: enhanceCitationsSchema,
+    description: enhanceCitationsDescription,
+  },
+  validate_and_audit_citations: {
+    handler: validateAndAuditCitations,
+    schema: validateAndAuditCitationsSchema,
+    description: validateAndAuditCitationsDescription,
   },
 } as const;
 

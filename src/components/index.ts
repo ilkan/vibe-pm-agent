@@ -3,6 +3,8 @@
 export * from './intent-interpreter';
 export * from './business-analyzer';
 export * from './workflow-optimizer';
+export * from './source-validation-engine';
+export * from './confidence-scoring-engine';
 export * from './quota-forecaster';
 export * from './spec-generator';
 export * from './market-analyzer';
@@ -20,3 +22,14 @@ export * from './steering-user-interaction';
 export { SteeringFilePreview as SteeringFilePreviewComponent } from './steering-file-preview';
 export * from './market-data-integrator';
 export * from './proprietary-pm-frameworks';
+export * from './ai-citation-discovery-engine';
+export * from './audit-trail-manager';
+
+// Security and privacy components
+export * from './secure-document-handler';
+export * from './access-control-manager';
+export * from './data-anonymization-service';
+export * from './secure-credential-manager';
+
+// Enhanced Citation System - Unified Integration
+export * from './enhanced-citation-system';

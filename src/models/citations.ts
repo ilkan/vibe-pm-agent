@@ -175,3 +175,222 @@ export interface CitationEnrichment {
   funding_sources?: string[];
   conflicts_of_interest?: string[];
 }
+
+/**
+ * Source accessibility status for validation
+ */
+export interface AccessibilityStatus {
+  isAccessible: boolean;
+  accessType: 'free' | 'paywall' | 'subscription' | 'broken';
+  lastChecked: Date;
+  alternativeAccess: string[];
+  cacheAvailable: boolean;
+  httpStatus?: number;
+  responseTime?: number;
+  errorMessage?: string;
+}
+
+/**
+ * Source credibility assessment
+ */
+export interface CredibilityAssessment {
+  overallScore: number; // 0-100
+  factors: {
+    domainAuthority: number;
+    authorCredentials: number;
+    peerReviewStatus: number;
+    citationFrequency: number;
+    methodologyTransparency: number;
+  };
+  riskFactors: string[];
+  confidenceLevel: 'high' | 'medium' | 'low';
+  assessmentDate: Date;
+}
+
+/**
+ * Compliance status for regulatory requirements
+ */
+export interface ComplianceStatus {
+  isCompliant: boolean;
+  checkedStandards: string[];
+  violations: string[];
+  recommendations: string[];
+  lastChecked: Date;
+}
+
+/**
+ * Enhanced citation with validation data
+ */
+export interface EnhancedCitation extends Citation {
+  validationStatus: {
+    lastValidated: Date;
+    accessibilityStatus: AccessibilityStatus;
+    credibilityAssessment: CredibilityAssessment;
+    complianceStatus: ComplianceStatus;
+  };
+  qualityMetrics: {
+    credibilityScore: number;
+    relevanceScore: number;
+    recencyScore: number;
+    methodologyScore: number;
+    overallQuality: number;
+  };
+  usageTracking: {
+    timesUsed: number;
+    documentsReferenced: string[];
+    lastUsed: Date;
+    effectivenessRating: number;
+  };
+  alternatives: {
+    similarSources: Citation[];
+    updatedVersions: Citation[];
+    betterAlternatives: Citation[];
+  };
+}
+
+/**
+ * Source quality validation result
+ */
+export interface SourceQualityValidation {
+  isValid: boolean;
+  qualityScore: number;
+  issues: string[];
+  recommendations: string[];
+}
+
+/**
+ * Citation requirement identified by AI analysis
+ */
+export interface CitationRequirement {
+  claim: string;
+  claimType: 'quantitative' | 'qualitative' | 'comparative';
+  evidenceStrength: 'weak' | 'moderate' | 'strong';
+  requiredSourceTypes: CitationSourceType[];
+  confidenceThreshold: number;
+  industryRelevance: string[];
+}
+
+/**
+ * Quality gap in citation coverage
+ */
+export interface QualityGap {
+  gapType: 'insufficient_sources' | 'low_credibility' | 'outdated_sources' | 'methodology_unclear';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  affectedClaims: string[];
+  recommendedActions: string[];
+}
+
+/**
+ * Quality assessment report
+ */
+export interface QualityReport {
+  overallScore: number; // 0-100
+  metrics: {
+    sourceCredibility: number;
+    evidenceDiversity: number;
+    recencyScore: number;
+    methodologyTransparency: number;
+    sampleSizeAdequacy: number;
+  };
+  qualityGaps: QualityGap[];
+  recommendations: string[];
+  complianceStatus: 'compliant' | 'warning' | 'non-compliant';
+}
+
+/**
+ * Confidence score for a citation or claim
+ */
+export interface ConfidenceScore {
+  overall: number; // 0-100
+  breakdown: {
+    sourceQuality: number;
+    evidenceStrength: number;
+    methodologyClarity: number;
+    sampleSizeAdequacy: number;
+    recencyFactor: number;
+  };
+  confidenceInterval: {
+    lower: number;
+    upper: number;
+    level: number; // e.g., 95 for 95% confidence
+  };
+  uncertaintyFactors: string[];
+}
+
+/**
+ * Validation result for a citation
+ */
+export interface ValidationResult {
+  citationId: string;
+  isValid: boolean;
+  accessibility: AccessibilityStatus;
+  credibility: CredibilityAssessment;
+  alternatives: Citation[];
+  validatedAt: Date;
+  error?: string;
+}
+
+/**
+ * Evidence package for comprehensive analysis
+ */
+export interface EvidencePackage {
+  topic: string;
+  evidenceStrength: 'weak' | 'moderate' | 'strong' | 'very_strong';
+  overallConfidence: number;
+  primaryEvidence: {
+    citations: Citation[];
+    keyFindings: string[];
+    methodologyNotes: string[];
+  };
+  supportingEvidence: {
+    citations: Citation[];
+    contextualSupport: string[];
+    comparativeData: string[];
+  };
+  contradictoryEvidence: {
+    citations: Citation[];
+    conflictingFindings: string[];
+    resolutionNotes: string[];
+  };
+  qualityAssessment: QualityReport;
+  confidenceAnalysis: {
+    overallConfidence: number;
+    claimConfidences: Map<string, ConfidenceScore>;
+    weakestClaims: Array<{claim: string; confidence: number}>;
+    strongestClaims: Array<{claim: string; confidence: number}>;
+    recommendationReliability: 'high' | 'medium' | 'low';
+  };
+  recommendations: string[];
+}
+
+/**
+ * Citation enhancement options
+ */
+export interface CitationEnhancementOptions {
+  userId?: string;
+  minimumConfidence?: number;
+  requireSourceDiversity?: boolean;
+  recencyRequirementMonths?: number;
+  industryFocus?: string;
+  geographicScope?: string;
+}
+
+/**
+ * Citation audit report
+ */
+export interface CitationAuditReport {
+  auditId: string;
+  auditDate: Date;
+  totalCitations: number;
+  validCitations: number;
+  qualityScore: number;
+  complianceStatus: 'compliant' | 'warning' | 'non-compliant';
+  issues: string[];
+  recommendations: string[];
+  detailedResults: {
+    validationResults: ValidationResult[];
+    qualityReport: QualityReport;
+    confidenceScores: Map<string, ConfidenceScore>;
+  };
+  summary: string;
+}

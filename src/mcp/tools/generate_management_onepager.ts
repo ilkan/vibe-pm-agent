@@ -75,9 +75,11 @@ export async function generateManagementOnePager(
       args.roi_inputs
     );
 
-    // Integrate citations if requested
+    // Integrate enhanced citations if requested
     let enhancedContent = onePager.one_pager_markdown;
     let citationMetrics;
+    let qualityReport;
+    let confidenceScores;
     if (args.citation_options?.include_citations !== false) {
       const citationResult = await citationIntegration.integrateCitations(
         'executive_onepager',
@@ -86,11 +88,16 @@ export async function generateManagementOnePager(
       );
       enhancedContent = citationResult.enhancedContent;
       citationMetrics = citationResult.metrics;
+      qualityReport = citationResult.qualityReport;
+      confidenceScores = citationResult.confidenceScores;
 
-      MCPLogger.info('Citations integrated into one-pager', context, {
+      MCPLogger.info('Enhanced citations integrated into one-pager', context, {
         totalCitations: citationMetrics.total_citations,
         credibilityScore: citationMetrics.credibility_score,
         recencyScore: citationMetrics.recency_score,
+        qualityScore: qualityReport.overallScore,
+        overallConfidence: confidenceScores.overallConfidence,
+        validationsPassed: citationResult.validationResults.filter(r => r.accessibilityStatus.isAccessible).length,
       });
     }
 
@@ -146,6 +153,9 @@ export async function generateManagementOnePager(
             recency_score: citationMetrics.recency_score,
             diversity_score: citationMetrics.diversity_score,
             bibliography_included: args.citation_options?.include_bibliography !== false,
+            quality_score: qualityReport?.overallScore || 0,
+            overall_confidence: confidenceScores?.overallConfidence || 0,
+            compliance_status: qualityReport?.complianceStatus || 'unknown',
           }
         : undefined,
     });

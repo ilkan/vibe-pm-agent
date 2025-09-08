@@ -59,6 +59,22 @@ export interface MCPToolResult {
       recency_score: number;
       diversity_score: number;
       bibliography_included: boolean;
+      quality_score?: number;
+      overall_confidence?: number;
+      compliance_status?: 'compliant' | 'warning' | 'non-compliant';
+      validations_passed?: number;
+      validations_failed?: number;
+      broken_links?: number;
+      alternative_sources_found?: number;
+    };
+    enhancement?: {
+      citation_requirements_identified: number;
+      unsupported_claims_found: number;
+      critical_claims: number;
+      additional_sources_suggested: number;
+      quality_gaps_identified: number;
+      improvement_recommendations: number;
+      content_length_increase: string;
     };
   };
 }
@@ -377,7 +393,7 @@ export interface LogEntry {
 }
 
 /**
- * Citation options for MCP tools
+ * Enhanced citation options for MCP tools with validation and quality assessment
  */
 export interface CitationOptions {
   /** Whether to include citations and references */
@@ -396,6 +412,24 @@ export interface CitationOptions {
   include_bibliography?: boolean;
   /** Maximum age of citations in months */
   max_citation_age_months?: number;
+  
+  // Enhanced validation options
+  /** Whether to validate source accessibility */
+  validate_sources?: boolean;
+  /** Whether to perform quality assessment */
+  assess_quality?: boolean;
+  /** Whether to calculate confidence scores */
+  calculate_confidence?: boolean;
+  /** Whether to find alternative sources for broken links */
+  find_alternatives?: boolean;
+  /** Minimum quality score required (0-100) */
+  minimum_quality_score?: number;
+  /** Whether to show confidence indicators in content */
+  show_confidence_indicators?: boolean;
+  /** Whether to include quality report in metadata */
+  include_quality_report?: boolean;
+  /** Whether to filter out low-quality sources */
+  filter_low_quality?: boolean;
 }
 
 /**
