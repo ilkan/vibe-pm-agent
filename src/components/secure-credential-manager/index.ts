@@ -57,6 +57,7 @@ export interface CredentialRequest {
   purpose: string;
   context: RequestContext;
   timestamp: Date;
+  action?: 'retrieved' | 'used' | 'updated' | 'deleted';
 }
 
 export interface RequestContext {
@@ -665,9 +666,11 @@ export class SecureCredentialManager extends EventEmitter {
       id: crypto.randomUUID(),
       credentialId: request.credentialId,
       userId: request.userId,
-      action: request.purpose.includes('deletion') ? 'deleted' : 
-              request.purpose.includes('update') || request.purpose.includes('rotation') ? 'updated' :
-              request.purpose.includes('creation') ? 'updated' : 'retrieved',
+      action: request.action || (
+        request.purpose.includes('deletion') ? 'deleted' : 
+        request.purpose.includes('update') || request.purpose.includes('rotation') ? 'updated' :
+        request.purpose.includes('creation') ? 'updated' : 'retrieved'
+      ),
       purpose: request.purpose,
       context: request.context,
       success,
