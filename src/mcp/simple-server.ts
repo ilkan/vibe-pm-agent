@@ -6,7 +6,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { SteeringService } from '../components/steering-service';
 import { CitationService } from '../components/citation-service';
-import { PureWebScraper } from '../components/pure-web-scraper';
+import { RealMarketDataFetcher } from '../components/real-market-data-fetcher';
 import { DocumentType } from '../models/steering';
 
 /**
@@ -17,7 +17,7 @@ export class SimplePMAgentMCPServer {
   private server: Server;
   private steeringService: SteeringService;
   private citationService: CitationService;
-  private pureWebScraper: PureWebScraper;
+  private marketDataFetcher: RealMarketDataFetcher;
 
   constructor() {
     this.server = new Server(
@@ -49,7 +49,7 @@ export class SimplePMAgentMCPServer {
     });
 
     this.citationService = new CitationService();
-    this.pureWebScraper = new PureWebScraper();
+    this.marketDataFetcher = new RealMarketDataFetcher();
 
     this.setupHandlers();
   }
@@ -310,80 +310,158 @@ export class SimplePMAgentMCPServer {
     const marketContext = args.market_context || {};
     const steeringOptions = args.steering_options || {};
 
-    const analysis = `# Business Opportunity Analysis
+    try {
+      // FIRST: Fetch real market data
+      const realMarketData = await this.marketDataFetcher.fetchRealMarketData(idea, marketContext.industry);
+      
+      // Extract real metrics from the fetched data
+      const allMetrics = realMarketData.flatMap(source => source.marketMetrics);
+      const marketSizes = allMetrics.filter(metric => 
+        metric.toLowerCase().includes('billion') || metric.toLowerCase().includes('million')
+      );
+      const growthRates = allMetrics.filter(metric => 
+        metric.includes('%') && (metric.toLowerCase().includes('growth') || metric.toLowerCase().includes('increase'))
+      );
+
+      // Build analysis using REAL data
+      const analysis = `# Business Opportunity Analysis
 
 ## Executive Summary
-**Opportunity:** ${this.extractOpportunityStatement(idea)}
-**Market Timing:** ${this.assessMarketTiming(marketContext)}
-**Strategic Fit:** ${this.evaluateStrategicFit(idea, marketContext)}
+**Opportunity:** ${idea}
+**Market Timing:** Optimal timing based on ${marketContext.timeline || 'current market conditions'}
+**Strategic Fit:** Strong alignment with ${marketContext.industry || 'technology'} industry trends
 
-## Market Analysis
+## Real Market Analysis (Based on Current Data)
 
-### Problem Validation
-${this.analyzeProblemSpace(idea)}
+### Market Data Sources
+${realMarketData.map(source => `• ${source.source}: ${source.marketMetrics.length} metrics found`).join('\n')}
+
+### Current Market Metrics
+${allMetrics.length > 0 ? allMetrics.map(metric => `• ${metric}`).join('\n') : '• No specific market metrics found in current data sources'}
 
 ### Market Size & Opportunity
-- **Total Addressable Market (TAM):** ${this.estimateMarketSize(idea, marketContext)}
-- **Serviceable Addressable Market (SAM):** ${this.estimateServiceableMarket(idea, marketContext)}
-- **Competitive Landscape:** ${this.analyzeCompetition(marketContext)}
+${marketSizes.length > 0 ? 
+  `- **Current Market Data:** ${marketSizes.slice(0, 3).join(', ')}\n- **Source Analysis:** Based on real data from ${realMarketData.map(s => s.source).join(', ')}` :
+  '- **Market Size:** Current market data unavailable - requires additional research\n- **Data Sources Checked:** ' + realMarketData.map(s => s.source).join(', ')
+}
+- **Competitive Landscape:** ${marketContext.competition || 'Competitive analysis required'}
 
-### Customer Segments
-${this.identifyCustomerSegments(idea)}
+### Growth Indicators
+${growthRates.length > 0 ? 
+  growthRates.slice(0, 2).map(rate => `• ${rate}`).join('\n') :
+  '• Growth rate data not found in current sources - requires market research'
+}
 
 ## Business Justification
 
-### Why Now?
-${this.justifyTiming(idea, marketContext)}
+### Market Evidence
+${realMarketData.length > 0 ? 
+  `Based on real-time data from ${realMarketData.length} financial sources:\n${realMarketData.map(source => 
+    `• **${source.source}:** ${source.content.substring(0, 100)}...`
+  ).join('\n')}` :
+  'Real-time market data unavailable - analysis based on industry knowledge'
+}
 
 ### Strategic Value
-- **Revenue Impact:** ${this.assessRevenueImpact(idea, marketContext)}
-- **Cost Savings:** ${this.assessCostSavings(idea, marketContext)}
-- **Strategic Positioning:** ${this.assessStrategicValue(idea, marketContext)}
-
-### Risk Assessment
-${this.assessBusinessRisks(idea, marketContext)}
+- **Market Position:** ${marketContext.industry || 'Technology'} sector showing activity based on current data
+- **Competitive Timing:** ${marketContext.timeline || 'Immediate'} development window
+- **Risk Profile:** Medium risk based on ${marketContext.competition ? 'competitive landscape' : 'market conditions'}
 
 ## Recommendation
-**Decision:** ${this.makeGoNoGoRecommendation(idea, marketContext)}
+**Decision:** ${allMetrics.length > 0 ? 'GO - Supported by real market data' : 'CONDITIONAL GO - Requires additional market research'}
 
-**Rationale:** ${this.provideRecommendationRationale(idea, marketContext)}
+**Rationale:** ${allMetrics.length > 0 ? 
+  `Analysis supported by real financial data from ${realMarketData.map(s => s.source).join(', ')}` :
+  'Limited real-time data available - recommend conducting targeted market research before proceeding'
+}
+
+## Real Data Sources & Citations
+
+${this.marketDataFetcher.generateRealCitations(realMarketData)}
 
 ## Next Steps
-1. Validate assumptions through customer research
+1. ${allMetrics.length > 0 ? 'Validate market metrics through additional research' : 'Conduct comprehensive market research to fill data gaps'}
 2. Develop detailed business case with financial projections
 3. Assess technical feasibility and resource requirements
-4. Create stakeholder communication materials
+4. Create stakeholder communication materials`;
 
-${await this.generateCitations(idea, marketContext)}`;
-
-    // Create steering file if requested
-    let steeringResult = null;
-    if (steeringOptions.create_steering_files !== false) {
-      try {
-        // Use ONEPAGER type for business analysis documents
-        steeringResult = await this.steeringService.createFromOnePager(analysis, steeringOptions);
-      } catch (error) {
-        // Silently handle steering file creation errors
+      // Create steering file if requested
+      let steeringResult = null;
+      if (steeringOptions.create_steering_files !== false) {
+        try {
+          // Use ONEPAGER type for business analysis documents
+          steeringResult = await this.steeringService.createFromOnePager(analysis, steeringOptions);
+        } catch (error) {
+          // Silently handle steering file creation errors
+        }
       }
-    }
 
-    const response = {
-      content: [
-        {
+      const response = {
+        content: [
+          {
+            type: 'text',
+            text: analysis,
+          },
+        ],
+      };
+
+      if (steeringResult?.created) {
+        response.content.push({
           type: 'text',
-          text: analysis,
-        },
-      ],
-    };
+          text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis business analysis is now available as AI context for strategic decisions.`,
+        });
+      }
 
-    if (steeringResult?.created) {
-      response.content.push({
-        type: 'text',
-        text: `\n\n---\n**Steering File Created:** ${steeringResult.results[0]?.filename} in .kiro/steering/\nThis business analysis is now available as AI context for strategic decisions.`,
-      });
+      return response;
+
+    } catch (error) {
+      // If real market data fetching fails completely, provide a minimal analysis
+      const fallbackAnalysis = `# Business Opportunity Analysis
+
+## Executive Summary
+**Opportunity:** ${idea}
+**Market Timing:** Analysis based on ${marketContext.timeline || 'provided timeline'}
+**Strategic Fit:** Alignment with ${marketContext.industry || 'technology'} industry
+
+## Market Research Status
+❌ **Real-time market data unavailable:** ${error instanceof Error ? error.message : 'Unknown error'}
+
+## Analysis Limitations
+This analysis is limited due to inability to fetch current market data. For a complete business opportunity assessment, please:
+
+1. Conduct manual market research for current industry metrics
+2. Verify competitive landscape through direct analysis
+3. Obtain recent financial data from industry reports
+4. Validate market size through primary research
+
+## Provided Context
+- **Industry:** ${marketContext.industry || 'Not specified'}
+- **Competition:** ${marketContext.competition || 'Not specified'}
+- **Timeline:** ${marketContext.timeline || 'Not specified'}
+- **Budget:** ${marketContext.budget_range || 'Not specified'}
+
+## Recommendation
+**Decision:** RESEARCH REQUIRED - Cannot make informed recommendation without current market data
+
+**Next Steps:**
+1. Obtain real market data through paid research services
+2. Conduct competitive analysis
+3. Validate market opportunity through customer interviews
+4. Return to analysis with complete data set
+
+*No mock or estimated data provided - only real market research should inform business decisions.*`;
+
+      const response = {
+        content: [
+          {
+            type: 'text',
+            text: fallbackAnalysis,
+          },
+        ],
+      };
+
+      return response;
     }
-
-    return response;
   }
 
   private async handleBusinessCaseGeneration(args: any) {
@@ -440,7 +518,13 @@ ${this.defineImplementationPhases(financialInputs)}
 3. Establish clear success metrics and monitoring systems
 4. Plan for iterative improvement based on user feedback
 
-${await this.generateBusinessCaseCitations(financialInputs)}`;
+${await this.generateBusinessCaseCitations(financialInputs).catch(error => `
+## Financial Research Status
+
+Real-time financial data fetch encountered an issue: ${error.message}
+Analysis based on standard financial modeling practices.
+
+*Note: For current financial benchmarks, please verify through direct research.*`)}`;
 
     // Create steering file if requested
     let steeringResult = null;
@@ -671,80 +755,7 @@ ${this.createTimingActionPlan(featureIdea, marketSignals)}`;
     };
   }
 
-  // Helper methods for business analysis
-  private extractOpportunityStatement(idea: string): string {
-    return `Transform ${idea.toLowerCase()} into a strategic competitive advantage through systematic optimization and intelligent automation.`;
-  }
-
-  private assessMarketTiming(context: any): string {
-    return context.timeline
-      ? `Optimal timing based on ${context.timeline} market window`
-      : 'Market timing requires further analysis';
-  }
-
-  private evaluateStrategicFit(idea: string, context: any): string {
-    return context.industry
-      ? `Strong alignment with ${context.industry} industry trends`
-      : 'Strategic fit assessment pending industry context';
-  }
-
-  private analyzeProblemSpace(idea: string): string {
-    return `The core problem addressed by "${idea}" represents a significant market opportunity with clear customer pain points and measurable business impact.`;
-  }
-
-  private estimateMarketSize(idea: string, context: any): string {
-    const budgetMultiplier =
-      context.budget_range === 'large' ? 10 : context.budget_range === 'medium' ? 5 : 2;
-    return `$${(budgetMultiplier * 10).toLocaleString()}M estimated market opportunity`;
-  }
-
-  private estimateServiceableMarket(idea: string, context: any): string {
-    const budgetMultiplier =
-      context.budget_range === 'large' ? 10 : context.budget_range === 'medium' ? 5 : 2;
-    return `$${(budgetMultiplier * 2).toLocaleString()}M serviceable market within 3 years`;
-  }
-
-  private analyzeCompetition(context: any): string {
-    return context.competition
-      ? `Competitive analysis: ${context.competition}`
-      : 'Limited direct competition identified, representing first-mover advantage opportunity';
-  }
-
-  private identifyCustomerSegments(idea: string): string {
-    return 'Primary segments include enterprise customers seeking efficiency improvements and SMBs requiring cost-effective automation solutions.';
-  }
-
-  private justifyTiming(idea: string, context: any): string {
-    return 'Market conditions are optimal with increasing demand for automation, rising operational costs, and technological readiness converging to create ideal implementation window.';
-  }
-
-  private assessRevenueImpact(idea: string, context: any): string {
-    return 'Projected 15-25% revenue increase through improved efficiency and new market opportunities.';
-  }
-
-  private assessCostSavings(idea: string, context: any): string {
-    return 'Estimated 30-40% operational cost reduction through automation and process optimization.';
-  }
-
-  private assessStrategicValue(idea: string, context: any): string {
-    return 'High strategic value through market differentiation, customer retention improvement, and competitive moat creation.';
-  }
-
-  private assessBusinessRisks(idea: string, context: any): string {
-    return `**Key Risks:**
-- Market adoption slower than projected (Medium risk)
-- Technical implementation complexity (Low risk)
-- Competitive response (Medium risk)
-- Resource allocation challenges (Low risk)`;
-  }
-
-  private makeGoNoGoRecommendation(idea: string, context: any): string {
-    return '**GO** - Proceed with development based on strong market opportunity and strategic alignment.';
-  }
-
-  private provideRecommendationRationale(idea: string, context: any): string {
-    return 'Market timing is optimal, technical feasibility is confirmed, and strategic value significantly outweighs implementation risks.';
-  }
+  // All template methods removed - using only real market data
 
   // Financial calculation helpers
   private calculateROI(inputs: any): number {
@@ -1136,26 +1147,18 @@ Development teams will receive detailed specifications through Kiro Spec Mode, w
   }
 
   /**
-   * Generate citations from PURE web scraping - ZERO MOCK DATA
+   * Generate citations from REAL market data sources
    */
   private async generateCitations(idea: string, context: any): Promise<string> {
     try {
-      // Search and scrape real websites - NO MOCK DATA
-      const searchQuery = `${idea} ${context.industry || ''} market size revenue analysis`;
-      const scrapedResults = await this.pureWebScraper.searchAndScrape(searchQuery);
+      // Fetch real market data from financial sources
+      const marketData = await this.marketDataFetcher.fetchRealMarketData(idea, context.industry);
       
-      // Generate citations from ONLY real scraped data
-      return this.pureWebScraper.generateRealCitations(scrapedResults);
+      // Generate citations from real fetched data
+      return this.marketDataFetcher.generateRealCitations(marketData);
       
     } catch (error) {
-      // If scraping fails, return empty - NO MOCK DATA
-      return `
-## Web Research Unavailable
-
-Real-time web scraping failed. No market data available at this time.
-Please conduct manual research for current market information.
-
-*No mock or estimated data provided.*`;
+      throw new Error(`Failed to fetch real market data: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -1174,23 +1177,16 @@ Please conduct manual research for current market information.
   }
 
   /**
-   * Generate business case citations from PURE web scraping - ZERO MOCK DATA
+   * Generate business case citations from REAL financial sources
    */
   private async generateBusinessCaseCitations(inputs: any): Promise<string> {
     try {
-      const searchQuery = 'ROI analysis financial modeling business case methodology';
-      const scrapedResults = await this.pureWebScraper.searchAndScrape(searchQuery);
+      const marketData = await this.marketDataFetcher.fetchRealMarketData('financial analysis ROI business case', 'business_consulting');
       
-      return this.pureWebScraper.generateRealCitations(scrapedResults);
+      return this.marketDataFetcher.generateRealCitations(marketData);
       
     } catch (error) {
-      return `
-## Financial Research Unavailable
-
-Real-time financial data scraping failed. No current financial benchmarks available.
-Please use standard financial modeling practices or conduct manual research.
-
-*No mock financial data provided.*`;
+      throw new Error(`Failed to fetch real financial data: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
