@@ -1,251 +1,248 @@
-# PM Agent Steering File Integration Documentation
+# Vibe PM Agent Documentation
 
 ## Overview
 
-This documentation covers the steering file integration feature of the PM Agent Intent-to-Spec Optimizer. This feature automatically converts PM agent consulting documents into Kiro steering files, creating a self-improving development environment where PM expertise becomes persistent guidance.
+This documentation covers the Vibe PM Agent MCP server, which provides PM Mode for Kiro. It transforms raw developer ideas into comprehensive business intelligence with professional citations and strategic analysis.
 
 ## Documentation Structure
 
 ### 📚 Core Documentation
 
-#### [Steering File Integration Guide](steering-file-integration-guide.md)
-**Start here** - Comprehensive guide covering:
-- What steering files are and how they work
-- Complete workflow from PM document to steering file
-- Document types and their steering patterns
-- Using MCP tools with steering integration
-- Configuration and customization options
-- Troubleshooting common issues
+#### [Project Structure](PROJECT_STRUCTURE.md)
+**Project overview** - Complete project organization and architecture:
+- Project overview and component structure
+- MCP server implementation details
+- Business intelligence pipeline architecture
+- Data models and interfaces
+- Testing suite and quality metrics
 
-#### [Steering File Examples](steering-file-examples.md)
-**Concrete examples** of generated steering files:
-- Requirements steering file from PM requirements document
-- Design options steering file with Impact vs Effort analysis
-- Management one-pager steering file for executives
-- PR-FAQ steering file for product clarity
-- Task plan steering file for implementation guidance
-- Usage patterns and customization tips
+#### [MCP Tools Documentation](mcp-tools-documentation.md)
+**MCP tools reference** - Complete API reference for all MCP tools:
+- Business opportunity analysis tools
+- Strategic alignment assessment
+- Market timing validation
+- Resource allocation optimization
+- Stakeholder communication generation
 
-#### [Best Practices Guide](steering-file-best-practices.md)
-**Proven strategies** for effective steering file management:
-- Organization patterns (feature-based, type-based, hybrid)
-- Naming conventions and file match patterns
-- Inclusion rule strategies (always, fileMatch, manual)
-- Cross-reference management and maintenance
-- Content quality guidelines and team collaboration
-- Performance optimization and troubleshooting
+#### [Enhanced Citation System API](enhanced-citation-system-comprehensive-api.md)
+**Citation system API** - Complete API documentation for citation capabilities:
+- MCP tools for citation enhancement
+- Core components and data models
+- Integration patterns and performance guidelines
+- Error handling and troubleshooting
 
-#### [MCP Tool Reference](mcp-steering-tool-reference.md)
-**Complete API reference** for steering integration:
-- Common steering parameters across all tools
-- Tool-specific documentation and examples
-- Batch steering file creation patterns
-- Error handling and recovery strategies
-- Configuration examples for different teams/projects
-- CI/CD and IDE integration patterns
+### 📊 Business Intelligence Features
 
-#### [Competitive Analysis & Market Sizing Guide](competitive-analysis-market-sizing-guide.md)
-**Comprehensive guide** for competitive intelligence tools:
-- Complete documentation for analyze_competitor_landscape and calculate_market_sizing
-- Usage examples and integration workflows
-- Best practices for competitive analysis and market sizing
+#### [Competitive Analysis Guide](competitive-analysis-market-sizing-guide.md)
+**Competitive intelligence** - Comprehensive guide for market analysis:
+- Competitive landscape analysis tools
+- Market sizing and opportunity assessment
+- Best practices for competitive intelligence
 - Source attribution and data quality guidelines
-- Steering file integration for competitive intelligence
 
 #### [Competitive Analysis Examples](competitive-analysis-examples.md)
-**Real-world examples** and use cases:
-- SaaS platform competitive analysis examples
+**Real-world examples** - Practical use cases and scenarios:
+- SaaS platform competitive analysis
 - Mobile app market sizing scenarios
-- Enterprise software competitive positioning
-- Fintech and AI/ML product examples
-- Complete workflow examples and integration patterns
+- Enterprise software positioning
+- Complete workflow examples
+
+#### [PM Document Best Practices](pm-document-best-practices.md)
+**Document standards** - Professional PM document creation:
+- Executive communication standards
+- Business case development guidelines
+- Strategic analysis frameworks
+- Quality assurance and validation
 
 #### [PM Workflow Integration Guide](pm-workflow-integration-guide.md)
-**Integration with existing PM processes**:
-- Product discovery and planning phase integration
-- Go-to-market planning with competitive intelligence
+**Process integration** - Integration with existing PM workflows:
+- Product discovery and planning integration
+- Go-to-market planning processes
 - Team workflow templates and best practices
-- Integration with Jira, Confluence, and other PM tools
-- Metrics and KPIs for competitive intelligence
+- Metrics and KPIs for business intelligence
 
 ### 🚀 Quick Start
 
-1. **Read the [Integration Guide](steering-file-integration-guide.md)** to understand the concepts
-2. **Try the examples** from the [Examples Documentation](steering-file-examples.md)
-3. **Follow best practices** from the [Best Practices Guide](steering-file-best-practices.md)
-4. **Reference the API** in the [MCP Tool Reference](mcp-steering-tool-reference.md)
+1. **Read the [Project Structure](PROJECT_STRUCTURE.md)** to understand the architecture
+2. **Try the MCP tools** from the [MCP Tools Documentation](mcp-tools-documentation.md)
+3. **Follow best practices** from the [PM Document Best Practices](pm-document-best-practices.md)
+4. **Reference the citation API** in the [Enhanced Citation System API](enhanced-citation-system-comprehensive-api.md)
 
 ### 📖 Documentation by Use Case
 
 #### For Product Managers
-- [Integration Guide: Document Types](steering-file-integration-guide.md#document-types-and-steering-patterns)
-- [Examples: Requirements and One-Pagers](steering-file-examples.md#example-1-requirements-steering-file)
-- [Best Practices: Content Quality](steering-file-best-practices.md#content-quality-guidelines)
+- [PM Workflow Integration Guide](pm-workflow-integration-guide.md) - Process integration
+- [PM Document Best Practices](pm-document-best-practices.md) - Document standards
+- [Competitive Analysis Guide](competitive-analysis-market-sizing-guide.md) - Market intelligence
 
 #### For Developers
-- [Integration Guide: Using MCP Tools](steering-file-integration-guide.md#using-mcp-tools-with-steering-integration)
-- [Examples: Design and Implementation](steering-file-examples.md#example-2-design-options-steering-file)
-- [MCP Reference: Tool Parameters](mcp-steering-tool-reference.md#tool-specific-documentation)
+- [MCP Tools Documentation](mcp-tools-documentation.md) - API reference
+- [Enhanced Citation System API](enhanced-citation-system-comprehensive-api.md) - Citation integration
+- [Project Structure](PROJECT_STRUCTURE.md) - Architecture overview
 
-#### For Team Leads
-- [Best Practices: Organization Strategies](steering-file-best-practices.md#organization-strategies)
-- [Best Practices: Team Collaboration](steering-file-best-practices.md#team-collaboration-strategies)
-- [Integration Guide: Configuration](steering-file-integration-guide.md#configuration-and-customization)
+#### For Business Analysts
+- [Competitive Analysis Examples](competitive-analysis-examples.md) - Practical examples
+- [PM Workflow Integration Guide](pm-workflow-integration-guide.md) - Process templates
+- [Enhanced Citation System Best Practices](enhanced-citation-system-best-practices.md) - Quality standards
 
-#### For Architects
-- [Examples: Design Options](steering-file-examples.md#example-2-design-options-steering-file)
-- [Best Practices: Cross-Reference Management](steering-file-best-practices.md#cross-reference-management)
-- [MCP Reference: Advanced Usage](mcp-steering-tool-reference.md#advanced-usage)
+#### For Executives
+- [PM Document Best Practices](pm-document-best-practices.md) - Executive communications
+- [Competitive Analysis Guide](competitive-analysis-market-sizing-guide.md) - Strategic analysis
+- [Project Structure](PROJECT_STRUCTURE.md) - System capabilities
 
 ## Key Features
 
-### 🔄 Automatic Conversion
-- Transform PM agent outputs into properly formatted steering files
-- Smart front-matter generation with appropriate inclusion rules
-- Automatic cross-reference creation between related documents
+### 🧠 Business Intelligence
+- Evidence-backed business opportunity analysis
+- Strategic alignment assessment with company OKRs
+- Market timing validation with confidence scoring
+- Resource allocation optimization recommendations
 
-### 🎯 Contextual Activation
-- **Always**: Core principles active in every interaction
-- **FileMatch**: Feature-specific guidance activated by file patterns
-- **Manual**: Executive summaries and reference materials on-demand
+### 📊 Professional Citations
+- Comprehensive citation management with credibility ratings
+- Source validation and accessibility checking
+- Quality assessment with improvement recommendations
+- Multiple citation formats (APA, Business, Inline)
 
-### 🏗️ Flexible Organization
-- **Feature-based**: Organize by project features
-- **Type-based**: Organize by document types
-- **Hybrid**: Mix of always-active, contextual, and manual guidance
+### 💼 Executive Communications
+- Management one-pagers with Pyramid Principle structure
+- PR-FAQ documents for product announcements
+- Board presentations with strategic context
+- Stakeholder alignment summaries
 
-### 🔗 Smart Cross-References
-- Automatic linking between requirements, design, and implementation
-- References to related specs and documentation
-- Bidirectional relationship management
+### 🔍 Competitive Intelligence
+- Automated competitive landscape analysis
+- Market sizing with methodology transparency
+- Strategic positioning recommendations
+- Industry benchmark comparisons
 
 ## Common Workflows
 
-### Basic Workflow: Single Document
+### Business Opportunity Analysis
 ```typescript
-// Generate requirements with steering file
-const result = await mcp_pm_agent_intent_optimizer_generate_requirements({
-  raw_intent: "Create user authentication system",
-  context: {
-    createSteeringFile: true,
-    featureName: "user-authentication"
+// Analyze market opportunity and strategic fit
+const result = await mcp_vibe_pm_agent_analyze_business_opportunity({
+  idea: "AI-powered customer support chatbot",
+  market_context: {
+    industry: "e-commerce",
+    budget_range: "medium"
   }
 });
 ```
 
-### Advanced Workflow: Complete Feature Suite
+### Executive Communication Generation
 ```typescript
-// Generate complete workflow with steering files
-const workflow = await createCompleteWorkflowWithSteering(
-  "Create user authentication with OAuth and RBAC",
-  "user-authentication"
-);
-// Creates: requirements, design, tasks, and onepager steering files
+// Generate executive one-pager with ROI analysis
+const onePager = await mcp_vibe_pm_agent_create_stakeholder_communication({
+  business_case: "...",
+  communication_type: "executive_onepager",
+  audience: "executives"
+});
 ```
 
-### Team Workflow: Collaborative Development
-1. **PM**: Generate requirements and one-pager with steering files
-2. **Architect**: Generate design options with steering files
-3. **Tech Lead**: Generate task plan with steering files
-4. **Developers**: Implementation guided by contextual steering files
+### Strategic Validation Workflow
+1. **Business Analysis**: Analyze opportunity and market fit
+2. **Strategic Alignment**: Assess alignment with company strategy
+3. **Market Timing**: Validate timing and competitive landscape
+4. **Resource Planning**: Optimize resource allocation and timeline
+5. **Executive Communication**: Generate stakeholder materials
 
 ## Integration Points
 
 ### 🛠️ MCP Tools
-All PM Agent MCP tools support steering file creation:
-- `generate_requirements` → Requirements steering files
-- `generate_design_options` → Design guidance steering files
-- `generate_management_onepager` → Executive steering files
-- `generate_pr_faq` → Product clarity steering files
-- `generate_task_plan` → Implementation steering files
-- `analyze_competitor_landscape` → Competitive intelligence steering files
-- `calculate_market_sizing` → Market opportunity steering files
+Core PM Mode tools for business intelligence:
+- `analyze_business_opportunity` → Market opportunity analysis
+- `generate_business_case` → ROI analysis and financial projections
+- `assess_strategic_alignment` → Company strategy alignment
+- `create_stakeholder_communication` → Executive communications
+- `validate_market_timing` → Market timing validation
+- `optimize_resource_allocation` → Resource optimization
 
 ### 🔧 Development Tools
-- **Kiro IDE**: Native steering file support with contextual activation
-- **VSCode**: Extension support for steering file management
-- **CI/CD**: Automated steering file generation and validation
-- **Git**: Version control integration with steering file workflows
+- **Kiro IDE**: Native MCP integration with PM Mode
+- **n8n/Zapier**: Automation platform integration
+- **CI/CD**: Automated business intelligence generation
+- **APIs**: RESTful integration with existing PM tools
 
-### 📊 Analytics and Management
-- Usage tracking for steering file effectiveness
-- Broken reference detection and repair
-- Content freshness monitoring
-- Team collaboration metrics
+### 📊 Analytics and Intelligence
+- Citation quality tracking and validation
+- Confidence scoring for all recommendations
+- Source credibility assessment
+- Performance metrics and optimization
 
 ## Benefits
 
-### 🎯 For Development Teams
-- **Persistent Expertise**: PM consulting insights become ongoing guidance
-- **Contextual Help**: Relevant guidance appears when working on related files
-- **Consistency**: Shared understanding across team members
-- **Self-Improving**: Guidance evolves with project requirements
+### 🎯 For Product Managers
+- **Professional Analysis**: Consulting-grade business intelligence with citations
+- **Executive Credibility**: Evidence-backed recommendations for stakeholders
+- **Time Savings**: Automated analysis and document generation
+- **Strategic Clarity**: Clear alignment between business goals and features
 
 ### 📈 For Organizations
-- **Knowledge Retention**: Capture and preserve PM consulting expertise
-- **Onboarding**: New team members get contextual guidance automatically
-- **Quality**: Consistent application of best practices and standards
-- **Efficiency**: Reduce repeated consulting and decision-making overhead
+- **Investment Confidence**: ROI analysis with financial projections
+- **Risk Mitigation**: Evidence-backed decision making
+- **Strategic Alignment**: Ensure features align with company objectives
+- **Competitive Intelligence**: Automated market and competitor analysis
 
-### 🔄 For Project Management
-- **Traceability**: Clear links between requirements, design, and implementation
-- **Visibility**: Executive summaries and business context readily available
-- **Alignment**: Ensure implementation matches original intent and requirements
-- **Evolution**: Update guidance as requirements and understanding evolve
+### 🔄 For Development Teams
+- **Business Context**: Clear understanding of WHY to build features
+- **Stakeholder Buy-in**: Professional materials for executive approval
+- **Resource Optimization**: Data-driven resource allocation recommendations
+- **Quality Assurance**: Citation validation and confidence scoring
 
 ## Getting Started
 
 ### Prerequisites
-- PM Agent Intent-to-Spec Optimizer installed and configured
-- Kiro workspace with `.kiro/steering/` directory
-- Basic understanding of Kiro steering file concepts
+- Node.js 18+ and npm installed
+- MCP-compatible AI system (Kiro, Claude Desktop, etc.)
+- Basic understanding of MCP protocol
 
 ### Quick Setup
-1. **Enable steering integration** in your PM Agent configuration
-2. **Choose organization strategy** (feature-based recommended for most teams)
-3. **Generate your first steering file** using any PM Agent MCP tool
-4. **Review and customize** the generated steering file
-5. **Test activation** by working on related files
+1. **Install the server**: `npm install && npm run build`
+2. **Configure MCP client** with vibe-pm-agent server
+3. **Test business analysis** using analyze_business_opportunity
+4. **Generate executive materials** using create_stakeholder_communication
+5. **Validate market timing** using validate_market_timing
 
 ### Next Steps
-1. **Read the [Integration Guide](steering-file-integration-guide.md)** for comprehensive understanding
-2. **Try the examples** from the [Examples Documentation](steering-file-examples.md)
-3. **Establish team practices** using the [Best Practices Guide](steering-file-best-practices.md)
-4. **Integrate with your workflow** using the [MCP Tool Reference](mcp-steering-tool-reference.md)
+1. **Read the [Project Structure](PROJECT_STRUCTURE.md)** for architecture overview
+2. **Try the MCP tools** from the [MCP Tools Documentation](mcp-tools-documentation.md)
+3. **Follow best practices** from the [PM Document Best Practices](pm-document-best-practices.md)
+4. **Integrate citations** using the [Enhanced Citation System API](enhanced-citation-system-comprehensive-api.md)
 
 ## Support and Troubleshooting
 
 ### Common Issues
-- **Steering files not activating**: Check inclusion rules and file patterns
-- **Broken cross-references**: Validate file paths and update when files move
-- **Performance impact**: Review always-included files and optimize patterns
-- **Content quality**: Follow content guidelines and review regularly
+- **MCP server connection**: Check server health and MCP configuration
+- **Citation quality**: Review source validation and credibility assessment
+- **Performance optimization**: Check caching and batch processing settings
+- **Integration problems**: Validate MCP tool schemas and parameters
 
 ### Getting Help
-- Review the [troubleshooting sections](steering-file-integration-guide.md#troubleshooting) in each guide
-- Check the [error handling documentation](mcp-steering-tool-reference.md#error-handling)
-- Follow the [best practices](steering-file-best-practices.md) for common scenarios
+- Review the [Enhanced Citation System Troubleshooting](enhanced-citation-system-troubleshooting.md) guide
+- Check the [MCP Tools Documentation](mcp-tools-documentation.md) for API reference
+- Follow the [PM Document Best Practices](pm-document-best-practices.md) for quality standards
 
 ### Contributing
-- Report issues with steering file generation or activation
+- Report issues with business analysis or citation quality
 - Suggest improvements to documentation and examples
-- Share successful patterns and configurations with the community
-- Contribute to steering file templates and best practices
+- Share successful integration patterns with the community
+- Contribute to citation database and quality standards
 
 ## Version History
 
-### Current Version: 1.0.0
-- Complete steering file integration with all PM Agent tools
-- Comprehensive documentation and examples
-- Best practices guide based on real-world usage
-- Full MCP tool API reference with error handling
+### Current Version: 2.0.0
+- Complete PM Mode implementation with 6 core MCP tools
+- Enhanced citation system with quality validation
+- Professional executive communication generation
+- Comprehensive business intelligence capabilities
 
 ### Roadmap
-- Enhanced analytics and usage tracking
-- Advanced template system for custom steering files
-- IDE integration improvements
-- Team collaboration features
+- Advanced competitive intelligence features
+- Real-time market data integration
+- Enhanced automation platform support
+- Machine learning-powered analysis improvements
 
 ---
 
-**Ready to get started?** Begin with the [Steering File Integration Guide](steering-file-integration-guide.md) to understand the concepts, then try the examples and follow the best practices for your team's workflow.
+**Ready to get started?** Begin with the [Project Structure](PROJECT_STRUCTURE.md) to understand the architecture, then try the MCP tools and follow the best practices for professional business intelligence.
