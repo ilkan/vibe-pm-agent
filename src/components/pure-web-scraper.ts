@@ -69,6 +69,7 @@ export class PureWebScraper {
           'User-Agent': this.userAgent,
           'Accept': 'application/json',
         },
+        rejectUnauthorized: false, // Allow self-signed certificates for testing
       };
 
       const req = https.request(options, (res) => {
@@ -137,6 +138,7 @@ export class PureWebScraper {
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
         },
+        rejectUnauthorized: false, // Allow self-signed certificates for testing
       };
 
       const req = https.request(options, (res) => {
