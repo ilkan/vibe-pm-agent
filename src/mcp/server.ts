@@ -73,14 +73,12 @@ export class PMAgentMCPServer {
   constructor(options: MCPServerOptions = {}) {
     this.pipeline = new AIAgentPipeline();
 
-    // Configure steering service with test-friendly defaults if in test environment
-    const isTestEnvironment =
-      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
+    // Configure steering service with MCP-friendly defaults
     this.steeringService = new SteeringService({
       userPreferences: {
-        autoCreate: isTestEnvironment, // Auto-create in test environment
-        showPreview: false, // Skip preview in tests
-        showSummary: !isTestEnvironment, // Only show summary in non-test environments
+        autoCreate: true, // Always auto-create for MCP tools
+        showPreview: false, // Skip preview for MCP tools
+        showSummary: false, // Skip summary for MCP tools
       },
     });
 
