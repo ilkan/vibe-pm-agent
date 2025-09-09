@@ -218,7 +218,7 @@ export class SpecGenerator implements ISpecGenerator {
           userStory: `As a user, I want the system to ${step.description.toLowerCase()}, so that I can achieve my intended outcome efficiently.`,
           acceptanceCriteria: [
             `WHEN the system processes ${step.type} operations THEN it SHALL complete within quota limits`,
-            `WHEN ${step.description} is executed THEN it SHALL produce the expected outputs: ${step.outputs.join(', ')}`,
+            `WHEN ${step.description} is executed THEN it SHALL produce the expected outputs: ${step.outputs?.join(', ') || 'none specified'}`,
           ],
           priority: step.quotaCost > 10 ? 'high' : step.quotaCost > 5 ? 'medium' : 'low',
         });
@@ -257,7 +257,7 @@ export class SpecGenerator implements ISpecGenerator {
         name: `${type.charAt(0).toUpperCase() + type.slice(1)} Handler`,
         purpose: `Manages ${type} operations with optimized quota usage`,
         interfaces: steps.map(s => `I${s.id}Handler`),
-        dependencies: steps.flatMap(s => s.inputs).filter((v, i, a) => a.indexOf(v) === i),
+        dependencies: steps.flatMap(s => s.inputs || []).filter((v, i, a) => a.indexOf(v) === i),
       });
     });
 
@@ -265,7 +265,7 @@ export class SpecGenerator implements ISpecGenerator {
       overview: `Optimized workflow implementation with ${optimizedWorkflow.optimizations.length} efficiency improvements`,
       architecture: `Pipeline architecture with ${components.length} main components, optimized for ${optimizedWorkflow.efficiencyGains.totalSavingsPercentage.toFixed(1)}% quota reduction`,
       components,
-      dataModels: optimizedWorkflow.dataFlow
+      dataModels: (optimizedWorkflow.dataFlow || [])
         .map(df => df.dataType)
         .filter((v, i, a) => a.indexOf(v) === i),
     };

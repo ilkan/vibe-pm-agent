@@ -2,17 +2,19 @@
 
 export interface Workflow {
   id: string;
+  name?: string;
+  description?: string;
   steps: WorkflowStep[];
-  dataFlow: DataDependency[];
+  dataFlow?: DataDependency[];
   estimatedComplexity: number;
 }
 
 export interface WorkflowStep {
   id: string;
-  type: 'vibe' | 'spec' | 'data_retrieval' | 'processing' | 'analysis';
+  type: 'vibe' | 'spec' | 'data_retrieval' | 'processing' | 'analysis' | 'kiro_vibe_coding' | 'kiro_spec_generation' | 'kiro_autopilot' | 'kiro_supervised';
   description: string;
-  inputs: string[];
-  outputs: string[];
+  inputs?: string[];
+  outputs?: string[];
   quotaCost: number;
 }
 
@@ -30,13 +32,15 @@ export interface OptimizedWorkflow extends Workflow {
 }
 
 export interface Optimization {
-  type: 'batching' | 'caching' | 'decomposition' | 'vibe_to_spec';
+  id: string;
+  type: 'batching' | 'caching' | 'decomposition' | 'vibe_to_spec' | 'kiro_autopilot' | 'kiro_optimization';
   description: string;
   stepsAffected: string[];
   estimatedSavings: {
     vibes: number;
     specs: number;
     percentage: number;
+    time?: number;
   };
 }
 

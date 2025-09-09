@@ -403,7 +403,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
       rootCauses.push('High workflow complexity leading to increased quota consumption');
     }
 
-    if (workflow.dataFlow.length > workflow.steps.length) {
+    if (workflow.dataFlow && workflow.dataFlow.length > workflow.steps.length) {
       rootCauses.push('Complex data dependencies creating inefficient execution paths');
     }
 
@@ -829,7 +829,7 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
         case 'ZeroBased':
           analysis.zeroBasedSolution = this.applyZeroBasedDesign(intent);
           analysis.keyFindings.push(
-            `Zero-based design challenges ${analysis.zeroBasedSolution.assumptionsChallenged.length} assumptions with ${analysis.zeroBasedSolution.potentialSavings}% potential savings`
+            `Zero-based design challenges ${analysis.zeroBasedSolution.assumptionsChallenged?.length || 0} assumptions with ${analysis.zeroBasedSolution.potentialSavings}% potential savings`
           );
           break;
 
@@ -844,18 +844,21 @@ export class BusinessAnalyzer implements IBusinessAnalyzer {
           // Create mock optimizations for impact-effort analysis
           const mockOptimizations: Optimization[] = [
             {
+              id: 'opt-caching-1',
               type: 'caching',
               description: 'Implement caching layer for data operations',
               stepsAffected: workflow.steps.filter(s => s.type === 'data_retrieval').map(s => s.id),
               estimatedSavings: { vibes: 0, specs: 0, percentage: 30 },
             },
             {
+              id: 'opt-batching-1',
               type: 'batching',
               description: 'Batch similar operations together',
               stepsAffected: workflow.steps.filter(s => s.type === 'processing').map(s => s.id),
               estimatedSavings: { vibes: 0, specs: 0, percentage: 25 },
             },
             {
+              id: 'opt-vibe-to-spec-1',
               type: 'vibe_to_spec',
               description: 'Convert vibe operations to spec templates',
               stepsAffected: workflow.steps.filter(s => s.type === 'vibe').map(s => s.id),

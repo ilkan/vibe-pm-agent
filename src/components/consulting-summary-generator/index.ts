@@ -136,7 +136,7 @@ export class ConsultingSummaryGenerator {
 
       case 'ZeroBased':
         if (analysis.zeroBasedSolution) {
-          keyInsight = `Zero-based redesign challenges ${analysis.zeroBasedSolution.assumptionsChallenged.length} assumptions and offers ${analysis.zeroBasedSolution.potentialSavings}% savings`;
+          keyInsight = `Zero-based redesign challenges ${analysis.zeroBasedSolution.assumptionsChallenged?.length || 0} assumptions and offers ${analysis.zeroBasedSolution.potentialSavings}% savings`;
           supportingData = analysis.zeroBasedSolution;
           actionableRecommendation = `Consider implementing the radical approach: "${analysis.zeroBasedSolution.radicalApproach}" despite ${analysis.zeroBasedSolution.implementationRisk} implementation risk`;
         }
