@@ -162,7 +162,7 @@ export function validateParsedIntent(intent: ParsedIntent): void {
 
     if (
       !operation.type ||
-      !['vibe', 'spec', 'data_retrieval', 'processing', 'analysis'].includes(operation.type)
+      !['vibe', 'spec', 'data_retrieval', 'processing', 'analysis', 'kiro_vibe_coding', 'kiro_spec_generation', 'kiro_autopilot', 'kiro_supervised'].includes(operation.type)
     ) {
       throw new ValidationError(
         `Operation ${index} must have a valid type`,
@@ -251,7 +251,7 @@ export function validateWorkflow(workflow: Workflow): void {
 
     if (
       !step.type ||
-      !['vibe', 'spec', 'data_retrieval', 'processing', 'analysis'].includes(step.type)
+      !['vibe', 'spec', 'data_retrieval', 'processing', 'analysis', 'kiro_vibe_coding', 'kiro_spec_generation', 'kiro_autopilot', 'kiro_supervised'].includes(step.type)
     ) {
       throw new ValidationError(
         `Workflow step ${index} must have a valid type`,
@@ -273,14 +273,14 @@ export function validateWorkflow(workflow: Workflow): void {
       );
     }
 
-    if (!Array.isArray(step.inputs)) {
+    if (step.inputs && !Array.isArray(step.inputs)) {
       throw new ValidationError(
         `Workflow step ${index} inputs must be an array`,
         `steps[${index}].inputs`
       );
     }
 
-    if (!Array.isArray(step.outputs)) {
+    if (step.outputs && !Array.isArray(step.outputs)) {
       throw new ValidationError(
         `Workflow step ${index} outputs must be an array`,
         `steps[${index}].outputs`

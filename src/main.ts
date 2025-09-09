@@ -4,7 +4,7 @@ import {
   IntentInterpreter,
   BusinessAnalyzer,
   WorkflowOptimizer,
-  QuotaForecaster,
+  KiroResourceOptimizer,
   SpecGenerator,
   ConsultingSummaryGenerator,
 } from './components';
@@ -40,7 +40,7 @@ export class AIAgentPipeline {
   private intentInterpreter: IntentInterpreter;
   private businessAnalyzer: BusinessAnalyzer;
   private workflowOptimizer: WorkflowOptimizer;
-  private quotaForecaster: QuotaForecaster;
+  private kiroResourceOptimizer: KiroResourceOptimizer;
   private consultingSummaryGenerator: ConsultingSummaryGenerator;
   private specGenerator: SpecGenerator;
 
@@ -48,7 +48,7 @@ export class AIAgentPipeline {
     this.intentInterpreter = new IntentInterpreter();
     this.businessAnalyzer = new BusinessAnalyzer();
     this.workflowOptimizer = new WorkflowOptimizer();
-    this.quotaForecaster = new QuotaForecaster();
+    this.kiroResourceOptimizer = new KiroResourceOptimizer();
     this.consultingSummaryGenerator = new ConsultingSummaryGenerator();
     this.specGenerator = new SpecGenerator();
   }
@@ -242,15 +242,15 @@ export class AIAgentPipeline {
     zeroBasedSolution?: any
   ): Promise<ROIAnalysis> {
     try {
-      const naiveForecast = await this.quotaForecaster.estimateNaiveConsumption(workflow);
+      const naiveForecast = await this.kiroResourceOptimizer.estimateVibeConsumption(workflow);
       const optimizedForecast = optimizedWorkflow
-        ? await this.quotaForecaster.estimateOptimizedConsumption(optimizedWorkflow)
+        ? await this.kiroResourceOptimizer.estimateOptimizedKiroUsage(optimizedWorkflow)
         : naiveForecast;
       const zeroBasedForecast = zeroBasedSolution
-        ? await this.quotaForecaster.estimateZeroBasedConsumption(zeroBasedSolution)
+        ? await this.kiroResourceOptimizer.estimateZeroBasedKiroApproach(zeroBasedSolution)
         : optimizedForecast;
 
-      return await this.quotaForecaster.generateROITable([
+      return await this.kiroResourceOptimizer.generateKiroROIAnalysis([
         {
           name: 'Current',
           forecast: naiveForecast,
@@ -469,7 +469,7 @@ export class AIAgentPipeline {
   ): Promise<ROIAnalysis> {
     try {
       const naiveForecast = await ErrorHandler.safeExecute(
-        () => this.quotaForecaster.estimateNaiveConsumption(optimizedWorkflow.originalWorkflow),
+        () => this.kiroResourceOptimizer.estimateVibeConsumption(optimizedWorkflow.originalWorkflow),
         ErrorHandler.handleForecastingFailure(
           new Error('Naive forecast failed'),
           optimizedWorkflow.originalWorkflow
@@ -478,7 +478,7 @@ export class AIAgentPipeline {
       );
 
       const optimizedForecast = await ErrorHandler.safeExecute(
-        () => this.quotaForecaster.estimateOptimizedConsumption(optimizedWorkflow),
+        () => this.kiroResourceOptimizer.estimateOptimizedKiroUsage(optimizedWorkflow),
         ErrorHandler.handleForecastingFailure(
           new Error('Optimized forecast failed'),
           optimizedWorkflow
@@ -488,7 +488,7 @@ export class AIAgentPipeline {
 
       const zeroBasedForecast = analysis.zeroBasedSolution
         ? await ErrorHandler.safeExecute(
-            () => this.quotaForecaster.estimateZeroBasedConsumption(analysis.zeroBasedSolution!),
+            () => this.kiroResourceOptimizer.estimateZeroBasedKiroApproach(analysis.zeroBasedSolution!),
             optimizedForecast,
             { stage: 'forecasting', operation: 'zero_based_forecast' }
           )
@@ -496,7 +496,7 @@ export class AIAgentPipeline {
 
       const result = await ErrorHandler.safeExecute(
         () =>
-          this.quotaForecaster.generateROITable([
+          this.kiroResourceOptimizer.generateKiroROIAnalysis([
             {
               name: 'Conservative',
               forecast: naiveForecast,

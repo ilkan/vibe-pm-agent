@@ -49,7 +49,8 @@ export interface ValueDriver {
 
 export interface ZeroBasedSolution {
   radicalApproach: string;
-  assumptionsChallenged: string[];
+  assumptionsChallenged?: string[];
+  keyAssumptions?: string[];
   potentialSavings: number;
   implementationRisk: 'low' | 'medium' | 'high';
 }

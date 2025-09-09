@@ -5,7 +5,7 @@ export * from './business-analyzer';
 export * from './workflow-optimizer';
 export * from './source-validation-engine';
 export * from './confidence-scoring-engine';
-export * from './quota-forecaster';
+export * from './kiro-resource-optimizer';
 export * from './spec-generator';
 export * from './market-analyzer';
 export * from './competitor-analyzer';

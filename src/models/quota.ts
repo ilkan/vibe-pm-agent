@@ -7,7 +7,7 @@ export interface QuotaForecast {
   specsConsumed: number;
   estimatedCost: number;
   confidenceLevel: 'low' | 'medium' | 'high';
-  scenario: 'naive' | 'optimized' | 'zero-based';
+  scenario: 'naive' | 'optimized' | 'zero-based' | 'kiro-optimized' | 'kiro-spec-optimized' | 'kiro-advanced-optimized' | 'kiro-zero-based';
   breakdown: QuotaBreakdown[];
 }
 
@@ -17,6 +17,7 @@ export interface QuotaBreakdown {
   vibes: number;
   specs: number;
   cost: number;
+  kiroOptimization?: string;
 }
 
 export interface QuotaCostModel {

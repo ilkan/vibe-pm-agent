@@ -424,6 +424,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
     switch (issue.type) {
       case 'redundant_query':
         return {
+          id: `opt-cache-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: 'caching',
           description: `Cache results for redundant queries: ${issue.description}`,
           stepsAffected: issue.stepsAffected,
@@ -436,6 +437,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
 
       case 'excessive_loops':
         return {
+          id: `opt-batch-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: 'batching',
           description: `Batch operations to reduce loop overhead: ${issue.description}`,
           stepsAffected: issue.stepsAffected,
@@ -448,6 +450,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
 
       case 'unnecessary_vibes':
         return {
+          id: `opt-vibe-to-spec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: 'vibe_to_spec',
           description: `Convert repetitive vibes to structured specs: ${issue.description}`,
           stepsAffected: issue.stepsAffected,
@@ -460,6 +463,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
 
       case 'missing_cache':
         return {
+          id: `opt-cache-missing-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: 'caching',
           description: `Add caching layer for repeated operations: ${issue.description}`,
           stepsAffected: issue.stepsAffected,
@@ -481,6 +485,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
     // Check for workflow decomposition opportunities
     if (analysis.stepCount > 10 && analysis.totalQuotaCost > 100) {
       optimizations.push({
+        id: `opt-decomp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type: 'decomposition',
         description: 'Break complex workflow into smaller, reusable specs',
         stepsAffected: workflow.steps.map(step => step.id),
@@ -497,6 +502,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
       for (const group of analysis.similarOperations) {
         if (group.length >= 3) {
           optimizations.push({
+            id: `opt-batch-sim-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             type: 'batching',
             description: `Batch ${group.length} similar ${group[0].type} operations`,
             stepsAffected: group.map(step => step.id),
@@ -515,6 +521,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
       for (const group of analysis.repeatedOperations) {
         if (group.length >= 2) {
           optimizations.push({
+            id: `opt-cache-rep-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             type: 'caching',
             description: `Cache results for ${group.length} repeated operations`,
             stepsAffected: group.map(step => step.id),
@@ -561,6 +568,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
           );
 
           consolidated.push({
+            id: `opt-consol-${optimization.type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             type: optimization.type,
             description: `Consolidated ${optimization.type} optimization affecting ${mergedSteps.length} steps`,
             stepsAffected: mergedSteps,
@@ -599,7 +607,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
     const groups: Map<string, WorkflowStep[]> = new Map();
 
     for (const step of steps) {
-      const key = `${step.type}-${step.description}-${step.inputs.join(',')}-${step.outputs.join(',')}`;
+      const key = `${step.type}-${step.description}-${step.inputs?.join(',') || ''}-${step.outputs?.join(',') || ''}`;
       if (!groups.has(key)) {
         groups.set(key, []);
       }
@@ -650,7 +658,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
     // Create a key that identifies similar operations that can be batched
     const typeKey = step.type;
     const operationPattern = this.extractOperationPattern(step.description);
-    const inputPattern = this.extractInputPattern(step.inputs);
+    const inputPattern = this.extractInputPattern(step.inputs || []);
 
     return `${typeKey}-${operationPattern}-${inputPattern}`;
   }
@@ -744,7 +752,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
   private generateCacheKey(step: WorkflowStep): string {
     // Generate a cache key based on step characteristics
     const operationType = this.extractOperationPattern(step.description);
-    const inputSignature = step.inputs.sort().join('|');
+    const inputSignature = (step.inputs || []).sort().join('|');
 
     return `${step.type}:${operationType}:${inputSignature}`;
   }
@@ -760,7 +768,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
     const typeBonus = step.type === 'data_retrieval' ? 0.2 : 0;
 
     // Operations with simple inputs have higher hit rates
-    const simplicityBonus = step.inputs.length <= 2 ? 0.1 : 0;
+    const simplicityBonus = (step.inputs?.length || 0) <= 2 ? 0.1 : 0;
 
     return Math.min(0.9, baseHitRate + frequencyBonus + typeBonus + simplicityBonus);
   }
@@ -863,7 +871,7 @@ export class WorkflowOptimizer implements IWorkflowOptimizer {
     }
 
     // Check for data flow boundaries - less restrictive
-    const hasStrongDataDependency = workflow.dataFlow.some(
+    const hasStrongDataDependency = (workflow.dataFlow || []).some(
       dep => dep.from === previousStep.id && dep.to === currentStep.id && dep.required
     );
 
