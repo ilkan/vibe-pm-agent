@@ -2,59 +2,109 @@
 inclusion: always
 ---
 
-# Vibe PM Agent - Product Guidelines
+# Vibe PM Agent - Product & Development Guidelines
 
 ## Product Identity
-This is the **Vibe PM Agent**, a Model Context Protocol (MCP) server that provides PM Mode for Kiro. It answers "WHY to build" questions through professional consulting-grade business analysis, completing Kiro's development trinity.
+The **Vibe PM Agent** is an MCP server providing strategic business analysis for Kiro's PM Mode. It transforms feature ideas into executive-ready business cases through consulting-grade analysis, answering "WHY to build" questions with data-driven insights.
 
-## Core Value Proposition
-- **PM Mode Integration**: Strategic business analysis that complements Kiro's Spec and Vibe modes
-- **Executive-Ready Outputs**: Generate professional PM artifacts (business cases, PR-FAQs, one-pagers)
-- **Data-Driven Decisions**: Market validation, ROI analysis, and strategic alignment assessment
-- **Right-Time Building**: Validate market timing and resource allocation before development
+## Architecture Patterns
 
-## Key Capabilities
-When implementing features, prioritize these core functions:
+### MCP Tool Structure
+- Implement tools in `src/mcp/tools/` following the pattern: `{action}_{subject}.ts`
+- Each tool must export a handler function with proper TypeScript interfaces
+- Use the existing pipeline components for business logic, don't duplicate functionality
+- Tools should orchestrate components, not implement core business logic
+
+### Component Organization
+- **Analysis Components**: `src/components/{analyzer-name}/index.ts` - Core business logic
+- **Pipeline Integration**: `src/pipeline/` - Orchestration and data flow
+- **Models**: `src/models/` - TypeScript interfaces and validation schemas
+- **Utilities**: `src/utils/` - Shared helpers and validation functions
+
+### Data Flow Pattern
+```
+User Input → MCP Tool → Pipeline Component → Business Logic → Formatted Output
+```
+
+## Code Style & Standards
+
+### TypeScript Conventions
+- Use strict typing with interfaces for all data structures
+- Implement proper error handling with custom error types
+- Include JSDoc comments for all public methods and interfaces
+- Use async/await pattern consistently, avoid callback patterns
+
+### Business Analysis Standards
+- Always include confidence scores (0-1 scale) for recommendations
+- Provide quantitative metrics with proper units and context
+- Reference data sources with proper citation formatting
+- Structure outputs for executive consumption (executive summary first)
+
+### Output Formatting
+- Use markdown for all generated documents
+- Include front matter for steering files with proper inclusion rules
+- Structure business documents with: Executive Summary → Analysis → Recommendations → Appendix
+- Provide actionable next steps in all outputs
+
+## Key Capabilities Implementation
 
 ### Business Analysis Tools
-- Market opportunity assessment with competitive landscape analysis
-- ROI calculations with multi-scenario financial projections
-- Strategic alignment evaluation against company objectives
-- Resource optimization recommendations
+- Market opportunity assessment using competitive landscape data
+- ROI calculations with sensitivity analysis and scenario modeling
+- Strategic alignment scoring against company OKRs and mission
+- Resource optimization with cost-benefit analysis
 
-### Communication Generation
-- Executive one-pagers with key metrics and recommendations
-- PR-FAQ documents for feature announcements
-- Board presentation materials with strategic context
-- Stakeholder alignment summaries
+### Document Generation
+- Executive one-pagers: 1-page summary with key metrics and decision framework
+- PR-FAQ format: Customer-focused narrative with internal FAQ
+- Board presentations: Strategic context with financial projections
+- Stakeholder summaries: Role-specific communication with relevant metrics
 
 ### Validation & Timing
-- Market timing validation using real-time signals
-- Quick validation for feature ideas and business cases
-- Risk assessment and mitigation strategies
+- Market timing signals using real-time competitive and demand data
+- Quick validation framework for rapid go/no-go decisions
+- Risk assessment matrix with mitigation strategies
 
-## Development Principles
+## Development Guidelines
 
-### User Experience
-- **Consulting-Grade Quality**: All outputs should match professional consulting standards
-- **Executive Accessibility**: Content must be digestible for C-level stakeholders
-- **Actionable Insights**: Every analysis should include clear next steps and recommendations
+### Error Handling
+- Use structured error responses with error codes and user-friendly messages
+- Implement graceful degradation when external data sources are unavailable
+- Log errors with sufficient context for debugging without exposing sensitive data
 
-### Technical Integration
-- **MCP Server Architecture**: Implement as tools callable from Kiro
-- **Steering File Integration**: Generate and manage Kiro steering files automatically
-- **Citation System**: Include proper source attribution for all market data and analysis
+### Performance Considerations
+- Cache expensive calculations and external API calls
+- Use streaming responses for long-running analysis
+- Implement timeout handling for external data sources
 
-### Content Standards
-- Use business terminology and frameworks (SWOT, Porter's Five Forces, etc.)
-- Include quantitative metrics wherever possible
-- Provide confidence scores for recommendations
-- Reference real market data and competitive intelligence
+### Testing Requirements
+- Unit tests for all business logic components
+- Integration tests for MCP tool workflows
+- Mock external data sources in tests
+- Include edge case testing for invalid inputs
 
-## Target Workflows
-Design features to support these primary use cases:
-1. **Feature Justification**: "Should we build this feature now?"
-2. **Investment Analysis**: "What's the ROI and strategic value?"
-3. **Market Validation**: "Is this the right time to enter this market?"
-4. **Resource Planning**: "How should we allocate development resources?"
-5. **Stakeholder Communication**: "How do we present this to executives/board?"
+## Content Standards
+
+### Business Terminology
+- Use standard consulting frameworks (SWOT, Porter's Five Forces, BCG Matrix)
+- Include industry-standard metrics (TAM, SAM, SOM, LTV, CAC, etc.)
+- Reference established business models and competitive positioning
+
+### Data Requirements
+- Always cite sources for market data and competitive intelligence
+- Include confidence intervals for financial projections
+- Provide methodology explanations for complex calculations
+- Use real market data when available, clearly mark estimates
+
+### Executive Communication
+- Lead with executive summary and key recommendations
+- Use bullet points and structured formatting for readability
+- Include visual elements (tables, charts) when beneficial
+- Provide clear decision criteria and success metrics
+
+## Primary Use Cases
+1. **Feature Justification**: Market opportunity + competitive analysis + ROI projection
+2. **Investment Analysis**: Financial modeling + strategic alignment + risk assessment
+3. **Market Validation**: Timing signals + competitive landscape + demand analysis
+4. **Resource Planning**: Cost optimization + team allocation + timeline analysis
+5. **Stakeholder Communication**: Executive summaries + board materials + team alignment
