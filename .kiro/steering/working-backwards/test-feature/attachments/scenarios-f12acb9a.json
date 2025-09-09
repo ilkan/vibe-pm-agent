@@ -1,0 +1,97 @@
+{
+  "scenarios": {
+    "bear": [
+      {
+        "metric": "Revenue",
+        "base": 1000000,
+        "bear": 800000,
+        "bull": 1000000,
+        "unit": "USD"
+      },
+      {
+        "metric": "Costs",
+        "base": 500000,
+        "bear": 600000,
+        "bull": 500000,
+        "unit": "USD"
+      },
+      {
+        "metric": "ROI",
+        "base": 100,
+        "bear": 80,
+        "bull": 100,
+        "unit": "%"
+      },
+      {
+        "metric": "NPV",
+        "base": 500000,
+        "bear": 400000,
+        "bull": 500000,
+        "unit": "USD"
+      }
+    ],
+    "base": [
+      {
+        "metric": "Revenue",
+        "base": 1000000,
+        "bear": 1000000,
+        "bull": 1000000,
+        "unit": "USD"
+      },
+      {
+        "metric": "Costs",
+        "base": 500000,
+        "bear": 500000,
+        "bull": 500000,
+        "unit": "USD"
+      },
+      {
+        "metric": "ROI",
+        "base": 100,
+        "bear": 100,
+        "bull": 100,
+        "unit": "%"
+      },
+      {
+        "metric": "NPV",
+        "base": 500000,
+        "bear": 500000,
+        "bull": 500000,
+        "unit": "USD"
+      }
+    ],
+    "bull": [
+      {
+        "metric": "Revenue",
+        "base": 1000000,
+        "bear": 1000000,
+        "bull": 1200000,
+        "unit": "USD"
+      },
+      {
+        "metric": "Costs",
+        "base": 500000,
+        "bear": 500000,
+        "bull": 400000,
+        "unit": "USD"
+      },
+      {
+        "metric": "ROI",
+        "base": 100,
+        "bear": 100,
+        "bull": 120,
+        "unit": "%"
+      },
+      {
+        "metric": "NPV",
+        "base": 500000,
+        "bear": 500000,
+        "bull": 600000,
+        "unit": "USD"
+      }
+    ]
+  },
+  "elasticities": [],
+  "keyDrivers": [],
+  "sensitivityPct": 20
+}

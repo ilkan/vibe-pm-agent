@@ -48,6 +48,18 @@ export interface MCPToolResult {
     cacheHit?: boolean;
     warnings?: string[];
     steeringFileCreated?: boolean;
+    confidenceScore?: number; // Added for Amazon Working Backwards methodology
+    amazonMode?: {
+      enabled: boolean;
+      fallbackReason?: string;
+      performanceMetrics?: {
+        assumptionLedgerTime?: number;
+        confidenceTime?: number;
+        scenarioTime?: number;
+        hardQuestionsTime?: number;
+        totalTime: number;
+      };
+    };
     steeringFiles?: Array<{
       filename: string;
       action: string;
@@ -279,6 +291,8 @@ export interface GenerateBusinessCaseArgs {
     expected_revenue?: number;
     time_to_market?: number;
   };
+  amazon_mode?: boolean; // Default: true
+  include_evidence_mechanisms?: boolean; // Default: true
   steering_options?: SteeringFileOptions;
   citation_options?: CitationOptions;
 }
@@ -287,6 +301,8 @@ export interface CreateStakeholderCommunicationArgs {
   business_case: string;
   communication_type: 'executive_onepager' | 'pr_faq' | 'board_presentation' | 'team_announcement';
   audience: 'executives' | 'board' | 'engineering_team' | 'customers' | 'investors';
+  amazon_mode?: boolean; // Default: true
+  include_evidence_mechanisms?: boolean; // Default: true
   steering_options?: SteeringFileOptions;
   citation_options?: CitationOptions;
 }

@@ -46,6 +46,18 @@ import {
   validateAndAuditCitationsDescription,
 } from './validate_and_audit_citations';
 
+import {
+  generateBusinessCase,
+  generateBusinessCaseSchema,
+  generateBusinessCaseDescription,
+} from './generate_business_case';
+
+import {
+  createStakeholderCommunication,
+  createStakeholderCommunicationSchema,
+  createStakeholderCommunicationDescription,
+} from './create_stakeholder_communication';
+
 // Re-export for external use
 export {
   generateRequirements,
@@ -69,6 +81,12 @@ export {
   validateAndAuditCitations,
   validateAndAuditCitationsSchema,
   validateAndAuditCitationsDescription,
+  generateBusinessCase,
+  generateBusinessCaseSchema,
+  generateBusinessCaseDescription,
+  createStakeholderCommunication,
+  createStakeholderCommunicationSchema,
+  createStakeholderCommunicationDescription,
 };
 
 /**
@@ -109,6 +127,16 @@ export const MCP_TOOLS_REGISTRY = {
     handler: validateAndAuditCitations,
     schema: validateAndAuditCitationsSchema,
     description: validateAndAuditCitationsDescription,
+  },
+  generate_business_case: {
+    handler: generateBusinessCase,
+    schema: generateBusinessCaseSchema,
+    description: generateBusinessCaseDescription,
+  },
+  create_stakeholder_communication: {
+    handler: createStakeholderCommunication,
+    schema: createStakeholderCommunicationSchema,
+    description: createStakeholderCommunicationDescription,
   },
 } as const;
 
