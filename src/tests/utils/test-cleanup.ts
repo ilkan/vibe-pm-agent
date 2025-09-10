@@ -182,6 +182,16 @@ export async function cleanupTestDirectories(): Promise<{
  * Clean up memory leaks and open handles
  */
 export async function cleanupMemoryLeaks(): Promise<void> {
+  // Import ResourceManager dynamically to avoid circular dependencies
+  try {
+    const { ResourceManager } = await import('../../utils/resource-manager');
+    
+    // Clean up all tracked resources
+    ResourceManager.getInstance().cleanup();
+  } catch (error) {
+    console.warn('Could not clean up resources via ResourceManager:', error);
+  }
+
   // Clear all timers
   if (typeof jest !== 'undefined') {
     jest.clearAllTimers();
@@ -193,11 +203,46 @@ export async function cleanupMemoryLeaks(): Promise<void> {
     global.gc();
   }
 
-  // Clear any remaining intervals/timeouts
+  // Clear any remaining intervals/timeouts (fallback)
   const highestTimeoutId = setTimeout(() => {}, 0);
   for (let i = 0; i < Number(highestTimeoutId); i++) {
     clearTimeout(i);
     clearInterval(i);
+  }
+}
+
+/**
+ * Verify that no resources are still active
+ */
+export async function verifyNoActiveResources(): Promise<{
+  hasActiveResources: boolean;
+  resourceCounts: any;
+  warnings: string[];
+}> {
+  const warnings: string[] = [];
+  
+  try {
+    const { ResourceManager } = await import('../../utils/resource-manager');
+    const resourceManager = ResourceManager.getInstance();
+    const resourceCounts = resourceManager.getResourceCounts();
+    const hasActiveResources = resourceManager.hasActiveResources();
+    
+    if (hasActiveResources) {
+      warnings.push(`Active resources detected: ${JSON.stringify(resourceCounts)}`);
+    }
+    
+    return {
+      hasActiveResources,
+      resourceCounts,
+      warnings,
+    };
+  } catch (error) {
+    warnings.push(`Could not verify resources: ${error}`);
+    return {
+      hasActiveResources: false,
+      resourceCounts: {},
+      warnings,
+    };
   }
 }
 
@@ -294,6 +339,7 @@ export async function cleanupAllTestArtifacts(): Promise<{
   dirsCleanup: { cleaned: string[]; errors: string[] };
   evidenceCleanup: { cleaned: string[]; errors: string[] };
   memoryCleanup: boolean;
+  resourceVerification: { hasActiveResources: boolean; resourceCounts: any; warnings: string[] };
   validation: { valid: boolean; missing: string[]; unexpected: string[] };
 }> {
   const filesCleanup = await cleanupTestSteeringFiles();
@@ -309,6 +355,9 @@ export async function cleanupAllTestArtifacts(): Promise<{
     console.warn('Memory cleanup failed:', error);
   }
 
+  // Verify no active resources remain
+  const resourceVerification = await verifyNoActiveResources();
+
   // Validate integrity
   const validation = await validateSteeringIntegrity();
 
@@ -317,6 +366,7 @@ export async function cleanupAllTestArtifacts(): Promise<{
     dirsCleanup,
     evidenceCleanup,
     memoryCleanup,
+    resourceVerification,
     validation,
   };
 }
@@ -347,6 +397,19 @@ export async function globalTeardown(): Promise<void> {
 
   if (result.memoryCleanup) {
     console.log('✅ Memory cleanup completed');
+  }
+
+  // Report resource verification results
+  if (!result.resourceVerification.hasActiveResources) {
+    console.log('✅ No active resources detected');
+  } else {
+    console.warn(`⚠️  Active resources detected: ${JSON.stringify(result.resourceVerification.resourceCounts)}`);
+  }
+  
+  if (result.resourceVerification.warnings.length > 0) {
+    result.resourceVerification.warnings.forEach(warning => 
+      console.warn(`⚠️  Resource warning: ${warning}`)
+    );
   }
 
   // Report validation results

@@ -43,6 +43,9 @@
     "cleanup": "node scripts/cleanup.mjs",
     "cleanup:verbose": "node scripts/cleanup.mjs --verbose",
     "cleanup:dry-run": "node scripts/cleanup.mjs --dry-run",
+    "test:resource-leaks": "jest --testNamePattern=\"should create and destroy\" --maxWorkers=1 --testTimeout=10000 --detectOpenHandles --forceExit",
+    "test:ci": "jest --maxWorkers=1 --testTimeout=30000 --forceExit --detectOpenHandles --coverage",
+    "prepare": "husky install",
     "prebuild": "npm run clean",
     "prepublishOnly": "npm run build && npm run test",
     "postinstall": "npm run build"

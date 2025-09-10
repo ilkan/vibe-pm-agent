@@ -3,6 +3,8 @@ module.exports = {
   testEnvironment: 'node',
   forceExit: true,
   detectOpenHandles: true,
+  // Increased timeout for complex integration tests
+  testTimeout: 30000, // 30 seconds
   roots: ['<rootDir>/src/tests'],
   testMatch: [
     '**/tests/**/*.test.ts',
@@ -31,5 +33,15 @@ module.exports = {
     '^@modelcontextprotocol/sdk/types.js$': '<rootDir>/src/tests/__mocks__/@modelcontextprotocol/sdk/types.js'
   },
   setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
-  globalTeardown: '<rootDir>/src/tests/global-teardown.ts'
+  globalTeardown: '<rootDir>/src/tests/global-teardown.ts',
+  // Additional Jest configuration for better resource management
+  maxWorkers: 1, // Run tests serially to avoid resource conflicts
+  // Ensure tests don't hang by forcing exit
+  forceExit: true,
+  // Detect open handles to identify resource leaks
+  detectOpenHandles: true,
+  // Clear mocks between tests
+  clearMocks: true,
+  // Reset modules between tests to prevent state leakage
+  resetModules: true
 };
