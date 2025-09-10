@@ -1,0 +1,1 @@
+Call vibe-pm-agent to help my idea "I want to have a wod coach ai for crossfit lovers. I want to help them by tracking their movements during the training via mobile app(camera) and gave them instant feedbacks"
