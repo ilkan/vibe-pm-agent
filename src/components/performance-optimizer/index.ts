@@ -1,6 +1,15 @@
-// Performance Optimization and Caching System for Enhanced Citation System
+/**
+ * Performance Optimization and Caching System for Enhanced Citation System
+ * 
+ * This module provides intelligent caching, batch processing, and database query optimization
+ * for the citation system. It includes proper resource management and test environment support.
+ */
 
+// Internal imports - models
 import { Citation, EnhancedCitation } from '../../models/citations';
+
+// Internal imports - utilities
+import { ResourceManager, Destroyable } from '../../utils/resource-manager';
 
 // Forward declarations to avoid circular imports
 interface ValidationResult {
@@ -25,6 +34,15 @@ interface QualityReport {
 }
 
 /**
+ * Test environment configuration interface
+ */
+interface TestEnvironmentConfig {
+  isTestEnvironment: boolean;
+  disableTimers: boolean;
+  enableMockMode: boolean;
+}
+
+/**
  * Cache configuration options
  */
 export interface CacheConfig {
@@ -34,6 +52,7 @@ export interface CacheConfig {
   compressionEnabled: boolean;
   persistToDisk: boolean;
   diskCachePath?: string;
+  testMode?: boolean; // Disable background processes for testing
 }
 
 /**
@@ -89,21 +108,45 @@ export interface PerformanceMetrics {
 }
 
 /**
- * Intelligent caching system for source validation results
+ * Detects if running in test environment
+ * @returns Test environment configuration
  */
-export class IntelligentCache<T> {
+function detectTestEnvironment(): TestEnvironmentConfig {
+  return {
+    isTestEnvironment: process.env.NODE_ENV === 'test' || typeof jest !== 'undefined',
+    disableTimers: process.env.DISABLE_TIMERS === 'true',
+    enableMockMode: process.env.MOCK_MODE === 'true'
+  };
+}
+
+/**
+ * Intelligent caching system for source validation results
+ * 
+ * Provides high-performance caching with automatic cleanup, compression support,
+ * and test environment awareness to prevent timer-related issues in tests.
+ */
+export class IntelligentCache<T> implements Destroyable {
   private cache: Map<string, CacheEntry<T>> = new Map();
   private config: CacheConfig;
   private stats: CacheStats;
   private cleanupTimer?: NodeJS.Timeout;
+  private testConfig: TestEnvironmentConfig;
+  private isDestroyed: boolean = false;
 
+  /**
+   * Creates a new IntelligentCache instance
+   * @param config - Cache configuration options
+   */
   constructor(config: Partial<CacheConfig> = {}) {
+    this.testConfig = detectTestEnvironment();
+    
     this.config = {
       maxSize: 10000,
       ttl: 24 * 60 * 60 * 1000, // 24 hours
       cleanupInterval: 60 * 60 * 1000, // 1 hour
       compressionEnabled: true,
       persistToDisk: false,
+      testMode: this.testConfig.isTestEnvironment,
       ...config,
     };
 
@@ -118,11 +161,19 @@ export class IntelligentCache<T> {
       averageAccessCount: 0,
     };
 
-    this.startCleanupTimer();
+    // Register with resource manager for automatic cleanup
+    ResourceManager.getInstance().registerComponent(this);
+
+    // Only start cleanup timer in non-test environments unless explicitly enabled
+    if (!this.config.testMode && !this.testConfig.disableTimers) {
+      this.startCleanupTimer();
+    }
   }
 
   /**
    * Get item from cache
+   * @param key - Cache key to retrieve
+   * @returns Cached item or null if not found/expired
    */
   get(key: string): T | null {
     const entry = this.cache.get(key);
@@ -152,35 +203,44 @@ export class IntelligentCache<T> {
 
   /**
    * Set item in cache
+   * @param key - Cache key
+   * @param data - Data to cache
    */
   set(key: string, data: T): void {
-    // Check if we need to evict entries (evict multiple if needed)
+    // Enforce cache size limit using LRU eviction strategy
+    // We use a while loop to handle cases where multiple entries need eviction
     while (this.cache.size >= this.config.maxSize) {
       this.evictLeastRecentlyUsed();
     }
 
+    // Estimate memory footprint for cache management
     const size = this.estimateSize(data);
+    
+    // Create cache entry with metadata for LRU tracking and statistics
     const entry: CacheEntry<T> = {
       data,
       timestamp: Date.now(),
-      accessCount: 1,
+      accessCount: 1, // Initialize with 1 since we're accessing it now
       lastAccessed: Date.now(),
       size,
       compressed: false,
     };
 
-    // Compress large entries if enabled
+    // Apply compression for large entries to optimize memory usage
+    // Threshold of 1KB chosen as reasonable balance between CPU and memory
     if (this.config.compressionEnabled && size > 1024) {
       entry.compressed = true;
-      // In real implementation, would compress the data
+      // In real implementation, would compress the data using gzip or similar
     }
 
     this.cache.set(key, entry);
-    this.updateStats();
+    this.updateStats(); // Update cache statistics for monitoring
   }
 
   /**
    * Check if cache has key
+   * @param key - Cache key to check
+   * @returns True if key exists and is not expired
    */
   has(key: string): boolean {
     const entry = this.cache.get(key);
@@ -189,6 +249,8 @@ export class IntelligentCache<T> {
 
   /**
    * Delete item from cache
+   * @param key - Cache key to delete
+   * @returns True if item was deleted, false if not found
    */
   delete(key: string): boolean {
     const result = this.cache.delete(key);
@@ -215,6 +277,8 @@ export class IntelligentCache<T> {
 
   /**
    * Get cache keys matching pattern
+   * @param pattern - Regular expression pattern to match keys
+   * @returns Array of matching cache keys
    */
   getKeysMatching(pattern: RegExp): string[] {
     return Array.from(this.cache.keys()).filter(key => pattern.test(key));
@@ -222,6 +286,8 @@ export class IntelligentCache<T> {
 
   /**
    * Bulk get operation
+   * @param keys - Array of cache keys to retrieve
+   * @returns Map of found key-value pairs
    */
   getBulk(keys: string[]): Map<string, T> {
     const results = new Map<string, T>();
@@ -238,6 +304,7 @@ export class IntelligentCache<T> {
 
   /**
    * Bulk set operation
+   * @param entries - Map of key-value pairs to cache
    */
   setBulk(entries: Map<string, T>): void {
     for (const [key, value] of entries) {
@@ -247,16 +314,26 @@ export class IntelligentCache<T> {
 
   // Private methods
 
+  /**
+   * Check if cache entry has expired
+   * @param entry - Cache entry to check
+   * @returns True if entry has expired
+   */
   private isExpired(entry: CacheEntry<T>): boolean {
     return Date.now() - entry.timestamp > this.config.ttl;
   }
 
+  /**
+   * Evict the least recently used cache entry
+   */
   private evictLeastRecentlyUsed(): void {
     if (this.cache.size === 0) return;
 
     let oldestKey: string | null = null;
-    let oldestTime = Date.now();
+    let oldestTime = Date.now(); // Start with current time as baseline
 
+    // Linear scan to find LRU entry - O(n) complexity but acceptable for cache sizes
+    // Alternative would be to maintain a separate LRU linked list for O(1) eviction
     for (const [key, entry] of this.cache) {
       if (entry.lastAccessed < oldestTime) {
         oldestTime = entry.lastAccessed;
@@ -264,22 +341,34 @@ export class IntelligentCache<T> {
       }
     }
 
+    // Remove the oldest entry if found
     if (oldestKey) {
       this.cache.delete(oldestKey);
-      this.updateStats();
+      this.updateStats(); // Recalculate statistics after eviction
     }
   }
 
+  /**
+   * Estimate the size of data in bytes
+   * @param data - Data to estimate size for
+   * @returns Estimated size in bytes
+   */
   private estimateSize(data: T): number {
     // Simple size estimation - in real implementation, would be more sophisticated
     return JSON.stringify(data).length * 2; // Rough estimate for UTF-16
   }
 
+  /**
+   * Update cache hit rate statistics
+   */
   private updateHitRate(): void {
     const total = this.stats.hits + this.stats.misses;
     this.stats.hitRate = total > 0 ? (this.stats.hits / total) * 100 : 0;
   }
 
+  /**
+   * Update comprehensive cache statistics
+   */
   private updateStats(): void {
     this.stats.totalEntries = this.cache.size;
     this.stats.totalSize = Array.from(this.cache.values())
@@ -294,6 +383,9 @@ export class IntelligentCache<T> {
     }
   }
 
+  /**
+   * Reset all cache statistics to initial values
+   */
   private resetStats(): void {
     this.stats = {
       hits: 0,
@@ -307,12 +399,27 @@ export class IntelligentCache<T> {
     };
   }
 
+  /**
+   * Start the automatic cleanup timer
+   * Only starts if not in test mode and not already destroyed
+   */
   private startCleanupTimer(): void {
-    this.cleanupTimer = setInterval(() => {
-      this.cleanup();
-    }, this.config.cleanupInterval);
+    if (this.isDestroyed || this.config.testMode) {
+      return;
+    }
+    
+    this.cleanupTimer = ResourceManager.getInstance().registerInterval(
+      setInterval(() => {
+        if (!this.isDestroyed) {
+          this.cleanup();
+        }
+      }, this.config.cleanupInterval)
+    );
   }
 
+  /**
+   * Clean up expired cache entries
+   */
   private cleanup(): void {
     const now = Date.now();
     const keysToDelete: string[] = [];
@@ -331,24 +438,45 @@ export class IntelligentCache<T> {
   }
 
   /**
-   * Cleanup resources
+   * Cleanup all resources and destroy the cache
+   * This method should be called when the cache is no longer needed,
+   * especially important in test environments to prevent hanging timers
    */
   destroy(): void {
-    if (this.cleanupTimer) {
-      clearInterval(this.cleanupTimer);
+    if (this.isDestroyed) {
+      return;
     }
+    
+    this.isDestroyed = true;
+    
+    // Unregister from resource manager
+    ResourceManager.getInstance().unregisterComponent(this);
+    
+    if (this.cleanupTimer) {
+      ResourceManager.getInstance().unregisterInterval(this.cleanupTimer);
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = undefined;
+    }
+    
     this.clear();
   }
 }
 
 /**
  * Asynchronous batch processor for citation operations
+ * 
+ * Provides efficient batch processing with concurrency control, retry logic,
+ * and performance monitoring for citation-related operations.
  */
 export class AsyncBatchProcessor {
   private config: BatchConfig;
   private activeJobs: Map<string, Promise<any>> = new Map();
   private metrics: PerformanceMetrics[] = [];
 
+  /**
+   * Creates a new AsyncBatchProcessor instance
+   * @param config - Optional batch processing configuration
+   */
   constructor(config: Partial<BatchConfig> = {}) {
     this.config = {
       batchSize: 50,
@@ -362,6 +490,10 @@ export class AsyncBatchProcessor {
 
   /**
    * Process items in batches with concurrency control
+   * @param items - Array of items to process
+   * @param processor - Function to process each item
+   * @param operationType - Type of operation for metrics tracking
+   * @returns Promise resolving to array of processed results
    */
   async processBatch<T, R>(
     items: T[],
@@ -369,32 +501,41 @@ export class AsyncBatchProcessor {
     operationType: string = 'batch_process'
   ): Promise<R[]> {
     const startTime = Date.now();
+    
+    // Pre-allocate results array to maintain order correspondence with input
     const results: R[] = new Array(items.length);
     const errors: Error[] = [];
 
-    // Process items with concurrency control
+    // Use semaphore pattern for concurrency control to prevent resource exhaustion
+    // This is more efficient than batching for I/O-bound operations
     const semaphore = new Semaphore(this.config.maxConcurrency);
     
+    // Create promises for all items but control execution via semaphore
     const itemPromises = items.map(async (item, index) => {
-      await semaphore.acquire();
+      await semaphore.acquire(); // Wait for available slot
       
       try {
+        // Apply timeout to prevent hanging operations from blocking the batch
         const result = await this.withTimeout(processor(item), this.config.timeoutMs);
-        results[index] = result;
+        results[index] = result; // Maintain original order
       } catch (error) {
         errors.push(error as Error);
+        // Don't re-throw here to allow other operations to complete
         throw error;
       } finally {
-        semaphore.release();
+        semaphore.release(); // Always release the semaphore slot
       }
     });
 
+    // Use allSettled to allow partial success - some operations can fail
+    // while others succeed, which is often desirable for batch processing
     await Promise.allSettled(itemPromises);
 
     // Filter out undefined results from failed operations
+    // This preserves successful results even when some operations fail
     const validResults = results.filter(r => r !== undefined);
 
-    // Record performance metrics
+    // Record comprehensive performance metrics for monitoring and optimization
     const endTime = Date.now();
     const duration = endTime - startTime;
     const metrics: PerformanceMetrics = {
@@ -403,14 +544,16 @@ export class AsyncBatchProcessor {
       endTime,
       duration,
       itemsProcessed: items.length,
+      // Calculate throughput as items per second, avoiding division by zero
       throughput: duration > 0 ? items.length / (duration / 1000) : 0,
       memoryUsage: this.getMemoryUsage(),
-      cacheHitRate: 0, // Would be set by calling code
+      cacheHitRate: 0, // Would be set by calling code if cache is involved
       errors: errors.length,
     };
 
     this.metrics.push(metrics);
 
+    // Log warnings for partial failures to aid in debugging
     if (errors.length > 0) {
       console.warn(`Batch processing completed with ${errors.length} errors`);
     }
@@ -420,6 +563,10 @@ export class AsyncBatchProcessor {
 
   /**
    * Process single batch with retry logic
+   * @param batch - Batch of items to process
+   * @param processor - Function to process each item
+   * @param operationType - Type of operation for error tracking
+   * @returns Promise resolving to array of processed results
    */
   private async processSingleBatch<T, R>(
     batch: T[],
@@ -450,7 +597,9 @@ export class AsyncBatchProcessor {
   }
 
   /**
-   * Create batches from items array
+   * Create batches from items array based on configured batch size
+   * @param items - Array of items to batch
+   * @returns Array of batches
    */
   private createBatches<T>(items: T[]): T[][] {
     const batches: T[][] = [];
@@ -463,7 +612,10 @@ export class AsyncBatchProcessor {
   }
 
   /**
-   * Add timeout to promise
+   * Add timeout to promise to prevent hanging operations
+   * @param promise - Promise to add timeout to
+   * @param timeoutMs - Timeout in milliseconds
+   * @returns Promise that rejects if timeout is exceeded
    */
   private withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
     return Promise.race([
@@ -475,14 +627,17 @@ export class AsyncBatchProcessor {
   }
 
   /**
-   * Delay utility
+   * Delay utility for retry logic
+   * @param ms - Delay in milliseconds
+   * @returns Promise that resolves after the specified delay
    */
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**
-   * Get current memory usage
+   * Get current memory usage in bytes
+   * @returns Memory usage in bytes, or 0 if not available
    */
   private getMemoryUsage(): number {
     if (typeof process !== 'undefined' && process.memoryUsage) {
@@ -492,21 +647,23 @@ export class AsyncBatchProcessor {
   }
 
   /**
-   * Get performance metrics
+   * Get performance metrics history
+   * @returns Array of performance metrics for all operations
    */
   getMetrics(): PerformanceMetrics[] {
     return [...this.metrics];
   }
 
   /**
-   * Clear metrics history
+   * Clear metrics history to free memory
    */
   clearMetrics(): void {
     this.metrics = [];
   }
 
   /**
-   * Get average performance metrics
+   * Get average performance metrics across all operations
+   * @returns Object containing averaged performance metrics
    */
   getAverageMetrics(): Partial<PerformanceMetrics> {
     if (this.metrics.length === 0) {
@@ -781,6 +938,9 @@ export class DatabaseQueryOptimizer {
 
 /**
  * Main performance optimization coordinator
+ * 
+ * Orchestrates multiple performance optimization components including caching,
+ * batch processing, and database query optimization for the citation system.
  */
 export class PerformanceOptimizer {
   private validationCache: IntelligentCache<ValidationResult>;
@@ -789,6 +949,11 @@ export class PerformanceOptimizer {
   private batchProcessor: AsyncBatchProcessor;
   private queryOptimizer: DatabaseQueryOptimizer;
 
+  /**
+   * Creates a new PerformanceOptimizer instance
+   * @param cacheConfig - Optional cache configuration
+   * @param batchConfig - Optional batch processing configuration
+   */
   constructor(
     cacheConfig?: Partial<CacheConfig>,
     batchConfig?: Partial<BatchConfig>
@@ -801,42 +966,48 @@ export class PerformanceOptimizer {
   }
 
   /**
-   * Get validation cache
+   * Get validation cache instance
+   * @returns IntelligentCache for validation results
    */
   getValidationCache(): IntelligentCache<ValidationResult> {
     return this.validationCache;
   }
 
   /**
-   * Get quality cache
+   * Get quality cache instance
+   * @returns IntelligentCache for quality reports
    */
   getQualityCache(): IntelligentCache<QualityReport> {
     return this.qualityCache;
   }
 
   /**
-   * Get citation cache
+   * Get citation cache instance
+   * @returns IntelligentCache for enhanced citations
    */
   getCitationCache(): IntelligentCache<EnhancedCitation> {
     return this.citationCache;
   }
 
   /**
-   * Get batch processor
+   * Get batch processor instance
+   * @returns AsyncBatchProcessor for parallel operations
    */
   getBatchProcessor(): AsyncBatchProcessor {
     return this.batchProcessor;
   }
 
   /**
-   * Get query optimizer
+   * Get query optimizer instance
+   * @returns DatabaseQueryOptimizer for database operations
    */
   getQueryOptimizer(): DatabaseQueryOptimizer {
     return this.queryOptimizer;
   }
 
   /**
-   * Get comprehensive performance statistics
+   * Get comprehensive performance statistics from all optimization components
+   * @returns Object containing statistics from all caches, batch processor, and query optimizer
    */
   getPerformanceStats(): {
     validation: CacheStats;

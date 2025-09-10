@@ -20,6 +20,7 @@ import { AIAgentPipeline } from '../../pipeline/ai-agent-pipeline';
 import { performanceMonitor } from '../../utils/performance-monitor';
 import { AmazonModeManager } from '../../components/amazon-mode-manager';
 import { AmazonModeConfig } from '../../models/amazon-config';
+import { AuthoritativeSourceEnhancer } from '../../components/authoritative-source-enhancer';
 
 /**
  * MCP Tool: generate_business_case

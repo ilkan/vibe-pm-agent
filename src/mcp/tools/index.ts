@@ -58,6 +58,12 @@ import {
   createStakeholderCommunicationDescription,
 } from './create_stakeholder_communication';
 
+import {
+  analyzeBusinessOpportunityEnhanced,
+  analyzeBusinessOpportunityEnhancedSchema,
+  analyzeBusinessOpportunityEnhancedDescription,
+} from './analyze_business_opportunity_enhanced';
+
 // Re-export for external use
 export {
   generateRequirements,
@@ -87,6 +93,9 @@ export {
   createStakeholderCommunication,
   createStakeholderCommunicationSchema,
   createStakeholderCommunicationDescription,
+  analyzeBusinessOpportunityEnhanced,
+  analyzeBusinessOpportunityEnhancedSchema,
+  analyzeBusinessOpportunityEnhancedDescription,
 };
 
 /**
@@ -137,6 +146,11 @@ export const MCP_TOOLS_REGISTRY = {
     handler: createStakeholderCommunication,
     schema: createStakeholderCommunicationSchema,
     description: createStakeholderCommunicationDescription,
+  },
+  analyze_business_opportunity_enhanced: {
+    handler: analyzeBusinessOpportunityEnhanced,
+    schema: analyzeBusinessOpportunityEnhancedSchema,
+    description: analyzeBusinessOpportunityEnhancedDescription,
   },
 } as const;
 
