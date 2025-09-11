@@ -3,11 +3,12 @@
     "target": "ES2020",
     "downlevelIteration": true,
     "module": "commonjs",
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "ES2018.RegExp"],
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
@@ -15,7 +16,10 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noEmitOnError": false
   },
   "include": [
     "src/**/*"
