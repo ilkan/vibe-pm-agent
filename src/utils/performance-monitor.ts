@@ -35,33 +35,33 @@ export class PerformanceMonitor {
     {
       operationName: 'assumption_ledger_service',
       maxDuration: 500,
-      description: 'Assumption ledger normalization and validation'
+      description: 'Assumption ledger normalization and validation',
     },
     {
       operationName: 'confidence_service',
       maxDuration: 500,
-      description: 'Confidence score calculation with breakdown'
+      description: 'Confidence score calculation with breakdown',
     },
     {
       operationName: 'scenario_service',
       maxDuration: 500,
-      description: 'Bear/base/bull scenario analysis'
+      description: 'Bear/base/bull scenario analysis',
     },
     {
       operationName: 'hard_questions_service',
       maxDuration: 500,
-      description: 'Hard questions generation'
+      description: 'Hard questions generation',
     },
     {
       operationName: 'template_rendering',
       maxDuration: 500,
-      description: 'Template compilation and rendering'
+      description: 'Template compilation and rendering',
     },
     {
       operationName: 'total_generation',
       maxDuration: 120000, // 2 minutes
-      description: 'Complete Amazon working backwards document generation'
-    }
+      description: 'Complete Amazon working backwards document generation',
+    },
   ];
 
   private reports: PerformanceReport[] = [];
@@ -96,7 +96,7 @@ export class PerformanceMonitor {
         targetDuration: target?.maxDuration || 1000,
         passed: target ? duration <= target.maxDuration : true,
         cacheHit,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       this.reports.push(report);
@@ -121,7 +121,7 @@ export class PerformanceMonitor {
         targetDuration: target?.maxDuration || 1000,
         passed: false,
         cacheHit: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       this.reports.push(report);
@@ -158,7 +158,7 @@ export class PerformanceMonitor {
         targetDuration: target?.maxDuration || 1000,
         passed: target ? duration <= target.maxDuration : true,
         cacheHit,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       this.reports.push(report);
@@ -178,7 +178,7 @@ export class PerformanceMonitor {
         targetDuration: target?.maxDuration || 1000,
         passed: false,
         cacheHit: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       this.reports.push(report);
@@ -191,15 +191,15 @@ export class PerformanceMonitor {
    */
   getPerformanceSummary(limit: number = 100): PerformanceSummary {
     const recentReports = this.reports.slice(-limit);
-    
+
     const totalOperations = recentReports.length;
     const passedOperations = recentReports.filter(r => r.passed).length;
     const failedOperations = totalOperations - passedOperations;
     const overallPassRate = totalOperations > 0 ? passedOperations / totalOperations : 0;
-    
+
     const totalDuration = recentReports.reduce((sum, r) => sum + r.actualDuration, 0);
     const averageDuration = totalOperations > 0 ? totalDuration / totalOperations : 0;
-    
+
     const cacheHits = recentReports.filter(r => r.cacheHit).length;
     const cacheHitRate = totalOperations > 0 ? cacheHits / totalOperations : 0;
 
@@ -210,27 +210,33 @@ export class PerformanceMonitor {
       overallPassRate: Math.round(overallPassRate * 100) / 100,
       averageDuration: Math.round(averageDuration * 100) / 100,
       cacheHitRate: Math.round(cacheHitRate * 100) / 100,
-      reports: recentReports
+      reports: recentReports,
     };
   }
 
   /**
    * Get performance summary by operation type
    */
-  getPerformanceByOperation(): Record<string, {
-    avgDuration: number;
-    passRate: number;
-    count: number;
-    cacheHitRate: number;
-    target: number;
-  }> {
-    const operationStats: Record<string, {
-      durations: number[];
-      passed: number;
-      total: number;
-      cacheHits: number;
+  getPerformanceByOperation(): Record<
+    string,
+    {
+      avgDuration: number;
+      passRate: number;
+      count: number;
+      cacheHitRate: number;
       target: number;
-    }> = {};
+    }
+  > {
+    const operationStats: Record<
+      string,
+      {
+        durations: number[];
+        passed: number;
+        total: number;
+        cacheHits: number;
+        target: number;
+      }
+    > = {};
 
     for (const report of this.reports) {
       if (!operationStats[report.operationName]) {
@@ -240,30 +246,33 @@ export class PerformanceMonitor {
           passed: 0,
           total: 0,
           cacheHits: 0,
-          target: target?.maxDuration || 1000
+          target: target?.maxDuration || 1000,
         };
       }
 
       const stats = operationStats[report.operationName];
       stats.durations.push(report.actualDuration);
       stats.total++;
-      
+
       if (report.passed) {
         stats.passed++;
       }
-      
+
       if (report.cacheHit) {
         stats.cacheHits++;
       }
     }
 
-    const result: Record<string, {
-      avgDuration: number;
-      passRate: number;
-      count: number;
-      cacheHitRate: number;
-      target: number;
-    }> = {};
+    const result: Record<
+      string,
+      {
+        avgDuration: number;
+        passRate: number;
+        count: number;
+        cacheHitRate: number;
+        target: number;
+      }
+    > = {};
 
     for (const [operation, stats] of Object.entries(operationStats)) {
       const avgDuration = stats.durations.reduce((sum, d) => sum + d, 0) / stats.durations.length;
@@ -275,7 +284,7 @@ export class PerformanceMonitor {
         passRate: Math.round(passRate * 100) / 100,
         count: stats.total,
         cacheHitRate: Math.round(cacheHitRate * 100) / 100,
-        target: stats.target
+        target: stats.target,
       };
     }
 

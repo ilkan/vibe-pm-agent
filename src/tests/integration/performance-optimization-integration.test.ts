@@ -68,7 +68,7 @@ describe('Performance Optimization Integration', () => {
 
           // Validate citations with caching
           const validationResults = await sourceValidationEngine.validateCitations(citations);
-          
+
           // Assess quality with caching
           const qualityReport = await qualityAssessmentSystem.assessCitationQuality(citations);
 
@@ -131,7 +131,7 @@ describe('Performance Optimization Integration', () => {
     });
 
     it('should handle large-scale batch processing efficiently', async () => {
-      const largeCitationSet = Array.from({ length: 100 }, (_, i) => 
+      const largeCitationSet = Array.from({ length: 100 }, (_, i) =>
         createMockCitation(`large-set-${i}`)
       );
 
@@ -141,7 +141,7 @@ describe('Performance Optimization Integration', () => {
       const batchProcessor = performanceOptimizer.getBatchProcessor();
       const validationResults = await batchProcessor.processBatch(
         largeCitationSet,
-        async (citation) => {
+        async citation => {
           const validation = await sourceValidationEngine.validateCitation(citation);
           const quality = await qualityAssessmentSystem.assessCitationQuality([citation]);
           return { citation, validation, quality };
@@ -156,7 +156,7 @@ describe('Performance Optimization Integration', () => {
 
       const metrics = batchProcessor.getMetrics();
       const processingMetric = metrics.find(m => m.operationType === 'large_scale_processing');
-      
+
       expect(processingMetric).toBeDefined();
       expect(processingMetric!.itemsProcessed).toBe(100);
       expect(processingMetric!.throughput).toBeGreaterThan(1); // At least 1 item per second
@@ -305,7 +305,7 @@ describe('Performance Optimization Integration', () => {
       const citationsPerOperation = 10;
 
       const operations = Array.from({ length: concurrentOperations }, async (_, i) => {
-        const citations = Array.from({ length: citationsPerOperation }, (_, j) => 
+        const citations = Array.from({ length: citationsPerOperation }, (_, j) =>
           createMockCitation(`concurrent-${i}-${j}`)
         );
 
@@ -330,13 +330,15 @@ describe('Performance Optimization Integration', () => {
       // Check that concurrent execution was efficient
       const averageOperationTime = results.reduce((sum, r) => sum + r.duration, 0) / results.length;
       const sequentialEstimate = averageOperationTime * concurrentOperations;
-      
+
       // Concurrent execution should be significantly faster than sequential
       expect(totalTime).toBeLessThan(sequentialEstimate * 0.7);
 
       console.log(`Concurrent execution: ${totalTime}ms`);
       console.log(`Sequential estimate: ${sequentialEstimate}ms`);
-      console.log(`Efficiency gain: ${((sequentialEstimate - totalTime) / sequentialEstimate * 100).toFixed(1)}%`);
+      console.log(
+        `Efficiency gain: ${(((sequentialEstimate - totalTime) / sequentialEstimate) * 100).toFixed(1)}%`
+      );
     });
   });
 
@@ -353,7 +355,7 @@ describe('Performance Optimization Integration', () => {
     });
 
     it('should handle 100 citations within 10 seconds', async () => {
-      const citations = Array.from({ length: 100 }, (_, i) => 
+      const citations = Array.from({ length: 100 }, (_, i) =>
         createMockCitation(`batch-performance-${i}`)
       );
 
@@ -380,7 +382,7 @@ describe('Performance Optimization Integration', () => {
       // Third pass with some new citations
       const mixedCitations = [
         ...citations.slice(0, 15), // 15 cached citations
-        ...Array.from({ length: 5 }, (_, i) => createMockCitation(`new-${i}`)) // 5 new citations
+        ...Array.from({ length: 5 }, (_, i) => createMockCitation(`new-${i}`)), // 5 new citations
       ];
 
       await sourceValidationEngine.validateCitations(mixedCitations);

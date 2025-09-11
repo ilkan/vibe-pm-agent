@@ -200,29 +200,38 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
           break;
         case 'kiro_autopilot':
           // Autopilot mode for autonomous development
-          stepVibes = Math.max(2, Math.floor(step.quotaCost / this.costModel.vibeUnitCost * 0.7));
+          stepVibes = Math.max(2, Math.floor((step.quotaCost / this.costModel.vibeUnitCost) * 0.7));
           kiroOptimization = 'Autopilot mode reduces manual intervention';
           break;
         case 'kiro_supervised':
           // Supervised mode with user oversight
-          stepVibes = Math.max(1, Math.floor(step.quotaCost / this.costModel.vibeUnitCost * 0.8));
+          stepVibes = Math.max(1, Math.floor((step.quotaCost / this.costModel.vibeUnitCost) * 0.8));
           kiroOptimization = 'Supervised mode with user control';
           break;
         case 'data_retrieval':
           // Kiro's context awareness reduces data retrieval needs
-          stepVibes = Math.max(0.5, Math.floor(step.quotaCost / this.costModel.vibeUnitCost * 0.6));
+          stepVibes = Math.max(
+            0.5,
+            Math.floor((step.quotaCost / this.costModel.vibeUnitCost) * 0.6)
+          );
           kiroOptimization = 'Kiro context awareness reduces data needs';
           break;
         case 'processing':
           // Kiro's intelligent processing capabilities
           if (step.quotaCost > this.costModel.specUnitCost) {
             stepSpecs = 1;
-            stepVibes = Math.max(0, Math.floor(
-              (step.quotaCost - this.costModel.specUnitCost) / this.costModel.vibeUnitCost * 0.5
-            ));
+            stepVibes = Math.max(
+              0,
+              Math.floor(
+                ((step.quotaCost - this.costModel.specUnitCost) / this.costModel.vibeUnitCost) * 0.5
+              )
+            );
             kiroOptimization = 'Spec mode handles complex processing efficiently';
           } else {
-            stepVibes = Math.max(0.8, Math.floor(step.quotaCost / this.costModel.vibeUnitCost * 0.7));
+            stepVibes = Math.max(
+              0.8,
+              Math.floor((step.quotaCost / this.costModel.vibeUnitCost) * 0.7)
+            );
             kiroOptimization = 'Kiro intelligent processing optimization';
           }
           break;
@@ -232,13 +241,19 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
             stepSpecs = 1;
             kiroOptimization = 'Spec mode provides comprehensive analysis';
           } else {
-            stepVibes = Math.max(1.5, Math.floor(step.quotaCost / this.costModel.vibeUnitCost * 0.8));
+            stepVibes = Math.max(
+              1.5,
+              Math.floor((step.quotaCost / this.costModel.vibeUnitCost) * 0.8)
+            );
             kiroOptimization = 'Vibe mode for rapid analysis iterations';
           }
           break;
         default:
           // Default Kiro optimization
-          stepVibes = Math.max(0.8, Math.floor(step.quotaCost / this.costModel.vibeUnitCost * 0.75));
+          stepVibes = Math.max(
+            0.8,
+            Math.floor((step.quotaCost / this.costModel.vibeUnitCost) * 0.75)
+          );
           kiroOptimization = 'General Kiro efficiency optimization';
       }
 
@@ -302,7 +317,7 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
   ): Promise<QuotaForecast> {
     // Spec-focused estimation with emphasis on comprehensive feature delivery
     const vibeEstimate = await this.estimateVibeConsumption(workflow, params);
-    
+
     // Transform vibe-heavy workflow to spec-optimized approach
     let totalSpecs = 0;
     let totalVibes = 0;
@@ -429,10 +444,14 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
         const stepBreakdown = breakdown.find(b => b.stepId === stepId);
         if (stepBreakdown) {
           const stepVibeReduction = Math.floor(
-            stepBreakdown.vibes * (optimization.estimatedSavings.vibes / 100) * (kiroVibeMultiplier / 3)
+            stepBreakdown.vibes *
+              (optimization.estimatedSavings.vibes / 100) *
+              (kiroVibeMultiplier / 3)
           );
           const stepSpecReduction = Math.floor(
-            stepBreakdown.specs * (optimization.estimatedSavings.specs / 100) * (kiroSpecMultiplier / 3)
+            stepBreakdown.specs *
+              (optimization.estimatedSavings.specs / 100) *
+              (kiroSpecMultiplier / 3)
           );
 
           stepBreakdown.vibes = Math.max(0.1, stepBreakdown.vibes - stepVibeReduction);
@@ -440,7 +459,7 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
           stepBreakdown.cost =
             stepBreakdown.vibes * this.costModel.vibeUnitCost +
             stepBreakdown.specs * this.costModel.specUnitCost;
-          
+
           // Add Kiro optimization note
           if (stepBreakdown.kiroOptimization) {
             stepBreakdown.kiroOptimization += ' + Advanced Kiro workflow optimization';
@@ -468,7 +487,7 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
   ): Promise<QuotaForecast> {
     // Zero-based approach leveraging Kiro's full capabilities
     const baseSavingsPercentage = zeroBasedSolution.potentialSavings;
-    
+
     // Kiro's advanced capabilities enable more aggressive optimization
     const kiroEnhancedSavings = Math.min(95, baseSavingsPercentage * 1.3); // Up to 30% better savings
 
@@ -516,7 +535,8 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
         vibes: minimalVibes,
         specs: minimalSpecs,
         cost: estimatedCost,
-        kiroOptimization: 'Zero-based approach leveraging full Kiro capabilities for maximum efficiency',
+        kiroOptimization:
+          'Zero-based approach leveraging full Kiro capabilities for maximum efficiency',
       },
     ];
 
@@ -536,22 +556,26 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
     const baselineBugRate = 0.15; // 15% of features have significant bugs
     const baselineTestCoverage = 0.65; // 65% test coverage
     const baselineDailyTasks = 3; // Tasks completed per developer per day
-    
+
     // Kiro Vibe Coding efficiency factors
     const vibeVelocityMultiplier = this.kiroEfficiencyFactors.get('vibe_coding_velocity') || 3.2;
     const codeQualityMultiplier = this.kiroEfficiencyFactors.get('code_quality_improvement') || 1.9;
     const debuggingEfficiency = this.kiroEfficiencyFactors.get('debugging_efficiency') || 4.1;
-    const testCoverageMultiplier = this.kiroEfficiencyFactors.get('test_coverage_improvement') || 2.3;
+    const testCoverageMultiplier =
+      this.kiroEfficiencyFactors.get('test_coverage_improvement') || 2.3;
     const refactoringSpeed = this.kiroEfficiencyFactors.get('refactoring_speed') || 3.7;
     const learningAcceleration = this.kiroEfficiencyFactors.get('learning_curve_reduction') || 2.1;
 
     // Calculate development velocity improvements
     const vibeOptimizedHours = baselineHoursPerFeature / vibeVelocityMultiplier;
-    const timeToMarketReduction = ((baselineHoursPerFeature - vibeOptimizedHours) / baselineHoursPerFeature) * 100;
+    const timeToMarketReduction =
+      ((baselineHoursPerFeature - vibeOptimizedHours) / baselineHoursPerFeature) * 100;
 
     // Calculate code quality improvements
-    const bugReductionPercentage = ((baselineBugRate - (baselineBugRate / codeQualityMultiplier)) / baselineBugRate) * 100;
-    const testCoverageImprovement = ((baselineTestCoverage * testCoverageMultiplier) - baselineTestCoverage) * 100;
+    const bugReductionPercentage =
+      ((baselineBugRate - baselineBugRate / codeQualityMultiplier) / baselineBugRate) * 100;
+    const testCoverageImprovement =
+      (baselineTestCoverage * testCoverageMultiplier - baselineTestCoverage) * 100;
     const maintainabilityScore = Math.min(95, codeQualityMultiplier * 50); // Cap at 95%
     const technicalDebtReduction = ((refactoringSpeed - 1) / refactoringSpeed) * 100;
 
@@ -573,11 +597,12 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
     const averageHourlyRate = 75; // $75/hour average developer cost
     const infrastructureCostReduction = 25; // 25% reduction in infrastructure costs
     const maintenanceCostSavings = technicalDebtReduction * 0.8; // Maintenance cost reduction
-    
+
     // Calculate total ROI with economies of scale for larger teams
-    const totalCostSavings = (developerHoursSaved * averageHourlyRate) + 
-                           (infrastructureCostReduction * 1000) + 
-                           (maintenanceCostSavings * 500);
+    const totalCostSavings =
+      developerHoursSaved * averageHourlyRate +
+      infrastructureCostReduction * 1000 +
+      maintenanceCostSavings * 500;
     const baseKiroInvestment = teamSize * 100; // $100 per developer for Kiro
     // Economies of scale: larger teams get volume discounts
     const scaleDiscount = teamSize > 5 ? Math.min(0.3, (teamSize - 5) * 0.05) : 0;
@@ -648,7 +673,9 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
           'Best for real-time collaboration and pair programming',
           'Optimal for handling technical debt incrementally',
         ],
-        costOptimization: Math.round(((1 - vibeEstimate.estimatedCost / (workflow.steps.length * 0.05)) * 100)),
+        costOptimization: Math.round(
+          (1 - vibeEstimate.estimatedCost / (workflow.steps.length * 0.05)) * 100
+        ),
         vibeCodingROI,
       },
       specMode: {
@@ -700,22 +727,29 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
     const totalVibes = forecasts.reduce((sum, f) => sum + f.vibesConsumed, 0);
     const totalSpecs = forecasts.reduce((sum, f) => sum + f.specsConsumed, 0);
     const totalCost = forecasts.reduce((sum, f) => sum + f.estimatedCost, 0);
-    const avgConfidence = forecasts.filter(f => f.confidenceLevel === 'high').length / forecasts.length;
+    const avgConfidence =
+      forecasts.filter(f => f.confidenceLevel === 'high').length / forecasts.length;
 
     // Calculate Kiro-specific metrics
-    const vibeEfficiency = totalVibes > 0 ? 
-      (this.kiroEfficiencyFactors.get('vibe_coding_velocity') || 1) * (forecasts.length / totalVibes) : 0;
-    
-    const specUtilization = totalSpecs > 0 ? 
-      (this.kiroEfficiencyFactors.get('spec_feature_delivery') || 1) * (forecasts.length / totalSpecs) : 0;
+    const vibeEfficiency =
+      totalVibes > 0
+        ? (this.kiroEfficiencyFactors.get('vibe_coding_velocity') || 1) *
+          (forecasts.length / totalVibes)
+        : 0;
+
+    const specUtilization =
+      totalSpecs > 0
+        ? (this.kiroEfficiencyFactors.get('spec_feature_delivery') || 1) *
+          (forecasts.length / totalSpecs)
+        : 0;
 
     const kiroModeOptimization = Math.min(1, (vibeEfficiency + specUtilization) / 2);
-    
-    const developmentVelocity = 
+
+    const developmentVelocity =
       (this.kiroEfficiencyFactors.get('vibe_coding_velocity') || 1) * 0.4 +
       (this.kiroEfficiencyFactors.get('spec_feature_delivery') || 1) * 0.6;
 
-    const codeQualityScore = 
+    const codeQualityScore =
       (this.kiroEfficiencyFactors.get('code_quality_improvement') || 1) * avgConfidence;
 
     return {
@@ -740,9 +774,10 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
       (a, b) => b.savingsPercentage - a.savingsPercentage
     );
 
-    const baselineScenario = scenarios.find(
-      s => s.name.toLowerCase().includes('naive') || s.name.toLowerCase().includes('current')
-    ) || scenarios[0];
+    const baselineScenario =
+      scenarios.find(
+        s => s.name.toLowerCase().includes('naive') || s.name.toLowerCase().includes('current')
+      ) || scenarios[0];
 
     const recommendations: string[] = [];
 
@@ -843,16 +878,28 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
       // Enhanced scoring with Kiro and Vibe Coding factors
       let riskFactor = 1.0;
       switch (scenario.riskLevel) {
-        case 'low': riskFactor = 1.3; break; // Kiro + Vibe Coding significantly reduce risk
-        case 'medium': riskFactor = 1.1; break;
-        case 'high': riskFactor = 0.9; break; // Even high risk is more manageable
+        case 'low':
+          riskFactor = 1.3;
+          break; // Kiro + Vibe Coding significantly reduce risk
+        case 'medium':
+          riskFactor = 1.1;
+          break;
+        case 'high':
+          riskFactor = 0.9;
+          break; // Even high risk is more manageable
       }
 
       let effortFactor = 1.0;
       switch (scenario.implementationEffort) {
-        case 'low': effortFactor = 1.2; break;
-        case 'medium': effortFactor = 1.1; break;
-        case 'high': effortFactor = 1.0; break; // Kiro makes high effort more feasible
+        case 'low':
+          effortFactor = 1.2;
+          break;
+        case 'medium':
+          effortFactor = 1.1;
+          break;
+        case 'high':
+          effortFactor = 1.0;
+          break; // Kiro makes high effort more feasible
       }
 
       // Enhanced Kiro bonus for scenarios that leverage Kiro capabilities
@@ -862,10 +909,12 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
       if (scenario.name.toLowerCase().includes('spec')) kiroBonus += 0.15;
 
       // Vibe Coding velocity bonus
-      const vibeVelocityBonus = scenario.name.toLowerCase().includes('vibe') ? 
-        (vibeCodingROI.developmentVelocity.velocityMultiplier / 10) : 0;
+      const vibeVelocityBonus = scenario.name.toLowerCase().includes('vibe')
+        ? vibeCodingROI.developmentVelocity.velocityMultiplier / 10
+        : 0;
 
-      const score = scenario.savingsPercentage * riskFactor * effortFactor * kiroBonus + vibeVelocityBonus;
+      const score =
+        scenario.savingsPercentage * riskFactor * effortFactor * kiroBonus + vibeVelocityBonus;
       if (score > bestScore) {
         bestScore = score;
         bestOption = scenario;
@@ -874,9 +923,10 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
 
     // Enhanced risk assessment with Kiro and Vibe Coding capabilities
     const highRiskScenarios = scenarios.filter(s => s.riskLevel === 'high');
-    const riskAssessment = highRiskScenarios.length > 0
-      ? `${highRiskScenarios.length} high-risk scenarios identified. Kiro Resource Optimizer with Vibe Coding capabilities provides ${vibeCodingROI.developerProductivity.contextSwitchingReduction}% context switching reduction and ${vibeCodingROI.codeQuality.bugReductionPercentage}% bug reduction, significantly mitigating implementation risks. The ${vibeCodingROI.developmentVelocity.velocityMultiplier}x development velocity allows for rapid iteration and risk mitigation through faster feedback cycles.`
-      : `Risk levels are highly manageable with Kiro Resource Optimizer. Vibe Coding provides ${vibeCodingROI.developmentVelocity.velocityMultiplier}x development velocity and ${vibeCodingROI.codeQuality.maintainabilityScore}% maintainability improvement, enabling confident implementation with ${vibeCodingROI.costSavings.totalROIPercentage}% ROI.`;
+    const riskAssessment =
+      highRiskScenarios.length > 0
+        ? `${highRiskScenarios.length} high-risk scenarios identified. Kiro Resource Optimizer with Vibe Coding capabilities provides ${vibeCodingROI.developerProductivity.contextSwitchingReduction}% context switching reduction and ${vibeCodingROI.codeQuality.bugReductionPercentage}% bug reduction, significantly mitigating implementation risks. The ${vibeCodingROI.developmentVelocity.velocityMultiplier}x development velocity allows for rapid iteration and risk mitigation through faster feedback cycles.`
+        : `Risk levels are highly manageable with Kiro Resource Optimizer. Vibe Coding provides ${vibeCodingROI.developmentVelocity.velocityMultiplier}x development velocity and ${vibeCodingROI.codeQuality.maintainabilityScore}% maintainability improvement, enabling confident implementation with ${vibeCodingROI.costSavings.totalROIPercentage}% ROI.`;
 
     return {
       scenarios: sortedScenarios,
@@ -887,7 +937,10 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
   }
 
   // Legacy method names for backward compatibility
-  async estimateNaiveConsumption(workflow: Workflow, params?: OptionalParams): Promise<QuotaForecast> {
+  async estimateNaiveConsumption(
+    workflow: Workflow,
+    params?: OptionalParams
+  ): Promise<QuotaForecast> {
     return this.estimateVibeConsumption(workflow, params);
   }
 
@@ -921,32 +974,33 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
     }
 
     // Find baseline forecast
-    const naiveForecast = forecasts.find(f => 
-      f.scenario === 'naive' || f.scenario === 'kiro-optimized'
-    ) || forecasts[0];
+    const naiveForecast =
+      forecasts.find(f => f.scenario === 'naive' || f.scenario === 'kiro-optimized') ||
+      forecasts[0];
     const baselineCost = naiveForecast.estimatedCost;
 
     // Find Kiro-optimized forecasts
-    const kiroOptimizedForecast = forecasts.find(f => 
-      f.scenario === 'kiro-advanced-optimized' || f.scenario === 'optimized'
+    const kiroOptimizedForecast = forecasts.find(
+      f => f.scenario === 'kiro-advanced-optimized' || f.scenario === 'optimized'
     );
-    const kiroZeroBasedForecast = forecasts.find(f => 
-      f.scenario === 'kiro-zero-based' || f.scenario === 'zero-based'
+    const kiroZeroBasedForecast = forecasts.find(
+      f => f.scenario === 'kiro-zero-based' || f.scenario === 'zero-based'
     );
 
     // Calculate Kiro-enhanced savings
     let conservativeSavings = 0;
-    const conservativeForecast = kiroOptimizedForecast || 
-      forecasts.find(f => f.scenario !== naiveForecast.scenario);
-    
+    const conservativeForecast =
+      kiroOptimizedForecast || forecasts.find(f => f.scenario !== naiveForecast.scenario);
+
     if (conservativeForecast && baselineCost > 0) {
-      conservativeSavings = ((baselineCost - conservativeForecast.estimatedCost) / baselineCost) * 100;
+      conservativeSavings =
+        ((baselineCost - conservativeForecast.estimatedCost) / baselineCost) * 100;
     }
 
     // Enhanced balanced savings with Kiro capabilities
     let balancedSavings = conservativeSavings;
     if (kiroZeroBasedForecast && baselineCost > 0) {
-      const zeroBasedSavingsPercentage = 
+      const zeroBasedSavingsPercentage =
         ((baselineCost - kiroZeroBasedForecast.estimatedCost) / baselineCost) * 100;
       balancedSavings = (conservativeSavings + zeroBasedSavingsPercentage) / 2;
     }
@@ -983,18 +1037,19 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
   }
 
   calculateSavings(naive: QuotaForecast, optimized: QuotaForecast): EfficiencySavings {
-    const vibeReduction = naive.vibesConsumed > 0
-      ? ((naive.vibesConsumed - optimized.vibesConsumed) / naive.vibesConsumed) * 100
-      : 0;
+    const vibeReduction =
+      naive.vibesConsumed > 0
+        ? ((naive.vibesConsumed - optimized.vibesConsumed) / naive.vibesConsumed) * 100
+        : 0;
 
-    const specReduction = naive.specsConsumed > 0
-      ? ((naive.specsConsumed - optimized.specsConsumed) / naive.specsConsumed) * 100
-      : 0;
+    const specReduction =
+      naive.specsConsumed > 0
+        ? ((naive.specsConsumed - optimized.specsConsumed) / naive.specsConsumed) * 100
+        : 0;
 
     const costSavings = naive.estimatedCost - optimized.estimatedCost;
-    const totalSavingsPercentage = naive.estimatedCost > 0 
-      ? (costSavings / naive.estimatedCost) * 100 
-      : 0;
+    const totalSavingsPercentage =
+      naive.estimatedCost > 0 ? (costSavings / naive.estimatedCost) * 100 : 0;
 
     return {
       vibeReduction: Math.round(vibeReduction * 100) / 100,
@@ -1054,7 +1109,7 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
         adjustedSpecs = maxSpecs;
       }
 
-      adjustedCost = 
+      adjustedCost =
         adjustedVibes * this.costModel.vibeUnitCost + adjustedSpecs * this.costModel.specUnitCost;
 
       if (maxCostDollars !== undefined && adjustedCost > maxCostDollars) {
@@ -1067,20 +1122,21 @@ export class KiroResourceOptimizer implements IKiroResourceOptimizer {
           adjustedVibes = Math.max(0.5, Math.floor(remainingBudget / this.costModel.vibeUnitCost));
         } else {
           // Optimize spec usage with Kiro efficiency
-          adjustedSpecs = Math.max(0, Math.floor(targetCost / this.costModel.specUnitCost * 0.9));
+          adjustedSpecs = Math.max(0, Math.floor((targetCost / this.costModel.specUnitCost) * 0.9));
           adjustedVibes = Math.max(
             0.5,
             Math.floor(
-              (targetCost - adjustedSpecs * this.costModel.specUnitCost) / this.costModel.vibeUnitCost
+              (targetCost - adjustedSpecs * this.costModel.specUnitCost) /
+                this.costModel.vibeUnitCost
             )
           );
         }
 
-        adjustedCost = 
+        adjustedCost =
           adjustedVibes * this.costModel.vibeUnitCost + adjustedSpecs * this.costModel.specUnitCost;
       }
     } else {
-      adjustedCost = 
+      adjustedCost =
         adjustedVibes * this.costModel.vibeUnitCost + adjustedSpecs * this.costModel.specUnitCost;
     }
 

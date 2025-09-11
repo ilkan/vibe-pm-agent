@@ -6,24 +6,28 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { generateBusinessCase } from '../../mcp/tools/generate_business_case';
 import { createStakeholderCommunication } from '../../mcp/tools/create_stakeholder_communication';
-import { MCPToolContext, GenerateBusinessCaseArgs, CreateStakeholderCommunicationArgs } from '../../models/mcp';
+import {
+  MCPToolContext,
+  GenerateBusinessCaseArgs,
+  CreateStakeholderCommunicationArgs,
+} from '../../models/mcp';
 
 // Mock the Amazon services
 jest.mock('../../services/amazon', () => {
   const mockAssumptionLedgerService = {
-    normalizeLedger: jest.fn()
+    normalizeLedger: jest.fn(),
   };
   const mockConfidenceService = {
-    computeConfidence: jest.fn()
+    computeConfidence: jest.fn(),
   };
   const mockScenarioService = {
-    runScenarios: jest.fn()
+    runScenarios: jest.fn(),
   };
   const mockHardQuestionsService = {
-    generateQuestions: jest.fn()
+    generateQuestions: jest.fn(),
   };
   const mockSteeringWriter = {
-    writeSteering: jest.fn()
+    writeSteering: jest.fn(),
   };
 
   return {
@@ -31,7 +35,7 @@ jest.mock('../../services/amazon', () => {
     ConfidenceService: jest.fn(() => mockConfidenceService),
     ScenarioService: jest.fn(() => mockScenarioService),
     HardQuestionsService: jest.fn(() => mockHardQuestionsService),
-    SteeringWriter: jest.fn(() => mockSteeringWriter)
+    SteeringWriter: jest.fn(() => mockSteeringWriter),
   };
 });
 
@@ -40,11 +44,11 @@ jest.mock('../../pipeline/ai-agent-pipeline', () => {
   const mockPipeline = {
     generateBusinessCase: jest.fn(),
     generatePRFAQ: jest.fn(),
-    generateManagementOnePager: jest.fn()
+    generateManagementOnePager: jest.fn(),
   };
 
   return {
-    AIAgentPipeline: jest.fn(() => mockPipeline)
+    AIAgentPipeline: jest.fn(() => mockPipeline),
   };
 });
 
@@ -57,14 +61,20 @@ describe('Amazon MCP Handlers Integration', () => {
       sessionId: 'test-session-123',
       timestamp: Date.now(),
       requestId: 'req-123',
-      traceId: 'trace-123'
+      traceId: 'trace-123',
     };
 
     // Clear all mocks
     jest.clearAllMocks();
 
     // Set up default mock return values
-    const { AssumptionLedgerService, ConfidenceService, ScenarioService, HardQuestionsService, SteeringWriter } = require('../../services/amazon');
+    const {
+      AssumptionLedgerService,
+      ConfidenceService,
+      ScenarioService,
+      HardQuestionsService,
+      SteeringWriter,
+    } = require('../../services/amazon');
     const { AIAgentPipeline } = require('../../pipeline/ai-agent-pipeline');
 
     // Mock Amazon services
@@ -82,7 +92,7 @@ describe('Amazon MCP Handlers Integration', () => {
             certainty: 'High',
             lastChecked: new Date(),
             category: 'market',
-            impact: 'critical'
+            impact: 'critical',
           },
           {
             id: 'A2',
@@ -93,14 +103,14 @@ describe('Amazon MCP Handlers Integration', () => {
             certainty: 'Medium',
             lastChecked: new Date(),
             category: 'financial',
-            impact: 'critical'
-          }
+            impact: 'critical',
+          },
         ],
         coverage_pct: 75,
         lastUpdated: new Date(),
         totalClaims: 4,
-        backedClaims: 3
-      }
+        backedClaims: 3,
+      },
     });
 
     const mockConfidenceService = new ConfidenceService();
@@ -114,11 +124,11 @@ describe('Amazon MCP Handlers Integration', () => {
           diversity: 70,
           agreement: 80,
           coverage: 75,
-          sensitivity: 85
+          sensitivity: 85,
         },
         explanation: 'Moderate confidence with good evidence quality',
-        lowConfidence: false
-      }
+        lowConfidence: false,
+      },
     });
 
     const mockScenarioService = new ScenarioService();
@@ -128,16 +138,16 @@ describe('Amazon MCP Handlers Integration', () => {
         scenarios: {
           bear: [
             { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000, unit: 'USD' },
-            { metric: 'ROI', bear: 60, base: 100, bull: 140, unit: '%' }
+            { metric: 'ROI', bear: 60, base: 100, bull: 140, unit: '%' },
           ],
           base: [
             { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000, unit: 'USD' },
-            { metric: 'ROI', bear: 60, base: 100, bull: 140, unit: '%' }
+            { metric: 'ROI', bear: 60, base: 100, bull: 140, unit: '%' },
           ],
           bull: [
             { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000, unit: 'USD' },
-            { metric: 'ROI', bear: 60, base: 100, bull: 140, unit: '%' }
-          ]
+            { metric: 'ROI', bear: 60, base: 100, bull: 140, unit: '%' },
+          ],
         },
         elasticities: [
           {
@@ -145,19 +155,19 @@ describe('Amazon MCP Handlers Integration', () => {
             assumptionChange: '±20%',
             outcomeMetric: 'Revenue',
             outcomeChange: '±15%',
-            sensitivity: 15
-          }
+            sensitivity: 15,
+          },
         ],
         keyDrivers: [
           {
             assumption: 'Market Size',
             assumptionId: 'A1',
             impact: 15,
-            description: 'Market Size shows moderate sensitivity (±15% impact on Revenue)'
-          }
+            description: 'Market Size shows moderate sensitivity (±15% impact on Revenue)',
+          },
         ],
-        sensitivityPct: 20
-      }
+        sensitivityPct: 20,
+      },
     });
 
     const mockQuestionsService = new HardQuestionsService();
@@ -166,21 +176,23 @@ describe('Amazon MCP Handlers Integration', () => {
       data: [
         {
           id: 1,
-          question: 'How do you know that Market Size ($1B) is accurate? What evidence supports this critical assumption?',
+          question:
+            'How do you know that Market Size ($1B) is accurate? What evidence supports this critical assumption?',
           targetAssumptions: ['A1'],
           category: 'market',
           severity: 'critical',
-          evidenceNeeded: ['Third-party market research', 'Bottom-up market sizing analysis']
+          evidenceNeeded: ['Third-party market research', 'Bottom-up market sizing analysis'],
         },
         {
           id: 2,
-          question: 'What if development costs are 50% higher than estimated? How does this affect ROI and payback period?',
+          question:
+            'What if development costs are 50% higher than estimated? How does this affect ROI and payback period?',
           targetAssumptions: ['A2'],
           category: 'financial',
           severity: 'critical',
-          evidenceNeeded: ['Historical cost analysis', 'Vendor quotes']
-        }
-      ]
+          evidenceNeeded: ['Historical cost analysis', 'Vendor quotes'],
+        },
+      ],
     });
 
     const mockSteeringWriter = new SteeringWriter();
@@ -194,8 +206,8 @@ describe('Amazon MCP Handlers Integration', () => {
         inputsHash: 'abc123',
         message: 'Success',
         filename: 'business-case-abc123.md',
-        fullPath: '.kiro/steering/working-backwards/business-case/business-case-abc123.md'
-      }
+        fullPath: '.kiro/steering/working-backwards/business-case/business-case-abc123.md',
+      },
     });
 
     // Mock AI Pipeline
@@ -239,7 +251,7 @@ A2: Q2 2024.`,
 - [ ] Complete development
 - [ ] Conduct user testing
 - [ ] Prepare marketing materials
-- [ ] Train support team`
+- [ ] Train support team`,
     });
 
     mockPipeline.generateManagementOnePager.mockResolvedValue({
@@ -259,7 +271,7 @@ Enterprise customers need improved operational efficiency.
 ## ROI Analysis
 - Investment: $500K
 - Return: $1M
-- Payback: 6 months`
+- Payback: 6 months`,
     });
   });
 
@@ -290,12 +302,12 @@ We expect to capture market share through superior UX and pricing.`,
           development_cost: 500000,
           operational_cost: 100000,
           expected_revenue: 1000000,
-          time_to_market: 12
+          time_to_market: 12,
         },
         steering_options: {
           create_steering_files: true,
-          feature_name: 'test-feature'
-        }
+          feature_name: 'test-feature',
+        },
       };
 
       const result = await generateBusinessCase(args, mockContext);
@@ -321,8 +333,12 @@ We expect to capture market share through superior UX and pricing.`,
 
       // Verify assumption ledger table format
       expect(result.content[0].markdown).toContain('| ID | Name | Value | Certainty | Sources |');
-      expect(result.content[0].markdown).toContain('| A1 | Market Size | 1000000000 USD | High | 1 |');
-      expect(result.content[0].markdown).toContain('| A2 | Development Cost | 500000 USD | Medium | 0 |');
+      expect(result.content[0].markdown).toContain(
+        '| A1 | Market Size | 1000000000 USD | High | 1 |'
+      );
+      expect(result.content[0].markdown).toContain(
+        '| A2 | Development Cost | 500000 USD | Medium | 0 |'
+      );
 
       // Verify confidence breakdown
       expect(result.content[0].markdown).toContain('**Overall Confidence**: 78/100 ✅');
@@ -330,17 +346,23 @@ We expect to capture market share through superior UX and pricing.`,
       expect(result.content[0].markdown).toContain('- Data Recency: 75/100');
 
       // Verify scenario analysis table
-      expect(result.content[0].markdown).toContain('| Metric | Bear Case | Base Case | Bull Case | Unit |');
-      expect(result.content[0].markdown).toContain('| Revenue | 800000 | **1000000** | 1200000 | USD |');
+      expect(result.content[0].markdown).toContain(
+        '| Metric | Bear Case | Base Case | Bull Case | Unit |'
+      );
+      expect(result.content[0].markdown).toContain(
+        '| Revenue | 800000 | **1000000** | 1200000 | USD |'
+      );
 
       // Verify hard questions
       expect(result.content[0].markdown).toContain('**Q1**: How do you know that Market Size');
-      expect(result.content[0].markdown).toContain('*Evidence needed*: Third-party market research');
+      expect(result.content[0].markdown).toContain(
+        '*Evidence needed*: Third-party market research'
+      );
     });
 
     it('should handle missing financial inputs gracefully', async () => {
       const args: GenerateBusinessCaseArgs = {
-        opportunity_analysis: 'Basic opportunity analysis without detailed financial data.'
+        opportunity_analysis: 'Basic opportunity analysis without detailed financial data.',
       };
 
       const result = await generateBusinessCase(args, mockContext);
@@ -356,11 +378,11 @@ We expect to capture market share through superior UX and pricing.`,
       const mockService = new AssumptionLedgerService();
       mockService.normalizeLedger.mockResolvedValue({
         success: false,
-        error: { message: 'Service unavailable' }
+        error: { message: 'Service unavailable' },
       });
 
       const args: GenerateBusinessCaseArgs = {
-        opportunity_analysis: 'Test opportunity analysis'
+        opportunity_analysis: 'Test opportunity analysis',
       };
 
       const result = await generateBusinessCase(args, mockContext);
@@ -396,8 +418,8 @@ We expect minimal competitive response.`;
         audience: 'customers',
         steering_options: {
           create_steering_files: true,
-          feature_name: 'test-feature'
-        }
+          feature_name: 'test-feature',
+        },
       };
 
       const result = await createStakeholderCommunication(args, mockContext);
@@ -406,7 +428,9 @@ We expect minimal competitive response.`;
       expect(result.content[0].markdown).toContain('# Press Release');
       expect(result.content[0].markdown).toContain('# FAQ');
       expect(result.content[0].markdown).toContain('# Launch Checklist');
-      expect(result.content[0].markdown).toContain('## Amazon Working Backwards Evidence Mechanisms');
+      expect(result.content[0].markdown).toContain(
+        '## Amazon Working Backwards Evidence Mechanisms'
+      );
       expect(result.metadata?.confidenceScore).toBe(78);
     });
 
@@ -414,7 +438,7 @@ We expect minimal competitive response.`;
       const args: CreateStakeholderCommunicationArgs = {
         business_case: baseBusinesCase,
         communication_type: 'executive_onepager',
-        audience: 'executives'
+        audience: 'executives',
       };
 
       const result = await createStakeholderCommunication(args, mockContext);
@@ -424,14 +448,16 @@ We expect minimal competitive response.`;
       expect(result.content[0].markdown).toContain('## Context');
       expect(result.content[0].markdown).toContain('## Options');
       expect(result.content[0].markdown).toContain('## Recommendation');
-      expect(result.content[0].markdown).toContain('## Amazon Working Backwards Evidence Mechanisms');
+      expect(result.content[0].markdown).toContain(
+        '## Amazon Working Backwards Evidence Mechanisms'
+      );
     });
 
     it('should generate Board Presentation correctly', async () => {
       const args: CreateStakeholderCommunicationArgs = {
         business_case: baseBusinesCase,
         communication_type: 'board_presentation',
-        audience: 'board'
+        audience: 'board',
       };
 
       const result = await createStakeholderCommunication(args, mockContext);
@@ -449,24 +475,24 @@ We expect minimal competitive response.`;
       const args: CreateStakeholderCommunicationArgs = {
         business_case: baseBusinesCase,
         communication_type: 'team_announcement',
-        audience: 'engineering_team'
+        audience: 'engineering_team',
       };
 
       const result = await createStakeholderCommunication(args, mockContext);
 
       expect(result.isError).toBeFalsy();
       expect(result.content[0].markdown).toContain('# Team Announcement: Test Feature');
-      expect(result.content[0].markdown).toContain('## What We\'re Building');
+      expect(result.content[0].markdown).toContain("## What We're Building");
       expect(result.content[0].markdown).toContain('## Why Now');
       expect(result.content[0].markdown).toContain('## What Success Looks Like');
-      expect(result.content[0].markdown).toContain('## How We\'ll Execute');
+      expect(result.content[0].markdown).toContain("## How We'll Execute");
     });
 
     it('should maintain API compatibility', async () => {
       const args: CreateStakeholderCommunicationArgs = {
         business_case: baseBusinesCase,
         communication_type: 'pr_faq',
-        audience: 'customers'
+        audience: 'customers',
       };
 
       const result = await createStakeholderCommunication(args, mockContext);
@@ -484,7 +510,7 @@ We expect minimal competitive response.`;
       const args = {
         business_case: baseBusinesCase,
         communication_type: 'unsupported_type' as any,
-        audience: 'customers' as any
+        audience: 'customers' as any,
       };
 
       const result = await createStakeholderCommunication(args, mockContext);
@@ -501,8 +527,8 @@ We expect minimal competitive response.`;
         steering_options: {
           create_steering_files: true,
           feature_name: 'test-feature',
-          inclusion_rule: 'manual'
-        }
+          inclusion_rule: 'manual',
+        },
       };
 
       const result = await createStakeholderCommunication(args, mockContext);
@@ -512,7 +538,7 @@ We expect minimal competitive response.`;
       expect(result.metadata?.steeringFiles?.[0]).toEqual({
         filename: 'business-case-abc123.md',
         action: 'created',
-        fullPath: '.kiro/steering/working-backwards/business-case/business-case-abc123.md'
+        fullPath: '.kiro/steering/working-backwards/business-case/business-case-abc123.md',
       });
     });
   });
@@ -521,18 +547,18 @@ We expect minimal competitive response.`;
     it('should not break existing API contracts', async () => {
       // Test that new handlers don't interfere with existing functionality
       const businessCaseArgs: GenerateBusinessCaseArgs = {
-        opportunity_analysis: 'Test analysis'
+        opportunity_analysis: 'Test analysis',
       };
 
       const communicationArgs: CreateStakeholderCommunicationArgs = {
         business_case: 'Test business case',
         communication_type: 'pr_faq',
-        audience: 'customers'
+        audience: 'customers',
       };
 
       const [businessResult, communicationResult] = await Promise.all([
         generateBusinessCase(businessCaseArgs, mockContext),
-        createStakeholderCommunication(communicationArgs, mockContext)
+        createStakeholderCommunication(communicationArgs, mockContext),
       ]);
 
       // Both should succeed without interference
@@ -546,17 +572,17 @@ We expect minimal competitive response.`;
 
     it('should handle concurrent mechanism service calls', async () => {
       const args1: GenerateBusinessCaseArgs = {
-        opportunity_analysis: 'Analysis 1'
+        opportunity_analysis: 'Analysis 1',
       };
 
       const args2: GenerateBusinessCaseArgs = {
-        opportunity_analysis: 'Analysis 2'
+        opportunity_analysis: 'Analysis 2',
       };
 
       // Run multiple handlers concurrently
       const results = await Promise.all([
         generateBusinessCase(args1, { ...mockContext, sessionId: 'session-1' }),
-        generateBusinessCase(args2, { ...mockContext, sessionId: 'session-2' })
+        generateBusinessCase(args2, { ...mockContext, sessionId: 'session-2' }),
       ]);
 
       results.forEach(result => {
@@ -571,13 +597,13 @@ We expect minimal competitive response.`;
       // Mock all services to fail
       const { AssumptionLedgerService } = require('../../services/amazon');
       const mockService = new AssumptionLedgerService();
-      mockService.normalizeLedger.mockResolvedValue({ 
-        success: false, 
-        error: { message: 'Service failure' } 
+      mockService.normalizeLedger.mockResolvedValue({
+        success: false,
+        error: { message: 'Service failure' },
       });
 
       const args: GenerateBusinessCaseArgs = {
-        opportunity_analysis: 'Test analysis'
+        opportunity_analysis: 'Test analysis',
       };
 
       const result = await generateBusinessCase(args, mockContext);
@@ -596,8 +622,8 @@ We expect minimal competitive response.`;
         opportunity_analysis: 'Test analysis',
         steering_options: {
           create_steering_files: true,
-          feature_name: 'test'
-        }
+          feature_name: 'test',
+        },
       };
 
       const result = await generateBusinessCase(args, mockContext);

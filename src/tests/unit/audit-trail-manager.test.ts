@@ -9,7 +9,12 @@ import {
   ComplianceCheckResult,
   AuditReportConfig,
 } from '../../models/audit';
-import { Citation, CitationSourceType, CitationConfidence, EnhancedCitation } from '../../models/citations';
+import {
+  Citation,
+  CitationSourceType,
+  CitationConfidence,
+  EnhancedCitation,
+} from '../../models/citations';
 
 describe('AuditTrailManager', () => {
   let auditManager: AuditTrailManager;
@@ -113,7 +118,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.eventType).toBe(AuditEventType.CITATION_CREATED);
       expect(entry.severity).toBe(AuditSeverity.INFO);
@@ -158,7 +163,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.eventType).toBe(AuditEventType.CITATION_MODIFIED);
       expect(entry.severity).toBe(AuditSeverity.INFO);
@@ -172,15 +177,10 @@ describe('AuditTrailManager', () => {
     });
 
     it('should log citation deletion events with warning severity', async () => {
-      await auditManager.logCitationDeleted(
-        mockCitation,
-        mockUser,
-        'Citation no longer relevant',
-        {
-          documentId: 'doc-123',
-          toolUsed: 'audit_citation_quality',
-        }
-      );
+      await auditManager.logCitationDeleted(mockCitation, mockUser, 'Citation no longer relevant', {
+        documentId: 'doc-123',
+        toolUsed: 'audit_citation_quality',
+      });
 
       const query: AuditTrailQuery = {
         eventTypes: [AuditEventType.CITATION_DELETED],
@@ -189,7 +189,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.eventType).toBe(AuditEventType.CITATION_DELETED);
       expect(entry.severity).toBe(AuditSeverity.WARNING);
@@ -207,15 +207,10 @@ describe('AuditTrailManager', () => {
         credibilityAssessment: { overallScore: 85 },
       };
 
-      await auditManager.logCitationValidated(
-        mockCitation.id,
-        validationResult,
-        mockUser,
-        {
-          documentId: 'doc-123',
-          toolUsed: 'validate_sources',
-        }
-      );
+      await auditManager.logCitationValidated(mockCitation.id, validationResult, mockUser, {
+        documentId: 'doc-123',
+        toolUsed: 'validate_sources',
+      });
 
       const query: AuditTrailQuery = {
         eventTypes: [AuditEventType.CITATION_VALIDATED],
@@ -224,7 +219,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.eventType).toBe(AuditEventType.CITATION_VALIDATED);
       expect(entry.severity).toBe(AuditSeverity.INFO);
@@ -241,11 +236,7 @@ describe('AuditTrailManager', () => {
         issues: ['URL not accessible', 'Low credibility score'],
       };
 
-      await auditManager.logCitationValidated(
-        mockCitation.id,
-        validationResult,
-        mockUser
-      );
+      await auditManager.logCitationValidated(mockCitation.id, validationResult, mockUser);
 
       const query: AuditTrailQuery = {
         eventTypes: [AuditEventType.CITATION_VALIDATED],
@@ -254,7 +245,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.severity).toBe(AuditSeverity.WARNING);
       expect(entry.changeDescription).toContain('validation failed');
@@ -264,18 +255,12 @@ describe('AuditTrailManager', () => {
   describe('Document and Quality Logging', () => {
     it('should log document generation events', async () => {
       const citationsUsed = ['citation-1', 'citation-2', 'citation-3'];
-      
-      await auditManager.logDocumentGenerated(
-        'doc-123',
-        'business_case',
-        citationsUsed,
-        mockUser,
-        {
-          toolUsed: 'generate_business_case',
-          requestId: 'req-789',
-          qualityMetrics: { overallScore: 85 },
-        }
-      );
+
+      await auditManager.logDocumentGenerated('doc-123', 'business_case', citationsUsed, mockUser, {
+        toolUsed: 'generate_business_case',
+        requestId: 'req-789',
+        qualityMetrics: { overallScore: 85 },
+      });
 
       const query: AuditTrailQuery = {
         eventTypes: [AuditEventType.DOCUMENT_GENERATED],
@@ -284,7 +269,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.eventType).toBe(AuditEventType.DOCUMENT_GENERATED);
       expect(entry.resourceId).toBe('doc-123');
@@ -303,15 +288,9 @@ describe('AuditTrailManager', () => {
         recommendations: ['Add more recent sources'],
       };
 
-      await auditManager.logQualityAssessed(
-        'doc-123',
-        'document',
-        qualityResult,
-        mockUser,
-        {
-          toolUsed: 'audit_citation_quality',
-        }
-      );
+      await auditManager.logQualityAssessed('doc-123', 'document', qualityResult, mockUser, {
+        toolUsed: 'audit_citation_quality',
+      });
 
       const query: AuditTrailQuery = {
         eventTypes: [AuditEventType.QUALITY_ASSESSED],
@@ -320,7 +299,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.eventType).toBe(AuditEventType.QUALITY_ASSESSED);
       expect(entry.severity).toBe(AuditSeverity.INFO);
@@ -336,12 +315,7 @@ describe('AuditTrailManager', () => {
         recommendations: ['Add more credible sources', 'Update outdated citations'],
       };
 
-      await auditManager.logQualityAssessed(
-        'citation-123',
-        'citation',
-        qualityResult,
-        mockUser
-      );
+      await auditManager.logQualityAssessed('citation-123', 'citation', qualityResult, mockUser);
 
       const query: AuditTrailQuery = {
         eventTypes: [AuditEventType.QUALITY_ASSESSED],
@@ -350,7 +324,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.severity).toBe(AuditSeverity.WARNING);
       expect(entry.additionalMetadata?.qualityGaps).toBe(2);
@@ -372,15 +346,9 @@ describe('AuditTrailManager', () => {
         documentationComplete: true,
       };
 
-      await auditManager.logComplianceChecked(
-        'doc-123',
-        'sox_2002',
-        complianceResult,
-        mockUser,
-        {
-          toolUsed: 'validate_compliance',
-        }
-      );
+      await auditManager.logComplianceChecked('doc-123', 'sox_2002', complianceResult, mockUser, {
+        toolUsed: 'validate_compliance',
+      });
 
       const query: AuditTrailQuery = {
         eventTypes: [AuditEventType.COMPLIANCE_CHECKED],
@@ -389,7 +357,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.eventType).toBe(AuditEventType.COMPLIANCE_CHECKED);
       expect(entry.severity).toBe(AuditSeverity.INFO);
@@ -430,12 +398,7 @@ describe('AuditTrailManager', () => {
         documentationComplete: false,
       };
 
-      await auditManager.logComplianceChecked(
-        'doc-123',
-        'gdpr_2018',
-        complianceResult,
-        mockUser
-      );
+      await auditManager.logComplianceChecked('doc-123', 'gdpr_2018', complianceResult, mockUser);
 
       const query: AuditTrailQuery = {
         eventTypes: [AuditEventType.COMPLIANCE_CHECKED],
@@ -444,7 +407,7 @@ describe('AuditTrailManager', () => {
 
       const entries = await auditManager.queryAuditTrail(query);
       expect(entries).toHaveLength(1);
-      
+
       const entry = entries[0];
       expect(entry.severity).toBe(AuditSeverity.ERROR);
       expect(entry.changeDescription).toContain('FAILED');
@@ -464,7 +427,12 @@ describe('AuditTrailManager', () => {
         mockUser,
         'Test modification'
       );
-      await auditManager.logDocumentGenerated('doc-123', 'business_case', ['citation-123'], mockUser);
+      await auditManager.logDocumentGenerated(
+        'doc-123',
+        'business_case',
+        ['citation-123'],
+        mockUser
+      );
     });
 
     it('should query entries by event type', async () => {
@@ -504,7 +472,7 @@ describe('AuditTrailManager', () => {
     it('should query entries by date range', async () => {
       const now = new Date();
       const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-      
+
       const query: AuditTrailQuery = {
         startDate: oneHourAgo,
         endDate: now,
@@ -530,7 +498,7 @@ describe('AuditTrailManager', () => {
 
     it('should sort entries by timestamp descending by default', async () => {
       const entries = await auditManager.queryAuditTrail({});
-      
+
       for (let i = 1; i < entries.length; i++) {
         expect(entries[i - 1].timestamp.getTime()).toBeGreaterThanOrEqual(
           entries[i].timestamp.getTime()
@@ -545,7 +513,7 @@ describe('AuditTrailManager', () => {
       };
 
       const entries = await auditManager.queryAuditTrail(query);
-      
+
       const severityLevels = {
         [AuditSeverity.INFO]: 1,
         [AuditSeverity.WARNING]: 2,
@@ -572,15 +540,20 @@ describe('AuditTrailManager', () => {
         mockUser,
         'Test modification'
       );
-      await auditManager.logDocumentGenerated('doc-123', 'business_case', ['citation-123'], mockUser);
-      
+      await auditManager.logDocumentGenerated(
+        'doc-123',
+        'business_case',
+        ['citation-123'],
+        mockUser
+      );
+
       const qualityResult = { overallScore: 85, qualityGaps: [], recommendations: [] };
       await auditManager.logQualityAssessed('doc-123', 'document', qualityResult, mockUser);
     });
 
     it('should generate comprehensive summary', async () => {
       const summary = await auditManager.generateSummary();
-      
+
       expect(summary.totalEvents).toBeGreaterThan(0);
       expect(summary.dateRange.start).toBeInstanceOf(Date);
       expect(summary.dateRange.end).toBeInstanceOf(Date);
@@ -593,7 +566,7 @@ describe('AuditTrailManager', () => {
 
     it('should include event type distribution', async () => {
       const summary = await auditManager.generateSummary();
-      
+
       expect(summary.eventTypeDistribution[AuditEventType.CITATION_CREATED]).toBe(1);
       expect(summary.eventTypeDistribution[AuditEventType.CITATION_MODIFIED]).toBe(1);
       expect(summary.eventTypeDistribution[AuditEventType.DOCUMENT_GENERATED]).toBe(1);
@@ -602,7 +575,7 @@ describe('AuditTrailManager', () => {
 
     it('should include top users', async () => {
       const summary = await auditManager.generateSummary();
-      
+
       expect(summary.topUsers).toHaveLength(1);
       expect(summary.topUsers[0].userId).toBe(mockUser.userId);
       expect(summary.topUsers[0].eventCount).toBeGreaterThan(0);
@@ -611,7 +584,7 @@ describe('AuditTrailManager', () => {
     it('should handle empty audit trail', async () => {
       const emptyManager = new AuditTrailManager();
       const summary = await emptyManager.generateSummary();
-      
+
       expect(summary.totalEvents).toBe(0);
       expect(summary.topUsers).toHaveLength(0);
       expect(summary.topResources).toHaveLength(0);
@@ -631,7 +604,7 @@ describe('AuditTrailManager', () => {
       );
 
       const results = await auditManager.validateCompliance(['sox_2002']);
-      
+
       expect(results).toHaveLength(1);
       expect(results[0].standardId).toBe('sox_2002');
       expect(results[0].checkedAt).toBeInstanceOf(Date);
@@ -641,7 +614,7 @@ describe('AuditTrailManager', () => {
 
     it('should validate compliance against multiple standards', async () => {
       const results = await auditManager.validateCompliance(['sox_2002', 'gdpr_2018', 'iso_27001']);
-      
+
       expect(results).toHaveLength(3);
       expect(results.map(r => r.standardId)).toContain('sox_2002');
       expect(results.map(r => r.standardId)).toContain('gdpr_2018');
@@ -650,7 +623,7 @@ describe('AuditTrailManager', () => {
 
     it('should handle unknown compliance standards', async () => {
       const results = await auditManager.validateCompliance(['unknown_standard']);
-      
+
       expect(results).toHaveLength(0);
     });
   });
@@ -659,7 +632,12 @@ describe('AuditTrailManager', () => {
     beforeEach(async () => {
       // Add test data
       await auditManager.logCitationCreated(mockCitation, mockUser);
-      await auditManager.logDocumentGenerated('doc-123', 'business_case', ['citation-123'], mockUser);
+      await auditManager.logDocumentGenerated(
+        'doc-123',
+        'business_case',
+        ['citation-123'],
+        mockUser
+      );
     });
 
     it('should generate detailed audit report', async () => {
@@ -676,7 +654,7 @@ describe('AuditTrailManager', () => {
       };
 
       const report = await auditManager.generateAuditReport(config, mockUser);
-      
+
       expect(report.id).toBeDefined();
       expect(report.config).toEqual(config);
       expect(report.generatedAt).toBeInstanceOf(Date);
@@ -702,7 +680,7 @@ describe('AuditTrailManager', () => {
       };
 
       const report = await auditManager.generateAuditReport(config, mockUser);
-      
+
       expect(report.complianceResults).toBeDefined();
       expect(report.complianceResults).toHaveLength(2);
     });
@@ -721,7 +699,7 @@ describe('AuditTrailManager', () => {
       };
 
       const report = await auditManager.generateAuditReport(config, mockUser);
-      
+
       expect(report.entries).toHaveLength(0); // No details included
       expect(report.summary).toBeDefined();
       expect(report.summary.totalEvents).toBeGreaterThan(0);
@@ -731,7 +709,7 @@ describe('AuditTrailManager', () => {
   describe('Configuration and Initialization', () => {
     it('should initialize with default configuration', () => {
       const manager = new AuditTrailManager();
-      
+
       // Should not throw and should have reasonable defaults
       expect(manager).toBeInstanceOf(AuditTrailManager);
     });
@@ -744,7 +722,7 @@ describe('AuditTrailManager', () => {
       };
 
       const manager = new AuditTrailManager(customConfig);
-      
+
       expect(manager).toBeInstanceOf(AuditTrailManager);
     });
 
@@ -755,7 +733,7 @@ describe('AuditTrailManager', () => {
 
       // This should not be logged due to log level filtering
       await manager.logCitationCreated(mockCitation, mockUser);
-      
+
       const entries = await manager.queryAuditTrail({});
       expect(entries).toHaveLength(0);
     });
@@ -766,7 +744,7 @@ describe('AuditTrailManager', () => {
       });
 
       await manager.logCitationCreated(mockCitation, mockUser);
-      
+
       const entries = await manager.queryAuditTrail({});
       expect(entries).toHaveLength(0);
     });
@@ -774,15 +752,11 @@ describe('AuditTrailManager', () => {
 
   describe('Error Handling and Edge Cases', () => {
     it('should handle null/undefined citation gracefully', async () => {
-      await expect(
-        auditManager.logCitationCreated(null as any, mockUser)
-      ).rejects.toThrow();
+      await expect(auditManager.logCitationCreated(null as any, mockUser)).rejects.toThrow();
     });
 
     it('should handle null/undefined user gracefully', async () => {
-      await expect(
-        auditManager.logCitationCreated(mockCitation, null as any)
-      ).rejects.toThrow();
+      await expect(auditManager.logCitationCreated(mockCitation, null as any)).rejects.toThrow();
     });
 
     it('should handle empty query results', async () => {

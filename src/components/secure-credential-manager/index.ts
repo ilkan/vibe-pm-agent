@@ -1,6 +1,6 @@
 /**
  * Secure Credential Manager
- * 
+ *
  * Provides secure storage, retrieval, and management of credentials
  * for external data sources with encryption and access control.
  */
@@ -125,7 +125,10 @@ export class SecureCredentialManager extends EventEmitter {
    * Store a new credential securely
    */
   async storeCredential(
-    credentialData: Omit<Credential, 'id' | 'encryptedValue' | 'createdAt' | 'updatedAt' | 'lastUsed'>,
+    credentialData: Omit<
+      Credential,
+      'id' | 'encryptedValue' | 'createdAt' | 'updatedAt' | 'lastUsed'
+    >,
     plainTextValue: string,
     userId: string
   ): Promise<string> {
@@ -143,32 +146,36 @@ export class SecureCredentialManager extends EventEmitter {
         encryptedValue,
         createdAt: new Date(),
         updatedAt: new Date(),
-        isActive: true
+        isActive: true,
       };
 
       // Store credential
       this.credentials.set(credential.id, credential);
 
       // Log credential creation
-      await this.logCredentialUsage({
-        credentialId: credential.id,
-        userId,
-        action: 'updated',
-        purpose: 'credential_creation',
-        context: {},
-        timestamp: new Date()
-      }, true);
+      await this.logCredentialUsage(
+        {
+          credentialId: credential.id,
+          userId,
+          action: 'updated',
+          purpose: 'credential_creation',
+          context: {},
+          timestamp: new Date(),
+        },
+        true
+      );
 
       this.emit('credentialStored', { credentialId: credential.id, userId });
       return credential.id;
-
     } catch (error) {
       this.emit('credentialError', {
         action: 'store',
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId
+        userId,
       });
-      throw new Error(`Failed to store credential: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to store credential: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -198,7 +205,12 @@ export class SecureCredentialManager extends EventEmitter {
       }
 
       // Check permissions
-      const hasPermission = await this.checkCredentialPermission(credential, userId, 'use', context);
+      const hasPermission = await this.checkCredentialPermission(
+        credential,
+        userId,
+        'use',
+        context
+      );
       if (!hasPermission) {
         throw new Error('Insufficient permissions to access credential');
       }
@@ -211,34 +223,40 @@ export class SecureCredentialManager extends EventEmitter {
       credential.updatedAt = new Date();
 
       // Log credential usage
-      await this.logCredentialUsage({
-        credentialId,
-        userId,
-        action: 'retrieved',
-        purpose,
-        context,
-        timestamp: new Date()
-      }, true);
+      await this.logCredentialUsage(
+        {
+          credentialId,
+          userId,
+          action: 'retrieved',
+          purpose,
+          context,
+          timestamp: new Date(),
+        },
+        true
+      );
 
       this.emit('credentialRetrieved', { credentialId, userId, purpose });
       return decryptedValue;
-
     } catch (error) {
       // Log failed attempt
-      await this.logCredentialUsage({
-        credentialId,
-        userId,
-        action: 'retrieved',
-        purpose,
-        context,
-        timestamp: new Date()
-      }, false, error instanceof Error ? error.message : 'Unknown error');
+      await this.logCredentialUsage(
+        {
+          credentialId,
+          userId,
+          action: 'retrieved',
+          purpose,
+          context,
+          timestamp: new Date(),
+        },
+        false,
+        error instanceof Error ? error.message : 'Unknown error'
+      );
 
       this.emit('credentialError', {
         action: 'retrieve',
         credentialId,
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId
+        userId,
       });
       throw error;
     }
@@ -278,24 +296,26 @@ export class SecureCredentialManager extends EventEmitter {
 
       // Log credential update
       if (userId) {
-        await this.logCredentialUsage({
-          credentialId,
-          userId,
-          action: 'updated',
-          purpose: 'credential_update',
-          context: {},
-          timestamp: new Date()
-        }, true);
+        await this.logCredentialUsage(
+          {
+            credentialId,
+            userId,
+            action: 'updated',
+            purpose: 'credential_update',
+            context: {},
+            timestamp: new Date(),
+          },
+          true
+        );
       }
 
       this.emit('credentialUpdated', { credentialId, userId });
-
     } catch (error) {
       this.emit('credentialError', {
         action: 'update',
         credentialId,
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId
+        userId,
       });
       throw error;
     }
@@ -321,23 +341,25 @@ export class SecureCredentialManager extends EventEmitter {
       this.credentials.delete(credentialId);
 
       // Log credential deletion
-      await this.logCredentialUsage({
-        credentialId,
-        userId,
-        action: 'deleted',
-        purpose: 'credential_deletion',
-        context: {},
-        timestamp: new Date()
-      }, true);
+      await this.logCredentialUsage(
+        {
+          credentialId,
+          userId,
+          action: 'deleted',
+          purpose: 'credential_deletion',
+          context: {},
+          timestamp: new Date(),
+        },
+        true
+      );
 
       this.emit('credentialDeleted', { credentialId, userId });
-
     } catch (error) {
       this.emit('credentialError', {
         action: 'delete',
         credentialId,
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId
+        userId,
       });
       throw error;
     }
@@ -346,12 +368,15 @@ export class SecureCredentialManager extends EventEmitter {
   /**
    * List credentials accessible to user
    */
-  async listCredentials(userId: string, filters?: {
-    type?: string;
-    provider?: string;
-    environment?: string;
-    isActive?: boolean;
-  }): Promise<Omit<Credential, 'encryptedValue'>[]> {
+  async listCredentials(
+    userId: string,
+    filters?: {
+      type?: string;
+      provider?: string;
+      environment?: string;
+      isActive?: boolean;
+    }
+  ): Promise<Omit<Credential, 'encryptedValue'>[]> {
     const accessibleCredentials: Omit<Credential, 'encryptedValue'>[] = [];
 
     for (const credential of this.credentials.values()) {
@@ -363,7 +388,8 @@ export class SecureCredentialManager extends EventEmitter {
       if (filters) {
         if (filters.type && credential.type !== filters.type) continue;
         if (filters.provider && credential.provider !== filters.provider) continue;
-        if (filters.environment && credential.metadata.environment !== filters.environment) continue;
+        if (filters.environment && credential.metadata.environment !== filters.environment)
+          continue;
         if (filters.isActive !== undefined && credential.isActive !== filters.isActive) continue;
       }
 
@@ -378,11 +404,7 @@ export class SecureCredentialManager extends EventEmitter {
   /**
    * Rotate credential value
    */
-  async rotateCredential(
-    credentialId: string,
-    newValue: string,
-    userId: string
-  ): Promise<void> {
+  async rotateCredential(credentialId: string, newValue: string, userId: string): Promise<void> {
     try {
       const credential = this.credentials.get(credentialId);
       if (!credential) {
@@ -404,29 +426,30 @@ export class SecureCredentialManager extends EventEmitter {
         credential.updatedAt = new Date();
 
         // Log rotation
-        await this.logCredentialUsage({
-          credentialId,
-          userId,
-          action: 'updated',
-          purpose: 'credential_rotation',
-          context: {},
-          timestamp: new Date()
-        }, true);
+        await this.logCredentialUsage(
+          {
+            credentialId,
+            userId,
+            action: 'updated',
+            purpose: 'credential_rotation',
+            context: {},
+            timestamp: new Date(),
+          },
+          true
+        );
 
         this.emit('credentialRotated', { credentialId, userId });
-
       } catch (error) {
         // Rollback on failure
         credential.encryptedValue = oldEncryptedValue;
         throw error;
       }
-
     } catch (error) {
       this.emit('credentialError', {
         action: 'rotate',
         credentialId,
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId
+        userId,
       });
       throw error;
     }
@@ -476,7 +499,7 @@ export class SecureCredentialManager extends EventEmitter {
     needsRotation: number;
   }> {
     const now = new Date();
-    const soonThreshold = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+    const soonThreshold = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
     let total = 0;
     let active = 0;
@@ -502,7 +525,9 @@ export class SecureCredentialManager extends EventEmitter {
       // Check if needs rotation based on policy
       const policy = this.rotationPolicies.get(credential.type);
       if (policy && policy.isActive) {
-        const rotationDue = new Date(credential.updatedAt.getTime() + (policy.rotationIntervalDays * 24 * 60 * 60 * 1000));
+        const rotationDue = new Date(
+          credential.updatedAt.getTime() + policy.rotationIntervalDays * 24 * 60 * 60 * 1000
+        );
         if (rotationDue < now) {
           needsRotation++;
         }
@@ -514,7 +539,7 @@ export class SecureCredentialManager extends EventEmitter {
       active,
       expired,
       expiringSoon,
-      needsRotation
+      needsRotation,
     };
   }
 
@@ -546,12 +571,7 @@ export class SecureCredentialManager extends EventEmitter {
     const authTag = (cipher as any).getAuthTag ? (cipher as any).getAuthTag() : Buffer.alloc(0);
 
     // Combine salt, iv, authTag, and encrypted data
-    const combined = Buffer.concat([
-      salt,
-      iv,
-      authTag,
-      Buffer.from(encrypted, 'hex')
-    ]);
+    const combined = Buffer.concat([salt, iv, authTag, Buffer.from(encrypted, 'hex')]);
 
     return combined.toString('base64');
   }
@@ -567,7 +587,13 @@ export class SecureCredentialManager extends EventEmitter {
     const salt = combined.slice(0, config.saltLength);
     const iv = combined.slice(config.saltLength, config.saltLength + config.ivLength);
     const authTagLength = config.algorithm.includes('gcm') ? 16 : 0;
-    const authTag = authTagLength > 0 ? combined.slice(config.saltLength + config.ivLength, config.saltLength + config.ivLength + authTagLength) : Buffer.alloc(0);
+    const authTag =
+      authTagLength > 0
+        ? combined.slice(
+            config.saltLength + config.ivLength,
+            config.saltLength + config.ivLength + authTagLength
+          )
+        : Buffer.alloc(0);
     const encrypted = combined.slice(config.saltLength + config.ivLength + authTagLength);
 
     // Derive key
@@ -612,7 +638,9 @@ export class SecureCredentialManager extends EventEmitter {
     }
 
     // Check role-based permissions (simplified - in production, integrate with proper RBAC)
-    const rolePermission = credential.permissions.find(p => p.role && this.userHasRole(userId, p.role));
+    const rolePermission = credential.permissions.find(
+      p => p.role && this.userHasRole(userId, p.role)
+    );
     if (rolePermission && rolePermission.actions.includes(action)) {
       if (rolePermission.conditions && rolePermission.conditions.length > 0) {
         return this.evaluatePermissionConditions(rolePermission.conditions, context);
@@ -634,7 +662,7 @@ export class SecureCredentialManager extends EventEmitter {
 
     return conditions.every(condition => {
       const contextValue = (context as any)[condition.field];
-      
+
       switch (condition.operator) {
         case 'equals':
           return contextValue === condition.value;
@@ -666,22 +694,26 @@ export class SecureCredentialManager extends EventEmitter {
       id: crypto.randomUUID(),
       credentialId: request.credentialId,
       userId: request.userId,
-      action: request.action || (
-        request.purpose.includes('deletion') ? 'deleted' : 
-        request.purpose.includes('update') || request.purpose.includes('rotation') ? 'updated' :
-        request.purpose.includes('creation') ? 'updated' : 'retrieved'
-      ),
+      action:
+        request.action ||
+        (request.purpose.includes('deletion')
+          ? 'deleted'
+          : request.purpose.includes('update') || request.purpose.includes('rotation')
+            ? 'updated'
+            : request.purpose.includes('creation')
+              ? 'updated'
+              : 'retrieved'),
       purpose: request.purpose,
       context: request.context,
       success,
       errorMessage,
-      timestamp: request.timestamp
+      timestamp: request.timestamp,
     };
 
     this.usageLogs.push(logEntry);
 
     // Clean up old logs based on retention policy
-    const cutoffDate = new Date(Date.now() - (this.options.maxRetentionDays * 24 * 60 * 60 * 1000));
+    const cutoffDate = new Date(Date.now() - this.options.maxRetentionDays * 24 * 60 * 60 * 1000);
     this.usageLogs = this.usageLogs.filter(log => log.timestamp > cutoffDate);
 
     this.emit('usageLogged', logEntry);
@@ -695,7 +727,11 @@ export class SecureCredentialManager extends EventEmitter {
       throw new Error('Missing required credential fields');
     }
 
-    if (!['api_key', 'oauth_token', 'basic_auth', 'bearer_token', 'certificate'].includes(credentialData.type)) {
+    if (
+      !['api_key', 'oauth_token', 'basic_auth', 'bearer_token', 'certificate'].includes(
+        credentialData.type
+      )
+    ) {
       throw new Error('Invalid credential type');
     }
   }
@@ -712,7 +748,7 @@ export class SecureCredentialManager extends EventEmitter {
         warningDays: 7,
         autoRotate: false,
         notificationEmails: [],
-        isActive: true
+        isActive: true,
       },
       {
         id: 'oauth_token_policy',
@@ -721,8 +757,8 @@ export class SecureCredentialManager extends EventEmitter {
         warningDays: 3,
         autoRotate: false,
         notificationEmails: [],
-        isActive: true
-      }
+        isActive: true,
+      },
     ];
 
     defaultPolicies.forEach(policy => this.rotationPolicies.set(policy.id, policy));
@@ -733,9 +769,12 @@ export class SecureCredentialManager extends EventEmitter {
    */
   private startRotationMonitoring(): void {
     // Check for credentials needing rotation every 24 hours
-    setInterval(() => {
-      this.checkRotationNeeds();
-    }, 24 * 60 * 60 * 1000);
+    setInterval(
+      () => {
+        this.checkRotationNeeds();
+      },
+      24 * 60 * 60 * 1000
+    );
   }
 
   /**
@@ -749,15 +788,19 @@ export class SecureCredentialManager extends EventEmitter {
       if (!policy || !policy.isActive) continue;
 
       const lastRotation = credential.updatedAt;
-      const rotationDue = new Date(lastRotation.getTime() + (policy.rotationIntervalDays * 24 * 60 * 60 * 1000));
-      const warningDate = new Date(rotationDue.getTime() - (policy.warningDays * 24 * 60 * 60 * 1000));
+      const rotationDue = new Date(
+        lastRotation.getTime() + policy.rotationIntervalDays * 24 * 60 * 60 * 1000
+      );
+      const warningDate = new Date(
+        rotationDue.getTime() - policy.warningDays * 24 * 60 * 60 * 1000
+      );
 
       if (now >= warningDate) {
         this.emit('rotationWarning', {
           credentialId: credential.id,
           credentialName: credential.name,
           rotationDue,
-          policy
+          policy,
         });
       }
 
@@ -765,7 +808,7 @@ export class SecureCredentialManager extends EventEmitter {
         this.emit('autoRotationNeeded', {
           credentialId: credential.id,
           credentialName: credential.name,
-          policy
+          policy,
         });
       }
     }

@@ -45,23 +45,23 @@ export interface AuditLogEntry {
   eventType: AuditEventType;
   severity: AuditSeverity;
   user: AuditUser;
-  
+
   // Event details
   resourceId: string; // Citation ID, Document ID, etc.
   resourceType: 'citation' | 'document' | 'validation' | 'assessment';
   action: string; // Specific action performed
-  
+
   // Change tracking
   previousState?: any;
   newState?: any;
   changeDescription: string;
-  
+
   // Context information
   documentId?: string;
   documentType?: string;
   toolUsed?: string;
   requestId?: string;
-  
+
   // Metadata
   ipAddress?: string;
   userAgent?: string;
@@ -89,7 +89,12 @@ export interface ComplianceRequirement {
   id: string;
   title: string;
   description: string;
-  category: 'data_retention' | 'source_validation' | 'audit_trail' | 'access_control' | 'documentation';
+  category:
+    | 'data_retention'
+    | 'source_validation'
+    | 'audit_trail'
+    | 'access_control'
+    | 'documentation';
   severity: 'mandatory' | 'recommended' | 'optional';
   validationRules: ValidationRule[];
   evidenceRequired: string[];
@@ -113,11 +118,11 @@ export interface ComplianceCheckResult {
   isCompliant: boolean;
   overallScore: number; // 0-100
   checkedAt: Date;
-  
+
   requirementResults: ComplianceRequirementResult[];
   violations: ComplianceViolation[];
   recommendations: ComplianceRecommendation[];
-  
+
   // Evidence and documentation
   evidenceCollected: EvidenceItem[];
   auditTrailComplete: boolean;
@@ -244,11 +249,11 @@ export interface AuditReport {
   config: AuditReportConfig;
   generatedAt: Date;
   generatedBy: AuditUser;
-  
+
   summary: AuditTrailSummary;
   entries: AuditLogEntry[];
   complianceResults?: ComplianceCheckResult[];
-  
+
   // Report metadata
   totalPages?: number;
   exportPath?: string;
@@ -262,17 +267,17 @@ export interface RetentionPolicy {
   id: string;
   name: string;
   description: string;
-  
+
   // Retention rules
   defaultRetentionMonths: number;
   eventTypeRetention: Record<AuditEventType, number>;
   severityRetention: Record<AuditSeverity, number>;
-  
+
   // Archive and deletion rules
   archiveAfterMonths: number;
   deleteAfterMonths: number;
   complianceOverride: boolean; // Don't delete if compliance requires retention
-  
+
   // Notification settings
   notifyBeforeArchive: boolean;
   notifyBeforeDelete: boolean;
@@ -301,17 +306,17 @@ export interface AuditTrailConfig {
   logLevel: AuditSeverity;
   retentionPolicy: RetentionPolicy;
   complianceStandards: ComplianceStandard[];
-  
+
   // Storage settings
   storageType: 'database' | 'file' | 'cloud';
   encryptionEnabled: boolean;
   compressionEnabled: boolean;
-  
+
   // Performance settings
   batchSize: number;
   flushIntervalSeconds: number;
   maxMemoryMB: number;
-  
+
   // Notification settings
   alertOnViolations: boolean;
   alertOnErrors: boolean;

@@ -162,7 +162,17 @@ export function validateParsedIntent(intent: ParsedIntent): void {
 
     if (
       !operation.type ||
-      !['vibe', 'spec', 'data_retrieval', 'processing', 'analysis', 'kiro_vibe_coding', 'kiro_spec_generation', 'kiro_autopilot', 'kiro_supervised'].includes(operation.type)
+      ![
+        'vibe',
+        'spec',
+        'data_retrieval',
+        'processing',
+        'analysis',
+        'kiro_vibe_coding',
+        'kiro_spec_generation',
+        'kiro_autopilot',
+        'kiro_supervised',
+      ].includes(operation.type)
     ) {
       throw new ValidationError(
         `Operation ${index} must have a valid type`,
@@ -251,7 +261,17 @@ export function validateWorkflow(workflow: Workflow): void {
 
     if (
       !step.type ||
-      !['vibe', 'spec', 'data_retrieval', 'processing', 'analysis', 'kiro_vibe_coding', 'kiro_spec_generation', 'kiro_autopilot', 'kiro_supervised'].includes(step.type)
+      ![
+        'vibe',
+        'spec',
+        'data_retrieval',
+        'processing',
+        'analysis',
+        'kiro_vibe_coding',
+        'kiro_spec_generation',
+        'kiro_autopilot',
+        'kiro_supervised',
+      ].includes(step.type)
     ) {
       throw new ValidationError(
         `Workflow step ${index} must have a valid type`,

@@ -45,7 +45,7 @@ export class PerformanceCache {
    */
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       this.missCount++;
       return null;
@@ -67,14 +67,18 @@ export class PerformanceCache {
   /**
    * Set cached value with appropriate TTL
    */
-  set<T>(key: string, data: T, cacheType: 'source_validation' | 'confidence' | 'template' | 'duplicate_input'): void {
+  set<T>(
+    key: string,
+    data: T,
+    cacheType: 'source_validation' | 'confidence' | 'template' | 'duplicate_input'
+  ): void {
     const ttl = this.getTTL(cacheType);
-    
+
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
       ttl,
-      hits: 0
+      hits: 0,
     });
 
     // Clean up expired entries periodically
@@ -130,7 +134,7 @@ export class PerformanceCache {
       title: c.title,
       date: c.date,
       rating: c.rating,
-      sourceType: c.sourceType
+      sourceType: c.sourceType,
     }));
     return this.hashString(JSON.stringify(citationData));
   }
@@ -138,13 +142,18 @@ export class PerformanceCache {
   /**
    * Record performance metric
    */
-  recordMetric(operationName: string, duration: number, cacheHit?: boolean, inputHash?: string): void {
+  recordMetric(
+    operationName: string,
+    duration: number,
+    cacheHit?: boolean,
+    inputHash?: string
+  ): void {
     this.metrics.push({
       operationName,
       duration,
       timestamp: Date.now(),
       cacheHit,
-      inputHash
+      inputHash,
     });
 
     // Keep only last 1000 metrics to prevent memory bloat
@@ -159,7 +168,7 @@ export class PerformanceCache {
   getStats(): CacheStats {
     const totalRequests = this.hitCount + this.missCount;
     const hitRate = totalRequests > 0 ? this.hitCount / totalRequests : 0;
-    
+
     // Estimate memory usage
     let memoryUsage = 0;
     for (const [key, entry] of this.cache) {
@@ -173,7 +182,7 @@ export class PerformanceCache {
       hitRate: Math.round(hitRate * 100) / 100,
       totalHits: this.hitCount,
       totalMisses: this.missCount,
-      memoryUsage
+      memoryUsage,
     };
   }
 
@@ -187,32 +196,38 @@ export class PerformanceCache {
   /**
    * Get average performance by operation
    */
-  getAveragePerformance(): Record<string, { avgDuration: number; count: number; cacheHitRate: number }> {
-    const operationStats: Record<string, { durations: number[]; cacheHits: number; total: number }> = {};
+  getAveragePerformance(): Record<
+    string,
+    { avgDuration: number; count: number; cacheHitRate: number }
+  > {
+    const operationStats: Record<
+      string,
+      { durations: number[]; cacheHits: number; total: number }
+    > = {};
 
     for (const metric of this.metrics) {
       if (!operationStats[metric.operationName]) {
         operationStats[metric.operationName] = { durations: [], cacheHits: 0, total: 0 };
       }
-      
+
       operationStats[metric.operationName].durations.push(metric.duration);
       operationStats[metric.operationName].total++;
-      
+
       if (metric.cacheHit) {
         operationStats[metric.operationName].cacheHits++;
       }
     }
 
     const result: Record<string, { avgDuration: number; count: number; cacheHitRate: number }> = {};
-    
+
     for (const [operation, stats] of Object.entries(operationStats)) {
       const avgDuration = stats.durations.reduce((sum, d) => sum + d, 0) / stats.durations.length;
       const cacheHitRate = stats.total > 0 ? stats.cacheHits / stats.total : 0;
-      
+
       result[operation] = {
         avgDuration: Math.round(avgDuration * 100) / 100,
         count: stats.total,
-        cacheHitRate: Math.round(cacheHitRate * 100) / 100
+        cacheHitRate: Math.round(cacheHitRate * 100) / 100,
       };
     }
 
@@ -249,7 +264,9 @@ export class PerformanceCache {
   /**
    * Get TTL based on cache type
    */
-  private getTTL(cacheType: 'source_validation' | 'confidence' | 'template' | 'duplicate_input'): number {
+  private getTTL(
+    cacheType: 'source_validation' | 'confidence' | 'template' | 'duplicate_input'
+  ): number {
     switch (cacheType) {
       case 'source_validation':
         return PerformanceCache.SOURCE_VALIDATION_TTL;
@@ -285,7 +302,7 @@ export class PerformanceCache {
 
     const normalized: any = {};
     const sortedKeys = Object.keys(inputs).sort();
-    
+
     for (const key of sortedKeys) {
       // Skip undefined values and functions
       if (inputs[key] !== undefined && typeof inputs[key] !== 'function') {

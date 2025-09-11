@@ -86,13 +86,116 @@ export class AICitationDiscoveryEngine {
    */
   private initializeIndustryKeywords(): void {
     this.industryKeywords = new Map([
-      ['technology', ['software', 'ai', 'artificial intelligence', 'machine learning', 'cloud', 'digital transformation', 'automation', 'api', 'platform', 'saas', 'tech', 'developer', 'development']],
-      ['finance', ['fintech', 'banking', 'investment', 'roi', 'revenue', 'cost', 'profit', 'valuation', 'funding', 'financial', 'money', 'economic']],
-      ['healthcare', ['medical', 'patient', 'clinical', 'pharmaceutical', 'telemedicine', 'health tech', 'diagnosis', 'treatment', 'healthcare', 'hospital', 'doctor']],
-      ['retail', ['ecommerce', 'consumer', 'shopping', 'conversion', 'customer experience', 'omnichannel', 'supply chain', 'retail', 'store', 'sales']],
-      ['manufacturing', ['production', 'supply chain', 'quality', 'lean', 'automation', 'industry 4.0', 'operations', 'manufacturing', 'factory', 'industrial']],
-      ['education', ['learning', 'student', 'curriculum', 'online education', 'edtech', 'assessment', 'training', 'education', 'school', 'university']],
-      ['marketing', ['brand', 'campaign', 'customer acquisition', 'retention', 'engagement', 'social media', 'content marketing', 'advertising', 'promotion']],
+      [
+        'technology',
+        [
+          'software',
+          'ai',
+          'artificial intelligence',
+          'machine learning',
+          'cloud',
+          'digital transformation',
+          'automation',
+          'api',
+          'platform',
+          'saas',
+          'tech',
+          'developer',
+          'development',
+        ],
+      ],
+      [
+        'finance',
+        [
+          'fintech',
+          'banking',
+          'investment',
+          'roi',
+          'revenue',
+          'cost',
+          'profit',
+          'valuation',
+          'funding',
+          'financial',
+          'money',
+          'economic',
+        ],
+      ],
+      [
+        'healthcare',
+        [
+          'medical',
+          'patient',
+          'clinical',
+          'pharmaceutical',
+          'telemedicine',
+          'health tech',
+          'diagnosis',
+          'treatment',
+          'healthcare',
+          'hospital',
+          'doctor',
+        ],
+      ],
+      [
+        'retail',
+        [
+          'ecommerce',
+          'consumer',
+          'shopping',
+          'conversion',
+          'customer experience',
+          'omnichannel',
+          'supply chain',
+          'retail',
+          'store',
+          'sales',
+        ],
+      ],
+      [
+        'manufacturing',
+        [
+          'production',
+          'supply chain',
+          'quality',
+          'lean',
+          'automation',
+          'industry 4.0',
+          'operations',
+          'manufacturing',
+          'factory',
+          'industrial',
+        ],
+      ],
+      [
+        'education',
+        [
+          'learning',
+          'student',
+          'curriculum',
+          'online education',
+          'edtech',
+          'assessment',
+          'training',
+          'education',
+          'school',
+          'university',
+        ],
+      ],
+      [
+        'marketing',
+        [
+          'brand',
+          'campaign',
+          'customer acquisition',
+          'retention',
+          'engagement',
+          'social media',
+          'content marketing',
+          'advertising',
+          'promotion',
+        ],
+      ],
     ]);
   }
 
@@ -141,7 +244,7 @@ export class AICitationDiscoveryEngine {
   async analyzeCitationNeeds(content: string): Promise<CitationRequirement[]> {
     const requirements: CitationRequirement[] = [];
     const sentences = this.splitIntoSentences(content);
-    
+
     for (const sentence of sentences) {
       const claimType = this.identifyClaimType(sentence);
       if (claimType) {
@@ -170,12 +273,14 @@ export class AICitationDiscoveryEngine {
   /**
    * Identify the type of claim in a sentence
    */
-  private identifyClaimType(sentence: string): 'quantitative' | 'qualitative' | 'comparative' | null {
+  private identifyClaimType(
+    sentence: string
+  ): 'quantitative' | 'qualitative' | 'comparative' | null {
     // Reset regex lastIndex to avoid issues with global flags
-    this.quantitativePatterns.forEach(pattern => pattern.lastIndex = 0);
-    this.comparativePatterns.forEach(pattern => pattern.lastIndex = 0);
-    this.qualitativePatterns.forEach(pattern => pattern.lastIndex = 0);
-    
+    this.quantitativePatterns.forEach(pattern => (pattern.lastIndex = 0));
+    this.comparativePatterns.forEach(pattern => (pattern.lastIndex = 0));
+    this.qualitativePatterns.forEach(pattern => (pattern.lastIndex = 0));
+
     if (this.quantitativePatterns.some(pattern => pattern.test(sentence))) {
       return 'quantitative';
     }
@@ -185,18 +290,20 @@ export class AICitationDiscoveryEngine {
     if (this.qualitativePatterns.some(pattern => pattern.test(sentence))) {
       return 'qualitative';
     }
-    
+
     // Additional simple checks for common patterns
     if (/\d+%|\d+x|\d+\s*(?:times|fold)|\d+\s*(?:million|billion|thousand)/i.test(sentence)) {
       return 'quantitative';
     }
-    if (/(?:better|worse|faster|slower|more|less)\s+than|compared\s+to|versus|vs\.?/i.test(sentence)) {
+    if (
+      /(?:better|worse|faster|slower|more|less)\s+than|compared\s+to|versus|vs\.?/i.test(sentence)
+    ) {
       return 'comparative';
     }
     if (/(?:most|many|few|some|generally|typically|usually|often|rarely)/i.test(sentence)) {
       return 'qualitative';
     }
-    
+
     return null;
   }
 
@@ -234,14 +341,60 @@ export class AICitationDiscoveryEngine {
    * Extract keywords from a claim
    */
   private extractKeywords(claim: string): string[] {
-    const words = claim.toLowerCase()
+    const words = claim
+      .toLowerCase()
       .replace(/[^\w\s]/g, ' ')
       .split(/\s+/)
       .filter(word => word.length > 3);
 
     // Remove common stop words
-    const stopWords = new Set(['this', 'that', 'with', 'from', 'they', 'them', 'their', 'there', 'where', 'when', 'what', 'which', 'will', 'would', 'could', 'should', 'have', 'been', 'were', 'said', 'each', 'than', 'more', 'most', 'some', 'very', 'also', 'just', 'only', 'even', 'much', 'such', 'well', 'like', 'back', 'over', 'after', 'before', 'through', 'during', 'above', 'below', 'between', 'among']);
-    
+    const stopWords = new Set([
+      'this',
+      'that',
+      'with',
+      'from',
+      'they',
+      'them',
+      'their',
+      'there',
+      'where',
+      'when',
+      'what',
+      'which',
+      'will',
+      'would',
+      'could',
+      'should',
+      'have',
+      'been',
+      'were',
+      'said',
+      'each',
+      'than',
+      'more',
+      'most',
+      'some',
+      'very',
+      'also',
+      'just',
+      'only',
+      'even',
+      'much',
+      'such',
+      'well',
+      'like',
+      'back',
+      'over',
+      'after',
+      'before',
+      'through',
+      'during',
+      'above',
+      'below',
+      'between',
+      'among',
+    ]);
+
     return words.filter(word => !stopWords.has(word));
   }
 
@@ -253,11 +406,12 @@ export class AICitationDiscoveryEngine {
     const lowerContent = content.toLowerCase();
 
     for (const [industry, keywords] of this.industryKeywords.entries()) {
-      const matchCount = keywords.filter(keyword => 
+      const matchCount = keywords.filter(keyword =>
         lowerContent.includes(keyword.toLowerCase())
       ).length;
-      
-      if (matchCount >= 1) { // Require at least 1 keyword match
+
+      if (matchCount >= 1) {
+        // Require at least 1 keyword match
         industries.push(industry);
       }
     }
@@ -273,24 +427,28 @@ export class AICitationDiscoveryEngine {
     claimType: 'quantitative' | 'qualitative' | 'comparative'
   ): 'weak' | 'moderate' | 'strong' {
     const lowerClaim = claim.toLowerCase();
-    
+
     // Strong evidence required for specific numbers or strong claims
-    if (claimType === 'quantitative' || 
-        lowerClaim.includes('significantly') || 
-        lowerClaim.includes('dramatically') ||
-        lowerClaim.includes('proven') ||
-        lowerClaim.includes('guarantee')) {
+    if (
+      claimType === 'quantitative' ||
+      lowerClaim.includes('significantly') ||
+      lowerClaim.includes('dramatically') ||
+      lowerClaim.includes('proven') ||
+      lowerClaim.includes('guarantee')
+    ) {
       return 'strong';
     }
-    
+
     // Moderate evidence for comparative claims
-    if (claimType === 'comparative' || 
-        lowerClaim.includes('better') || 
-        lowerClaim.includes('faster') ||
-        lowerClaim.includes('more effective')) {
+    if (
+      claimType === 'comparative' ||
+      lowerClaim.includes('better') ||
+      lowerClaim.includes('faster') ||
+      lowerClaim.includes('more effective')
+    ) {
       return 'moderate';
     }
-    
+
     return 'weak';
   }
 
@@ -302,26 +460,28 @@ export class AICitationDiscoveryEngine {
     claimType: 'quantitative' | 'qualitative' | 'comparative'
   ): 'low' | 'medium' | 'high' | 'critical' {
     const lowerClaim = claim.toLowerCase();
-    
+
     // Critical priority for financial or safety claims
-    if (lowerClaim.includes('roi') || 
-        lowerClaim.includes('revenue') || 
-        lowerClaim.includes('cost') ||
-        lowerClaim.includes('safety') ||
-        lowerClaim.includes('security')) {
+    if (
+      lowerClaim.includes('roi') ||
+      lowerClaim.includes('revenue') ||
+      lowerClaim.includes('cost') ||
+      lowerClaim.includes('safety') ||
+      lowerClaim.includes('security')
+    ) {
       return 'critical';
     }
-    
+
     // High priority for quantitative claims
     if (claimType === 'quantitative') {
       return 'high';
     }
-    
+
     // Medium priority for comparative claims
     if (claimType === 'comparative') {
       return 'medium';
     }
-    
+
     return 'low';
   }
 
@@ -333,7 +493,7 @@ export class AICitationDiscoveryEngine {
     evidenceStrength: 'weak' | 'moderate' | 'strong'
   ): CitationSourceType[] {
     const baseTypes = [CitationSourceType.INDUSTRY_REPORT];
-    
+
     if (evidenceStrength === 'strong') {
       baseTypes.push(
         CitationSourceType.ACADEMIC_PAPER,
@@ -341,7 +501,7 @@ export class AICitationDiscoveryEngine {
         CitationSourceType.RESEARCH_PUBLICATION
       );
     }
-    
+
     if (claimType === 'quantitative') {
       baseTypes.push(
         CitationSourceType.SURVEY_DATA,
@@ -349,14 +509,11 @@ export class AICitationDiscoveryEngine {
         CitationSourceType.GOVERNMENT_DATA
       );
     }
-    
+
     if (claimType === 'comparative') {
-      baseTypes.push(
-        CitationSourceType.BENCHMARK_STUDY,
-        CitationSourceType.CASE_STUDY
-      );
+      baseTypes.push(CitationSourceType.BENCHMARK_STUDY, CitationSourceType.CASE_STUDY);
     }
-    
+
     return [...new Set(baseTypes)]; // Remove duplicates
   }
 
@@ -368,13 +525,13 @@ export class AICitationDiscoveryEngine {
     evidenceStrength: 'weak' | 'moderate' | 'strong'
   ): number {
     let threshold = 60; // Base threshold
-    
+
     if (evidenceStrength === 'strong') threshold += 20;
     if (evidenceStrength === 'moderate') threshold += 10;
-    
+
     if (claimType === 'quantitative') threshold += 15;
     if (claimType === 'comparative') threshold += 10;
-    
+
     return Math.min(95, threshold); // Cap at 95%
   }
 
@@ -384,10 +541,10 @@ export class AICitationDiscoveryEngine {
   private extractContext(claim: string, fullContent: string): string {
     const claimIndex = fullContent.indexOf(claim);
     if (claimIndex === -1) return claim;
-    
+
     const start = Math.max(0, claimIndex - 200);
     const end = Math.min(fullContent.length, claimIndex + claim.length + 200);
-    
+
     return fullContent.substring(start, end).trim();
   }
 
@@ -397,11 +554,11 @@ export class AICitationDiscoveryEngine {
   private deduplicateAndPrioritize(requirements: CitationRequirement[]): CitationRequirement[] {
     // Simple deduplication based on similar claims
     const unique = requirements.filter((req, index) => {
-      return !requirements.slice(0, index).some(existing => 
-        this.calculateSimilarity(req.claim, existing.claim) > 0.8
-      );
+      return !requirements
+        .slice(0, index)
+        .some(existing => this.calculateSimilarity(req.claim, existing.claim) > 0.8);
     });
-    
+
     // Sort by priority
     const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
     return unique.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
@@ -413,10 +570,10 @@ export class AICitationDiscoveryEngine {
   private calculateSimilarity(claim1: string, claim2: string): number {
     const words1 = new Set(claim1.toLowerCase().split(/\s+/));
     const words2 = new Set(claim2.toLowerCase().split(/\s+/));
-    
+
     const intersection = new Set([...words1].filter(word => words2.has(word)));
     const union = new Set([...words1, ...words2]);
-    
+
     return intersection.size / union.size;
   }
 
@@ -425,7 +582,7 @@ export class AICitationDiscoveryEngine {
    */
   async discoverRelevantSources(requirements: CitationRequirement[]): Promise<SourceCandidate[]> {
     const candidates: SourceCandidate[] = [];
-    
+
     for (const requirement of requirements) {
       const searchCriteria: CitationSearchCriteria = {
         keywords: requirement.suggestedKeywords,
@@ -437,13 +594,14 @@ export class AICitationDiscoveryEngine {
           end: new Date().toISOString(),
         },
       };
-      
+
       const sources = await this.citationService.findRelevantCitations(searchCriteria);
-      
+
       for (const source of sources) {
         const relevanceScore = await this.scoreSourceRelevance(source, requirement.claim);
-        
-        if (relevanceScore.overall >= (requirement.confidenceThreshold * 0.6)) { // Lower threshold for discovery
+
+        if (relevanceScore.overall >= requirement.confidenceThreshold * 0.6) {
+          // Lower threshold for discovery
           candidates.push({
             source,
             relevanceScore: relevanceScore.overall,
@@ -456,7 +614,7 @@ export class AICitationDiscoveryEngine {
         }
       }
     }
-    
+
     // Sort by relevance score and remove duplicates
     return this.deduplicateSourceCandidates(candidates)
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
@@ -482,28 +640,33 @@ export class AICitationDiscoveryEngine {
       ...source.key_finding.toLowerCase().split(/\s+/),
       ...(source.industry_focus?.join(' ').toLowerCase().split(/\s+/) || []),
     ]);
-    
+
     // Calculate keyword match score
     const intersection = new Set([...contextWords].filter(word => sourceWords.has(word)));
     const keywordMatch = (intersection.size / Math.max(contextWords.size, 1)) * 100;
-    
+
     // Industry alignment score
     const industryAlignment = this.calculateIndustryAlignment(source, context);
-    
+
     // Claim type match score
     const claimTypeMatch = this.calculateClaimTypeMatch(source, context);
-    
+
     // Recency bonus
-    const monthsOld = (Date.now() - new Date(source.published_at).getTime()) / (1000 * 60 * 60 * 24 * 30);
+    const monthsOld =
+      (Date.now() - new Date(source.published_at).getTime()) / (1000 * 60 * 60 * 24 * 30);
     const recencyBonus = Math.max(0, 20 - monthsOld); // Bonus decreases with age
-    
+
     // Credibility bonus
-    const credibilityBonus = source.confidence === CitationConfidence.HIGH ? 15 : 
-                           source.confidence === CitationConfidence.MEDIUM ? 10 : 5;
-    
+    const credibilityBonus =
+      source.confidence === CitationConfidence.HIGH
+        ? 15
+        : source.confidence === CitationConfidence.MEDIUM
+          ? 10
+          : 5;
+
     // Methodology match
     const methodologyMatch = source.methodology ? 10 : 0;
-    
+
     const factors = {
       keywordMatch,
       industryAlignment,
@@ -512,16 +675,15 @@ export class AICitationDiscoveryEngine {
       credibilityBonus,
       methodologyMatch,
     };
-    
-    const overall = (
+
+    const overall =
       keywordMatch * 0.3 +
       industryAlignment * 0.2 +
       claimTypeMatch * 0.2 +
       recencyBonus * 0.1 +
       credibilityBonus * 0.1 +
-      methodologyMatch * 0.1
-    );
-    
+      methodologyMatch * 0.1;
+
     return {
       overall: Math.round(overall),
       factors,
@@ -534,15 +696,16 @@ export class AICitationDiscoveryEngine {
    */
   private calculateIndustryAlignment(source: Citation, context: string): number {
     if (!source.industry_focus) return 50; // Neutral score if no industry info
-    
+
     const contextIndustries = this.identifyIndustries(context);
     const matchingIndustries = source.industry_focus.filter(industry =>
-      contextIndustries.some(contextInd => 
-        industry.toLowerCase().includes(contextInd.toLowerCase()) ||
-        contextInd.toLowerCase().includes(industry.toLowerCase())
+      contextIndustries.some(
+        contextInd =>
+          industry.toLowerCase().includes(contextInd.toLowerCase()) ||
+          contextInd.toLowerCase().includes(industry.toLowerCase())
       )
     );
-    
+
     return (matchingIndustries.length / Math.max(source.industry_focus.length, 1)) * 100;
   }
 
@@ -550,10 +713,12 @@ export class AICitationDiscoveryEngine {
    * Calculate claim type match score
    */
   private calculateClaimTypeMatch(source: Citation, context: string): number {
-    const hasQuantitativeData = source.sample_size || source.methodology || 
-                               source.key_finding.match(/\d+%|\d+x|\d+\s*(?:million|billion)/);
+    const hasQuantitativeData =
+      source.sample_size ||
+      source.methodology ||
+      source.key_finding.match(/\d+%|\d+x|\d+\s*(?:million|billion)/);
     const contextHasQuantitative = this.quantitativePatterns.some(pattern => pattern.test(context));
-    
+
     if (hasQuantitativeData && contextHasQuantitative) return 90;
     if (!hasQuantitativeData && !contextHasQuantitative) return 70;
     return 50;
@@ -564,39 +729,42 @@ export class AICitationDiscoveryEngine {
    */
   private generateRelevanceExplanation(factors: any, overall: number): string {
     const explanations = [];
-    
+
     if (factors.keywordMatch > 70) explanations.push('strong keyword alignment');
     if (factors.industryAlignment > 70) explanations.push('excellent industry match');
     if (factors.recencyBonus > 15) explanations.push('recent publication');
     if (factors.credibilityBonus >= 15) explanations.push('high credibility source');
     if (factors.methodologyMatch > 0) explanations.push('clear methodology');
-    
+
     if (explanations.length === 0) {
       return `Moderate relevance (${overall}%) - basic alignment with requirements`;
     }
-    
+
     return `High relevance (${overall}%) - ${explanations.join(', ')}`;
   }
 
   /**
    * Calculate confidence contribution of a source
    */
-  private calculateConfidenceContribution(source: Citation, requirement: CitationRequirement): number {
+  private calculateConfidenceContribution(
+    source: Citation,
+    requirement: CitationRequirement
+  ): number {
     let contribution = 50; // Base contribution
-    
+
     // Boost for high confidence sources
     if (source.confidence === CitationConfidence.HIGH) contribution += 30;
     else if (source.confidence === CitationConfidence.MEDIUM) contribution += 15;
-    
+
     // Boost for appropriate source types
     if (requirement.requiredSourceTypes.includes(source.source_type)) {
       contribution += 20;
     }
-    
+
     // Boost for methodology transparency
     if (source.methodology) contribution += 10;
     if (source.sample_size && source.sample_size > 100) contribution += 10;
-    
+
     return Math.min(100, contribution);
   }
 
@@ -605,22 +773,22 @@ export class AICitationDiscoveryEngine {
    */
   private assessSourceEvidenceStrength(source: Citation): 'weak' | 'moderate' | 'strong' {
     let score = 0;
-    
+
     if (source.confidence === CitationConfidence.HIGH) score += 3;
     else if (source.confidence === CitationConfidence.MEDIUM) score += 2;
     else score += 1;
-    
+
     if (source.methodology) score += 2;
     if (source.sample_size && source.sample_size > 500) score += 2;
     else if (source.sample_size && source.sample_size > 100) score += 1;
-    
+
     const strongTypes = [
       CitationSourceType.ACADEMIC_PAPER,
       CitationSourceType.CONSULTING_STUDY,
       CitationSourceType.RESEARCH_PUBLICATION,
     ];
     if (strongTypes.includes(source.source_type)) score += 2;
-    
+
     if (score >= 7) return 'strong';
     if (score >= 4) return 'moderate';
     return 'weak';
@@ -635,11 +803,11 @@ export class AICitationDiscoveryEngine {
       source.key_finding,
       source.organization || '',
       ...(source.industry_focus || []),
-    ].join(' ').toLowerCase();
-    
-    return keywords.filter(keyword => 
-      sourceText.includes(keyword.toLowerCase())
-    );
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    return keywords.filter(keyword => sourceText.includes(keyword.toLowerCase()));
   }
 
   /**
@@ -651,7 +819,7 @@ export class AICitationDiscoveryEngine {
       ...source.title.toLowerCase().split(/\s+/),
       ...source.key_finding.toLowerCase().split(/\s+/),
     ]);
-    
+
     const intersection = new Set([...contextWords].filter(word => sourceWords.has(word)));
     return (intersection.size / Math.max(contextWords.size, 1)) * 100;
   }
@@ -676,7 +844,7 @@ export class AICitationDiscoveryEngine {
   async identifyUnsupportedClaims(content: string): Promise<UnsupportedClaim[]> {
     const claims: UnsupportedClaim[] = [];
     const sentences = this.splitIntoSentences(content);
-    
+
     for (const sentence of sentences) {
       const claimType = this.identifyClaimType(sentence);
       if (claimType) {
@@ -685,7 +853,7 @@ export class AICitationDiscoveryEngine {
         if (!hasNearbyReference) {
           const severity = this.assessClaimSeverity(sentence, claimType);
           const riskLevel = this.calculateRiskLevel(sentence, claimType, severity);
-          
+
           claims.push({
             claim: sentence.trim(),
             claimType,
@@ -697,7 +865,7 @@ export class AICitationDiscoveryEngine {
         }
       }
     }
-    
+
     return claims.sort((a, b) => b.riskLevel - a.riskLevel);
   }
 
@@ -707,11 +875,11 @@ export class AICitationDiscoveryEngine {
   private hasNearbyReference(claim: string, content: string): boolean {
     const claimIndex = content.indexOf(claim);
     if (claimIndex === -1) return false;
-    
+
     const contextStart = Math.max(0, claimIndex - 100);
     const contextEnd = Math.min(content.length, claimIndex + claim.length + 100);
     const context = content.substring(contextStart, contextEnd);
-    
+
     const referencePatterns = [
       /\[[\d\w]+\]/i, // [1], [ref1], etc.
       /\([\d\w\s,]+\)/i, // (Smith, 2024)
@@ -721,7 +889,7 @@ export class AICitationDiscoveryEngine {
       /study by/i,
       /research from/i,
     ];
-    
+
     return referencePatterns.some(pattern => pattern.test(context));
   }
 
@@ -733,27 +901,31 @@ export class AICitationDiscoveryEngine {
     claimType: 'quantitative' | 'qualitative' | 'comparative'
   ): 'low' | 'medium' | 'high' | 'critical' {
     const lowerClaim = claim.toLowerCase();
-    
+
     // Critical for financial or legal claims
-    if (lowerClaim.includes('guarantee') || 
-        lowerClaim.includes('proven') ||
-        lowerClaim.includes('roi') ||
-        lowerClaim.includes('compliance') ||
-        lowerClaim.includes('regulation')) {
+    if (
+      lowerClaim.includes('guarantee') ||
+      lowerClaim.includes('proven') ||
+      lowerClaim.includes('roi') ||
+      lowerClaim.includes('compliance') ||
+      lowerClaim.includes('regulation')
+    ) {
       return 'critical';
     }
-    
+
     // High for specific quantitative claims
-    if (claimType === 'quantitative' && 
-        (lowerClaim.includes('%') || lowerClaim.includes('times') || lowerClaim.includes('increase'))) {
+    if (
+      claimType === 'quantitative' &&
+      (lowerClaim.includes('%') || lowerClaim.includes('times') || lowerClaim.includes('increase'))
+    ) {
       return 'high';
     }
-    
+
     // Medium for comparative claims
     if (claimType === 'comparative') {
       return 'medium';
     }
-    
+
     return 'low';
   }
 
@@ -767,7 +939,7 @@ export class AICitationDiscoveryEngine {
   ): number {
     const severityScores = { low: 25, medium: 50, high: 75, critical: 100 };
     const typeScores = { qualitative: 0, comparative: 10, quantitative: 20 };
-    
+
     return severityScores[severity] + typeScores[claimType];
   }
 
@@ -779,19 +951,19 @@ export class AICitationDiscoveryEngine {
     claimType: 'quantitative' | 'qualitative' | 'comparative'
   ): string[] {
     const suggestions = ['Industry report', 'Research study'];
-    
+
     if (claimType === 'quantitative') {
       suggestions.push('Survey data', 'Benchmark study', 'Statistical analysis');
     }
-    
+
     if (claimType === 'comparative') {
       suggestions.push('Competitive analysis', 'Case study', 'Benchmark comparison');
     }
-    
+
     if (claim.toLowerCase().includes('customer') || claim.toLowerCase().includes('user')) {
       suggestions.push('Customer survey', 'User research', 'Feedback analysis');
     }
-    
+
     return suggestions;
   }
 }

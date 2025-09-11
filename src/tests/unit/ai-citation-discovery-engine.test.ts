@@ -8,11 +8,7 @@ import {
   RelevanceScore,
 } from '../../components/ai-citation-discovery-engine';
 import { CitationService } from '../../components/citation-service';
-import {
-  Citation,
-  CitationSourceType,
-  CitationConfidence,
-} from '../../models/citations';
+import { Citation, CitationSourceType, CitationConfidence } from '../../models/citations';
 
 // Mock CitationService
 jest.mock('../../components/citation-service');
@@ -62,12 +58,14 @@ describe('AICitationDiscoveryEngine', () => {
       expect(quantitativeClaims.length).toBeGreaterThanOrEqual(2);
       expect(quantitativeClaims.some(req => req.claim.includes('45%'))).toBe(true);
       expect(quantitativeClaims.some(req => req.claim.includes('250%'))).toBe(true);
-      
+
       // Check that at least one requirement has relevant keywords
       const productivityClaim = quantitativeClaims.find(req => req.claim.includes('45%'));
-      expect(productivityClaim?.suggestedKeywords.some(kw => 
-        ['productivity', 'increases', 'tool', 'generation'].includes(kw)
-      )).toBe(true);
+      expect(
+        productivityClaim?.suggestedKeywords.some(kw =>
+          ['productivity', 'increases', 'tool', 'generation'].includes(kw)
+        )
+      ).toBe(true);
     });
 
     it('should identify qualitative claims requiring citations', async () => {
@@ -138,10 +136,11 @@ describe('AICitationDiscoveryEngine', () => {
 
       // Should identify at least some industry relevance
       expect(requirements.length).toBeGreaterThan(0);
-      const hasIndustryRelevance = requirements.some(req => 
-        req.industryRelevance.includes('technology') || 
-        req.industryRelevance.includes('healthcare') || 
-        req.industryRelevance.includes('finance')
+      const hasIndustryRelevance = requirements.some(
+        req =>
+          req.industryRelevance.includes('technology') ||
+          req.industryRelevance.includes('healthcare') ||
+          req.industryRelevance.includes('finance')
       );
       expect(hasIndustryRelevance).toBe(true);
     });
@@ -456,18 +455,19 @@ describe('AICitationDiscoveryEngine', () => {
 
       // Should identify some unsupported claims
       expect(unsupportedClaims.length).toBeGreaterThanOrEqual(0);
-      
+
       // If claims are found, verify they are the right ones
       if (unsupportedClaims.length > 0) {
-        const hasUnsupportedClaim = unsupportedClaims.some(claim => 
-          claim.claim.includes('increases productivity by 75%') ||
-          claim.claim.includes('significant improvement') ||
-          claim.claim.includes('grow dramatically')
+        const hasUnsupportedClaim = unsupportedClaims.some(
+          claim =>
+            claim.claim.includes('increases productivity by 75%') ||
+            claim.claim.includes('significant improvement') ||
+            claim.claim.includes('grow dramatically')
         );
         expect(hasUnsupportedClaim).toBe(true);
-        
+
         // Should not flag claims with references
-        const supportedClaim = unsupportedClaims.find(claim => 
+        const supportedClaim = unsupportedClaims.find(claim =>
           claim.claim.includes('reduces errors by 50%')
         );
         expect(supportedClaim).toBeUndefined();

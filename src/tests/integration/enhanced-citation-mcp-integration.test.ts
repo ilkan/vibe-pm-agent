@@ -170,7 +170,7 @@ describe('Enhanced Citation System MCP Integration', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('markdown');
-      
+
       // Verify enhanced citation metadata
       expect(result.metadata?.citations).toBeDefined();
       expect(result.metadata?.citations?.total_citations).toBeGreaterThanOrEqual(0);
@@ -369,7 +369,7 @@ describe('Enhanced Citation System MCP Integration', () => {
   describe('Backward Compatibility', () => {
     it('should maintain backward compatibility with existing citation options', async () => {
       const content = 'Business analysis with market insights and competitive positioning.';
-      
+
       // Use old-style citation options
       const oldOptions: CitationOptions = {
         include_citations: true,

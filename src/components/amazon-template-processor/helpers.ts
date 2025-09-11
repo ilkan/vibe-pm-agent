@@ -38,7 +38,7 @@ export class AmazonTemplateHelpers implements TemplateHelpers {
    */
   formatCurrency(value: number): string {
     if (typeof value !== 'number' || isNaN(value)) return '$0';
-    
+
     if (value >= 1000000) {
       return `$${(value / 1000000).toFixed(1)}M`;
     } else if (value >= 10000) {
@@ -62,7 +62,7 @@ export class AmazonTemplateHelpers implements TemplateHelpers {
   formatDate(date: Date | string): string {
     const d = typeof date === 'string' ? new Date(date) : date;
     if (isNaN(d.getTime())) return 'Invalid Date';
-    
+
     return d.toISOString().split('T')[0]; // YYYY-MM-DD format
   }
 
@@ -179,7 +179,7 @@ export function parseHelperExpression(expression: string): HelperExpression {
   const parts = expression.trim().split(/\s+/);
   const name = parts[0];
   const args = parts.slice(1);
-  
+
   return { name, args };
 }
 
@@ -191,17 +191,16 @@ export function evaluateHelperArgs(args: string[], context: any): any[] {
     // Try to parse as number
     const num = parseFloat(arg);
     if (!isNaN(num)) return num;
-    
+
     // Try to parse as boolean
     if (arg === 'true') return true;
     if (arg === 'false') return false;
-    
+
     // Try to parse as string literal
-    if ((arg.startsWith('"') && arg.endsWith('"')) || 
-        (arg.startsWith("'") && arg.endsWith("'"))) {
+    if ((arg.startsWith('"') && arg.endsWith('"')) || (arg.startsWith("'") && arg.endsWith("'"))) {
       return arg.slice(1, -1);
     }
-    
+
     // Treat as property path
     return getNestedProperty(context, arg);
   });
@@ -229,56 +228,59 @@ export const AMAZON_TEMPLATE_VALIDATION_RULES: ValidationRule[] = [
   {
     type: 'required_section',
     pattern: /^## Evidence Mechanisms$/m,
-    description: 'Must include Evidence Mechanisms section'
+    description: 'Must include Evidence Mechanisms section',
   },
   {
     type: 'required_section',
     pattern: /^### Assumption Ledger$/m,
-    description: 'Must include Assumption Ledger subsection'
+    description: 'Must include Assumption Ledger subsection',
   },
   {
     type: 'required_section',
     pattern: /^### Confidence Score$/m,
-    description: 'Must include Confidence Score subsection'
+    description: 'Must include Confidence Score subsection',
   },
   {
     type: 'required_variable',
     pattern: /\{\{featureName\}\}/,
-    description: 'Must include featureName variable'
+    description: 'Must include featureName variable',
   },
   {
     type: 'required_variable',
     pattern: /\{\{customer\}\}/,
-    description: 'Must include customer variable'
+    description: 'Must include customer variable',
   },
   {
     type: 'helper_usage',
     pattern: /\{\{json\s+[^}]+\}\}/,
-    description: 'Must use json helper for front-matter'
+    description: 'Must use json helper for front-matter',
   },
   {
     type: 'front_matter',
     pattern: /^---\n[\s\S]*?\n---/,
-    description: 'Must include YAML front-matter'
-  }
+    description: 'Must include YAML front-matter',
+  },
 ];
 
 /**
  * Validate template against Amazon working backwards requirements
  */
-export function validateAmazonTemplate(template: string): { isValid: boolean; violations: string[] } {
+export function validateAmazonTemplate(template: string): {
+  isValid: boolean;
+  violations: string[];
+} {
   const violations: string[] = [];
-  
+
   for (const rule of AMAZON_TEMPLATE_VALIDATION_RULES) {
     const pattern = typeof rule.pattern === 'string' ? new RegExp(rule.pattern) : rule.pattern;
-    
+
     if (!pattern.test(template)) {
       violations.push(rule.description);
     }
   }
-  
+
   return {
     isValid: violations.length === 0,
-    violations
+    violations,
   };
 }

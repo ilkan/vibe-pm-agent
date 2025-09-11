@@ -185,7 +185,7 @@ export async function cleanupMemoryLeaks(): Promise<void> {
   // Import ResourceManager dynamically to avoid circular dependencies
   try {
     const { ResourceManager } = await import('../../utils/resource-manager');
-    
+
     // Clean up all tracked resources
     ResourceManager.getInstance().cleanup();
   } catch (error) {
@@ -220,17 +220,17 @@ export async function verifyNoActiveResources(): Promise<{
   warnings: string[];
 }> {
   const warnings: string[] = [];
-  
+
   try {
     const { ResourceManager } = await import('../../utils/resource-manager');
     const resourceManager = ResourceManager.getInstance();
     const resourceCounts = resourceManager.getResourceCounts();
     const hasActiveResources = resourceManager.hasActiveResources();
-    
+
     if (hasActiveResources) {
       warnings.push(`Active resources detected: ${JSON.stringify(resourceCounts)}`);
     }
-    
+
     return {
       hasActiveResources,
       resourceCounts,
@@ -403,11 +403,13 @@ export async function globalTeardown(): Promise<void> {
   if (!result.resourceVerification.hasActiveResources) {
     console.log('✅ No active resources detected');
   } else {
-    console.warn(`⚠️  Active resources detected: ${JSON.stringify(result.resourceVerification.resourceCounts)}`);
+    console.warn(
+      `⚠️  Active resources detected: ${JSON.stringify(result.resourceVerification.resourceCounts)}`
+    );
   }
-  
+
   if (result.resourceVerification.warnings.length > 0) {
-    result.resourceVerification.warnings.forEach(warning => 
+    result.resourceVerification.warnings.forEach(warning =>
       console.warn(`⚠️  Resource warning: ${warning}`)
     );
   }

@@ -1,6 +1,6 @@
 /**
  * Enhanced Citation System Performance Tests
- * 
+ *
  * Tests to validate system performance and deployment readiness
  */
 
@@ -46,36 +46,32 @@ describe('Enhanced Citation System Performance', () => {
         3. Focus on customer retention strategies
       `;
 
-      const result = await citationSystem.enhanceDocumentCitations(
-        testDocument,
-        'business_case',
-        {
-          userId: 'performance-test',
-          minimumConfidence: 70,
-          requireSourceDiversity: true,
-        }
-      );
+      const result = await citationSystem.enhanceDocumentCitations(testDocument, 'business_case', {
+        userId: 'performance-test',
+        minimumConfidence: 70,
+        requireSourceDiversity: true,
+      });
 
       // Validate successful integration
       expect(result.success).toBe(true);
       expect(result.processingTime).toBeGreaterThan(0);
       expect(result.processingTime).toBeLessThan(10000); // Should complete within 10 seconds
-      
+
       // Validate citation enhancement
       expect(result.enhancedCitations).toBeDefined();
       expect(Array.isArray(result.enhancedCitations)).toBe(true);
-      
+
       // Validate quality assessment
       expect(result.qualityScore).toBeGreaterThanOrEqual(0);
       expect(result.qualityScore).toBeLessThanOrEqual(100);
-      
+
       // Validate recommendations
       expect(result.recommendations).toBeDefined();
       expect(Array.isArray(result.recommendations)).toBe(true);
-      
+
       // Validate audit trail
       expect(result.auditTrail).toBeDefined();
-      
+
       console.log('✅ Enhanced Citation System Integration Test Results:');
       console.log(`   Processing Time: ${result.processingTime}ms`);
       console.log(`   Citations Found: ${result.enhancedCitations.length}`);
@@ -110,7 +106,7 @@ describe('Enhanced Citation System Performance', () => {
       expect(analysis.overallConfidence).toBeGreaterThanOrEqual(0);
       expect(analysis.overallConfidence).toBeLessThanOrEqual(100);
       expect(['compliant', 'warning', 'non-compliant']).toContain(analysis.complianceStatus);
-      
+
       console.log('✅ Document Analysis Test Results:');
       console.log(`   Existing Citations: ${analysis.existingCitations.length}`);
       console.log(`   Quality Gaps: ${analysis.qualityGaps.length}`);
@@ -121,17 +117,14 @@ describe('Enhanced Citation System Performance', () => {
 
     it('should generate evidence packages', async () => {
       const topic = 'AI adoption in enterprise software development';
-      
-      const evidencePackage = await citationSystem.generateEvidencePackage(
-        topic,
-        {
-          minimumSources: 5,
-          requiredSourceTypes: ['consulting', 'industry', 'academic'],
-          confidenceThreshold: 75,
-          industryFocus: 'software',
-          geographicScope: 'global',
-        }
-      );
+
+      const evidencePackage = await citationSystem.generateEvidencePackage(topic, {
+        minimumSources: 5,
+        requiredSourceTypes: ['consulting', 'industry', 'academic'],
+        confidenceThreshold: 75,
+        industryFocus: 'software',
+        geographicScope: 'global',
+      });
 
       // Validate evidence package
       expect(evidencePackage.topic).toBe(topic);
@@ -142,7 +135,7 @@ describe('Enhanced Citation System Performance', () => {
       expect(evidencePackage.supportingEvidence).toBeDefined();
       expect(evidencePackage.recommendations).toBeDefined();
       expect(evidencePackage.recommendations.length).toBeGreaterThan(0);
-      
+
       console.log('✅ Evidence Package Test Results:');
       console.log(`   Topic: ${evidencePackage.topic}`);
       console.log(`   Evidence Strength: ${evidencePackage.evidenceStrength}`);
@@ -178,14 +171,11 @@ describe('Enhanced Citation System Performance', () => {
         },
       ];
 
-      const auditReport = await citationSystem.auditCitationQuality(
-        testCitations,
-        {
-          complianceStandards: ['business', 'academic'],
-          qualityThresholds: { minimum: 70, target: 85 },
-          industryRequirements: 'consulting',
-        }
-      );
+      const auditReport = await citationSystem.auditCitationQuality(testCitations, {
+        complianceStandards: ['business', 'academic'],
+        qualityThresholds: { minimum: 70, target: 85 },
+        industryRequirements: 'consulting',
+      });
 
       // Validate audit report
       expect(auditReport.auditId).toBeDefined();
@@ -199,7 +189,7 @@ describe('Enhanced Citation System Performance', () => {
       expect(auditReport.issues).toBeDefined();
       expect(auditReport.recommendations).toBeDefined();
       expect(auditReport.summary).toBeDefined();
-      
+
       console.log('✅ Citation Audit Test Results:');
       console.log(`   Audit ID: ${auditReport.auditId}`);
       console.log(`   Total Citations: ${auditReport.totalCitations}`);
@@ -216,17 +206,26 @@ describe('Enhanced Citation System Performance', () => {
       const performanceTests = [
         {
           name: 'Small Document (500 words)',
-          content: 'Market analysis shows 15% growth in SaaS adoption. Customer satisfaction rates average 85% across the industry. Digital transformation investments have increased by 40% year-over-year.',
+          content:
+            'Market analysis shows 15% growth in SaaS adoption. Customer satisfaction rates average 85% across the industry. Digital transformation investments have increased by 40% year-over-year.',
           expectedMaxTime: 5000,
         },
         {
           name: 'Medium Document (1500 words)',
-          content: Array(3).fill('Business intelligence platforms are experiencing rapid adoption across enterprises. Market research indicates 25% annual growth in the BI sector. Customer acquisition costs have decreased by 15% through automation. Digital transformation initiatives are driving technology investments. Cloud-based solutions represent 70% of new deployments.').join(' '),
+          content: Array(3)
+            .fill(
+              'Business intelligence platforms are experiencing rapid adoption across enterprises. Market research indicates 25% annual growth in the BI sector. Customer acquisition costs have decreased by 15% through automation. Digital transformation initiatives are driving technology investments. Cloud-based solutions represent 70% of new deployments.'
+            )
+            .join(' '),
           expectedMaxTime: 8000,
         },
         {
           name: 'Large Document (3000 words)',
-          content: Array(6).fill('Comprehensive market analysis reveals significant opportunities in the enterprise software sector. Customer experience platforms are showing strong adoption rates with 30% year-over-year growth. Digital transformation strategies are evolving to include AI and machine learning capabilities. Competitive landscape analysis indicates consolidation among top vendors. Revenue growth projections suggest 20% annual increases for market leaders.').join(' '),
+          content: Array(6)
+            .fill(
+              'Comprehensive market analysis reveals significant opportunities in the enterprise software sector. Customer experience platforms are showing strong adoption rates with 30% year-over-year growth. Digital transformation strategies are evolving to include AI and machine learning capabilities. Competitive landscape analysis indicates consolidation among top vendors. Revenue growth projections suggest 20% annual increases for market leaders.'
+            )
+            .join(' '),
           expectedMaxTime: 12000,
         },
       ];
@@ -242,23 +241,26 @@ describe('Enhanced Citation System Performance', () => {
         expect(result.success).toBe(true);
         expect(actualTime).toBeLessThan(test.expectedMaxTime);
         expect(result.processingTime).toBeGreaterThan(0);
-        
+
         console.log(`✅ ${test.name}: ${actualTime}ms (limit: ${test.expectedMaxTime}ms)`);
       }
     }, 30000);
 
     it('should handle concurrent requests efficiently', async () => {
       const concurrentRequests = 5;
-      const testDocument = 'Market analysis indicates 20% growth in enterprise software adoption. Customer satisfaction metrics show 88% positive ratings. Digital transformation budgets have increased by 35% annually.';
+      const testDocument =
+        'Market analysis indicates 20% growth in enterprise software adoption. Customer satisfaction metrics show 88% positive ratings. Digital transformation budgets have increased by 35% annually.';
 
       const startTime = Date.now();
-      const promises = Array(concurrentRequests).fill(0).map((_, index) =>
-        citationSystem.enhanceDocumentCitations(
-          `${testDocument} Request ${index + 1}`,
-          'concurrent_test',
-          { userId: `concurrent-user-${index + 1}` }
-        )
-      );
+      const promises = Array(concurrentRequests)
+        .fill(0)
+        .map((_, index) =>
+          citationSystem.enhanceDocumentCitations(
+            `${testDocument} Request ${index + 1}`,
+            'concurrent_test',
+            { userId: `concurrent-user-${index + 1}` }
+          )
+        );
 
       const results = await Promise.all(promises);
       const totalTime = Date.now() - startTime;
@@ -272,7 +274,7 @@ describe('Enhanced Citation System Performance', () => {
 
       // Should complete all requests within reasonable time
       expect(totalTime).toBeLessThan(15000); // 15 seconds for 5 concurrent requests
-      
+
       console.log(`✅ Concurrent Processing: ${concurrentRequests} requests in ${totalTime}ms`);
       console.log(`   Average per request: ${Math.round(totalTime / concurrentRequests)}ms`);
     }, 20000);
@@ -297,7 +299,7 @@ describe('Enhanced Citation System Performance', () => {
             testContent,
             'stability_test'
           );
-          
+
           if (result.success) {
             successCount++;
             totalProcessingTime += result.processingTime;
@@ -311,11 +313,11 @@ describe('Enhanced Citation System Performance', () => {
       // Should have high success rate
       const successRate = (successCount / stabilityTests.length) * 100;
       expect(successRate).toBeGreaterThan(80); // At least 80% success rate
-      
+
       if (successCount > 0) {
         const averageTime = totalProcessingTime / successCount;
         expect(averageTime).toBeLessThan(10000); // Average under 10 seconds
-        
+
         console.log(`✅ System Stability: ${successRate}% success rate`);
         console.log(`   Average processing time: ${Math.round(averageTime)}ms`);
       }
@@ -323,18 +325,18 @@ describe('Enhanced Citation System Performance', () => {
 
     it('should provide consistent performance metrics', async () => {
       const metrics = citationSystem.getPerformanceMetrics();
-      
+
       expect(metrics).toBeDefined();
       expect(typeof metrics.totalCitationsProcessed).toBe('number');
       expect(typeof metrics.averageProcessingTime).toBe('number');
       expect(typeof metrics.successRate).toBe('number');
       expect(typeof metrics.cacheHitRate).toBe('number');
-      
+
       expect(metrics.successRate).toBeGreaterThanOrEqual(0);
       expect(metrics.successRate).toBeLessThanOrEqual(100);
       expect(metrics.cacheHitRate).toBeGreaterThanOrEqual(0);
       expect(metrics.cacheHitRate).toBeLessThanOrEqual(100);
-      
+
       console.log('✅ Performance Metrics:');
       console.log(`   Citations Processed: ${metrics.totalCitationsProcessed}`);
       console.log(`   Average Processing Time: ${metrics.averageProcessingTime}ms`);
@@ -347,11 +349,11 @@ describe('Enhanced Citation System Performance', () => {
     it('should validate all requirements are met', () => {
       // Validate system configuration
       expect(citationSystem).toBeDefined();
-      
+
       // Validate performance metrics are available
       const metrics = citationSystem.getPerformanceMetrics();
       expect(metrics).toBeDefined();
-      
+
       console.log('✅ Enhanced Citation System is ready for deployment');
       console.log('   All integration tests passed');
       console.log('   Performance requirements met');

@@ -1,12 +1,15 @@
 /**
  * Integration tests for validate_and_audit_citations MCP tool
- * 
+ *
  * Tests the comprehensive citation validation and quality auditing functionality
  * including source validation, credibility assessment, compliance checking,
  * and evidence report generation.
  */
 
-import { validateAndAuditCitations, ValidateAndAuditCitationsArgs } from '../../mcp/tools/validate_and_audit_citations';
+import {
+  validateAndAuditCitations,
+  ValidateAndAuditCitationsArgs,
+} from '../../mcp/tools/validate_and_audit_citations';
 import { MCPToolContext } from '../../models/mcp';
 import { Citation, CitationSourceType, CitationConfidence } from '../../models/citations';
 
@@ -36,7 +39,8 @@ describe('validate_and_audit_citations Integration Tests', () => {
           published_at: '2024-01-15',
           source_type: CitationSourceType.CONSULTING_STUDY,
           confidence: CitationConfidence.HIGH,
-          key_finding: 'Companies implementing comprehensive digital transformation see 23% revenue increase',
+          key_finding:
+            'Companies implementing comprehensive digital transformation see 23% revenue increase',
           methodology: 'Survey of 500 enterprise companies across 15 industries',
           sample_size: 500,
           industry_focus: ['technology', 'enterprise software'],
@@ -73,7 +77,7 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(content).toContain('Citation Validation and Quality Audit Report');
       expect(content).toContain('Executive Summary');
@@ -154,7 +158,7 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(content).toContain('3');
       expect(content).toContain('Quality Gaps Identified');
@@ -162,11 +166,12 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(content).toContain('Failed Validations');
 
       // Should identify quality issues (at least one of these should be present)
-      const hasQualityIssues = content.includes('Quality Gaps Identified') || 
-                               content.includes('Improvement Recommendations') ||
-                               content.includes('Failed Validations') ||
-                               content.includes('WARNING') ||
-                               content.includes('NON-COMPLIANT');
+      const hasQualityIssues =
+        content.includes('Quality Gaps Identified') ||
+        content.includes('Improvement Recommendations') ||
+        content.includes('Failed Validations') ||
+        content.includes('WARNING') ||
+        content.includes('NON-COMPLIANT');
       expect(hasQualityIssues).toBe(true);
     });
   });
@@ -210,7 +215,7 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       // Should still provide validation results even with limited options
       expect(result.metadata).toBeDefined();
       expect(result.metadata?.quotaUsed).toBeGreaterThan(0);
@@ -252,13 +257,14 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       // Should show some compliance status (compliant, warning, or non-compliant)
-      const hasComplianceStatus = content.includes('compliant') || 
-                                  content.includes('COMPLIANT') ||
-                                  content.includes('WARNING') ||
-                                  content.includes('warning');
+      const hasComplianceStatus =
+        content.includes('compliant') ||
+        content.includes('COMPLIANT') ||
+        content.includes('WARNING') ||
+        content.includes('warning');
       expect(hasComplianceStatus).toBe(true);
     });
   });
@@ -297,12 +303,12 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(
-        content.includes('INSUFFICIENT_SOURCES') || 
-        content.includes('Only 1 sources provided') ||
-        content.includes('minimum 3 recommended')
+        content.includes('INSUFFICIENT_SOURCES') ||
+          content.includes('Only 1 sources provided') ||
+          content.includes('minimum 3 recommended')
       ).toBe(true);
     });
 
@@ -371,12 +377,12 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(
-        content.includes('OUTDATED_SOURCES') || 
-        content.includes('older than 3 years') ||
-        content.includes('recent sources')
+        content.includes('OUTDATED_SOURCES') ||
+          content.includes('older than 3 years') ||
+          content.includes('recent sources')
       ).toBe(true);
     });
 
@@ -445,12 +451,12 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(
-        content.includes('METHODOLOGY_UNCLEAR') || 
-        content.includes('methodology details') ||
-        content.includes('research sources lack methodology')
+        content.includes('METHODOLOGY_UNCLEAR') ||
+          content.includes('methodology details') ||
+          content.includes('research sources lack methodology')
       ).toBe(true);
     });
   });
@@ -494,7 +500,8 @@ describe('validate_and_audit_citations Integration Tests', () => {
 
       const args: ValidateAndAuditCitationsArgs = {
         citations,
-        document_content: 'This document analyzes the strong evidence for business transformation trends.',
+        document_content:
+          'This document analyzes the strong evidence for business transformation trends.',
         report_options: {
           generate_evidence_report: true,
           include_validation_details: true,
@@ -510,7 +517,7 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(content).toContain('Evidence Analysis');
       expect(content).toContain('Evidence Strength');
@@ -647,7 +654,7 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(content).toContain('Failed Validations');
       expect(content.includes('Critical Issues') || content.includes('Quality Gaps')).toBe(true);
@@ -692,7 +699,7 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.content[0].type).toBe('markdown');
       expect(result.content[0].markdown!).toContain('10');
       expect(processingTime).toBeLessThan(30000); // Should complete within 30 seconds
-      
+
       // Check that all citations were processed
       expect(result.metadata).toBeDefined();
       expect(result.metadata?.quotaUsed).toBeGreaterThan(0);
@@ -772,7 +779,7 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(content).toContain('Accessibility Status');
       // Should show high quality scores for McKinsey domain
@@ -815,7 +822,7 @@ describe('validate_and_audit_citations Integration Tests', () => {
       expect(result.isError).toBeFalsy();
       expect(result.content).toBeDefined();
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(content).toContain('Quality Assessment');
       expect(content).toContain('Quality Metrics Breakdown');

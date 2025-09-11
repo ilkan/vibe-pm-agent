@@ -11,7 +11,16 @@ export interface Workflow {
 
 export interface WorkflowStep {
   id: string;
-  type: 'vibe' | 'spec' | 'data_retrieval' | 'processing' | 'analysis' | 'kiro_vibe_coding' | 'kiro_spec_generation' | 'kiro_autopilot' | 'kiro_supervised';
+  type:
+    | 'vibe'
+    | 'spec'
+    | 'data_retrieval'
+    | 'processing'
+    | 'analysis'
+    | 'kiro_vibe_coding'
+    | 'kiro_spec_generation'
+    | 'kiro_autopilot'
+    | 'kiro_supervised';
   description: string;
   inputs?: string[];
   outputs?: string[];
@@ -33,7 +42,13 @@ export interface OptimizedWorkflow extends Workflow {
 
 export interface Optimization {
   id: string;
-  type: 'batching' | 'caching' | 'decomposition' | 'vibe_to_spec' | 'kiro_autopilot' | 'kiro_optimization';
+  type:
+    | 'batching'
+    | 'caching'
+    | 'decomposition'
+    | 'vibe_to_spec'
+    | 'kiro_autopilot'
+    | 'kiro_optimization';
   description: string;
   stepsAffected: string[];
   estimatedSavings: {

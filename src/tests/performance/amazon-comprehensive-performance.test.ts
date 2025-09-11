@@ -4,17 +4,24 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
-  BusinessInputs 
+  BusinessInputs,
 } from '../../services/amazon';
-import { AmazonTemplateProcessor, TemplateContext } from '../../components/amazon-template-processor/index.js';
+import {
+  AmazonTemplateProcessor,
+  TemplateContext,
+} from '../../components/amazon-template-processor/index.js';
 import { generateBusinessCase } from '../../mcp/tools/generate_business_case';
 import { createStakeholderCommunication } from '../../mcp/tools/create_stakeholder_communication';
-import { MCPToolContext, GenerateBusinessCaseArgs, CreateStakeholderCommunicationArgs } from '../../models/mcp';
+import {
+  MCPToolContext,
+  GenerateBusinessCaseArgs,
+  CreateStakeholderCommunicationArgs,
+} from '../../models/mcp';
 import { performanceCache } from '../../utils/performance-cache';
 import { performanceMonitor } from '../../utils/performance-monitor';
 
@@ -44,11 +51,13 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
       date: '2024-01-15',
       rating: (i % 3 === 0 ? 'A' : i % 3 === 1 ? 'B' : 'C') as 'A' | 'B' | 'C',
       sourceType: (['industry_report', 'research', 'financial_data', 'news'] as const)[i % 4],
-      snippet: `Market insight ${i + 1} about analytics trends and adoption`
+      snippet: `Market insight ${i + 1} about analytics trends and adoption`,
     })),
-    assumptions: Array.from({ length: 20 }, (_, i) => 
-      `Performance assumption ${i + 1}: Market will adopt advanced analytics at ${10 + i}% rate`
-    )
+    assumptions: Array.from(
+      { length: 20 },
+      (_, i) =>
+        `Performance assumption ${i + 1}: Market will adopt advanced analytics at ${10 + i}% rate`
+    ),
   };
 
   const mockContext: MCPToolContext = {
@@ -56,7 +65,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
     sessionId: 'perf-session-123',
     timestamp: Date.now(),
     requestId: 'perf-req-456',
-    traceId: 'perf-trace-789'
+    traceId: 'perf-trace-789',
   };
 
   beforeEach(() => {
@@ -113,7 +122,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
         citations: performanceTestInputs.citations || [],
         ledgerCoveragePct: ledgerResult.data!.coverage_pct,
         assumptionCount: ledgerResult.data!.assumptions.length,
-        sensitivityRisk: 'medium' as const
+        sensitivityRisk: 'medium' as const,
       };
 
       const iterations = 10;
@@ -150,12 +159,12 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
         ledger: ledgerResult.data!,
         basicCalc: {
           revenue: 24000000, // 100k users * $199.99 * 1.2 (annual factor)
-          costs: 6000000,    // Dev + ops costs
-          roi: 300,          // (24M - 6M) / 6M * 100
-          npv: 18000000      // Simplified NPV
+          costs: 6000000, // Dev + ops costs
+          roi: 300, // (24M - 6M) / 6M * 100
+          npv: 18000000, // Simplified NPV
         },
         topIds: ledgerResult.data!.assumptions.slice(0, 7).map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       };
 
       const iterations = 5; // Fewer iterations for more complex service
@@ -189,12 +198,12 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
 
       const questionContext = {
         ledger: ledgerResult.data!,
-        weakestIds: ledgerResult.data!.assumptions
-          .filter(a => a.certainty === 'Low' || a.sourceUrls.length === 0)
+        weakestIds: ledgerResult
+          .data!.assumptions.filter(a => a.certainty === 'Low' || a.sourceUrls.length === 0)
           .slice(0, 5)
           .map(a => a.id),
         businessContext: 'Enterprise analytics platform for large organizations',
-        competitiveContext: 'Tableau, PowerBI, Looker, Qlik, Sisense'
+        competitiveContext: 'Tableau, PowerBI, Looker, Qlik, Sisense',
       };
 
       const iterations = 10;
@@ -230,19 +239,19 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
         citations: performanceTestInputs.citations || [],
         ledgerCoveragePct: ledgerResult.data!.coverage_pct,
         assumptionCount: ledgerResult.data!.assumptions.length,
-        sensitivityRisk: 'medium' as const
+        sensitivityRisk: 'medium' as const,
       });
       const scenarioResult = await scenarioService.runScenarios({
         ledger: ledgerResult.data!,
         basicCalc: { revenue: 24000000, costs: 6000000, roi: 300, npv: 18000000 },
         topIds: ledgerResult.data!.assumptions.slice(0, 5).map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       });
       const questionsResult = await hardQuestionsService.generateQuestions({
         ledger: ledgerResult.data!,
         weakestIds: ledgerResult.data!.assumptions.slice(0, 3).map(a => a.id),
         businessContext: 'Enterprise analytics platform',
-        competitiveContext: 'Tableau, PowerBI'
+        competitiveContext: 'Tableau, PowerBI',
       });
 
       const templateContext: TemplateContext = {
@@ -258,7 +267,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
         citations: performanceTestInputs.citations || [],
         inputsHash: 'perf-test-hash',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'perftest'
+        shortHash: 'perftest',
       };
 
       const iterations = 10;
@@ -270,7 +279,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
         const prfaqStart = performance.now();
         const prfaqResult = templateProcessor.renderPRFAQ(templateContext);
         const prfaqDuration = performance.now() - prfaqStart;
-        
+
         expect(prfaqResult).toBeDefined();
         expect(prfaqResult.length).toBeGreaterThan(1000);
         prfaqResults.push(prfaqDuration);
@@ -279,7 +288,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
         const onepagerStart = performance.now();
         const onepagerResult = templateProcessor.renderDecisionOnePager(templateContext);
         const onepagerDuration = performance.now() - onepagerStart;
-        
+
         expect(onepagerResult).toBeDefined();
         expect(onepagerResult.length).toBeGreaterThan(1000);
         onepagerResults.push(onepagerDuration);
@@ -292,7 +301,9 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
 
       console.log(`Template Rendering Performance (${iterations} iterations):`);
       console.log(`  PR/FAQ Average: ${avgPRFAQ.toFixed(2)}ms, Max: ${maxPRFAQ.toFixed(2)}ms`);
-      console.log(`  One-Pager Average: ${avgOnePager.toFixed(2)}ms, Max: ${maxOnePager.toFixed(2)}ms`);
+      console.log(
+        `  One-Pager Average: ${avgOnePager.toFixed(2)}ms, Max: ${maxOnePager.toFixed(2)}ms`
+      );
       console.log(`  Target: <500ms each`);
 
       expect(avgPRFAQ).toBeLessThan(500);
@@ -318,7 +329,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
           citations: performanceTestInputs.citations || [],
           ledgerCoveragePct: ledgerResult.data!.coverage_pct,
           assumptionCount: ledgerResult.data!.assumptions.length,
-          sensitivityRisk: 'medium' as const
+          sensitivityRisk: 'medium' as const,
         });
         expect(confidenceResult.success).toBe(true);
 
@@ -326,7 +337,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
           ledger: ledgerResult.data!,
           basicCalc: { revenue: 24000000, costs: 6000000, roi: 300, npv: 18000000 },
           topIds: ledgerResult.data!.assumptions.slice(0, 7).map(a => a.id),
-          scenarioPct: 0.2
+          scenarioPct: 0.2,
         });
         expect(scenarioResult.success).toBe(true);
 
@@ -334,7 +345,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
           ledger: ledgerResult.data!,
           weakestIds: ledgerResult.data!.assumptions.slice(0, 5).map(a => a.id),
           businessContext: 'Enterprise analytics platform for large organizations',
-          competitiveContext: 'Tableau, PowerBI, Looker'
+          competitiveContext: 'Tableau, PowerBI, Looker',
         });
         expect(questionsResult.success).toBe(true);
 
@@ -351,7 +362,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
           citations: performanceTestInputs.citations || [],
           inputsHash: `e2e-test-${i}`,
           isoTimestamp: new Date().toISOString(),
-          shortHash: `e2e${i}`
+          shortHash: `e2e${i}`,
         };
 
         const prfaqResult = templateProcessor.renderPRFAQ(templateContext);
@@ -392,7 +403,7 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
         citations: performanceTestInputs.citations || [],
         ledgerCoveragePct: coldLedgerResult.data!.coverage_pct,
         assumptionCount: coldLedgerResult.data!.assumptions.length,
-        sensitivityRisk: 'medium' as const
+        sensitivityRisk: 'medium' as const,
       });
       const coldDuration = performance.now() - coldStart;
 
@@ -403,14 +414,16 @@ describe('Amazon Working Backwards - Comprehensive Performance Tests', () => {
         citations: performanceTestInputs.citations || [],
         ledgerCoveragePct: warmLedgerResult.data!.coverage_pct,
         assumptionCount: warmLedgerResult.data!.assumptions.length,
-        sensitivityRisk: 'medium' as const
+        sensitivityRisk: 'medium' as const,
       });
       const warmDuration = performance.now() - warmStart;
 
       console.log(`Caching Performance Comparison:`);
       console.log(`  Cold run: ${coldDuration.toFixed(2)}ms`);
       console.log(`  Warm run: ${warmDuration.toFixed(2)}ms`);
-      console.log(`  Improvement: ${((coldDuration - warmDuration) / coldDuration * 100).toFixed(1)}%`);
+      console.log(
+        `  Improvement: ${(((coldDuration - warmDuration) / coldDuration) * 100).toFixed(1)}%`
+      );
 
       expect(coldLedgerResult.success).toBe(true);
       expect(warmLedgerResult.success).toBe(true);
@@ -453,12 +466,12 @@ We expect to capture significant market share through superior technology.`,
           development_cost: performanceTestInputs.devCost!,
           operational_cost: performanceTestInputs.opsCost!,
           expected_revenue: 24000000,
-          time_to_market: 18
+          time_to_market: 18,
         },
         steering_options: {
           create_steering_files: true,
-          feature_name: 'enterprise-analytics'
-        }
+          feature_name: 'enterprise-analytics',
+        },
       };
 
       const iterations = 3;
@@ -512,8 +525,8 @@ We expect strong competitive positioning due to AI capabilities.`;
         audience: 'customers',
         steering_options: {
           create_steering_files: true,
-          feature_name: 'enterprise-analytics'
-        }
+          feature_name: 'enterprise-analytics',
+        },
       };
 
       const iterations = 3;
@@ -547,8 +560,10 @@ We expect strong competitive positioning due to AI capabilities.`;
     it('should handle large datasets without performance degradation', async () => {
       const largeInputs: BusinessInputs = {
         ...performanceTestInputs,
-        assumptions: Array.from({ length: 100 }, (_, i) => 
-          `Large dataset assumption ${i + 1}: Complex business logic with detailed explanations and multiple variables that need to be processed efficiently`
+        assumptions: Array.from(
+          { length: 100 },
+          (_, i) =>
+            `Large dataset assumption ${i + 1}: Complex business logic with detailed explanations and multiple variables that need to be processed efficiently`
         ),
         citations: Array.from({ length: 50 }, (_, i) => ({
           url: `https://large-dataset-source-${i + 1}.com/comprehensive-report`,
@@ -556,20 +571,20 @@ We expect strong competitive positioning due to AI capabilities.`;
           date: '2024-01-15',
           rating: (i % 3 === 0 ? 'A' : i % 3 === 1 ? 'B' : 'C') as 'A' | 'B' | 'C',
           sourceType: (['industry_report', 'research', 'financial_data', 'news'] as const)[i % 4],
-          snippet: `Detailed market insight ${i + 1} with comprehensive analysis of trends, adoption patterns, and competitive landscape dynamics`
-        }))
+          snippet: `Detailed market insight ${i + 1} with comprehensive analysis of trends, adoption patterns, and competitive landscape dynamics`,
+        })),
       };
 
       const startTime = performance.now();
-      
+
       const ledgerResult = await assumptionLedgerService.normalizeLedger(largeInputs);
       const confidenceResult = await confidenceService.computeConfidence({
         citations: largeInputs.citations || [],
         ledgerCoveragePct: ledgerResult.data!.coverage_pct,
         assumptionCount: ledgerResult.data!.assumptions.length,
-        sensitivityRisk: 'high' as const
+        sensitivityRisk: 'high' as const,
       });
-      
+
       const totalDuration = performance.now() - startTime;
 
       console.log(`Large Dataset Performance:`);
@@ -587,20 +602,20 @@ We expect strong competitive positioning due to AI capabilities.`;
       const concurrentRequests = 5;
       const promises = Array.from({ length: concurrentRequests }, async (_, i) => {
         const startTime = performance.now();
-        
+
         const testInputs = {
           ...performanceTestInputs,
-          featureName: `Concurrent Feature ${i + 1}`
+          featureName: `Concurrent Feature ${i + 1}`,
         };
-        
+
         const result = await assumptionLedgerService.normalizeLedger(testInputs);
         const duration = performance.now() - startTime;
-        
+
         return { result, duration, index: i };
       });
 
       const results = await Promise.all(promises);
-      
+
       results.forEach(({ result, duration, index }) => {
         expect(result.success).toBe(true);
         expect(duration).toBeLessThan(2000); // 2 seconds under concurrent load
@@ -619,7 +634,7 @@ We expect strong competitive positioning due to AI capabilities.`;
       // Get performance targets
       const targets = performanceMonitor.getTargets();
       expect(targets.length).toBeGreaterThan(0);
-      
+
       console.log('Performance Targets:');
       targets.forEach(target => {
         console.log(`  ${target.operationName}: ${(target as any).targetDuration || 'N/A'}ms`);

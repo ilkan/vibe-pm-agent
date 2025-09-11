@@ -1,22 +1,22 @@
 /**
  * Amazon Mode Manager
- * 
+ *
  * Manages integration between standard and Amazon Working Backwards modes
  * Provides backward compatibility while enabling Amazon methodology by default
  */
 
-import { 
-  AmazonModeConfig, 
-  DEFAULT_AMAZON_CONFIG, 
-  getConfigFromEnvironment, 
-  mergeConfig 
+import {
+  AmazonModeConfig,
+  DEFAULT_AMAZON_CONFIG,
+  getConfigFromEnvironment,
+  mergeConfig,
 } from '../../models/amazon-config';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
-  BusinessInputs 
+  BusinessInputs,
 } from '../../services/amazon';
 import { AmazonTemplateProcessor } from '../amazon-template-processor';
 import { MCPLogger } from '../../utils/mcp-error-handling';
@@ -71,14 +71,14 @@ export class AmazonModeManager {
     // Merge configuration with environment overrides and defaults
     const envConfig = getConfigFromEnvironment();
     this.config = mergeConfig(DEFAULT_AMAZON_CONFIG, { ...envConfig, ...config });
-    
+
     // Initialize Amazon mechanism services
     this.assumptionLedgerService = new AssumptionLedgerService();
     this.confidenceService = new ConfidenceService();
     this.scenarioService = new ScenarioService();
     this.hardQuestionsService = new HardQuestionsService();
     this.templateProcessor = new AmazonTemplateProcessor();
-    
+
     MCPLogger.info('Amazon Mode Manager initialized', undefined, {
       enabled: this.config.enabled,
       fallbackEnabled: this.config.fallbackToStandard,
@@ -117,7 +117,7 @@ export class AmazonModeManager {
     standardGenerator?: (analysis: string, inputs?: any) => Promise<string>
   ): Promise<AmazonModeResult<EnhancedContent>> {
     const startTime = Date.now();
-    
+
     if (!this.config.enabled) {
       // Use standard mode
       if (standardGenerator) {
@@ -144,7 +144,7 @@ export class AmazonModeManager {
           };
         }
       }
-      
+
       return {
         success: false,
         error: new Error('Amazon mode disabled and no standard generator provided'),
@@ -158,7 +158,7 @@ export class AmazonModeManager {
         () => this.generateAmazonBusinessCase(opportunityAnalysis, financialInputs),
         this.config.performanceThresholds.totalTimeout
       );
-      
+
       if (result.success) {
         return {
           ...result,
@@ -169,13 +169,13 @@ export class AmazonModeManager {
           },
         };
       }
-      
+
       // Amazon mode failed, try fallback if enabled
       if (this.config.fallbackToStandard && standardGenerator) {
         MCPLogger.warn('Amazon mode failed, falling back to standard mode', undefined, {
           error: result.error?.message,
         });
-        
+
         const content = await standardGenerator(opportunityAnalysis, financialInputs);
         return {
           success: true,
@@ -193,7 +193,7 @@ export class AmazonModeManager {
           },
         };
       }
-      
+
       return result;
     } catch (error) {
       // Timeout or other error, try fallback
@@ -201,7 +201,7 @@ export class AmazonModeManager {
         MCPLogger.warn('Amazon mode timed out, falling back to standard mode', undefined, {
           error: (error as Error).message,
         });
-        
+
         const content = await standardGenerator(opportunityAnalysis, financialInputs);
         return {
           success: true,
@@ -219,7 +219,7 @@ export class AmazonModeManager {
           },
         };
       }
-      
+
       return {
         success: false,
         error: error as Error,
@@ -238,7 +238,7 @@ export class AmazonModeManager {
     standardGenerator?: (businessCase: string, type: string, audience: string) => Promise<string>
   ): Promise<AmazonModeResult<EnhancedContent>> {
     const startTime = Date.now();
-    
+
     if (!this.config.enabled) {
       // Use standard mode
       if (standardGenerator) {
@@ -265,7 +265,7 @@ export class AmazonModeManager {
           };
         }
       }
-      
+
       return {
         success: false,
         error: new Error('Amazon mode disabled and no standard generator provided'),
@@ -276,10 +276,11 @@ export class AmazonModeManager {
     // Try Amazon mode
     try {
       const result = await this.executeWithTimeout(
-        () => this.generateAmazonStakeholderCommunication(businessCase, communicationType, audience),
+        () =>
+          this.generateAmazonStakeholderCommunication(businessCase, communicationType, audience),
         this.config.performanceThresholds.totalTimeout
       );
-      
+
       if (result.success) {
         return {
           ...result,
@@ -290,13 +291,17 @@ export class AmazonModeManager {
           },
         };
       }
-      
+
       // Amazon mode failed, try fallback
       if (this.config.fallbackToStandard && standardGenerator) {
-        MCPLogger.warn('Amazon stakeholder communication failed, falling back to standard mode', undefined, {
-          error: result.error?.message,
-        });
-        
+        MCPLogger.warn(
+          'Amazon stakeholder communication failed, falling back to standard mode',
+          undefined,
+          {
+            error: result.error?.message,
+          }
+        );
+
         const content = await standardGenerator(businessCase, communicationType, audience);
         return {
           success: true,
@@ -314,15 +319,19 @@ export class AmazonModeManager {
           },
         };
       }
-      
+
       return result;
     } catch (error) {
       // Timeout or other error, try fallback
       if (this.config.fallbackToStandard && standardGenerator) {
-        MCPLogger.warn('Amazon stakeholder communication timed out, falling back to standard mode', undefined, {
-          error: (error as Error).message,
-        });
-        
+        MCPLogger.warn(
+          'Amazon stakeholder communication timed out, falling back to standard mode',
+          undefined,
+          {
+            error: (error as Error).message,
+          }
+        );
+
         const content = await standardGenerator(businessCase, communicationType, audience);
         return {
           success: true,
@@ -340,7 +349,7 @@ export class AmazonModeManager {
           },
         };
       }
-      
+
       return {
         success: false,
         error: error as Error,
@@ -371,7 +380,7 @@ export class AmazonModeManager {
 
     try {
       const mechanisms = await this.generateEvidenceMechanisms(businessInputs);
-      
+
       if (!mechanisms.success) {
         // Return standard content if mechanisms fail
         return {
@@ -389,7 +398,7 @@ export class AmazonModeManager {
       }
 
       const enhancedContent = this.appendEvidenceMechanisms(standardContent, mechanisms.data!);
-      
+
       return {
         success: true,
         data: {
@@ -432,10 +441,10 @@ export class AmazonModeManager {
   ): Promise<AmazonModeResult<EnhancedContent>> {
     // Extract business inputs from opportunity analysis
     const businessInputs = await this.extractBusinessInputs(opportunityAnalysis, financialInputs);
-    
+
     // Generate evidence mechanisms
     const mechanisms = await this.generateEvidenceMechanisms(businessInputs);
-    
+
     if (!mechanisms.success) {
       return {
         success: false,
@@ -448,10 +457,10 @@ export class AmazonModeManager {
     // Generate business case content using standard pipeline
     // This would integrate with existing pipeline logic
     const baseContent = await this.generateBaseBusinessCase(opportunityAnalysis, financialInputs);
-    
+
     // Enhance with Amazon mechanisms
     const enhancedContent = this.appendEvidenceMechanisms(baseContent, mechanisms.data!);
-    
+
     return {
       success: true,
       data: {
@@ -481,10 +490,10 @@ export class AmazonModeManager {
   ): Promise<AmazonModeResult<EnhancedContent>> {
     // Extract business inputs from business case
     const businessInputs = await this.extractBusinessInputsFromBusinessCase(businessCase);
-    
+
     // Generate evidence mechanisms
     const mechanisms = await this.generateEvidenceMechanisms(businessInputs);
-    
+
     if (!mechanisms.success) {
       return {
         success: false,
@@ -522,7 +531,7 @@ export class AmazonModeManager {
         content = this.generateBasicDocument(templateContext, communicationType, audience);
         break;
     }
-    
+
     return {
       success: true,
       data: {
@@ -545,19 +554,21 @@ export class AmazonModeManager {
   /**
    * Generate evidence mechanisms with performance monitoring
    */
-  private async generateEvidenceMechanisms(businessInputs: BusinessInputs): Promise<AmazonModeResult<{
-    ledger: any;
-    confidence: any;
-    scenarios: any;
-    hardQuestions: any[];
-    attachments: Array<{
-      filename: string;
-      content: string;
-      type: 'assumptions' | 'citations' | 'scenarios';
-    }>;
-  }>> {
+  private async generateEvidenceMechanisms(businessInputs: BusinessInputs): Promise<
+    AmazonModeResult<{
+      ledger: any;
+      confidence: any;
+      scenarios: any;
+      hardQuestions: any[];
+      attachments: Array<{
+        filename: string;
+        content: string;
+        type: 'assumptions' | 'citations' | 'scenarios';
+      }>;
+    }>
+  > {
     const performanceMetrics: any = {};
-    
+
     try {
       // 1. Generate assumption ledger
       let ledger;
@@ -567,9 +578,9 @@ export class AmazonModeManager {
           () => this.assumptionLedgerService.normalizeLedger(businessInputs),
           JSON.stringify(businessInputs)
         );
-        
+
         performanceMetrics.assumptionLedgerTime = report.actualDuration;
-        
+
         if (!ledgerResult.success) {
           throw new Error(`Assumption ledger failed: ${ledgerResult.error?.message}`);
         }
@@ -581,17 +592,18 @@ export class AmazonModeManager {
       if (this.config.evidenceMechanisms.confidenceScoring && ledger) {
         const { result: confidenceResult, report } = await performanceMonitor.timeOperation(
           'confidence_scoring',
-          () => this.confidenceService.computeConfidence({
-            citations: businessInputs.citations || [],
-            ledgerCoveragePct: ledger.coverage_pct,
-            assumptionCount: ledger.assumptions.length,
-            sensitivityRisk: 'medium' as const,
-          }),
+          () =>
+            this.confidenceService.computeConfidence({
+              citations: businessInputs.citations || [],
+              ledgerCoveragePct: ledger.coverage_pct,
+              assumptionCount: ledger.assumptions.length,
+              sensitivityRisk: 'medium' as const,
+            }),
           JSON.stringify({ ledgerCoverage: ledger.coverage_pct })
         );
-        
+
         performanceMetrics.confidenceTime = report.actualDuration;
-        
+
         if (!confidenceResult.success) {
           throw new Error(`Confidence scoring failed: ${confidenceResult.error?.message}`);
         }
@@ -603,17 +615,18 @@ export class AmazonModeManager {
       if (this.config.evidenceMechanisms.scenarioAnalysis && ledger) {
         const { result: scenarioResult, report } = await performanceMonitor.timeOperation(
           'scenario_analysis',
-          () => this.scenarioService.runScenarios({
-            ledger,
-            basicCalc: this.extractFinancialModel(businessInputs),
-            topIds: ledger.assumptions.slice(0, 5).map((a: any) => a.id),
-            scenarioPct: 0.2,
-          }),
+          () =>
+            this.scenarioService.runScenarios({
+              ledger,
+              basicCalc: this.extractFinancialModel(businessInputs),
+              topIds: ledger.assumptions.slice(0, 5).map((a: any) => a.id),
+              scenarioPct: 0.2,
+            }),
           JSON.stringify({ assumptionCount: ledger.assumptions.length })
         );
-        
+
         performanceMetrics.scenarioTime = report.actualDuration;
-        
+
         if (!scenarioResult.success) {
           throw new Error(`Scenario analysis failed: ${scenarioResult.error?.message}`);
         }
@@ -625,20 +638,21 @@ export class AmazonModeManager {
       if (this.config.evidenceMechanisms.hardQuestions && ledger) {
         const { result: questionsResult, report } = await performanceMonitor.timeOperation(
           'hard_questions',
-          () => this.hardQuestionsService.generateQuestions({
-            ledger,
-            weakestIds: ledger.assumptions
-              .filter((a: any) => a.certainty === 'Low' || a.sourceUrls.length === 0)
-              .slice(0, 5)
-              .map((a: any) => a.id),
-            businessContext: JSON.stringify(businessInputs),
-            competitiveContext: businessInputs.competitors?.join(', '),
-          }),
+          () =>
+            this.hardQuestionsService.generateQuestions({
+              ledger,
+              weakestIds: ledger.assumptions
+                .filter((a: any) => a.certainty === 'Low' || a.sourceUrls.length === 0)
+                .slice(0, 5)
+                .map((a: any) => a.id),
+              businessContext: JSON.stringify(businessInputs),
+              competitiveContext: businessInputs.competitors?.join(', '),
+            }),
           JSON.stringify({ weakAssumptions: ledger.assumptions.length })
         );
-        
+
         performanceMetrics.hardQuestionsTime = report.actualDuration;
-        
+
         if (!questionsResult.success) {
           throw new Error(`Hard questions failed: ${questionsResult.error?.message}`);
         }
@@ -648,7 +662,7 @@ export class AmazonModeManager {
       // Create attachments
       const inputsHash = await this.generateInputsHash(businessInputs);
       const shortHash = inputsHash.slice(0, 8);
-      
+
       const attachments = [
         {
           filename: `assumptions-${shortHash}.json`,
@@ -692,10 +706,7 @@ export class AmazonModeManager {
   /**
    * Execute function with timeout
    */
-  private async executeWithTimeout<T>(
-    fn: () => Promise<T>,
-    timeoutMs: number
-  ): Promise<T> {
+  private async executeWithTimeout<T>(fn: () => Promise<T>, timeoutMs: number): Promise<T> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error(`Operation timed out after ${timeoutMs}ms`));
@@ -734,9 +745,14 @@ ${this.generateScenarioTable(mechanisms.scenarios)}
 
 ### Hard Questions
 
-${mechanisms.hardQuestions?.map((q: any) => 
-  `**Q${q.id}**: ${q.question}\n*Evidence needed*: ${q.evidenceNeeded?.join(', ') || 'None specified'}\n`
-).join('\n') || 'No hard questions generated'}
+${
+  mechanisms.hardQuestions
+    ?.map(
+      (q: any) =>
+        `**Q${q.id}**: ${q.question}\n*Evidence needed*: ${q.evidenceNeeded?.join(', ') || 'None specified'}\n`
+    )
+    .join('\n') || 'No hard questions generated'
+}
 
 ### Citations
 
@@ -747,7 +763,10 @@ ${mechanisms.hardQuestions?.map((q: any) =>
   }
 
   // Helper methods (simplified implementations)
-  private async extractBusinessInputs(opportunityAnalysis: string, financialInputs?: any): Promise<BusinessInputs> {
+  private async extractBusinessInputs(
+    opportunityAnalysis: string,
+    financialInputs?: any
+  ): Promise<BusinessInputs> {
     return {
       featureName: this.extractFeatureName(opportunityAnalysis) || 'New Feature',
       customer: this.extractCustomer(opportunityAnalysis) || 'Target Customer',
@@ -761,7 +780,9 @@ ${mechanisms.hardQuestions?.map((q: any) =>
     };
   }
 
-  private async extractBusinessInputsFromBusinessCase(businessCase: string): Promise<BusinessInputs> {
+  private async extractBusinessInputsFromBusinessCase(
+    businessCase: string
+  ): Promise<BusinessInputs> {
     return {
       featureName: this.extractFeatureName(businessCase) || 'Feature',
       customer: this.extractCustomer(businessCase) || 'Customer',
@@ -773,12 +794,19 @@ ${mechanisms.hardQuestions?.map((q: any) =>
     };
   }
 
-  private async generateBaseBusinessCase(opportunityAnalysis: string, financialInputs?: any): Promise<string> {
+  private async generateBaseBusinessCase(
+    opportunityAnalysis: string,
+    financialInputs?: any
+  ): Promise<string> {
     // This would integrate with existing pipeline logic
     return `# Business Case\n\n${opportunityAnalysis}\n\n## Financial Analysis\n\n${JSON.stringify(financialInputs, null, 2)}`;
   }
 
-  private generateBasicDocument(templateContext: any, communicationType: string, audience: string): string {
+  private generateBasicDocument(
+    templateContext: any,
+    communicationType: string,
+    audience: string
+  ): string {
     return `# ${communicationType.replace('_', ' ').toUpperCase()}: ${templateContext.featureName}
 
 ## Overview
@@ -797,36 +825,40 @@ ${templateContext.hardQuestions?.map((q: any) => `**Q${q.id}**: ${q.question}`).
 
   private generateAssumptionLedgerTable(ledger: any): string {
     if (!ledger?.assumptions) return 'No assumptions available';
-    
-    const header = '| ID | Name | Value | Certainty | Sources |\n|----|----|-------|-----------|---------|';
-    const rows = ledger.assumptions.map((a: any) => 
-      `| ${a.id} | ${a.name} | ${a.value} | ${a.certainty} | ${a.sourceUrls?.length || 0} |`
-    ).join('\n');
+
+    const header =
+      '| ID | Name | Value | Certainty | Sources |\n|----|----|-------|-----------|---------|';
+    const rows = ledger.assumptions
+      .map(
+        (a: any) =>
+          `| ${a.id} | ${a.name} | ${a.value} | ${a.certainty} | ${a.sourceUrls?.length || 0} |`
+      )
+      .join('\n');
     return header + '\n' + rows;
   }
 
   private generateScenarioTable(scenarios: any): string {
     if (!scenarios?.scenarios) return 'No scenarios available';
-    
+
     const header = '| Metric | Bear | Base | Bull |\n|--------|------|------|------|';
-    const rows = scenarios.scenarios.base?.map((row: any, i: number) => 
-      `| ${row.metric} | ${scenarios.scenarios.bear?.[i]?.bear || 'N/A'} | **${row.base}** | ${scenarios.scenarios.bull?.[i]?.bull || 'N/A'} |`
-    ).join('\n') || '';
+    const rows =
+      scenarios.scenarios.base
+        ?.map(
+          (row: any, i: number) =>
+            `| ${row.metric} | ${scenarios.scenarios.bear?.[i]?.bear || 'N/A'} | **${row.base}** | ${scenarios.scenarios.bull?.[i]?.bull || 'N/A'} |`
+        )
+        .join('\n') || '';
     return header + '\n' + rows;
   }
 
   private extractProblemStatement(text: string): string {
-    const patterns = [
-      /problem:\s*([^\n.]+)/i,
-      /challenge:\s*([^\n.]+)/i,
-      /issue:\s*([^\n.]+)/i
-    ];
-    
+    const patterns = [/problem:\s*([^\n.]+)/i, /challenge:\s*([^\n.]+)/i, /issue:\s*([^\n.]+)/i];
+
     for (const pattern of patterns) {
       const match = text.match(pattern);
       if (match) return match[1].trim();
     }
-    
+
     return 'Address key business challenges';
   }
 
@@ -887,16 +919,16 @@ ${templateContext.hardQuestions?.map((q: any) => `**Q${q.id}**: ${q.question}`).
       /assume[s]?\s+(?:that\s+)?([^.]+)/gi,
       /we believe\s+(?:that\s+)?([^.]+)/gi,
       /expect\s+(?:that\s+)?([^.]+)/gi,
-      /estimate\s+(?:that\s+)?([^.]+)/gi
+      /estimate\s+(?:that\s+)?([^.]+)/gi,
     ];
-    
+
     assumptionPatterns.forEach(pattern => {
       let match;
       while ((match = pattern.exec(text)) !== null) {
         assumptions.push(match[1].trim());
       }
     });
-    
+
     return assumptions;
   }
 }

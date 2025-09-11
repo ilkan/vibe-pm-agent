@@ -1,6 +1,6 @@
 /**
  * Integration tests for Security and Privacy Controls
- * 
+ *
  * Tests the integration between all security components:
  * - Secure Document Handler
  * - Access Control Manager
@@ -8,10 +8,21 @@
  * - Secure Credential Manager
  */
 
-import { SecureDocumentHandler, DocumentSecurityContext, SecureDocumentOptions } from '../../components/secure-document-handler';
+import {
+  SecureDocumentHandler,
+  DocumentSecurityContext,
+  SecureDocumentOptions,
+} from '../../components/secure-document-handler';
 import { AccessControlManager, User, AccessRequest } from '../../components/access-control-manager';
-import { DataAnonymizationService, AnonymizationOptions, AnonymizationContext } from '../../components/data-anonymization-service';
-import { SecureCredentialManager, SecureCredentialOptions } from '../../components/secure-credential-manager';
+import {
+  DataAnonymizationService,
+  AnonymizationOptions,
+  AnonymizationContext,
+} from '../../components/data-anonymization-service';
+import {
+  SecureCredentialManager,
+  SecureCredentialOptions,
+} from '../../components/secure-credential-manager';
 
 describe('Security Integration Tests', () => {
   let documentHandler: SecureDocumentHandler;
@@ -26,7 +37,7 @@ describe('Security Integration Tests', () => {
       sanitizationLevel: 'strict',
       retentionPolicyHours: 24,
       allowExternalAPIs: false,
-      logLevel: 'basic'
+      logLevel: 'basic',
     };
     documentHandler = new SecureDocumentHandler(documentOptions);
 
@@ -40,11 +51,11 @@ describe('Security Integration Tests', () => {
         keyDerivation: 'pbkdf2',
         iterations: 10000,
         saltLength: 32,
-        ivLength: 16
+        ivLength: 16,
       },
       auditLogging: true,
       maxRetentionDays: 90,
-      requireApprovalForAccess: false
+      requireApprovalForAccess: false,
     };
     credentialManager = new SecureCredentialManager(credentialOptions);
 
@@ -53,12 +64,14 @@ describe('Security Integration Tests', () => {
       username: 'security-test-user',
       email: 'security@test.com',
       roles: [],
-      permissions: [{
-        id: 'document-access',
-        resource: 'citation_data',
-        action: 'read'
-      }],
-      isActive: true
+      permissions: [
+        {
+          id: 'document-access',
+          resource: 'citation_data',
+          action: 'read',
+        },
+      ],
+      isActive: true,
     });
   });
 
@@ -83,14 +96,16 @@ describe('Security Integration Tests', () => {
           allowedDomains: ['api.external.com'],
           tags: ['citation', 'external'],
           owner: testUser.id,
-          team: 'research'
+          team: 'research',
         },
-        permissions: [{
-          userId: testUser.id,
-          role: 'user',
-          actions: ['read', 'use']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: testUser.id,
+            role: 'user',
+            actions: ['read', 'use'],
+          },
+        ],
+        isActive: true,
       };
 
       const credentialId = await credentialManager.storeCredential(
@@ -106,9 +121,9 @@ describe('Security Integration Tests', () => {
         action: 'read',
         context: {
           documentId: 'test-doc-123',
-          sessionId: 'session-456'
+          sessionId: 'session-456',
         },
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const accessResult = await accessControl.checkAccess(accessRequest);
@@ -135,10 +150,13 @@ describe('Security Integration Tests', () => {
         accessLevel: 'read',
         sessionId: 'session-456',
         timestamp: new Date(),
-        ipAddress: '192.168.1.100'
+        ipAddress: '192.168.1.100',
       };
 
-      const documentResult = await documentHandler.processDocument(sensitiveContent, securityContext);
+      const documentResult = await documentHandler.processDocument(
+        sensitiveContent,
+        securityContext
+      );
 
       // Verify document was sanitized
       expect(documentResult.processedContent).not.toContain('john.doe@company.com');
@@ -158,7 +176,7 @@ describe('Security Integration Tests', () => {
         preserveDataTypes: false,
         customRules: [],
         allowedFields: [],
-        blockedFields: ['ssn', 'creditCard', 'apiKey']
+        blockedFields: ['ssn', 'creditCard', 'apiKey'],
       };
 
       const anonymizationContext: AnonymizationContext = {
@@ -166,7 +184,7 @@ describe('Security Integration Tests', () => {
         dataType: 'text',
         purpose: 'external_analysis',
         retentionPeriod: 24,
-        complianceRequirements: ['GDPR', 'CCPA']
+        complianceRequirements: ['GDPR', 'CCPA'],
       };
 
       const anonymizedResult = await anonymizationService.anonymizeForExternalAPI(
@@ -206,7 +224,7 @@ describe('Security Integration Tests', () => {
         email: 'unauthorized@test.com',
         roles: [],
         permissions: [], // No permissions
-        isActive: true
+        isActive: true,
       });
 
       // Try to access restricted resource
@@ -215,7 +233,7 @@ describe('Security Integration Tests', () => {
         resource: 'audit_trail',
         action: 'read',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const accessResult = await accessControl.checkAccess(accessRequest);
@@ -228,17 +246,20 @@ describe('Security Integration Tests', () => {
         userId: unauthorizedUser.id,
         accessLevel: 'read',
         sessionId: 'unauthorized-session',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       // Should still process but with strict sanitization
-      const documentResult = await documentHandler.processDocument(sensitiveContent, securityContext);
+      const documentResult = await documentHandler.processDocument(
+        sensitiveContent,
+        securityContext
+      );
       expect(documentResult.processedContent).not.toContain('sk_live_secret123');
 
       // Verify access denial was logged
-      const accessLogs = accessControl.getAccessLogs({ 
+      const accessLogs = accessControl.getAccessLogs({
         userId: unauthorizedUser.id,
-        granted: false 
+        granted: false,
       });
       expect(accessLogs.length).toBeGreaterThan(0);
     });
@@ -247,28 +268,31 @@ describe('Security Integration Tests', () => {
   describe('Cross-Component Security Validation', () => {
     it('should validate user permissions before document processing', async () => {
       const restrictedContent = 'This document contains trade secrets and confidential information';
-      
+
       // Check access first
       const accessRequest: AccessRequest = {
         userId: testUser.id,
         resource: 'citation_data',
         action: 'read',
         context: { documentId: 'restricted-doc' },
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const accessResult = await accessControl.checkAccess(accessRequest);
-      
+
       if (accessResult.granted) {
         const securityContext: DocumentSecurityContext = {
           documentId: 'restricted-doc',
           userId: testUser.id,
           accessLevel: 'read',
           sessionId: 'session-789',
-          timestamp: new Date()
+          timestamp: new Date(),
         };
 
-        const documentResult = await documentHandler.processDocument(restrictedContent, securityContext);
+        const documentResult = await documentHandler.processDocument(
+          restrictedContent,
+          securityContext
+        );
         expect(documentResult.processedContent).toBeDefined();
       } else {
         // Should not process document if access denied
@@ -289,14 +313,16 @@ describe('Security Integration Tests', () => {
           allowedDomains: ['api.test.com'],
           tags: ['test'],
           owner: testUser.id,
-          team: 'test'
+          team: 'test',
         },
-        permissions: [{
-          userId: testUser.id,
-          role: 'user',
-          actions: ['read', 'use']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: testUser.id,
+            role: 'user',
+            actions: ['read', 'use'],
+          },
+        ],
+        isActive: true,
       };
 
       const credentialId = await credentialManager.storeCredential(
@@ -309,7 +335,7 @@ describe('Security Integration Tests', () => {
       const dataWithCredentials = {
         apiKey: 'secret-api-key-12345',
         endpoint: 'https://api.test.com/data',
-        user: 'test@company.com'
+        user: 'test@company.com',
       };
 
       const anonymizationOptions: AnonymizationOptions = {
@@ -318,7 +344,7 @@ describe('Security Integration Tests', () => {
         preserveDataTypes: false,
         customRules: [],
         allowedFields: ['endpoint'],
-        blockedFields: ['apiKey']
+        blockedFields: ['apiKey'],
       };
 
       const anonymizationContext: AnonymizationContext = {
@@ -326,7 +352,7 @@ describe('Security Integration Tests', () => {
         dataType: 'json',
         purpose: 'external_processing',
         retentionPeriod: 1,
-        complianceRequirements: ['GDPR']
+        complianceRequirements: ['GDPR'],
       };
 
       const anonymizedResult = await anonymizationService.anonymizeForExternalAPI(
@@ -350,11 +376,11 @@ describe('Security Integration Tests', () => {
         userId: testUser.id,
         resource: 'citation_data',
         action: 'read',
-        context: { 
+        context: {
           documentId: testDocumentId,
-          sessionId: testSessionId
+          sessionId: testSessionId,
         },
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       await accessControl.checkAccess(accessRequest);
@@ -365,7 +391,7 @@ describe('Security Integration Tests', () => {
         userId: testUser.id,
         accessLevel: 'read',
         sessionId: testSessionId,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       await documentHandler.processDocument('Test content with email@test.com', securityContext);
@@ -382,14 +408,16 @@ describe('Security Integration Tests', () => {
           allowedDomains: ['api.audit.com'],
           tags: ['audit'],
           owner: testUser.id,
-          team: 'audit'
+          team: 'audit',
         },
-        permissions: [{
-          userId: testUser.id,
-          role: 'user',
-          actions: ['read', 'use']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: testUser.id,
+            role: 'user',
+            actions: ['read', 'use'],
+          },
+        ],
+        isActive: true,
       };
 
       const credentialId = await credentialManager.storeCredential(
@@ -398,12 +426,9 @@ describe('Security Integration Tests', () => {
         testUser.id
       );
 
-      await credentialManager.retrieveCredential(
-        credentialId,
-        testUser.id,
-        'audit_test',
-        { sessionId: testSessionId }
-      );
+      await credentialManager.retrieveCredential(credentialId, testUser.id, 'audit_test', {
+        sessionId: testSessionId,
+      });
 
       // 4. Data anonymization
       const anonymizationContext: AnonymizationContext = {
@@ -411,7 +436,7 @@ describe('Security Integration Tests', () => {
         dataType: 'json',
         purpose: 'audit_test',
         retentionPeriod: 1,
-        complianceRequirements: []
+        complianceRequirements: [],
       };
 
       const anonymizationOptions: AnonymizationOptions = {
@@ -420,7 +445,7 @@ describe('Security Integration Tests', () => {
         preserveDataTypes: true,
         customRules: [],
         allowedFields: [],
-        blockedFields: []
+        blockedFields: [],
       };
 
       await anonymizationService.anonymizeForExternalAPI(
@@ -448,7 +473,7 @@ describe('Security Integration Tests', () => {
         sanitizationLevel: 'basic',
         retentionPolicyHours: 0.001, // Very short for testing
         allowExternalAPIs: false,
-        logLevel: 'basic'
+        logLevel: 'basic',
       };
 
       const shortRetentionHandler = new SecureDocumentHandler(shortRetentionOptions);
@@ -458,19 +483,25 @@ describe('Security Integration Tests', () => {
         userId: testUser.id,
         accessLevel: 'read',
         sessionId: 'retention-session',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       // Process document
-      const result1 = await shortRetentionHandler.processDocument('Test content 1', securityContext);
+      const result1 = await shortRetentionHandler.processDocument(
+        'Test content 1',
+        securityContext
+      );
       expect(result1.auditTrail.length).toBeGreaterThan(0);
 
       // Wait for retention cleanup
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Process another document to trigger cleanup
-      const result2 = await shortRetentionHandler.processDocument('Test content 2', securityContext);
-      
+      const result2 = await shortRetentionHandler.processDocument(
+        'Test content 2',
+        securityContext
+      );
+
       // Should have limited audit trail due to retention policy
       expect(result2.auditTrail.length).toBeLessThanOrEqual(10);
     });
@@ -481,17 +512,21 @@ describe('Security Integration Tests', () => {
         username: 'limited-user',
         email: 'limited@test.com',
         roles: [],
-        permissions: [{
-          id: 'limited-permission',
-          resource: 'citation_data',
-          action: 'read',
-          conditions: [{
-            field: 'ipAddress',
-            operator: 'equals',
-            value: '192.168.1.100'
-          }]
-        }],
-        isActive: true
+        permissions: [
+          {
+            id: 'limited-permission',
+            resource: 'citation_data',
+            action: 'read',
+            conditions: [
+              {
+                field: 'ipAddress',
+                operator: 'equals',
+                value: '192.168.1.100',
+              },
+            ],
+          },
+        ],
+        isActive: true,
       });
 
       // Test access with matching condition
@@ -500,7 +535,7 @@ describe('Security Integration Tests', () => {
         resource: 'citation_data',
         action: 'read',
         context: { ipAddress: '192.168.1.100' },
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const matchingResult = await accessControl.checkAccess(matchingRequest);
@@ -512,7 +547,7 @@ describe('Security Integration Tests', () => {
         resource: 'citation_data',
         action: 'read',
         context: { ipAddress: '192.168.1.200' },
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const nonMatchingResult = await accessControl.checkAccess(nonMatchingRequest);
@@ -532,14 +567,14 @@ describe('Security Integration Tests', () => {
         userId: testUser.id,
         accessLevel: 'read',
         sessionId: 'encryption-test',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await documentHandler.processDocument(highSensitivityContent, securityContext);
 
       // Should detect high risk and encrypt content
       expect(result.securityReport.riskLevel).toBe('critical');
-      
+
       // If encrypted, content should be JSON format
       if (result.securityReport.riskLevel === 'critical') {
         expect(() => JSON.parse(result.processedContent)).not.toThrow();
@@ -556,7 +591,7 @@ describe('Security Integration Tests', () => {
           resource: 'citation_data',
           action: 'read',
           context: { additionalData: { requestId: i } },
-          timestamp: new Date()
+          timestamp: new Date(),
         };
 
         const accessResult = await accessControl.checkAccess(accessRequest);
@@ -568,7 +603,7 @@ describe('Security Integration Tests', () => {
             userId: testUser.id,
             accessLevel: 'read',
             sessionId: `concurrent-session-${i}`,
-            timestamp: new Date()
+            timestamp: new Date(),
           };
 
           const documentResult = await documentHandler.processDocument(
@@ -583,7 +618,7 @@ describe('Security Integration Tests', () => {
             preserveDataTypes: true,
             customRules: [],
             allowedFields: [],
-            blockedFields: []
+            blockedFields: [],
           };
 
           const anonymizationContext: AnonymizationContext = {
@@ -591,7 +626,7 @@ describe('Security Integration Tests', () => {
             dataType: 'text',
             purpose: `concurrent_test_${i}`,
             retentionPeriod: 1,
-            complianceRequirements: []
+            complianceRequirements: [],
           };
 
           await anonymizationService.anonymizeForExternalAPI(
@@ -617,8 +652,9 @@ describe('Security Integration Tests', () => {
 
     it('should maintain performance with large datasets', async () => {
       // Create large document with multiple sensitive data points
-      const largeContent = Array.from({ length: 1000 }, (_, i) => 
-        `Entry ${i}: email${i}@company.com, phone: 555-${String(i).padStart(4, '0')}`
+      const largeContent = Array.from(
+        { length: 1000 },
+        (_, i) => `Entry ${i}: email${i}@company.com, phone: 555-${String(i).padStart(4, '0')}`
       ).join('\n');
 
       const securityContext: DocumentSecurityContext = {
@@ -626,7 +662,7 @@ describe('Security Integration Tests', () => {
         userId: testUser.id,
         accessLevel: 'read',
         sessionId: 'large-doc-session',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const startTime = Date.now();
@@ -650,12 +686,12 @@ describe('Security Integration Tests', () => {
           name: 'Hans Mueller',
           email: 'hans.mueller@example.de',
           address: 'Hauptstraße 123, Berlin, Germany',
-          phone: '+49 30 12345678'
+          phone: '+49 30 12345678',
         },
         businessData: {
           companyName: 'Example GmbH',
-          vatNumber: 'DE123456789'
-        }
+          vatNumber: 'DE123456789',
+        },
       };
 
       // Anonymize for GDPR compliance
@@ -665,7 +701,7 @@ describe('Security Integration Tests', () => {
         preserveDataTypes: false,
         customRules: [],
         allowedFields: ['companyName'], // Business data may be preserved
-        blockedFields: ['name', 'email', 'address', 'phone'] // Personal data must be anonymized
+        blockedFields: ['name', 'email', 'address', 'phone'], // Personal data must be anonymized
       };
 
       const gdprContext: AnonymizationContext = {
@@ -673,7 +709,7 @@ describe('Security Integration Tests', () => {
         dataType: 'json',
         purpose: 'gdpr_compliant_processing',
         retentionPeriod: 24,
-        complianceRequirements: ['GDPR']
+        complianceRequirements: ['GDPR'],
       };
 
       const result = await anonymizationService.anonymizeForExternalAPI(
@@ -685,9 +721,11 @@ describe('Security Integration Tests', () => {
       // Verify GDPR compliance
       expect(result.anonymizedData.personalData?.name).not.toBe('Hans Mueller');
       expect(result.anonymizedData.personalData?.email).not.toBe('hans.mueller@example.de');
-      expect(result.anonymizedData.personalData?.address).not.toBe('Hauptstraße 123, Berlin, Germany');
+      expect(result.anonymizedData.personalData?.address).not.toBe(
+        'Hauptstraße 123, Berlin, Germany'
+      );
       expect(result.anonymizedData.personalData?.phone).not.toBe('+49 30 12345678');
-      
+
       // Business data may be preserved if allowed
       expect(result.anonymizedData.businessData?.companyName).toBe('Example GmbH');
     });
@@ -698,12 +736,12 @@ describe('Security Integration Tests', () => {
           name: 'John Smith',
           email: 'john.smith@example.com',
           phone: '(555) 123-4567',
-          address: '123 Main St, Los Angeles, CA 90210'
+          address: '123 Main St, Los Angeles, CA 90210',
         },
         businessInfo: {
           transactionId: 'TXN-12345',
-          amount: '$99.99'
-        }
+          amount: '$99.99',
+        },
       };
 
       const ccpaAnonymizationOptions: AnonymizationOptions = {
@@ -712,7 +750,7 @@ describe('Security Integration Tests', () => {
         preserveDataTypes: false,
         customRules: [],
         allowedFields: ['transactionId'], // Transaction data may be preserved
-        blockedFields: ['name', 'email', 'phone', 'address'] // Consumer data must be anonymized
+        blockedFields: ['name', 'email', 'phone', 'address'], // Consumer data must be anonymized
       };
 
       const ccpaContext: AnonymizationContext = {
@@ -720,7 +758,7 @@ describe('Security Integration Tests', () => {
         dataType: 'json',
         purpose: 'ccpa_compliant_processing',
         retentionPeriod: 12,
-        complianceRequirements: ['CCPA']
+        complianceRequirements: ['CCPA'],
       };
 
       const result = await anonymizationService.anonymizeForExternalAPI(
@@ -733,8 +771,10 @@ describe('Security Integration Tests', () => {
       expect(result.anonymizedData.consumerInfo?.name).not.toBe('John Smith');
       expect(result.anonymizedData.consumerInfo?.email).not.toBe('john.smith@example.com');
       expect(result.anonymizedData.consumerInfo?.phone).not.toBe('(555) 123-4567');
-      expect(result.anonymizedData.consumerInfo?.address).not.toBe('123 Main St, Los Angeles, CA 90210');
-      
+      expect(result.anonymizedData.consumerInfo?.address).not.toBe(
+        '123 Main St, Los Angeles, CA 90210'
+      );
+
       // Business transaction data may be preserved
       expect(result.anonymizedData.businessInfo?.transactionId).toBe('TXN-12345');
     });

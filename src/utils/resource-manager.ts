@@ -1,6 +1,6 @@
 /**
  * Centralized Resource Management System
- * 
+ *
  * This module provides centralized tracking and cleanup of resources like timers,
  * intervals, and components to prevent memory leaks and hanging processes in tests.
  */
@@ -34,7 +34,11 @@ interface ResourceTracker {
   timers: Set<NodeJS.Timeout>;
   intervals: Set<NodeJS.Timeout>;
   components: Set<Destroyable>;
-  eventListeners: Set<{ target: GenericEventTarget; type: string; listener: EventListenerFunction }>;
+  eventListeners: Set<{
+    target: GenericEventTarget;
+    type: string;
+    listener: EventListenerFunction;
+  }>;
 }
 
 /**

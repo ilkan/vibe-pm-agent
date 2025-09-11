@@ -1,7 +1,7 @@
 /**
  * Comprehensive Test Suite for Amazon Working Backwards
  * Task 11: Create comprehensive test suite for Amazon working backwards
- * 
+ *
  * This test suite covers:
  * - Unit tests for all mechanism services with edge cases and error conditions
  * - Integration tests for complete Amazon working backwards workflow
@@ -11,18 +11,25 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
   SteeringWriter,
-  BusinessInputs 
+  BusinessInputs,
 } from '../../services/amazon';
-import { AmazonTemplateProcessor, TemplateContext } from '../../components/amazon-template-processor/index.js';
+import {
+  AmazonTemplateProcessor,
+  TemplateContext,
+} from '../../components/amazon-template-processor/index.js';
 import { generateBusinessCase } from '../../mcp/tools/generate_business_case';
 import { createStakeholderCommunication } from '../../mcp/tools/create_stakeholder_communication';
-import { MCPToolContext, GenerateBusinessCaseArgs, CreateStakeholderCommunicationArgs } from '../../models/mcp';
+import {
+  MCPToolContext,
+  GenerateBusinessCaseArgs,
+  CreateStakeholderCommunicationArgs,
+} from '../../models/mcp';
 import { performanceCache } from '../../utils/performance-cache';
 import { performanceMonitor } from '../../utils/performance-monitor';
 
@@ -47,7 +54,7 @@ const FIXED_SEED_INPUTS: BusinessInputs = {
       date: '2024-01-15',
       rating: 'A',
       sourceType: 'industry_report',
-      snippet: 'AI coding tools market expected to reach $15B by 2026'
+      snippet: 'AI coding tools market expected to reach $15B by 2026',
     },
     {
       url: 'https://stackoverflow.com/developer-survey-2024',
@@ -55,7 +62,7 @@ const FIXED_SEED_INPUTS: BusinessInputs = {
       date: '2024-02-01',
       rating: 'A',
       sourceType: 'research',
-      snippet: '68% of developers use or plan to use AI coding tools'
+      snippet: '68% of developers use or plan to use AI coding tools',
     },
     {
       url: 'https://techcrunch.com/ai-coding-adoption',
@@ -63,15 +70,15 @@ const FIXED_SEED_INPUTS: BusinessInputs = {
       date: '2024-01-20',
       rating: 'B',
       sourceType: 'news',
-      snippet: 'Enterprise adoption growing 25% quarterly'
-    }
+      snippet: 'Enterprise adoption growing 25% quarterly',
+    },
   ],
   assumptions: [
     'Developer productivity will increase by 30% with AI assistance',
     'Enterprise teams will pay premium for advanced features',
     'Market adoption rate will be 18% within first year',
-    'Competitive response will be limited due to technical barriers'
-  ]
+    'Competitive response will be limited due to technical barriers',
+  ],
 };
 
 const FIXED_SEED_CONTEXT: MCPToolContext = {
@@ -79,7 +86,7 @@ const FIXED_SEED_CONTEXT: MCPToolContext = {
   sessionId: 'test-session-fixed-seed',
   timestamp: 1704067200000, // Fixed timestamp: 2024-01-01T00:00:00.000Z
   requestId: 'req-fixed-seed-123',
-  traceId: 'trace-fixed-seed-456'
+  traceId: 'trace-fixed-seed-456',
 };
 
 describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
@@ -105,7 +112,9 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
 
     // Mock Date.now for deterministic testing
     jest.spyOn(Date, 'now').mockReturnValue(FIXED_SEED_CONTEXT.timestamp);
-    jest.spyOn(global, 'Date').mockImplementation(() => new Date(FIXED_SEED_CONTEXT.timestamp) as any);
+    jest
+      .spyOn(global, 'Date')
+      .mockImplementation(() => new Date(FIXED_SEED_CONTEXT.timestamp) as any);
   });
 
   afterEach(() => {
@@ -123,21 +132,21 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
             {
               url: 'invalid-url-format',
               title: '',
-              sourceType: 'industry_report'
+              sourceType: 'industry_report',
             } as any,
             {
               url: 'https://valid-url.com',
               title: 'Valid Citation',
-              sourceType: 'research'
-            }
-          ]
+              sourceType: 'research',
+            },
+          ],
         };
 
         const result = await assumptionLedgerService.normalizeLedger(inputsWithMalformedCitations);
-        
+
         expect(result.success).toBe(true);
         expect(result.data).toBeDefined();
-        
+
         // Should filter out invalid citations but keep valid ones
         const assumptions = result.data!.assumptions;
         const assumptionsWithSources = assumptions.filter(a => a.sourceUrls.length > 0);
@@ -147,11 +156,11 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
       it('should handle extremely large assumption sets', async () => {
         const largeInputs: BusinessInputs = {
           ...FIXED_SEED_INPUTS,
-          assumptions: Array.from({ length: 100 }, (_, i) => `Large assumption ${i + 1}`)
+          assumptions: Array.from({ length: 100 }, (_, i) => `Large assumption ${i + 1}`),
         };
 
         const result = await assumptionLedgerService.normalizeLedger(largeInputs);
-        
+
         expect(result.success).toBe(true);
         expect(result.data!.assumptions.length).toBeGreaterThan(0);
         expect(result.data!.assumptions.length).toBeLessThanOrEqual(110); // Should handle large sets
@@ -160,11 +169,11 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
       it('should handle missing required fields', async () => {
         const incompleteInputs = {
           featureName: '',
-          customer: ''
+          customer: '',
         } as BusinessInputs;
 
         const result = await assumptionLedgerService.normalizeLedger(incompleteInputs);
-        
+
         expect(result.success).toBe(true);
         expect(result.data!.assumptions).toHaveLength(0);
         expect(result.data!.coverage_pct).toBe(0);
@@ -177,18 +186,18 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
             {
               url: 'https://site1.com/ref-to-site2',
               title: 'Site 1 referencing Site 2',
-              sourceType: 'news'
+              sourceType: 'news',
             },
             {
               url: 'https://site2.com/ref-to-site1',
               title: 'Site 2 referencing Site 1',
-              sourceType: 'news'
-            }
-          ]
+              sourceType: 'news',
+            },
+          ],
         };
 
         const result = await assumptionLedgerService.normalizeLedger(inputsWithCircularRefs);
-        
+
         expect(result.success).toBe(true);
         // Should handle circular references without infinite loops
         expect(result.data).toBeDefined();
@@ -200,11 +209,11 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
         const emptyContext = {
           citations: [],
           ledgerCoveragePct: 0,
-          assumptionCount: 0
+          assumptionCount: 0,
         };
 
         const result = await confidenceService.computeConfidence(emptyContext);
-        
+
         expect(result.success).toBe(true);
         expect(result.data!.total).toBe(0);
         expect(result.data!.lowConfidence).toBe(true);
@@ -219,15 +228,15 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
             title: `Top Quality Source ${i}`,
             date: '2024-01-01',
             rating: 'A' as const,
-            sourceType: 'industry_report' as const
+            sourceType: 'industry_report' as const,
           })),
           ledgerCoveragePct: 100,
           assumptionCount: 5,
-          sensitivityRisk: 'low' as const
+          sensitivityRisk: 'low' as const,
         };
 
         const result = await confidenceService.computeConfidence(extremeContext);
-        
+
         expect(result.success).toBe(true);
         expect(result.data!.total).toBeGreaterThan(90);
         expect(result.data!.lowConfidence).toBe(false);
@@ -242,15 +251,15 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
               title: 'Source with invalid date',
               date: 'invalid-date-format',
               rating: 'B' as const,
-              sourceType: 'research' as const
-            }
+              sourceType: 'research' as const,
+            },
           ],
           ledgerCoveragePct: 50,
-          assumptionCount: 3
+          assumptionCount: 3,
         };
 
         const result = await confidenceService.computeConfidence(contextWithInvalidDates);
-        
+
         expect(result.success).toBe(true);
         expect(result.data!.breakdown.recency).toBe(50); // Should use default for invalid dates
       });
@@ -260,11 +269,11 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
           citations: [],
           ledgerCoveragePct: 150, // Invalid percentage > 100
           assumptionCount: -5, // Invalid negative count
-          varianceHint: 200 // Invalid variance > 100
+          varianceHint: 200, // Invalid variance > 100
         };
 
         const result = await confidenceService.computeConfidence(overflowContext);
-        
+
         expect(result.success).toBe(true);
         // Should clamp values to valid ranges
         expect(result.data!.breakdown.coverage).toBeLessThanOrEqual(100);
@@ -285,26 +294,26 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
                 certainty: 'Medium' as const,
                 lastChecked: new Date(),
                 category: 'financial' as const,
-                impact: 'critical' as const
-              }
+                impact: 'critical' as const,
+              },
             ],
             coverage_pct: 50,
             lastUpdated: new Date(),
             totalClaims: 1,
-            backedClaims: 0
+            backedClaims: 0,
           },
           basicCalc: {
             revenue: 0,
             costs: 100000,
             roi: -100,
-            npv: -50000
+            npv: -50000,
           },
           topIds: ['A1'],
-          scenarioPct: 0.2
+          scenarioPct: 0.2,
         };
 
         const result = await scenarioService.runScenarios(zeroBaseContext);
-        
+
         expect(result.success).toBe(true);
         expect(result.data!.scenarios.base).toBeDefined();
         expect(result.data!.scenarios.bear).toBeDefined();
@@ -323,26 +332,26 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
                 certainty: 'Low' as const,
                 lastChecked: new Date(),
                 category: 'financial' as const,
-                impact: 'critical' as const
-              }
+                impact: 'critical' as const,
+              },
             ],
             coverage_pct: 25,
             lastUpdated: new Date(),
             totalClaims: 1,
-            backedClaims: 0
+            backedClaims: 0,
           },
           basicCalc: {
             revenue: 1,
             costs: 1,
             roi: 1,
-            npv: 1
+            npv: 1,
           },
           topIds: ['A1'],
-          scenarioPct: 0.9 // Extreme 90% sensitivity
+          scenarioPct: 0.9, // Extreme 90% sensitivity
         };
 
         const result = await scenarioService.runScenarios(extremeSensitivityContext);
-        
+
         expect(result.success).toBe(true);
         // Should handle extreme sensitivities without breaking
         expect(result.data!.elasticities).toBeDefined();
@@ -355,20 +364,20 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
             coverage_pct: 0,
             lastUpdated: new Date(),
             totalClaims: 0,
-            backedClaims: 0
+            backedClaims: 0,
           },
           basicCalc: {
             revenue: 1000000,
             costs: 500000,
             roi: 100,
-            npv: 500000
+            npv: 500000,
           },
           topIds: [],
-          scenarioPct: 0.2
+          scenarioPct: 0.2,
         };
 
         const result = await scenarioService.runScenarios(emptyLedgerContext);
-        
+
         expect(result.success).toBe(true);
         expect(result.data!.keyDrivers).toHaveLength(0);
         expect(result.data!.elasticities).toHaveLength(0);
@@ -383,15 +392,15 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
             coverage_pct: 0,
             lastUpdated: new Date(),
             totalClaims: 0,
-            backedClaims: 0
+            backedClaims: 0,
           },
           weakestIds: [],
           businessContext: 'Empty context test',
-          competitiveContext: 'No competitors'
+          competitiveContext: 'No competitors',
         };
 
         const result = await hardQuestionsService.generateQuestions(emptyContext);
-        
+
         expect(result.success).toBe(true);
         expect(result.data!.length).toBeGreaterThan(0); // Should still generate general questions
       });
@@ -408,21 +417,21 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
                 certainty: 'Low' as const,
                 lastChecked: new Date(),
                 category: 'market' as const,
-                impact: 'critical' as const
-              }
+                impact: 'critical' as const,
+              },
             ],
             coverage_pct: 0,
             lastUpdated: new Date(),
             totalClaims: 1,
-            backedClaims: 0
+            backedClaims: 0,
           },
           weakestIds: ['A1'],
           businessContext: 'A'.repeat(10000), // Extremely long context
-          competitiveContext: 'B'.repeat(5000)
+          competitiveContext: 'B'.repeat(5000),
         };
 
         const result = await hardQuestionsService.generateQuestions(longContext);
-        
+
         expect(result.success).toBe(true);
         expect(result.data!.length).toBeLessThanOrEqual(10);
       });
@@ -439,21 +448,21 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
                 certainty: 'Medium' as const,
                 lastChecked: new Date(),
                 category: 'market' as const,
-                impact: 'important' as const
-              }
+                impact: 'important' as const,
+              },
             ],
             coverage_pct: 50,
             lastUpdated: new Date(),
             totalClaims: 1,
-            backedClaims: 0
+            backedClaims: 0,
           },
           weakestIds: ['A1', 'A999', 'INVALID'], // Include invalid IDs
           businessContext: 'Test context',
-          competitiveContext: 'Test competition'
+          competitiveContext: 'Test competition',
         };
 
         const result = await hardQuestionsService.generateQuestions(invalidRefContext);
-        
+
         expect(result.success).toBe(true);
         // Should handle invalid references gracefully
         expect(result.data!.length).toBeGreaterThan(0);
@@ -475,7 +484,7 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
         citations: FIXED_SEED_INPUTS.citations || [],
         ledgerCoveragePct: assumptionLedger.coverage_pct,
         assumptionCount: assumptionLedger.assumptions.length,
-        sensitivityRisk: 'medium' as const
+        sensitivityRisk: 'medium' as const,
       };
       const confidenceResult = await confidenceService.computeConfidence(confidenceContext);
       expect(confidenceResult.success).toBe(true);
@@ -486,12 +495,12 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
         ledger: assumptionLedger,
         basicCalc: {
           revenue: 3750000, // 25k users * $49.99 * 3 (annual multiplier)
-          costs: 1800000,   // Dev cost + ops cost
-          roi: 108,         // (3.75M - 1.8M) / 1.8M * 100
-          npv: 1950000      // Simplified NPV
+          costs: 1800000, // Dev cost + ops cost
+          roi: 108, // (3.75M - 1.8M) / 1.8M * 100
+          npv: 1950000, // Simplified NPV
         },
         topIds: assumptionLedger.assumptions.slice(0, 5).map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       };
       const scenarioResult = await scenarioService.runScenarios(scenarioContext);
       expect(scenarioResult.success).toBe(true);
@@ -505,7 +514,7 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
           .slice(0, 5)
           .map(a => a.id),
         businessContext: 'AI-powered code assistant for software development teams',
-        competitiveContext: 'GitHub Copilot, Tabnine, CodeWhisperer'
+        competitiveContext: 'GitHub Copilot, Tabnine, CodeWhisperer',
       };
       const questionsResult = await hardQuestionsService.generateQuestions(questionContext);
       expect(questionsResult.success).toBe(true);
@@ -525,7 +534,7 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
         citations: FIXED_SEED_INPUTS.citations || [],
         inputsHash: 'fixed-seed-hash-123',
         isoTimestamp: new Date(FIXED_SEED_CONTEXT.timestamp).toISOString(),
-        shortHash: 'fixed123'
+        shortHash: 'fixed123',
       };
 
       const prfaqDocument = templateProcessor.renderPRFAQ(templateContext);
@@ -543,40 +552,40 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
           profile: 'amazon',
           confidence: {
             total: confidenceScore.total,
-            breakdown: confidenceScore.breakdown
+            breakdown: confidenceScore.breakdown,
           },
           assumptions: {
             ids: assumptionLedger.assumptions.map(a => a.id),
-            coverage_pct: assumptionLedger.coverage_pct
+            coverage_pct: assumptionLedger.coverage_pct,
           },
           scenarios: {
             pct: scenarios.sensitivityPct,
-            metrics: scenarios.scenarios.base.map(s => s.metric)
+            metrics: scenarios.scenarios.base.map(s => s.metric),
           },
           paths: {
             assumptions_json: './attachments/assumptions-fixed123.json',
             citations_json: './attachments/citations-fixed123.json',
-            scenarios_json: './attachments/scenarios-fixed123.json'
-          }
+            scenarios_json: './attachments/scenarios-fixed123.json',
+          },
         },
         bodyMarkdown: prfaqDocument,
         attachments: [
           {
             filename: 'assumptions-fixed123.json',
             content: JSON.stringify(assumptionLedger, null, 2),
-            type: 'assumptions' as const
+            type: 'assumptions' as const,
           },
           {
             filename: 'citations-fixed123.json',
             content: JSON.stringify(FIXED_SEED_INPUTS.citations, null, 2),
-            type: 'citations' as const
+            type: 'citations' as const,
           },
           {
             filename: 'scenarios-fixed123.json',
             content: JSON.stringify(scenarios, null, 2),
-            type: 'scenarios' as const
-          }
-        ]
+            type: 'scenarios' as const,
+          },
+        ],
       };
 
       // Verify all components are properly integrated
@@ -615,7 +624,7 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
       const confidenceResult = await confidenceService.computeConfidence({
         citations: [],
         ledgerCoveragePct: ledgerResult.data!.coverage_pct,
-        assumptionCount: ledgerResult.data!.assumptions.length
+        assumptionCount: ledgerResult.data!.assumptions.length,
       });
       expect(confidenceResult.success).toBe(true);
 
@@ -644,7 +653,7 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
               certainty: 'High',
               lastChecked: new Date(FIXED_SEED_CONTEXT.timestamp),
               category: 'market',
-              impact: 'critical'
+              impact: 'critical',
             },
             {
               id: 'A2',
@@ -655,7 +664,7 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
               certainty: 'High',
               lastChecked: new Date(FIXED_SEED_CONTEXT.timestamp),
               category: 'market',
-              impact: 'critical'
+              impact: 'critical',
             },
             {
               id: 'A3',
@@ -666,13 +675,13 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
               certainty: 'Medium',
               lastChecked: new Date(FIXED_SEED_CONTEXT.timestamp),
               category: 'financial',
-              impact: 'important'
-            }
+              impact: 'important',
+            },
           ],
           coverage_pct: 67,
           lastUpdated: new Date(FIXED_SEED_CONTEXT.timestamp),
           totalClaims: 3,
-          backedClaims: 2
+          backedClaims: 2,
         },
         confidence: {
           total: 78,
@@ -682,25 +691,25 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
             diversity: 70,
             agreement: 80,
             coverage: 67,
-            sensitivity: 75
+            sensitivity: 75,
           },
           explanation: 'Moderate confidence with strong evidence quality and recent data',
-          lowConfidence: false
+          lowConfidence: false,
         },
         scenarios: {
           scenarios: {
             bear: [
               { metric: 'Revenue', bear: 3000000, base: 3750000, bull: 4500000, unit: 'USD' },
-              { metric: 'ROI', bear: 67, base: 108, bull: 150, unit: '%' }
+              { metric: 'ROI', bear: 67, base: 108, bull: 150, unit: '%' },
             ],
             base: [
               { metric: 'Revenue', bear: 3000000, base: 3750000, bull: 4500000, unit: 'USD' },
-              { metric: 'ROI', bear: 67, base: 108, bull: 150, unit: '%' }
+              { metric: 'ROI', bear: 67, base: 108, bull: 150, unit: '%' },
             ],
             bull: [
               { metric: 'Revenue', bear: 3000000, base: 3750000, bull: 4500000, unit: 'USD' },
-              { metric: 'ROI', bear: 67, base: 108, bull: 150, unit: '%' }
-            ]
+              { metric: 'ROI', bear: 67, base: 108, bull: 150, unit: '%' },
+            ],
           },
           elasticities: [
             {
@@ -708,48 +717,58 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
               assumptionChange: '±20%',
               outcomeMetric: 'Revenue',
               outcomeChange: '±15%',
-              sensitivity: 15
-            }
+              sensitivity: 15,
+            },
           ],
           keyDrivers: [
             {
               assumption: 'Market Adoption Rate',
               assumptionId: 'A2',
               impact: 15,
-              description: 'Market Adoption Rate shows moderate sensitivity (±15% impact on Revenue)'
-            }
+              description:
+                'Market Adoption Rate shows moderate sensitivity (±15% impact on Revenue)',
+            },
           ],
-          sensitivityPct: 20
+          sensitivityPct: 20,
         },
         hardQuestions: [
           {
             id: 1,
-            question: 'How do you know that Developer Productivity Increase (30%) is accurate? What evidence supports this critical assumption?',
+            question:
+              'How do you know that Developer Productivity Increase (30%) is accurate? What evidence supports this critical assumption?',
             targetAssumptions: ['A1'],
             category: 'market',
             severity: 'critical',
-            evidenceNeeded: ['Credible sources for Developer Productivity Increase', 'Independent validation of the assumption']
+            evidenceNeeded: [
+              'Credible sources for Developer Productivity Increase',
+              'Independent validation of the assumption',
+            ],
           },
           {
             id: 2,
-            question: 'What if the market adoption rate is significantly lower than projected? How would this impact the business case?',
+            question:
+              'What if the market adoption rate is significantly lower than projected? How would this impact the business case?',
             targetAssumptions: ['A2'],
             category: 'market',
             severity: 'critical',
-            evidenceNeeded: ['Third-party market research', 'Bottom-up market sizing analysis', 'Customer demand validation']
-          }
+            evidenceNeeded: [
+              'Third-party market research',
+              'Bottom-up market sizing analysis',
+              'Customer demand validation',
+            ],
+          },
         ],
         citations: FIXED_SEED_INPUTS.citations || [],
         inputsHash: 'fixed-seed-hash-123',
         isoTimestamp: '2024-01-01T00:00:00.000Z',
-        shortHash: 'fixed123'
+        shortHash: 'fixed123',
       };
 
       const prfaqDocument = templateProcessor.renderPRFAQ(templateContext);
 
       // Verify consistent structure and content
       expect(prfaqDocument).toMatchSnapshot('pr-faq-fixed-seed');
-      
+
       // Verify key sections are present
       expect(prfaqDocument).toContain('---\ntitle: "PR/FAQ — AI-Powered Code Assistant"');
       expect(prfaqDocument).toContain('artifact_type: pr_faq');
@@ -762,7 +781,9 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
       expect(prfaqDocument).toContain('### Assumption Ledger');
       expect(prfaqDocument).toContain('| A1 | Developer Productivity Increase | 30 | High | 1 |');
       expect(prfaqDocument).toContain('**Overall Confidence:** 78/100');
-      expect(prfaqDocument).toContain('**Q1:** How do you know that Developer Productivity Increase');
+      expect(prfaqDocument).toContain(
+        '**Q1:** How do you know that Developer Productivity Increase'
+      );
     });
 
     it('should render Decision One-Pager template consistently with fixed seed', () => {
@@ -783,7 +804,7 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
               certainty: 'High',
               lastChecked: new Date(FIXED_SEED_CONTEXT.timestamp),
               category: 'market',
-              impact: 'critical'
+              impact: 'critical',
             },
             {
               id: 'A2',
@@ -794,13 +815,13 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
               certainty: 'High',
               lastChecked: new Date(FIXED_SEED_CONTEXT.timestamp),
               category: 'market',
-              impact: 'critical'
-            }
+              impact: 'critical',
+            },
           ],
           coverage_pct: 100,
           lastUpdated: new Date(FIXED_SEED_CONTEXT.timestamp),
           totalClaims: 2,
-          backedClaims: 2
+          backedClaims: 2,
         },
         confidence: {
           total: 85,
@@ -810,28 +831,28 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
             diversity: 80,
             agreement: 85,
             coverage: 100,
-            sensitivity: 80
+            sensitivity: 80,
           },
           explanation: 'High confidence with excellent evidence quality',
-          lowConfidence: false
+          lowConfidence: false,
         },
         scenarios: {
           scenarios: {
             bear: [
               { metric: 'Investment', bear: 2160000, base: 1800000, bull: 1440000, unit: 'USD' },
               { metric: 'Revenue', bear: 3000000, base: 3750000, bull: 4500000, unit: 'USD' },
-              { metric: 'ROI', bear: 39, base: 108, bull: 213, unit: '%' }
+              { metric: 'ROI', bear: 39, base: 108, bull: 213, unit: '%' },
             ],
             base: [
               { metric: 'Investment', bear: 2160000, base: 1800000, bull: 1440000, unit: 'USD' },
               { metric: 'Revenue', bear: 3000000, base: 3750000, bull: 4500000, unit: 'USD' },
-              { metric: 'ROI', bear: 39, base: 108, bull: 213, unit: '%' }
+              { metric: 'ROI', bear: 39, base: 108, bull: 213, unit: '%' },
             ],
             bull: [
               { metric: 'Investment', bear: 2160000, base: 1800000, bull: 1440000, unit: 'USD' },
               { metric: 'Revenue', bear: 3000000, base: 3750000, bull: 4500000, unit: 'USD' },
-              { metric: 'ROI', bear: 39, base: 108, bull: 213, unit: '%' }
-            ]
+              { metric: 'ROI', bear: 39, base: 108, bull: 213, unit: '%' },
+            ],
           },
           elasticities: [
             {
@@ -839,18 +860,18 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
               assumptionChange: '±20%',
               outcomeMetric: 'Revenue',
               outcomeChange: '±15%',
-              sensitivity: 15
-            }
+              sensitivity: 15,
+            },
           ],
           keyDrivers: [
             {
               assumption: 'Market Adoption Rate',
               assumptionId: 'A2',
               impact: 15,
-              description: 'Market Adoption Rate shows moderate sensitivity'
-            }
+              description: 'Market Adoption Rate shows moderate sensitivity',
+            },
           ],
-          sensitivityPct: 20
+          sensitivityPct: 20,
         },
         hardQuestions: [
           {
@@ -859,22 +880,24 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
             targetAssumptions: ['A1'],
             category: 'market',
             severity: 'critical',
-            evidenceNeeded: ['Productivity studies', 'Customer validation']
-          }
+            evidenceNeeded: ['Productivity studies', 'Customer validation'],
+          },
         ],
         citations: FIXED_SEED_INPUTS.citations || [],
         inputsHash: 'fixed-seed-hash-123',
         isoTimestamp: '2024-01-01T00:00:00.000Z',
-        shortHash: 'fixed123'
+        shortHash: 'fixed123',
       };
 
       const onePagerDocument = templateProcessor.renderDecisionOnePager(templateContext);
 
       // Verify consistent structure and content
       expect(onePagerDocument).toMatchSnapshot('decision-onepager-fixed-seed');
-      
+
       // Verify key sections are present
-      expect(onePagerDocument).toContain('---\ntitle: "Decision One-Pager — AI-Powered Code Assistant"');
+      expect(onePagerDocument).toContain(
+        '---\ntitle: "Decision One-Pager — AI-Powered Code Assistant"'
+      );
       expect(onePagerDocument).toContain('artifact_type: decision_onepager');
       expect(onePagerDocument).toContain('# Decision One-Pager — AI-Powered Code Assistant');
       expect(onePagerDocument).toContain('## Context');
@@ -900,19 +923,19 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
           citations: FIXED_SEED_INPUTS.citations || [],
           ledgerCoveragePct: ledgerResult.data!.coverage_pct,
           assumptionCount: ledgerResult.data!.assumptions.length,
-          sensitivityRisk: 'medium' as const
+          sensitivityRisk: 'medium' as const,
         });
         const scenarioResult = await scenarioService.runScenarios({
           ledger: ledgerResult.data!,
           basicCalc: { revenue: 3750000, costs: 1800000, roi: 108, npv: 1950000 },
           topIds: ledgerResult.data!.assumptions.slice(0, 5).map(a => a.id),
-          scenarioPct: 0.2
+          scenarioPct: 0.2,
         });
         const questionsResult = await hardQuestionsService.generateQuestions({
           ledger: ledgerResult.data!,
           weakestIds: ledgerResult.data!.assumptions.slice(0, 3).map(a => a.id),
           businessContext: 'AI code assistant',
-          competitiveContext: 'GitHub Copilot'
+          competitiveContext: 'GitHub Copilot',
         });
 
         const templateContext: TemplateContext = {
@@ -926,7 +949,7 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
           citations: FIXED_SEED_INPUTS.citations || [],
           inputsHash: `test-${i}`,
           isoTimestamp: new Date().toISOString(),
-          shortHash: `test${i}`
+          shortHash: `test${i}`,
         };
 
         templateProcessor.renderPRFAQ(templateContext);
@@ -962,42 +985,56 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
 
       expect(firstResult.success).toBe(true);
       expect(secondResult.success).toBe(true);
-      
+
       // Second run should be faster or equal due to caching
       expect(secondDuration).toBeLessThanOrEqual(firstDuration);
 
-      console.log(`Caching performance: First run ${firstDuration}ms, Second run ${secondDuration}ms`);
+      console.log(
+        `Caching performance: First run ${firstDuration}ms, Second run ${secondDuration}ms`
+      );
     });
 
     it('should validate individual service performance targets', async () => {
       const services = [
-        { name: 'AssumptionLedger', fn: () => assumptionLedgerService.normalizeLedger(FIXED_SEED_INPUTS) },
-        { name: 'Confidence', fn: async () => {
-          const ledger = await assumptionLedgerService.normalizeLedger(FIXED_SEED_INPUTS);
-          return confidenceService.computeConfidence({
-            citations: FIXED_SEED_INPUTS.citations || [],
-            ledgerCoveragePct: ledger.data!.coverage_pct,
-            assumptionCount: ledger.data!.assumptions.length
-          });
-        }},
-        { name: 'Scenarios', fn: async () => {
-          const ledger = await assumptionLedgerService.normalizeLedger(FIXED_SEED_INPUTS);
-          return scenarioService.runScenarios({
-            ledger: ledger.data!,
-            basicCalc: { revenue: 1000000, costs: 500000, roi: 100, npv: 500000 },
-            topIds: ledger.data!.assumptions.slice(0, 3).map(a => a.id),
-            scenarioPct: 0.2
-          });
-        }},
-        { name: 'HardQuestions', fn: async () => {
-          const ledger = await assumptionLedgerService.normalizeLedger(FIXED_SEED_INPUTS);
-          return hardQuestionsService.generateQuestions({
-            ledger: ledger.data!,
-            weakestIds: ledger.data!.assumptions.slice(0, 2).map(a => a.id),
-            businessContext: 'Test',
-            competitiveContext: 'Test'
-          });
-        }}
+        {
+          name: 'AssumptionLedger',
+          fn: () => assumptionLedgerService.normalizeLedger(FIXED_SEED_INPUTS),
+        },
+        {
+          name: 'Confidence',
+          fn: async () => {
+            const ledger = await assumptionLedgerService.normalizeLedger(FIXED_SEED_INPUTS);
+            return confidenceService.computeConfidence({
+              citations: FIXED_SEED_INPUTS.citations || [],
+              ledgerCoveragePct: ledger.data!.coverage_pct,
+              assumptionCount: ledger.data!.assumptions.length,
+            });
+          },
+        },
+        {
+          name: 'Scenarios',
+          fn: async () => {
+            const ledger = await assumptionLedgerService.normalizeLedger(FIXED_SEED_INPUTS);
+            return scenarioService.runScenarios({
+              ledger: ledger.data!,
+              basicCalc: { revenue: 1000000, costs: 500000, roi: 100, npv: 500000 },
+              topIds: ledger.data!.assumptions.slice(0, 3).map(a => a.id),
+              scenarioPct: 0.2,
+            });
+          },
+        },
+        {
+          name: 'HardQuestions',
+          fn: async () => {
+            const ledger = await assumptionLedgerService.normalizeLedger(FIXED_SEED_INPUTS);
+            return hardQuestionsService.generateQuestions({
+              ledger: ledger.data!,
+              weakestIds: ledger.data!.assumptions.slice(0, 2).map(a => a.id),
+              businessContext: 'Test',
+              competitiveContext: 'Test',
+            });
+          },
+        },
       ];
 
       for (const service of services) {
@@ -1017,9 +1054,9 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
     it('should handle service failures with meaningful error messages', async () => {
       // Mock a service to fail
       const originalMethod = assumptionLedgerService.normalizeLedger;
-      (assumptionLedgerService.normalizeLedger as jest.Mock) = jest.fn().mockRejectedValue(
-        new Error('Service temporarily unavailable')
-      );
+      (assumptionLedgerService.normalizeLedger as jest.Mock) = jest
+        .fn()
+        .mockRejectedValue(new Error('Service temporarily unavailable'));
 
       try {
         const result = await assumptionLedgerService.normalizeLedger(FIXED_SEED_INPUTS);
@@ -1041,7 +1078,7 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
           coverage_pct: 0,
           lastUpdated: new Date(),
           totalClaims: 0,
-          backedClaims: 0
+          backedClaims: 0,
         },
         confidence: {
           total: 0,
@@ -1051,22 +1088,22 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
             diversity: 0,
             agreement: 0,
             coverage: 0,
-            sensitivity: 0
+            sensitivity: 0,
           },
           explanation: 'No data available',
-          lowConfidence: true
+          lowConfidence: true,
         },
         scenarios: {
           scenarios: { bear: [], base: [], bull: [] },
           elasticities: [],
           keyDrivers: [],
-          sensitivityPct: 0
+          sensitivityPct: 0,
         },
         hardQuestions: [],
         citations: [],
         inputsHash: 'empty',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'empty'
+        shortHash: 'empty',
       };
 
       expect(() => {
@@ -1083,12 +1120,12 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
         citations: Array.from({ length: 20 }, (_, i) => ({
           url: `https://slow-source-${i}.com`,
           title: `Slow Source ${i}`,
-          sourceType: 'research' as const
-        }))
+          sourceType: 'research' as const,
+        })),
       };
 
       const result = await assumptionLedgerService.normalizeLedger(slowInputs);
-      
+
       expect(result.success).toBe(true);
       // Should handle slow sources without timing out
       expect(result.data).toBeDefined();
@@ -1098,11 +1135,11 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
       const invalidInputs = {
         featureName: null,
         customer: undefined,
-        citations: 'invalid-format'
+        citations: 'invalid-format',
       } as any;
 
       const result = await assumptionLedgerService.normalizeLedger(invalidInputs);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.error!.code).toBe('ASSUMPTION_LEDGER_ERROR');
@@ -1110,15 +1147,15 @@ describe('Amazon Working Backwards - Comprehensive Test Suite', () => {
     });
 
     it('should handle concurrent service calls without race conditions', async () => {
-      const concurrentCalls = Array.from({ length: 5 }, (_, i) => 
+      const concurrentCalls = Array.from({ length: 5 }, (_, i) =>
         assumptionLedgerService.normalizeLedger({
           ...FIXED_SEED_INPUTS,
-          featureName: `Concurrent Feature ${i}`
+          featureName: `Concurrent Feature ${i}`,
         })
       );
 
       const results = await Promise.all(concurrentCalls);
-      
+
       results.forEach((result, index) => {
         expect(result.success).toBe(true);
         expect(result.data!.assumptions.length).toBeGreaterThan(0);
@@ -1149,12 +1186,12 @@ We expect to capture market share through superior AI capabilities.`,
           development_cost: FIXED_SEED_INPUTS.devCost!,
           operational_cost: FIXED_SEED_INPUTS.opsCost!,
           expected_revenue: 3750000,
-          time_to_market: 9
+          time_to_market: 9,
         },
         steering_options: {
           create_steering_files: true,
-          feature_name: 'ai-code-assistant'
-        }
+          feature_name: 'ai-code-assistant',
+        },
       };
 
       const result = await generateBusinessCase(args, FIXED_SEED_CONTEXT);
@@ -1162,14 +1199,14 @@ We expect to capture market share through superior AI capabilities.`,
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('markdown');
-      
+
       const content = result.content[0].markdown!;
       expect(content).toContain('## Evidence Mechanisms');
       expect(content).toContain('### Assumption Ledger');
       expect(content).toContain('### Confidence Assessment');
       expect(content).toContain('### Scenario Analysis');
       expect(content).toContain('### Hard Questions');
-      
+
       expect(result.metadata?.confidenceScore).toBeGreaterThan(0);
       expect(result.metadata?.steeringFileCreated).toBe(true);
     });
@@ -1199,8 +1236,8 @@ We expect minimal competitive response due to technical barriers.`;
         audience: 'customers',
         steering_options: {
           create_steering_files: true,
-          feature_name: 'ai-code-assistant'
-        }
+          feature_name: 'ai-code-assistant',
+        },
       };
 
       const result = await createStakeholderCommunication(args, FIXED_SEED_CONTEXT);
@@ -1208,7 +1245,9 @@ We expect minimal competitive response due to technical barriers.`;
       expect(result.isError).toBeFalsy();
       expect(result.content[0].markdown).toContain('# Press Release');
       expect(result.content[0].markdown).toContain('# FAQ');
-      expect(result.content[0].markdown).toContain('## Amazon Working Backwards Evidence Mechanisms');
+      expect(result.content[0].markdown).toContain(
+        '## Amazon Working Backwards Evidence Mechanisms'
+      );
       expect(result.metadata?.confidenceScore).toBeGreaterThan(0);
     });
   });

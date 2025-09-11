@@ -1,6 +1,6 @@
 /**
  * Amazon Mode Compatibility Tests
- * 
+ *
  * Ensures backward compatibility when integrating Amazon Working Backwards as default mode
  * Tests fallback behavior, API contract preservation, and performance requirements
  */
@@ -46,7 +46,8 @@ describe('Amazon Mode Compatibility Tests', () => {
   describe('Backward Compatibility', () => {
     it('should maintain existing API contracts for generate_business_case', async () => {
       const args = {
-        opportunity_analysis: 'Test market opportunity with $1B market size and 20% growth rate. Customer segment includes enterprise users.',
+        opportunity_analysis:
+          'Test market opportunity with $1B market size and 20% growth rate. Customer segment includes enterprise users.',
         financial_inputs: {
           development_cost: 500000,
           operational_cost: 100000,
@@ -78,7 +79,8 @@ describe('Amazon Mode Compatibility Tests', () => {
 
     it('should maintain existing API contracts for create_stakeholder_communication', async () => {
       const args = {
-        business_case: 'Comprehensive business case for new feature targeting enterprise customers with $1.2M revenue potential.',
+        business_case:
+          'Comprehensive business case for new feature targeting enterprise customers with $1.2M revenue potential.',
         communication_type: 'executive_onepager' as const,
         audience: 'executives' as const,
       };
@@ -132,7 +134,8 @@ describe('Amazon Mode Compatibility Tests', () => {
   describe('Amazon Mode Default Behavior', () => {
     it('should use Amazon mode by default', async () => {
       const args = {
-        opportunity_analysis: 'Market opportunity with clear assumptions and financial projections.',
+        opportunity_analysis:
+          'Market opportunity with clear assumptions and financial projections.',
       };
 
       const result = await generateBusinessCase(args, mockContext);
@@ -145,7 +148,8 @@ describe('Amazon Mode Compatibility Tests', () => {
 
     it('should include evidence mechanisms by default', async () => {
       const args = {
-        opportunity_analysis: 'Feature targeting $500M market with 15% growth. Development cost $300K.',
+        opportunity_analysis:
+          'Feature targeting $500M market with 15% growth. Development cost $300K.',
       };
 
       const result = await generateBusinessCase(args, mockContext);
@@ -228,7 +232,7 @@ describe('Amazon Mode Compatibility Tests', () => {
 
     it('should maintain performance requirements during fallback', async () => {
       const startTime = Date.now();
-      
+
       const args = {
         opportunity_analysis: 'Test analysis for performance check',
       };
@@ -245,14 +249,14 @@ describe('Amazon Mode Compatibility Tests', () => {
   describe('Environment Configuration', () => {
     it('should respect VIBE_PM_MODE=amazon environment variable', () => {
       process.env.VIBE_PM_MODE = 'amazon';
-      
+
       const manager = new AmazonModeManager();
       expect(manager.isAmazonModeEnabled()).toBe(true);
     });
 
     it('should respect VIBE_PM_MODE=standard environment variable', () => {
       process.env.VIBE_PM_MODE = 'standard';
-      
+
       const manager = new AmazonModeManager();
       expect(manager.isAmazonModeEnabled()).toBe(false);
     });
@@ -260,7 +264,7 @@ describe('Amazon Mode Compatibility Tests', () => {
     it('should respect individual environment variables', () => {
       process.env.VIBE_PM_AMAZON_ENABLED = 'false';
       process.env.VIBE_PM_FALLBACK_ENABLED = 'true';
-      
+
       const manager = new AmazonModeManager();
       expect(manager.isAmazonModeEnabled()).toBe(false);
       expect(manager.getConfig().fallbackToStandard).toBe(true);
@@ -270,7 +274,8 @@ describe('Amazon Mode Compatibility Tests', () => {
   describe('Performance Requirements', () => {
     it('should complete Amazon mode generation within 2 minutes', async () => {
       const args = {
-        opportunity_analysis: 'Comprehensive market analysis with detailed assumptions, competitive landscape, and financial projections for enterprise software targeting $2B market.',
+        opportunity_analysis:
+          'Comprehensive market analysis with detailed assumptions, competitive landscape, and financial projections for enterprise software targeting $2B market.',
         financial_inputs: {
           development_cost: 1000000,
           operational_cost: 200000,
@@ -331,7 +336,7 @@ describe('Amazon Mode Compatibility Tests', () => {
 
       expect(result.isError).toBe(false);
       expect(result.metadata?.steeringFileCreated).toBe(true);
-      
+
       if (result.metadata?.steeringFiles) {
         expect(result.metadata.steeringFiles.length).toBeGreaterThan(0);
       }
@@ -419,12 +424,12 @@ describe('Amazon Mode Compatibility Tests', () => {
 
     it('should allow runtime configuration updates', () => {
       const manager = new AmazonModeManager();
-      
+
       expect(manager.isAmazonModeEnabled()).toBe(true);
-      
+
       manager.updateConfig({ enabled: false });
       expect(manager.isAmazonModeEnabled()).toBe(false);
-      
+
       manager.updateConfig({ enabled: true });
       expect(manager.isAmazonModeEnabled()).toBe(true);
     });
@@ -469,16 +474,22 @@ describe('Integration with Existing Tools', () => {
     const opportunityAnalysis = 'Consistent test analysis for tool integration';
 
     // Generate business case
-    const businessCaseResult = await generateBusinessCase({
-      opportunity_analysis: opportunityAnalysis,
-    }, mockContext);
+    const businessCaseResult = await generateBusinessCase(
+      {
+        opportunity_analysis: opportunityAnalysis,
+      },
+      mockContext
+    );
 
     // Create PR/FAQ from business case
-    const prfaqResult = await createStakeholderCommunication({
-      business_case: getTextContent(businessCaseResult.content),
-      communication_type: 'pr_faq',
-      audience: 'customers',
-    }, mockContext);
+    const prfaqResult = await createStakeholderCommunication(
+      {
+        business_case: getTextContent(businessCaseResult.content),
+        communication_type: 'pr_faq',
+        audience: 'customers',
+      },
+      mockContext
+    );
 
     // Both should use Amazon mode consistently
     expect(businessCaseResult.metadata?.amazonMode?.enabled).toBe(true);

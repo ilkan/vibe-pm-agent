@@ -4,13 +4,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
   SteeringWriter,
-  BusinessInputs 
+  BusinessInputs,
 } from '../../services/amazon';
 import { readFile, rm, access } from 'fs/promises';
 import { join } from 'path';
@@ -28,7 +28,7 @@ describe('Amazon Steering End-to-End Integration', () => {
   beforeEach(async () => {
     // Create temporary directory for testing
     tempDir = await mkdtemp(join(tmpdir(), 'amazon-e2e-test-'));
-    
+
     // Initialize all services
     assumptionLedgerService = new AssumptionLedgerService();
     confidenceService = new ConfidenceService();
@@ -69,7 +69,7 @@ describe('Amazon Steering End-to-End Integration', () => {
             date: '2024-02-15',
             rating: 'A',
             snippet: 'Customer analytics market growing at 23% CAGR, reaching $25B by 2026',
-            sourceType: 'industry_report'
+            sourceType: 'industry_report',
           },
           {
             url: 'https://mckinsey.com/ai-analytics-pricing-study',
@@ -77,20 +77,20 @@ describe('Amazon Steering End-to-End Integration', () => {
             date: '2024-01-20',
             rating: 'A',
             snippet: 'Enterprise AI analytics platforms average $400-600 per user annually',
-            sourceType: 'research'
-          }
+            sourceType: 'research',
+          },
         ],
         assumptions: [
           'AI accuracy will maintain 95% prediction rate at scale',
-          'Enterprise customers willing to pay premium for real-time insights'
-        ]
+          'Enterprise customers willing to pay premium for real-time insights',
+        ],
       };
 
       // Step 2: Generate assumption ledger
       const ledgerResult = await assumptionLedgerService.normalizeLedger(businessInputs);
       expect(ledgerResult.success).toBe(true);
       const ledger = ledgerResult.data!;
-      
+
       expect(ledger.assumptions.length).toBeGreaterThan(5);
       expect(ledger.coverage_pct).toBeGreaterThan(0);
 
@@ -99,11 +99,11 @@ describe('Amazon Steering End-to-End Integration', () => {
         citations: businessInputs.citations || [],
         ledgerCoveragePct: ledger.coverage_pct,
         assumptionCount: ledger.assumptions.length,
-        sensitivityRisk: 'medium'
+        sensitivityRisk: 'medium',
       });
       expect(confidenceResult.success).toBe(true);
       const confidence = confidenceResult.data!;
-      
+
       expect(confidence.total).toBeGreaterThan(0);
       expect(confidence.total).toBeLessThanOrEqual(100);
       expect(confidence.breakdown.evidence).toBeGreaterThan(0);
@@ -113,20 +113,22 @@ describe('Amazon Steering End-to-End Integration', () => {
         revenue: (businessInputs.users || 0) * (businessInputs.pricing || 0),
         costs: (businessInputs.devCost || 0) + (businessInputs.opsCost || 0),
         roi: 0, // Will be calculated
-        npv: 0  // Will be calculated
+        npv: 0, // Will be calculated
       };
-      basicFinancialModel.roi = ((basicFinancialModel.revenue - basicFinancialModel.costs) / basicFinancialModel.costs) * 100;
+      basicFinancialModel.roi =
+        ((basicFinancialModel.revenue - basicFinancialModel.costs) / basicFinancialModel.costs) *
+        100;
       basicFinancialModel.npv = basicFinancialModel.revenue - basicFinancialModel.costs;
 
       const scenarioResult = await scenarioService.runScenarios({
         ledger,
         basicCalc: basicFinancialModel,
         topIds: ledger.assumptions.slice(0, 5).map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       });
       expect(scenarioResult.success).toBe(true);
       const scenarios = scenarioResult.data!;
-      
+
       expect(scenarios.scenarios.base.length).toBeGreaterThan(0);
       expect(scenarios.elasticities.length).toBeGreaterThan(0);
       expect(scenarios.keyDrivers.length).toBeGreaterThan(0);
@@ -141,11 +143,11 @@ describe('Amazon Steering End-to-End Integration', () => {
         ledger,
         weakestIds,
         businessContext: `${businessInputs.featureName} for ${businessInputs.customer}`,
-        competitiveContext: businessInputs.competitors?.join(', ')
+        competitiveContext: businessInputs.competitors?.join(', '),
       });
       expect(questionsResult.success).toBe(true);
       const hardQuestions = questionsResult.data!;
-      
+
       expect(hardQuestions.length).toBeGreaterThan(0);
       expect(hardQuestions.length).toBeLessThanOrEqual(10);
 
@@ -188,18 +190,18 @@ describe('Amazon Steering End-to-End Integration', () => {
       // Step 9: Verify complete file structure was created
       const featureSlug = 'ai-powered-customer-analytics-platform';
       const baseDir = join(tempDir, '.kiro', 'steering', 'working-backwards', featureSlug);
-      
+
       // Check main directory exists
       await expect(access(baseDir)).resolves.not.toThrow();
-      
+
       // Check attachments directory exists
       const attachmentsDir = join(baseDir, 'attachments');
       await expect(access(attachmentsDir)).resolves.not.toThrow();
-      
+
       // Check latest.json exists
       const latestPath = join(baseDir, 'latest.json');
       await expect(access(latestPath)).resolves.not.toThrow();
-      
+
       // Verify latest.json content
       const latestContent = await readFile(latestPath, 'utf-8');
       const latestData = JSON.parse(latestContent);
@@ -210,27 +212,27 @@ describe('Amazon Steering End-to-End Integration', () => {
       // Step 10: Verify PR/FAQ document structure
       const prfaqPath = prfaqResult.data!.artifactPath;
       const prfaqContent = await readFile(prfaqPath, 'utf-8');
-      
+
       // Check YAML front matter
       expect(prfaqContent).toContain('---');
       expect(prfaqContent).toContain('title: "PR/FAQ — AI-Powered Customer Analytics Platform"');
       expect(prfaqContent).toContain('artifact_type: pr_faq');
       expect(prfaqContent).toContain('profile: "amazon"');
       expect(prfaqContent).toContain(`inputs_hash: "${inputsHash}"`);
-      
+
       // Check confidence data in front matter
       expect(prfaqContent).toContain('confidence:');
       expect(prfaqContent).toContain(`total: ${confidence.total}`);
       expect(prfaqContent).toContain('breakdown:');
-      
+
       // Check assumptions data in front matter
       expect(prfaqContent).toContain('assumptions:');
       expect(prfaqContent).toContain('coverage_pct:');
-      
+
       // Check scenarios data in front matter
       expect(prfaqContent).toContain('scenarios:');
       expect(prfaqContent).toContain('pct: 20');
-      
+
       // Check attachment paths in front matter
       expect(prfaqContent).toContain('paths:');
       expect(prfaqContent).toContain('assumptions_json:');
@@ -240,13 +242,15 @@ describe('Amazon Steering End-to-End Integration', () => {
       // Step 11: Verify Decision One-Pager document structure
       const onepagerPath = onepagerResult.data!.artifactPath;
       const onepagerContent = await readFile(onepagerPath, 'utf-8');
-      
-      expect(onepagerContent).toContain('title: "Decision One-Pager — AI-Powered Customer Analytics Platform"');
+
+      expect(onepagerContent).toContain(
+        'title: "Decision One-Pager — AI-Powered Customer Analytics Platform"'
+      );
       expect(onepagerContent).toContain('artifact_type: decision_onepager');
 
       // Step 12: Verify all JSON attachments are valid and complete
       const shortHash = inputsHash.substring(0, 8);
-      
+
       // Check assumptions attachment
       const assumptionsPath = join(attachmentsDir, `assumptions-${shortHash}.json`);
       await expect(access(assumptionsPath)).resolves.not.toThrow();
@@ -254,14 +258,14 @@ describe('Amazon Steering End-to-End Integration', () => {
       const assumptionsData = JSON.parse(assumptionsContent);
       expect(assumptionsData.assumptions).toHaveLength(ledger.assumptions.length);
       expect(assumptionsData.coverage_pct).toBe(ledger.coverage_pct);
-      
+
       // Check citations attachment
       const citationsPath = join(attachmentsDir, `citations-${shortHash}.json`);
       await expect(access(citationsPath)).resolves.not.toThrow();
       const citationsContent = await readFile(citationsPath, 'utf-8');
       const citationsData = JSON.parse(citationsContent);
       expect(citationsData).toHaveLength(businessInputs.citations!.length);
-      
+
       // Check scenarios attachment
       const scenariosPath = join(attachmentsDir, `scenarios-${shortHash}.json`);
       await expect(access(scenariosPath)).resolves.not.toThrow();
@@ -284,7 +288,7 @@ describe('Amazon Steering End-to-End Integration', () => {
       const businessInputs: BusinessInputs = {
         featureName: 'Test Feature',
         customer: 'Test Customer',
-        pricing: 100
+        pricing: 100,
       };
 
       // Generate first hash
@@ -305,21 +309,28 @@ describe('Amazon Steering End-to-End Integration', () => {
         coverage_pct: 0,
         lastUpdated: new Date(),
         totalClaims: 0,
-        backedClaims: 0
+        backedClaims: 0,
       };
 
       const mockConfidence = {
         total: 50,
-        breakdown: { evidence: 50, recency: 50, diversity: 50, agreement: 50, coverage: 50, sensitivity: 50 },
+        breakdown: {
+          evidence: 50,
+          recency: 50,
+          diversity: 50,
+          agreement: 50,
+          coverage: 50,
+          sensitivity: 50,
+        },
         explanation: 'Test',
-        lowConfidence: true
+        lowConfidence: true,
       };
 
       const mockScenarios = {
         scenarios: { bear: [], base: [], bull: [] },
         elasticities: [],
         keyDrivers: [],
-        sensitivityPct: 20
+        sensitivityPct: 20,
       };
 
       const package1 = steeringWriter.createSteeringPackage(
@@ -348,7 +359,9 @@ describe('Amazon Steering End-to-End Integration', () => {
 
       // Different hashes should result in different attachment filenames
       expect(package1.attachments[0].filename).not.toBe(package2.attachments[0].filename);
-      expect(package1.frontMatter.paths.assumptions_json).not.toBe(package2.frontMatter.paths.assumptions_json);
+      expect(package1.frontMatter.paths.assumptions_json).not.toBe(
+        package2.frontMatter.paths.assumptions_json
+      );
     });
   });
 
@@ -356,30 +369,37 @@ describe('Amazon Steering End-to-End Integration', () => {
     it('should handle minimal business inputs gracefully', async () => {
       const minimalInputs: BusinessInputs = {
         featureName: 'Minimal Feature',
-        customer: 'Test Customer'
+        customer: 'Test Customer',
       };
 
       // Should still generate valid assumption ledger
       const ledgerResult = await assumptionLedgerService.normalizeLedger(minimalInputs);
       expect(ledgerResult.success).toBe(true);
-      
+
       // Should generate valid hash
       const inputsHash = steeringWriter.generateInputsHash(minimalInputs);
       expect(inputsHash).toHaveLength(64);
-      
+
       // Should create valid steering package
       const mockConfidence = {
         total: 30,
-        breakdown: { evidence: 30, recency: 30, diversity: 30, agreement: 30, coverage: 30, sensitivity: 30 },
+        breakdown: {
+          evidence: 30,
+          recency: 30,
+          diversity: 30,
+          agreement: 30,
+          coverage: 30,
+          sensitivity: 30,
+        },
         explanation: 'Low confidence due to minimal inputs',
-        lowConfidence: true
+        lowConfidence: true,
       };
 
       const mockScenarios = {
         scenarios: { bear: [], base: [], bull: [] },
         elasticities: [],
         keyDrivers: [],
-        sensitivityPct: 20
+        sensitivityPct: 20,
       };
 
       const package_ = steeringWriter.createSteeringPackage(
@@ -401,7 +421,7 @@ describe('Amazon Steering End-to-End Integration', () => {
     it('should handle service failures gracefully', async () => {
       const businessInputs: BusinessInputs = {
         featureName: 'Test Feature',
-        customer: 'Test Customer'
+        customer: 'Test Customer',
       };
 
       // Test assumption ledger service failure handling
@@ -508,9 +528,9 @@ ${inputs.customer} need advanced analytics capabilities to compete in the rapidl
 
 | Scenario | Revenue | Costs | ROI |
 |----------|---------|-------|-----|
-| **Bear** | $${(scenarios.scenarios.bear[0]?.bear || 0).toLocaleString()} | $${((inputs.devCost || 0) + (inputs.opsCost || 0)).toLocaleString()} | ${Math.round(((scenarios.scenarios.bear[0]?.bear || 0) - ((inputs.devCost || 0) + (inputs.opsCost || 0))) / ((inputs.devCost || 0) + (inputs.opsCost || 0)) * 100)}% |
-| **Base** | $${(scenarios.scenarios.base[0]?.base || 0).toLocaleString()} | $${((inputs.devCost || 0) + (inputs.opsCost || 0)).toLocaleString()} | ${Math.round(((scenarios.scenarios.base[0]?.base || 0) - ((inputs.devCost || 0) + (inputs.opsCost || 0))) / ((inputs.devCost || 0) + (inputs.opsCost || 0)) * 100)}% |
-| **Bull** | $${(scenarios.scenarios.bull[0]?.bull || 0).toLocaleString()} | $${((inputs.devCost || 0) + (inputs.opsCost || 0)).toLocaleString()} | ${Math.round(((scenarios.scenarios.bull[0]?.bull || 0) - ((inputs.devCost || 0) + (inputs.opsCost || 0))) / ((inputs.devCost || 0) + (inputs.opsCost || 0)) * 100)}% |
+| **Bear** | $${(scenarios.scenarios.bear[0]?.bear || 0).toLocaleString()} | $${((inputs.devCost || 0) + (inputs.opsCost || 0)).toLocaleString()} | ${Math.round((((scenarios.scenarios.bear[0]?.bear || 0) - ((inputs.devCost || 0) + (inputs.opsCost || 0))) / ((inputs.devCost || 0) + (inputs.opsCost || 0))) * 100)}% |
+| **Base** | $${(scenarios.scenarios.base[0]?.base || 0).toLocaleString()} | $${((inputs.devCost || 0) + (inputs.opsCost || 0)).toLocaleString()} | ${Math.round((((scenarios.scenarios.base[0]?.base || 0) - ((inputs.devCost || 0) + (inputs.opsCost || 0))) / ((inputs.devCost || 0) + (inputs.opsCost || 0))) * 100)}% |
+| **Bull** | $${(scenarios.scenarios.bull[0]?.bull || 0).toLocaleString()} | $${((inputs.devCost || 0) + (inputs.opsCost || 0)).toLocaleString()} | ${Math.round((((scenarios.scenarios.bull[0]?.bull || 0) - ((inputs.devCost || 0) + (inputs.opsCost || 0))) / ((inputs.devCost || 0) + (inputs.opsCost || 0))) * 100)}% |
 
 ## Recommendation
 
@@ -523,8 +543,14 @@ ${inputs.customer} need advanced analytics capabilities to compete in the rapidl
 ## Evidence Mechanisms
 
 ### Key Assumptions (${ledger.coverage_pct}% coverage)
-${ledger.assumptions.slice(0, 3).map((a: any) => `- ${a.id}: ${a.name} (${a.certainty} certainty)`).join('\n')}
+${ledger.assumptions
+  .slice(0, 3)
+  .map((a: any) => `- ${a.id}: ${a.name} (${a.certainty} certainty)`)
+  .join('\n')}
 
 ### Sensitivity Analysis
-Top drivers: ${scenarios.keyDrivers.slice(0, 3).map((kd: any) => `${kd.assumption} (${kd.impact}% impact)`).join(', ')}`;
+Top drivers: ${scenarios.keyDrivers
+    .slice(0, 3)
+    .map((kd: any) => `${kd.assumption} (${kd.impact}% impact)`)
+    .join(', ')}`;
 }

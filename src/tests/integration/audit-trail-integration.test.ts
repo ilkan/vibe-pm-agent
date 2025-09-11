@@ -92,16 +92,11 @@ describe('AuditTrailManager Integration', () => {
         },
       };
 
-      await auditManager.logCitationValidated(
-        newCitation.id,
-        validationResult,
-        mockUser,
-        {
-          documentId,
-          toolUsed: 'validate_sources',
-          requestId: 'req-integration-124',
-        }
-      );
+      await auditManager.logCitationValidated(newCitation.id, validationResult, mockUser, {
+        documentId,
+        toolUsed: 'validate_sources',
+        requestId: 'req-integration-124',
+      });
 
       // Step 3: Modify the citation
       const modifiedCitation = {
@@ -139,17 +134,11 @@ describe('AuditTrailManager Integration', () => {
         complianceStatus: 'compliant',
       };
 
-      await auditManager.logQualityAssessed(
-        newCitation.id,
-        'citation',
-        qualityResult,
-        mockUser,
-        {
-          documentId,
-          toolUsed: 'audit_citation_quality',
-          requestId: 'req-integration-126',
-        }
-      );
+      await auditManager.logQualityAssessed(newCitation.id, 'citation', qualityResult, mockUser, {
+        documentId,
+        toolUsed: 'audit_citation_quality',
+        requestId: 'req-integration-126',
+      });
 
       // Step 5: Generate document using the citation
       await auditManager.logDocumentGenerated(
@@ -196,16 +185,10 @@ describe('AuditTrailManager Integration', () => {
         documentationComplete: true,
       };
 
-      await auditManager.logComplianceChecked(
-        documentId,
-        'sox_2002',
-        complianceResult,
-        mockUser,
-        {
-          toolUsed: 'validate_compliance',
-          requestId: 'req-integration-128',
-        }
-      );
+      await auditManager.logComplianceChecked(documentId, 'sox_2002', complianceResult, mockUser, {
+        toolUsed: 'validate_compliance',
+        requestId: 'req-integration-128',
+      });
 
       // Verify complete audit trail
       const auditEntries = await auditManager.queryAuditTrail({
@@ -258,15 +241,10 @@ describe('AuditTrailManager Integration', () => {
       await auditManager.logCitationCreated(citation, mockUser);
 
       // Delete citation
-      await auditManager.logCitationDeleted(
-        citation,
-        mockUser,
-        'Source no longer credible',
-        {
-          documentId: 'doc-deletion-test',
-          toolUsed: 'audit_citation_quality',
-        }
-      );
+      await auditManager.logCitationDeleted(citation, mockUser, 'Source no longer credible', {
+        documentId: 'doc-deletion-test',
+        toolUsed: 'audit_citation_quality',
+      });
 
       // Verify audit trail
       const entries = await auditManager.queryAuditTrail({
@@ -274,7 +252,7 @@ describe('AuditTrailManager Integration', () => {
       });
 
       expect(entries).toHaveLength(2);
-      
+
       const creationEntry = entries.find(e => e.eventType === AuditEventType.CITATION_CREATED);
       const deletionEntry = entries.find(e => e.eventType === AuditEventType.CITATION_DELETED);
 
@@ -316,7 +294,7 @@ describe('AuditTrailManager Integration', () => {
 
       // Validate SOX compliance
       const complianceResults = await auditManager.validateCompliance(['sox_2002']);
-      
+
       expect(complianceResults).toHaveLength(1);
       expect(complianceResults[0].standardId).toBe('sox_2002');
       expect(complianceResults[0].auditTrailComplete).toBe(true);
@@ -324,19 +302,13 @@ describe('AuditTrailManager Integration', () => {
 
     it('should validate GDPR compliance for data processing', async () => {
       // Simulate data processing activity
-      await auditManager.logDocumentGenerated(
-        'gdpr-doc-123',
-        'privacy_policy',
-        [],
-        mockUser,
-        {
-          toolUsed: 'generate_privacy_policy',
-        }
-      );
+      await auditManager.logDocumentGenerated('gdpr-doc-123', 'privacy_policy', [], mockUser, {
+        toolUsed: 'generate_privacy_policy',
+      });
 
       // Validate GDPR compliance
       const complianceResults = await auditManager.validateCompliance(['gdpr_2018']);
-      
+
       expect(complianceResults).toHaveLength(1);
       expect(complianceResults[0].standardId).toBe('gdpr_2018');
       // GDPR compliance might fail due to missing data processing logs
@@ -363,7 +335,7 @@ describe('AuditTrailManager Integration', () => {
 
       // Validate ISO 27001 compliance
       const complianceResults = await auditManager.validateCompliance(['iso_27001']);
-      
+
       expect(complianceResults).toHaveLength(1);
       expect(complianceResults[0].standardId).toBe('iso_27001');
       expect(complianceResults[0].requirementResults).toBeDefined();
@@ -385,8 +357,13 @@ describe('AuditTrailManager Integration', () => {
       };
 
       await auditManager.logCitationCreated(testCitation, mockUser);
-      await auditManager.logDocumentGenerated('report-doc-123', 'business_case', [testCitation.id], mockUser);
-      
+      await auditManager.logDocumentGenerated(
+        'report-doc-123',
+        'business_case',
+        [testCitation.id],
+        mockUser
+      );
+
       const qualityResult = { overallScore: 88, qualityGaps: [], recommendations: [] };
       await auditManager.logQualityAssessed('report-doc-123', 'document', qualityResult, mockUser);
     });
@@ -475,7 +452,7 @@ describe('AuditTrailManager Integration', () => {
   describe('Performance and Scalability', () => {
     it('should handle large number of audit entries efficiently', async () => {
       const startTime = Date.now();
-      
+
       // Create many audit entries
       const promises = [];
       for (let i = 0; i < 100; i++) {
@@ -494,7 +471,7 @@ describe('AuditTrailManager Integration', () => {
       }
 
       await Promise.all(promises);
-      
+
       const endTime = Date.now();
       const duration = endTime - startTime;
 
@@ -527,7 +504,7 @@ describe('AuditTrailManager Integration', () => {
       }
 
       const startTime = Date.now();
-      
+
       // Query with various filters
       const results = await auditManager.queryAuditTrail({
         eventTypes: [AuditEventType.CITATION_CREATED],
@@ -567,9 +544,7 @@ describe('AuditTrailManager Integration', () => {
         key_finding: 'Recovery test finding',
       };
 
-      await expect(
-        auditManager.logCitationCreated(validCitation, mockUser)
-      ).resolves.not.toThrow();
+      await expect(auditManager.logCitationCreated(validCitation, mockUser)).resolves.not.toThrow();
 
       const entries = await auditManager.queryAuditTrail({
         resourceIds: [validCitation.id],
@@ -580,7 +555,7 @@ describe('AuditTrailManager Integration', () => {
 
     it('should handle concurrent audit logging', async () => {
       const promises = [];
-      
+
       // Create concurrent logging operations
       for (let i = 0; i < 20; i++) {
         const citation: Citation = {

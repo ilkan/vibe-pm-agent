@@ -4,18 +4,17 @@
  */
 
 import { BaseService, Result } from '../_base';
-import { 
-  ConfidenceScore, 
-  ConfidenceContext, 
-  ConfidenceBreakdown, 
-  Citation, 
-  Improvement 
+import {
+  ConfidenceScore,
+  ConfidenceContext,
+  ConfidenceBreakdown,
+  Citation,
+  Improvement,
 } from '../../models/confidence';
 import { performanceCache } from '../../utils/performance-cache';
 import { performanceMonitor } from '../../utils/performance-monitor';
 
 export class ConfidenceService extends BaseService {
-  
   /**
    * Compute confidence score with detailed breakdown
    */
@@ -24,11 +23,11 @@ export class ConfidenceService extends BaseService {
       // Generate cache key for confidence calculation
       const citationsHash = performanceCache.hashCitations(context.citations);
       const cacheKey = performanceCache.getConfidenceKey(
-        citationsHash, 
-        context.ledgerCoveragePct, 
+        citationsHash,
+        context.ledgerCoveragePct,
         context.sensitivityRisk
       );
-      
+
       // Check cache first
       const cachedScore = performanceCache.get<ConfidenceScore>(cacheKey);
       if (cachedScore) {
@@ -44,7 +43,10 @@ export class ConfidenceService extends BaseService {
           const diversity = this.calculateDiversityScore(context.citations);
           const agreement = this.calculateAgreementScore(context.citations);
           const coverage = this.calculateCoverageScore(context.ledgerCoveragePct);
-          const sensitivity = this.calculateSensitivityScore(context.sensitivityRisk, context.varianceHint);
+          const sensitivity = this.calculateSensitivityScore(
+            context.sensitivityRisk,
+            context.varianceHint
+          );
 
           const breakdown: ConfidenceBreakdown = {
             evidence,
@@ -52,15 +54,15 @@ export class ConfidenceService extends BaseService {
             diversity,
             agreement,
             coverage,
-            sensitivity
+            sensitivity,
           };
 
           // Calculate weighted total score
           const total = this.calculateWeightedTotal(breakdown);
-          
+
           // Generate explanation
           const explanation = this.generateExplanation(breakdown, total);
-          
+
           // Check if low confidence
           const lowConfidence = total < 60;
 
@@ -68,7 +70,7 @@ export class ConfidenceService extends BaseService {
             total: Math.round(total),
             breakdown,
             explanation,
-            lowConfidence
+            lowConfidence,
           };
         },
         citationsHash
@@ -76,7 +78,7 @@ export class ConfidenceService extends BaseService {
 
       // Cache the result
       performanceCache.set(cacheKey, result, 'confidence');
-      
+
       return result;
     }, 'CONFIDENCE_CALCULATION_ERROR');
   }
@@ -86,7 +88,7 @@ export class ConfidenceService extends BaseService {
    */
   explainScore(score: ConfidenceScore): string {
     const { breakdown, total } = score;
-    
+
     // Find the strongest and weakest components
     const components = [
       { name: 'evidence', score: breakdown.evidence, weight: 25 },
@@ -94,16 +96,12 @@ export class ConfidenceService extends BaseService {
       { name: 'diversity', score: breakdown.diversity, weight: 15 },
       { name: 'agreement', score: breakdown.agreement, weight: 15 },
       { name: 'coverage', score: breakdown.coverage, weight: 15 },
-      { name: 'sensitivity', score: breakdown.sensitivity, weight: 10 }
+      { name: 'sensitivity', score: breakdown.sensitivity, weight: 10 },
     ];
 
-    const strongest = components.reduce((max, comp) => 
-      comp.score > max.score ? comp : max
-    );
-    
-    const weakest = components.reduce((min, comp) => 
-      comp.score < min.score ? comp : min
-    );
+    const strongest = components.reduce((max, comp) => (comp.score > max.score ? comp : max));
+
+    const weakest = components.reduce((min, comp) => (comp.score < min.score ? comp : min));
 
     if (total >= 80) {
       return `High confidence driven by strong ${strongest.name} (${strongest.score}/100)`;
@@ -127,7 +125,8 @@ export class ConfidenceService extends BaseService {
         area: 'evidence',
         currentScore: breakdown.evidence,
         potentialGain: Math.min(25, (85 - breakdown.evidence) * 0.25),
-        recommendation: 'Add more high-quality sources (A-tier preferred) to strengthen evidence base'
+        recommendation:
+          'Add more high-quality sources (A-tier preferred) to strengthen evidence base',
       });
     }
 
@@ -136,8 +135,8 @@ export class ConfidenceService extends BaseService {
       improvements.push({
         area: 'recency',
         currentScore: breakdown.recency,
-        potentialGain: Math.min(20, (90 - breakdown.recency) * 0.20),
-        recommendation: 'Update with more recent data sources (within last 6 months preferred)'
+        potentialGain: Math.min(20, (90 - breakdown.recency) * 0.2),
+        recommendation: 'Update with more recent data sources (within last 6 months preferred)',
       });
     }
 
@@ -147,7 +146,8 @@ export class ConfidenceService extends BaseService {
         area: 'diversity',
         currentScore: breakdown.diversity,
         potentialGain: Math.min(15, (85 - breakdown.diversity) * 0.15),
-        recommendation: 'Include varied source types (industry reports, financial data, research studies)'
+        recommendation:
+          'Include varied source types (industry reports, financial data, research studies)',
       });
     }
 
@@ -157,7 +157,7 @@ export class ConfidenceService extends BaseService {
         area: 'coverage',
         currentScore: breakdown.coverage,
         potentialGain: Math.min(15, (90 - breakdown.coverage) * 0.15),
-        recommendation: 'Provide sources for more assumptions to increase coverage percentage'
+        recommendation: 'Provide sources for more assumptions to increase coverage percentage',
       });
     }
 
@@ -183,10 +183,10 @@ export class ConfidenceService extends BaseService {
 
     // Base score from average quality
     const avgQuality = totalQuality / sourceCount;
-    
+
     // Quantity bonus (diminishing returns)
     const quantityBonus = Math.min(20, sourceCount * 5);
-    
+
     // Cap at 100
     return Math.min(100, avgQuality + quantityBonus);
   }
@@ -206,8 +206,10 @@ export class ConfidenceService extends BaseService {
     for (const citation of citations) {
       if (citation.date) {
         const citationDate = new Date(citation.date);
-        const daysDiff = Math.floor((now.getTime() - citationDate.getTime()) / (1000 * 60 * 60 * 24));
-        
+        const daysDiff = Math.floor(
+          (now.getTime() - citationDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+
         // Exponential decay: 100% if <30 days, 50% if 1 year
         let recencyScore: number;
         if (daysDiff <= 30) {
@@ -250,10 +252,14 @@ export class ConfidenceService extends BaseService {
     // Score based on number of unique source types
     // 4+ types = 100, 3 types = 80, 2 types = 60, 1 type = 40
     switch (uniqueTypes) {
-      case 1: return 40;
-      case 2: return 60;
-      case 3: return 80;
-      default: return 100; // 4 or more types
+      case 1:
+        return 40;
+      case 2:
+        return 60;
+      case 3:
+        return 80;
+      default:
+        return 100; // 4 or more types
     }
   }
 
@@ -268,20 +274,20 @@ export class ConfidenceService extends BaseService {
     // Heuristic: More high-quality sources suggest better agreement
     const highQualitySources = citations.filter(c => (c.rating || 'C') === 'A').length;
     const totalSources = citations.length;
-    
+
     const highQualityRatio = highQualitySources / totalSources;
-    
+
     // Base agreement score
     let agreementScore = 70; // Default moderate agreement
-    
+
     // Bonus for high-quality sources (they tend to agree more)
     agreementScore += highQualityRatio * 25;
-    
+
     // Penalty for too many sources (might indicate disagreement)
     if (totalSources > 10) {
       agreementScore -= (totalSources - 10) * 2;
     }
-    
+
     return Math.max(20, Math.min(100, agreementScore));
   }
 
@@ -310,10 +316,14 @@ export class ConfidenceService extends BaseService {
 
     // Use sensitivity risk level
     switch (sensitivityRisk) {
-      case 'low': return 85; // Low sensitivity risk = high score
-      case 'medium': return 65;
-      case 'high': return 35; // High sensitivity risk = low score
-      default: return 70; // Default moderate sensitivity
+      case 'low':
+        return 85; // Low sensitivity risk = high score
+      case 'medium':
+        return 65;
+      case 'high':
+        return 35; // High sensitivity risk = low score
+      default:
+        return 70; // Default moderate sensitivity
     }
   }
 
@@ -322,12 +332,12 @@ export class ConfidenceService extends BaseService {
    */
   private calculateWeightedTotal(breakdown: ConfidenceBreakdown): number {
     const weights = {
-      evidence: 0.25,    // 25%
-      recency: 0.20,     // 20%
-      diversity: 0.15,   // 15%
-      agreement: 0.15,   // 15%
-      coverage: 0.15,    // 15%
-      sensitivity: 0.10  // 10%
+      evidence: 0.25, // 25%
+      recency: 0.2, // 20%
+      diversity: 0.15, // 15%
+      agreement: 0.15, // 15%
+      coverage: 0.15, // 15%
+      sensitivity: 0.1, // 10%
     };
 
     return (
@@ -350,26 +360,24 @@ export class ConfidenceService extends BaseService {
       { name: 'source diversity', score: breakdown.diversity },
       { name: 'source agreement', score: breakdown.agreement },
       { name: 'assumption coverage', score: breakdown.coverage },
-      { name: 'sensitivity analysis', score: breakdown.sensitivity }
+      { name: 'sensitivity analysis', score: breakdown.sensitivity },
     ];
 
     // Find the primary driver (highest weighted contribution)
     const weightedComponents = [
       { name: 'evidence quality', contribution: breakdown.evidence * 0.25 },
-      { name: 'data recency', contribution: breakdown.recency * 0.20 },
+      { name: 'data recency', contribution: breakdown.recency * 0.2 },
       { name: 'source diversity', contribution: breakdown.diversity * 0.15 },
       { name: 'source agreement', contribution: breakdown.agreement * 0.15 },
       { name: 'assumption coverage', contribution: breakdown.coverage * 0.15 },
-      { name: 'sensitivity analysis', contribution: breakdown.sensitivity * 0.10 }
+      { name: 'sensitivity analysis', contribution: breakdown.sensitivity * 0.1 },
     ];
 
-    const primaryDriver = weightedComponents.reduce((max, comp) => 
+    const primaryDriver = weightedComponents.reduce((max, comp) =>
       comp.contribution > max.contribution ? comp : max
     );
 
-    const weakestArea = components.reduce((min, comp) => 
-      comp.score < min.score ? comp : min
-    );
+    const weakestArea = components.reduce((min, comp) => (comp.score < min.score ? comp : min));
 
     if (total >= 80) {
       return `Strong confidence anchored by excellent ${primaryDriver.name}`;
@@ -385,10 +393,14 @@ export class ConfidenceService extends BaseService {
    */
   private getCredibilityScore(rating: 'A' | 'B' | 'C'): number {
     switch (rating) {
-      case 'A': return 100; // Highly credible sources
-      case 'B': return 75;  // Moderately credible sources
-      case 'C': return 50;  // Lower credibility sources
-      default: return 50;
+      case 'A':
+        return 100; // Highly credible sources
+      case 'B':
+        return 75; // Moderately credible sources
+      case 'C':
+        return 50; // Lower credibility sources
+      default:
+        return 50;
     }
   }
 }

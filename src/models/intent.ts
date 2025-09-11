@@ -17,7 +17,16 @@ export interface TechnicalRequirement {
 
 export interface Operation {
   id: string;
-  type: 'vibe' | 'spec' | 'data_retrieval' | 'processing' | 'analysis' | 'kiro_vibe_coding' | 'kiro_spec_generation' | 'kiro_autopilot' | 'kiro_supervised';
+  type:
+    | 'vibe'
+    | 'spec'
+    | 'data_retrieval'
+    | 'processing'
+    | 'analysis'
+    | 'kiro_vibe_coding'
+    | 'kiro_spec_generation'
+    | 'kiro_autopilot'
+    | 'kiro_supervised';
   description: string;
   estimatedQuotaCost: number;
 }

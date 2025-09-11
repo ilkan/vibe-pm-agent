@@ -356,8 +356,8 @@ export interface EvidencePackage {
   confidenceAnalysis: {
     overallConfidence: number;
     claimConfidences: Map<string, ConfidenceScore>;
-    weakestClaims: Array<{claim: string; confidence: number}>;
-    strongestClaims: Array<{claim: string; confidence: number}>;
+    weakestClaims: Array<{ claim: string; confidence: number }>;
+    strongestClaims: Array<{ claim: string; confidence: number }>;
     recommendationReliability: 'high' | 'medium' | 'low';
   };
   recommendations: string[];

@@ -4,12 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
-  BusinessInputs 
+  BusinessInputs,
 } from '../../services/amazon';
 
 describe('Amazon Working Backwards - Test Suite Validation', () => {
@@ -31,10 +31,10 @@ describe('Amazon Working Backwards - Test Suite Validation', () => {
       {
         url: 'https://example.com/test',
         title: 'Test Citation',
-        sourceType: 'research'
-      }
+        sourceType: 'research',
+      },
     ],
-    assumptions: ['Test assumption 1', 'Test assumption 2']
+    assumptions: ['Test assumption 1', 'Test assumption 2'],
   };
 
   beforeEach(() => {
@@ -55,7 +55,7 @@ describe('Amazon Working Backwards - Test Suite Validation', () => {
       const confidenceResult = await confidenceService.computeConfidence({
         citations: testInputs.citations || [],
         ledgerCoveragePct: ledgerResult.data!.coverage_pct,
-        assumptionCount: ledgerResult.data!.assumptions.length
+        assumptionCount: ledgerResult.data!.assumptions.length,
       });
       expect(confidenceResult.success).toBe(true);
       expect(confidenceResult.data).toBeDefined();
@@ -65,7 +65,7 @@ describe('Amazon Working Backwards - Test Suite Validation', () => {
         ledger: ledgerResult.data!,
         basicCalc: { revenue: 150000, costs: 120000, roi: 25, npv: 30000 },
         topIds: ledgerResult.data!.assumptions.slice(0, 3).map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       });
       expect(scenarioResult.success).toBe(true);
       expect(scenarioResult.data).toBeDefined();
@@ -75,7 +75,7 @@ describe('Amazon Working Backwards - Test Suite Validation', () => {
         ledger: ledgerResult.data!,
         weakestIds: ledgerResult.data!.assumptions.slice(0, 2).map(a => a.id),
         businessContext: 'Test context',
-        competitiveContext: 'Test competition'
+        competitiveContext: 'Test competition',
       });
       expect(questionsResult.success).toBe(true);
       expect(questionsResult.data).toBeDefined();
@@ -84,7 +84,7 @@ describe('Amazon Working Backwards - Test Suite Validation', () => {
     it('should handle edge cases gracefully', async () => {
       const emptyInputs: BusinessInputs = {
         featureName: '',
-        customer: ''
+        customer: '',
       };
 
       const result = await assumptionLedgerService.normalizeLedger(emptyInputs);
@@ -94,16 +94,16 @@ describe('Amazon Working Backwards - Test Suite Validation', () => {
 
     it('should validate performance requirements', async () => {
       const startTime = Date.now();
-      
+
       const ledgerResult = await assumptionLedgerService.normalizeLedger(testInputs);
       const confidenceResult = await confidenceService.computeConfidence({
         citations: testInputs.citations || [],
         ledgerCoveragePct: ledgerResult.data!.coverage_pct,
-        assumptionCount: ledgerResult.data!.assumptions.length
+        assumptionCount: ledgerResult.data!.assumptions.length,
       });
-      
+
       const duration = Date.now() - startTime;
-      
+
       expect(ledgerResult.success).toBe(true);
       expect(confidenceResult.success).toBe(true);
       expect(duration).toBeLessThan(5000); // 5 seconds for basic test
@@ -111,9 +111,9 @@ describe('Amazon Working Backwards - Test Suite Validation', () => {
 
     it('should validate error handling', async () => {
       const invalidInputs = null as any;
-      
+
       const result = await assumptionLedgerService.normalizeLedger(invalidInputs);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.error!.code).toBe('ASSUMPTION_LEDGER_ERROR');
@@ -132,14 +132,14 @@ describe('Amazon Working Backwards - Test Suite Validation', () => {
     it('should validate integration test patterns', async () => {
       // Test that services can be chained together
       const ledgerResult = await assumptionLedgerService.normalizeLedger(testInputs);
-      
+
       if (ledgerResult.success) {
         const confidenceResult = await confidenceService.computeConfidence({
           citations: testInputs.citations || [],
           ledgerCoveragePct: ledgerResult.data!.coverage_pct,
-          assumptionCount: ledgerResult.data!.assumptions.length
+          assumptionCount: ledgerResult.data!.assumptions.length,
         });
-        
+
         expect(confidenceResult.success).toBe(true);
       }
     });
@@ -160,17 +160,11 @@ describe('Amazon Working Backwards - Test Suite Validation', () => {
     });
 
     it('should validate error handling patterns', async () => {
-      const testCases = [
-        null,
-        undefined,
-        {},
-        { featureName: null },
-        { customer: undefined }
-      ];
+      const testCases = [null, undefined, {}, { featureName: null }, { customer: undefined }];
 
       for (const testCase of testCases) {
         const result = await assumptionLedgerService.normalizeLedger(testCase as any);
-        
+
         // Should either succeed gracefully or fail with meaningful error
         if (!result.success) {
           expect(result.error).toBeDefined();

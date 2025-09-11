@@ -3,7 +3,10 @@
  */
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { AssumptionLedgerService, type BusinessInputs } from '../../services/amazon/assumption-ledger';
+import {
+  AssumptionLedgerService,
+  type BusinessInputs,
+} from '../../services/amazon/assumption-ledger';
 import { AssumptionLedger, Assumption } from '../../models/assumptions';
 
 describe('AssumptionLedgerService', () => {
@@ -30,10 +33,10 @@ describe('AssumptionLedgerService', () => {
           date: '2024-01-15',
           rating: 'A',
           snippet: 'Market size projected at $10B',
-          sourceType: 'industry_report'
-        }
+          sourceType: 'industry_report',
+        },
       ],
-      assumptions: ['Customer adoption rate will be 20%']
+      assumptions: ['Customer adoption rate will be 20%'],
     };
   });
 
@@ -43,7 +46,7 @@ describe('AssumptionLedgerService', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
-      
+
       const ledger = result.data!;
       expect(ledger.assumptions.length).toBeGreaterThan(0);
       expect(ledger.coverage_pct).toBeGreaterThanOrEqual(0);
@@ -54,10 +57,10 @@ describe('AssumptionLedgerService', () => {
 
     it('should assign sequential A# IDs to assumptions', async () => {
       const result = await service.normalizeLedger(sampleInputs);
-      
+
       expect(result.success).toBe(true);
       const assumptions = result.data!.assumptions;
-      
+
       expect(assumptions[0].id).toBe('A1');
       expect(assumptions[1].id).toBe('A2');
       if (assumptions.length > 2) {
@@ -67,14 +70,14 @@ describe('AssumptionLedgerService', () => {
 
     it('should categorize assumptions correctly', async () => {
       const result = await service.normalizeLedger(sampleInputs);
-      
+
       expect(result.success).toBe(true);
       const assumptions = result.data!.assumptions;
-      
+
       const pricingAssumption = assumptions.find(a => a.name.includes('Pricing'));
       expect(pricingAssumption?.category).toBe('financial');
       expect(pricingAssumption?.impact).toBe('critical');
-      
+
       const usersAssumption = assumptions.find(a => a.name.includes('User'));
       expect(usersAssumption?.category).toBe('market');
       expect(usersAssumption?.impact).toBe('critical');
@@ -83,11 +86,11 @@ describe('AssumptionLedgerService', () => {
     it('should handle empty inputs gracefully', async () => {
       const emptyInputs: BusinessInputs = {
         featureName: 'Test Feature',
-        customer: 'Test Customer'
+        customer: 'Test Customer',
       };
 
       const result = await service.normalizeLedger(emptyInputs);
-      
+
       expect(result.success).toBe(true);
       expect(result.data!.assumptions).toHaveLength(0);
       expect(result.data!.coverage_pct).toBe(0);
@@ -96,9 +99,9 @@ describe('AssumptionLedgerService', () => {
     it('should handle errors gracefully', async () => {
       // Force an error by passing invalid data
       const invalidInputs = null as any;
-      
+
       const result = await service.normalizeLedger(invalidInputs);
-      
+
       expect(result.success).toBe(false);
       expect(result.error?.code).toBe('ASSUMPTION_LEDGER_ERROR');
     });
@@ -115,27 +118,27 @@ describe('AssumptionLedgerService', () => {
             title: 'AI Market Analysis 2024',
             snippet: 'AI market size expected to reach $10B by 2025',
             sourceType: 'industry_report',
-            rating: 'A'
+            rating: 'A',
           },
           {
             url: 'https://example.com/pricing-study',
             title: 'SaaS Pricing Study',
             snippet: 'Enterprise software pricing averages $99/month',
             sourceType: 'research',
-            rating: 'B'
-          }
-        ]
+            rating: 'B',
+          },
+        ],
       };
 
       const result = await service.normalizeLedger(inputsWithCitations);
-      
+
       expect(result.success).toBe(true);
       const assumptions = result.data!.assumptions;
-      
+
       // Check that market size assumption got the relevant citation
       const marketAssumption = assumptions.find(a => a.name.includes('Market'));
       expect(marketAssumption?.sourceUrls).toContain('https://mckinsey.com/ai-market-report');
-      
+
       // Check that pricing assumption got the relevant citation
       const pricingAssumption = assumptions.find(a => a.name.includes('Pricing'));
       expect(pricingAssumption?.sourceUrls).toContain('https://example.com/pricing-study');
@@ -143,10 +146,10 @@ describe('AssumptionLedgerService', () => {
 
     it('should sort assumptions by priority', async () => {
       const result = await service.normalizeLedger(sampleInputs);
-      
+
       expect(result.success).toBe(true);
       const assumptions = result.data!.assumptions;
-      
+
       // Critical assumptions should come first
       const firstFewAssumptions = assumptions.slice(0, 3);
       expect(firstFewAssumptions.every(a => a.impact === 'critical')).toBe(true);
@@ -164,7 +167,7 @@ describe('AssumptionLedgerService', () => {
           certainty: 'High',
           lastChecked: new Date(),
           category: 'market',
-          impact: 'critical' // weight: 3, multiplier: 1.0 = 3
+          impact: 'critical', // weight: 3, multiplier: 1.0 = 3
         },
         {
           id: 'A2',
@@ -174,8 +177,8 @@ describe('AssumptionLedgerService', () => {
           certainty: 'Medium',
           lastChecked: new Date(),
           category: 'financial',
-          impact: 'important' // weight: 2, no sources = 0
-        }
+          impact: 'important', // weight: 2, no sources = 0
+        },
       ];
 
       const coverage = service.calculateCoverage(assumptions);
@@ -200,7 +203,7 @@ describe('AssumptionLedgerService', () => {
           certainty: 'High',
           lastChecked: new Date(),
           category: 'market',
-          impact: 'critical' // weight: 3, multiplier: 1.0 = 3
+          impact: 'critical', // weight: 3, multiplier: 1.0 = 3
         },
         {
           id: 'A2',
@@ -210,8 +213,8 @@ describe('AssumptionLedgerService', () => {
           certainty: 'Low',
           lastChecked: new Date(),
           category: 'financial',
-          impact: 'important' // weight: 2, multiplier: 0.4 = 0.8
-        }
+          impact: 'important', // weight: 2, multiplier: 0.4 = 0.8
+        },
       ];
 
       const coverage = service.calculateCoverage(assumptions);
@@ -231,7 +234,7 @@ describe('AssumptionLedgerService', () => {
           certainty: 'High',
           lastChecked: new Date(),
           category: 'market',
-          impact: 'critical'
+          impact: 'critical',
         },
         {
           id: 'A2',
@@ -241,8 +244,8 @@ describe('AssumptionLedgerService', () => {
           certainty: 'High',
           lastChecked: new Date(),
           category: 'financial',
-          impact: 'important'
-        }
+          impact: 'important',
+        },
       ];
 
       const coverage = service.calculateCoverage(assumptions);
@@ -262,17 +265,17 @@ describe('AssumptionLedgerService', () => {
             certainty: 'High',
             lastChecked: new Date(),
             category: 'market',
-            impact: 'critical'
-          }
+            impact: 'critical',
+          },
         ],
         coverage_pct: 0,
         lastUpdated: new Date(),
         totalClaims: 1,
-        backedClaims: 0
+        backedClaims: 0,
       };
 
       const result = await service.identifyGaps(ledger);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(1);
       expect(result.data![0].gapType).toBe('missing_source');
@@ -290,17 +293,17 @@ describe('AssumptionLedgerService', () => {
             certainty: 'Low',
             lastChecked: new Date(),
             category: 'market',
-            impact: 'critical'
-          }
+            impact: 'critical',
+          },
         ],
         coverage_pct: 100,
         lastUpdated: new Date(),
         totalClaims: 1,
-        backedClaims: 1
+        backedClaims: 1,
       };
 
       const result = await service.identifyGaps(ledger);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(1);
       expect(result.data![0].gapType).toBe('low_certainty');
@@ -320,17 +323,17 @@ describe('AssumptionLedgerService', () => {
             certainty: 'High',
             lastChecked: oldDate,
             category: 'market',
-            impact: 'critical'
-          }
+            impact: 'critical',
+          },
         ],
         coverage_pct: 100,
         lastUpdated: new Date(),
         totalClaims: 1,
-        backedClaims: 1
+        backedClaims: 1,
       };
 
       const result = await service.identifyGaps(ledger);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(1);
       expect(result.data![0].gapType).toBe('stale_data');
@@ -347,17 +350,17 @@ describe('AssumptionLedgerService', () => {
             certainty: 'High',
             lastChecked: new Date(),
             category: 'market',
-            impact: 'critical'
-          }
+            impact: 'critical',
+          },
         ],
         coverage_pct: 100,
         lastUpdated: new Date(),
         totalClaims: 1,
-        backedClaims: 1
+        backedClaims: 1,
       };
 
       const result = await service.identifyGaps(ledger);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(0);
     });
@@ -374,12 +377,12 @@ describe('AssumptionLedgerService', () => {
           certainty: 'Medium',
           lastChecked: new Date('2020-01-01'),
           category: 'market',
-          impact: 'critical'
-        }
+          impact: 'critical',
+        },
       ];
 
       const validated = await service.validateSources(assumptions);
-      
+
       expect(validated[0].lastChecked.getTime()).toBeGreaterThan(new Date('2020-01-01').getTime());
     });
 
@@ -393,12 +396,12 @@ describe('AssumptionLedgerService', () => {
           certainty: 'Medium',
           lastChecked: new Date('2020-01-01'),
           category: 'market',
-          impact: 'critical'
-        }
+          impact: 'critical',
+        },
       ];
 
       const validated = await service.validateSources(assumptions);
-      
+
       expect(validated[0].certainty).toBe('High');
     });
 
@@ -412,12 +415,12 @@ describe('AssumptionLedgerService', () => {
           certainty: 'Low',
           lastChecked: new Date('2020-01-01'),
           category: 'market',
-          impact: 'critical'
-        }
+          impact: 'critical',
+        },
       ];
 
       const validated = await service.validateSources(assumptions);
-      
+
       expect(validated[0].certainty).toBe('Medium');
     });
 
@@ -431,13 +434,16 @@ describe('AssumptionLedgerService', () => {
           certainty: 'Medium',
           lastChecked: new Date('2020-01-01'),
           category: 'market',
-          impact: 'critical'
-        }
+          impact: 'critical',
+        },
       ];
 
       const validated = await service.validateSources(assumptions);
-      
-      expect(validated[0].sourceUrls).toEqual(['https://mckinsey.com/report', 'https://harvard.edu/study']);
+
+      expect(validated[0].sourceUrls).toEqual([
+        'https://mckinsey.com/report',
+        'https://harvard.edu/study',
+      ]);
       expect(validated[0].certainty).toBe('High'); // A-tier sources
     });
 
@@ -451,12 +457,12 @@ describe('AssumptionLedgerService', () => {
           certainty: 'High',
           lastChecked: new Date('2020-01-01'),
           category: 'market',
-          impact: 'critical'
-        }
+          impact: 'critical',
+        },
       ];
 
       const validated = await service.validateSources(assumptions);
-      
+
       expect(validated[0].id).toBe('A1');
       expect(validated[0].name).toBe('Test 1');
       expect(validated[0].value).toBe(100);
@@ -474,12 +480,12 @@ describe('AssumptionLedgerService', () => {
           certainty: 'Low',
           lastChecked: new Date('2020-01-01'),
           category: 'market',
-          impact: 'critical'
-        }
+          impact: 'critical',
+        },
       ];
 
       const validated = await service.validateSources(assumptions);
-      
+
       expect(validated[0].sourceUrls).toEqual([]);
       expect(validated[0].certainty).toBe('Medium'); // Default for no sources
     });

@@ -1,6 +1,6 @@
 /**
  * MCP Tool: enhance_citations
- * 
+ *
  * Takes existing document content and enhances it with comprehensive citations,
  * quality validation, and confidence scoring. Supports multiple citation formats
  * and provides detailed quality assessment.
@@ -8,7 +8,11 @@
 
 import { MCPToolResult, MCPToolContext, CitationOptions } from '../../models/mcp';
 import { CitationIntegration } from '../../utils/citation-integration';
-import { AICitationDiscoveryEngine, CitationRequirement, UnsupportedClaim } from '../../components/ai-citation-discovery-engine';
+import {
+  AICitationDiscoveryEngine,
+  CitationRequirement,
+  UnsupportedClaim,
+} from '../../components/ai-citation-discovery-engine';
 import { MCPResponseFormatter, MCPLogger, MCPErrorHandler } from '../../utils/mcp-error-handling';
 
 /**
@@ -18,7 +22,12 @@ export interface EnhanceCitationsArgs {
   /** Document content to enhance with citations */
   document_content: string;
   /** Type of document for appropriate citation standards */
-  document_type: 'business_case' | 'market_analysis' | 'executive_onepager' | 'pr_faq' | 'competitive_analysis';
+  document_type:
+    | 'business_case'
+    | 'market_analysis'
+    | 'executive_onepager'
+    | 'pr_faq'
+    | 'competitive_analysis';
   /** Enhancement options for citation processing */
   enhancement_options?: {
     /** Minimum confidence threshold (0-100) */
@@ -44,7 +53,7 @@ export interface EnhanceCitationsArgs {
 
 /**
  * MCP Tool: enhance_citations
- * 
+ *
  * Enhances document content with comprehensive citations, validation, and quality assessment
  */
 export async function enhanceCitations(
@@ -53,8 +62,14 @@ export async function enhanceCitations(
 ): Promise<MCPToolResult> {
   try {
     // Validate required arguments
-    if (!args || typeof args.document_content !== 'string' || args.document_content.trim().length === 0) {
-      throw new Error('Validation failed: document_content is required and must be a non-empty string');
+    if (
+      !args ||
+      typeof args.document_content !== 'string' ||
+      args.document_content.trim().length === 0
+    ) {
+      throw new Error(
+        'Validation failed: document_content is required and must be a non-empty string'
+      );
     }
 
     if (!args.document_type) {
@@ -117,14 +132,16 @@ export async function enhanceCitations(
     // Step 1: Analyze citation needs using AI discovery
     let citationRequirements: CitationRequirement[] = [];
     let unsupportedClaims: UnsupportedClaim[] = [];
-    
+
     if (enhancementOptions.identify_unsupported_claims) {
       MCPLogger.debug('Analyzing citation needs with AI discovery', context);
-      
+
       try {
         citationRequirements = await aiDiscoveryEngine.analyzeCitationNeeds(args.document_content);
-        unsupportedClaims = await aiDiscoveryEngine.identifyUnsupportedClaims(args.document_content);
-        
+        unsupportedClaims = await aiDiscoveryEngine.identifyUnsupportedClaims(
+          args.document_content
+        );
+
         MCPLogger.info('Citation needs analysis completed', context, {
           requirementsFound: citationRequirements.length,
           unsupportedClaimsFound: unsupportedClaims.length,
@@ -139,7 +156,7 @@ export async function enhanceCitations(
 
     // Step 2: Integrate enhanced citations with validation and quality assessment
     MCPLogger.debug('Integrating enhanced citations', context);
-    
+
     const citationResult = await citationIntegration.integrateCitations(
       args.document_type,
       args.document_content,
@@ -151,9 +168,10 @@ export async function enhanceCitations(
     let additionalSources: any[] = [];
     if (enhancementOptions.suggest_additional_sources && citationRequirements.length > 0) {
       MCPLogger.debug('Discovering additional relevant sources', context);
-      
+
       try {
-        const sourceCandidates = await aiDiscoveryEngine.discoverRelevantSources(citationRequirements);
+        const sourceCandidates =
+          await aiDiscoveryEngine.discoverRelevantSources(citationRequirements);
         additionalSources = sourceCandidates
           .filter(candidate => candidate.relevanceScore >= enhancementOptions.minimum_confidence)
           .slice(0, 5) // Limit to top 5 suggestions
@@ -163,13 +181,17 @@ export async function enhanceCitations(
             supportedClaims: candidate.supportedClaims,
             matchingKeywords: candidate.matchingKeywords,
           }));
-        
+
         MCPLogger.info('Additional sources discovered', context, {
           candidatesFound: sourceCandidates.length,
           qualifiedSources: additionalSources.length,
-          averageRelevance: additionalSources.length > 0 
-            ? Math.round(additionalSources.reduce((sum, s) => sum + s.relevanceScore, 0) / additionalSources.length)
-            : 0,
+          averageRelevance:
+            additionalSources.length > 0
+              ? Math.round(
+                  additionalSources.reduce((sum, s) => sum + s.relevanceScore, 0) /
+                    additionalSources.length
+                )
+              : 0,
         });
       } catch (discoveryError) {
         MCPLogger.warn('Additional source discovery failed', context, {
@@ -200,7 +222,7 @@ export async function enhanceCitations(
 
     // Step 6: Create final enhanced content
     let finalContent = citationResult.enhancedContent;
-    
+
     // Add enhancement summary if quality assessment was performed
     if (enhancementOptions.perform_quality_assessment) {
       finalContent += `\n\n${enhancementSummary}`;
@@ -213,8 +235,12 @@ export async function enhanceCitations(
       qualityScore: qualityAssessment.overallScore,
       complianceStatus: qualityAssessment.complianceStatus,
       confidenceScore: citationResult.confidenceScores.overallConfidence,
-      validationsPassed: citationResult.validationResults.filter(v => v.accessibilityStatus.isAccessible).length,
-      validationsFailed: citationResult.validationResults.filter(v => !v.accessibilityStatus.isAccessible).length,
+      validationsPassed: citationResult.validationResults.filter(
+        v => v.accessibilityStatus.isAccessible
+      ).length,
+      validationsFailed: citationResult.validationResults.filter(
+        v => !v.accessibilityStatus.isAccessible
+      ).length,
     });
 
     // Format the response with comprehensive metadata
@@ -230,10 +256,14 @@ export async function enhanceCitations(
         quality_score: qualityAssessment.overallScore,
         overall_confidence: citationResult.confidenceScores.overallConfidence,
         compliance_status: qualityAssessment.complianceStatus,
-        validations_passed: citationResult.validationResults.filter((v: any) => v.accessibilityStatus.isAccessible).length,
-        validations_failed: citationResult.validationResults.filter((v: any) => !v.accessibilityStatus.isAccessible).length,
-        broken_links: citationResult.validationResults.filter((v: any) => 
-          v.accessibilityStatus.accessType === 'broken'
+        validations_passed: citationResult.validationResults.filter(
+          (v: any) => v.accessibilityStatus.isAccessible
+        ).length,
+        validations_failed: citationResult.validationResults.filter(
+          (v: any) => !v.accessibilityStatus.isAccessible
+        ).length,
+        broken_links: citationResult.validationResults.filter(
+          (v: any) => v.accessibilityStatus.accessType === 'broken'
         ).length,
         alternative_sources_found: additionalSources.length,
       },
@@ -244,10 +274,13 @@ export async function enhanceCitations(
         additional_sources_suggested: additionalSources.length,
         quality_gaps_identified: qualityAssessment.qualityGaps,
         improvement_recommendations: qualityAssessment.recommendations,
-        content_length_increase: ((finalContent.length - args.document_content.length) / args.document_content.length * 100).toFixed(1) + '%',
+        content_length_increase:
+          (
+            ((finalContent.length - args.document_content.length) / args.document_content.length) *
+            100
+          ).toFixed(1) + '%',
       },
     });
-
   } catch (error) {
     MCPLogger.error('enhance_citations tool failed', error as Error, context, {
       contentLength: args.document_content?.length,
@@ -273,14 +306,14 @@ function generateEnhancementSummary(
   qualityAssessment: any
 ): string {
   let summary = `## Citation Enhancement Summary\n\n`;
-  
+
   // Overall enhancement metrics
   summary += `### Enhancement Metrics\n`;
   summary += `- **Citations Added**: ${citationResult.citations.length}\n`;
   summary += `- **Quality Score**: ${qualityAssessment.overallScore}/100\n`;
   summary += `- **Compliance Status**: ${qualityAssessment.complianceStatus}\n`;
   summary += `- **Overall Confidence**: ${citationResult.confidenceScores.overallConfidence}%\n`;
-  summary += `- **Content Expansion**: ${((citationResult.enhancedContent.length - originalContent.length) / originalContent.length * 100).toFixed(1)}%\n\n`;
+  summary += `- **Content Expansion**: ${(((citationResult.enhancedContent.length - originalContent.length) / originalContent.length) * 100).toFixed(1)}%\n\n`;
 
   // Citation quality breakdown
   if (citationResult.metrics) {
@@ -293,9 +326,13 @@ function generateEnhancementSummary(
 
   // Validation results
   if (citationResult.validationResults && citationResult.validationResults.length > 0) {
-    const accessibleSources = citationResult.validationResults.filter((v: any) => v.accessibilityStatus.isAccessible).length;
-    const brokenSources = citationResult.validationResults.filter((v: any) => v.accessibilityStatus.accessType === 'broken').length;
-    
+    const accessibleSources = citationResult.validationResults.filter(
+      (v: any) => v.accessibilityStatus.isAccessible
+    ).length;
+    const brokenSources = citationResult.validationResults.filter(
+      (v: any) => v.accessibilityStatus.accessType === 'broken'
+    ).length;
+
     summary += `### Source Validation Results\n`;
     summary += `- **Accessible Sources**: ${accessibleSources}/${citationResult.validationResults.length}\n`;
     if (brokenSources > 0) {
@@ -308,10 +345,10 @@ function generateEnhancementSummary(
   if (unsupportedClaims.length > 0) {
     summary += `### Unsupported Claims Analysis\n`;
     summary += `- **Total Unsupported Claims**: ${unsupportedClaims.length}\n`;
-    
+
     const criticalClaims = unsupportedClaims.filter(c => c.severity === 'critical');
     const highClaims = unsupportedClaims.filter(c => c.severity === 'high');
-    
+
     if (criticalClaims.length > 0) {
       summary += `- **Critical Claims**: ${criticalClaims.length} (require immediate attention)\n`;
     }
@@ -325,7 +362,7 @@ function generateEnhancementSummary(
   if (additionalSources.length > 0) {
     summary += `### Additional Source Suggestions\n`;
     summary += `Found ${additionalSources.length} additional high-relevance sources:\n\n`;
-    
+
     additionalSources.slice(0, 3).forEach((source, index) => {
       summary += `${index + 1}. **${source.source.title}** (${source.relevanceScore}% relevance)\n`;
       summary += `   - Organization: ${source.source.organization}\n`;
@@ -353,7 +390,7 @@ function generateEnhancementSummary(
   }
 
   summary += `*Enhancement completed with comprehensive validation and quality assessment.*\n`;
-  
+
   return summary;
 }
 
@@ -371,7 +408,13 @@ export const enhanceCitationsSchema = {
     },
     document_type: {
       type: 'string',
-      enum: ['business_case', 'market_analysis', 'executive_onepager', 'pr_faq', 'competitive_analysis'],
+      enum: [
+        'business_case',
+        'market_analysis',
+        'executive_onepager',
+        'pr_faq',
+        'competitive_analysis',
+      ],
       description: 'Type of document for appropriate citation standards',
     },
     enhancement_options: {
@@ -492,5 +535,5 @@ export const enhanceCitationsSchema = {
 /**
  * Tool description for MCP registration
  */
-export const enhanceCitationsDescription = 
+export const enhanceCitationsDescription =
   'Enhances document content with comprehensive citations, quality validation, and confidence scoring. Analyzes citation needs, validates sources, and provides detailed quality assessment with improvement recommendations.';

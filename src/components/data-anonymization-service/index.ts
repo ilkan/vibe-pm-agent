@@ -1,6 +1,6 @@
 /**
  * Data Anonymization Service
- * 
+ *
  * Provides comprehensive data anonymization for external API calls
  * to protect sensitive information while maintaining data utility.
  */
@@ -77,28 +77,29 @@ export class DataAnonymizationService extends EventEmitter {
     options: AnonymizationOptions
   ): Promise<AnonymizationResult> {
     const startTime = Date.now();
-    
+
     try {
       // Classify data sensitivity
       const classification = await this.classifyData(data);
-      
+
       // Determine anonymization strategy based on classification and options
       const strategy = this.determineAnonymizationStrategy(classification, options);
-      
+
       // Apply anonymization
       const result = await this.applyAnonymization(data, strategy, context);
-      
+
       // Log anonymization operation
       this.logAnonymizationOperation(context, classification, result, Date.now() - startTime);
-      
+
       return result;
-      
     } catch (error) {
       this.emit('anonymizationError', {
         context,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
-      throw new Error(`Data anonymization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Data anonymization failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -115,7 +116,7 @@ export class DataAnonymizationService extends EventEmitter {
 
     // Get applicable rules based on options level
     const rules = this.getApplicableRules(options.level);
-    
+
     // Apply rules in priority order
     for (const rule of rules) {
       if (rule.enabled && options.customRules.find(r => r.id === rule.id)?.enabled !== false) {
@@ -147,7 +148,7 @@ export class DataAnonymizationService extends EventEmitter {
     }
 
     const anonymized = Array.isArray(jsonData) ? [] : {};
-    
+
     for (const [key, value] of Object.entries(jsonData)) {
       // Check if field should be blocked
       if (options.blockedFields.includes(key)) {
@@ -186,16 +187,19 @@ export class DataAnonymizationService extends EventEmitter {
     options: AnonymizationOptions
   ): Promise<AnonymizationResult> {
     const reversibilityMap = new Map<string, string>();
-    
+
     const anonymized = await this.anonymizeWithMapping(data, options, reversibilityMap);
-    
+
     // Store reversibility map securely
     this.reversibilityMaps.set(sessionId, reversibilityMap);
-    
+
     // Set expiration for reversibility map
-    setTimeout(() => {
-      this.reversibilityMaps.delete(sessionId);
-    }, 24 * 60 * 60 * 1000); // 24 hours
+    setTimeout(
+      () => {
+        this.reversibilityMaps.delete(sessionId);
+      },
+      24 * 60 * 60 * 1000
+    ); // 24 hours
 
     return {
       anonymizedData: anonymized,
@@ -204,19 +208,16 @@ export class DataAnonymizationService extends EventEmitter {
         anonymizedSize: JSON.stringify(anonymized).length,
         fieldsProcessed: Array.from(reversibilityMap.keys()),
         rulesApplied: [],
-        preservationScore: this.calculatePreservationScore(data, anonymized)
+        preservationScore: this.calculatePreservationScore(data, anonymized),
       },
-      reversibilityMap
+      reversibilityMap,
     };
   }
 
   /**
    * Reverse anonymization (for internal use only)
    */
-  async reverseAnonymization(
-    anonymizedData: any,
-    sessionId: string
-  ): Promise<any> {
+  async reverseAnonymization(anonymizedData: any, sessionId: string): Promise<any> {
     const reversibilityMap = this.reversibilityMaps.get(sessionId);
     if (!reversibilityMap) {
       throw new Error('Reversibility map not found or expired');
@@ -240,7 +241,7 @@ export class DataAnonymizationService extends EventEmitter {
       categories.push({
         type: 'pii',
         confidence: 0.9,
-        fields: piiFields
+        fields: piiFields,
       });
       riskScore += 40;
     }
@@ -251,7 +252,7 @@ export class DataAnonymizationService extends EventEmitter {
       categories.push({
         type: 'financial',
         confidence: 0.8,
-        fields: financialFields
+        fields: financialFields,
       });
       riskScore += 30;
     }
@@ -262,7 +263,7 @@ export class DataAnonymizationService extends EventEmitter {
       categories.push({
         type: 'business',
         confidence: 0.7,
-        fields: businessFields
+        fields: businessFields,
       });
       riskScore += 20;
     }
@@ -277,7 +278,7 @@ export class DataAnonymizationService extends EventEmitter {
     return {
       level,
       categories,
-      riskScore
+      riskScore,
     };
   }
 
@@ -342,8 +343,8 @@ export class DataAnonymizationService extends EventEmitter {
         anonymizedSize,
         fieldsProcessed,
         rulesApplied,
-        preservationScore
-      }
+        preservationScore,
+      },
     };
   }
 
@@ -397,7 +398,7 @@ export class DataAnonymizationService extends EventEmitter {
         pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
         replacement: (match: string) => this.generateAnonymousEmail(),
         priority: 100,
-        enabled: true
+        enabled: true,
       },
       {
         id: 'phone',
@@ -405,7 +406,7 @@ export class DataAnonymizationService extends EventEmitter {
         pattern: /(\+?1[-.\s]?)?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})/g,
         replacement: '***-***-****',
         priority: 90,
-        enabled: true
+        enabled: true,
       },
       {
         id: 'ssn',
@@ -413,7 +414,7 @@ export class DataAnonymizationService extends EventEmitter {
         pattern: /\b\d{3}-?\d{2}-?\d{4}\b/g,
         replacement: '***-**-****',
         priority: 95,
-        enabled: true
+        enabled: true,
       },
       {
         id: 'credit_card',
@@ -421,7 +422,7 @@ export class DataAnonymizationService extends EventEmitter {
         pattern: /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g,
         replacement: '****-****-****-****',
         priority: 95,
-        enabled: true
+        enabled: true,
       },
       {
         id: 'ip_address',
@@ -429,7 +430,7 @@ export class DataAnonymizationService extends EventEmitter {
         pattern: /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/g,
         replacement: 'XXX.XXX.XXX.XXX',
         priority: 80,
-        enabled: true
+        enabled: true,
       },
       {
         id: 'api_key',
@@ -437,8 +438,8 @@ export class DataAnonymizationService extends EventEmitter {
         pattern: /[A-Za-z0-9]{32,}/g,
         replacement: (match: string) => '*'.repeat(match.length),
         priority: 100,
-        enabled: true
-      }
+        enabled: true,
+      },
     ];
 
     defaultRules.forEach(rule => this.anonymizationRules.set(rule.id, rule));
@@ -458,7 +459,7 @@ export class DataAnonymizationService extends EventEmitter {
 
   private anonymizePhoneNumber(phone: string, level: string): string {
     if (level === 'basic') {
-      return phone.replace(/\d/g, (match, index) => index < 3 ? match : '*');
+      return phone.replace(/\d/g, (match, index) => (index < 3 ? match : '*'));
     } else {
       return '***-***-****';
     }
@@ -501,7 +502,7 @@ export class DataAnonymizationService extends EventEmitter {
   // Detection methods
   private detectPII(data: string): string[] {
     const piiFields: string[] = [];
-    
+
     if (/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/.test(data)) {
       piiFields.push('email');
     }
@@ -511,30 +512,30 @@ export class DataAnonymizationService extends EventEmitter {
     if (/\b\d{3}-?\d{2}-?\d{4}\b/.test(data)) {
       piiFields.push('ssn');
     }
-    
+
     return piiFields;
   }
 
   private detectFinancialData(data: string): string[] {
     const financialFields: string[] = [];
-    
+
     if (/\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/.test(data)) {
       financialFields.push('credit_card');
     }
     if (/\$[\d,]+\.?\d*/.test(data)) {
       financialFields.push('currency');
     }
-    
+
     return financialFields;
   }
 
   private detectBusinessSensitiveData(data: string): string[] {
     const businessFields: string[] = [];
-    
+
     if (/confidential|proprietary|internal/i.test(data)) {
       businessFields.push('confidential_content');
     }
-    
+
     return businessFields;
   }
 
@@ -552,7 +553,10 @@ export class DataAnonymizationService extends EventEmitter {
   }
 
   private generateRandomId(length: number): string {
-    return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
+    return crypto
+      .randomBytes(Math.ceil(length / 2))
+      .toString('hex')
+      .slice(0, length);
   }
 
   private getApplicableRules(level: string): AnonymizationRule[] {
@@ -571,11 +575,11 @@ export class DataAnonymizationService extends EventEmitter {
   private calculatePreservationScore(original: any, anonymized: any): number {
     const originalStr = JSON.stringify(original);
     const anonymizedStr = JSON.stringify(anonymized);
-    
+
     // Simple preservation score based on structure similarity
     const structurePreserved = typeof original === typeof anonymized ? 50 : 0;
     const sizeRatio = Math.min(100, (anonymizedStr.length / originalStr.length) * 50);
-    
+
     return Math.round(structurePreserved + sizeRatio);
   }
 
@@ -606,9 +610,9 @@ export class DataAnonymizationService extends EventEmitter {
       classification,
       result: {
         ...result,
-        reversibilityMap: undefined // Never log reversibility maps
+        reversibilityMap: undefined, // Never log reversibility maps
       },
-      processingTime
+      processingTime,
     });
   }
 }

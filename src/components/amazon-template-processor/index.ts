@@ -8,12 +8,12 @@ import { ConfidenceScore } from '../../models/confidence.js';
 import { ScenarioResults } from '../../models/scenarios.js';
 import { HardQuestion } from '../../models/questions.js';
 import { Citation } from '../../models/confidence.js';
-import { 
-  TemplateHelperRegistry, 
-  parseHelperExpression, 
+import {
+  TemplateHelperRegistry,
+  parseHelperExpression,
   evaluateHelperArgs,
   validateAmazonTemplate,
-  AMAZON_TEMPLATE_VALIDATION_RULES
+  AMAZON_TEMPLATE_VALIDATION_RULES,
 } from './helpers';
 import { performanceCache } from '../../utils/performance-cache';
 import { performanceMonitor } from '../../utils/performance-monitor';
@@ -26,14 +26,14 @@ export interface TemplateContext {
   problemOneLine: string;
   region?: string;
   competitors?: string[];
-  
+
   // Evidence mechanisms
   ledger: AssumptionLedger;
   confidence: ConfidenceScore;
   scenarios: ScenarioResults;
   hardQuestions: HardQuestion[];
   citations: Citation[];
-  
+
   // Metadata
   inputsHash: string;
   isoTimestamp: string;
@@ -57,7 +57,7 @@ export interface TemplateData extends TemplateContext {
   ledgerCoveragePct: number;
   scenarioPct: number;
   lowConfidence: boolean;
-  
+
   // Complex derived content
   assumptionIds: string[];
   assumptionTable: string;
@@ -95,7 +95,7 @@ export class AmazonTemplateProcessor {
       },
       context.inputsHash
     );
-    
+
     return result;
   }
 
@@ -112,7 +112,7 @@ export class AmazonTemplateProcessor {
       },
       context.inputsHash
     );
-    
+
     return result;
   }
 
@@ -134,12 +134,16 @@ export class AmazonTemplateProcessor {
   /**
    * Validate template has all required sections and variables
    */
-  validateTemplate(template: string, requiredSections: string[], requiredVariables: string[]): TemplateValidationResult {
+  validateTemplate(
+    template: string,
+    requiredSections: string[],
+    requiredVariables: string[]
+  ): TemplateValidationResult {
     const result: TemplateValidationResult = {
       isValid: true,
       missingVariables: [],
       missingSections: [],
-      errors: []
+      errors: [],
     };
 
     // Check for required sections
@@ -186,13 +190,12 @@ export class AmazonTemplateProcessor {
    * Get cached template with compilation caching
    */
   private getCachedTemplate(templateType: 'pr_faq' | 'decision_onepager'): string {
-    const templateContent = templateType === 'pr_faq' 
-      ? this.getPRFAQTemplate() 
-      : this.getDecisionOnePagerTemplate();
-    
+    const templateContent =
+      templateType === 'pr_faq' ? this.getPRFAQTemplate() : this.getDecisionOnePagerTemplate();
+
     const templateHash = this.hashTemplate(templateContent);
     const cacheKey = performanceCache.getTemplateKey(templateType, templateHash);
-    
+
     // Check cache first
     const cachedTemplate = performanceCache.get<string>(cacheKey);
     if (cachedTemplate) {
@@ -201,7 +204,7 @@ export class AmazonTemplateProcessor {
 
     // Cache the template (templates are static, so we can cache the raw content)
     performanceCache.set(cacheKey, templateContent, 'template');
-    
+
     return templateContent;
   }
 
@@ -233,23 +236,26 @@ export class AmazonTemplateProcessor {
       ledgerCoveragePct: context.ledger.coverage_pct,
       scenarioPct: context.scenarios.sensitivityPct,
       lowConfidence: context.confidence.lowConfidence,
-      
+
       // Complex derived content
       assumptionIds: context.ledger.assumptions.map(a => a.id),
       assumptionTable: this.generateAssumptionTable(context.ledger),
       scenarioTable: this.generateScenarioTable(context.scenarios),
       roiTable: this.generateROITable(context.scenarios),
-      topAssumptionIds: context.ledger.assumptions.slice(0, 3).map(a => a.id).join(', '),
+      topAssumptionIds: context.ledger.assumptions
+        .slice(0, 3)
+        .map(a => a.id)
+        .join(', '),
       topSensitivities: this.generateTopSensitivities(context.scenarios),
       citationsList: this.generateCitationsList(context.citations),
-      scenarioMetrics: this.extractScenarioMetrics(context.scenarios)
+      scenarioMetrics: this.extractScenarioMetrics(context.scenarios),
     } as TemplateData;
 
     // Add processed hard questions with text fields
     enriched.hardQuestions = context.hardQuestions.map(q => ({
       ...q,
       targetAssumptionsText: q.targetAssumptions.join(', '),
-      evidenceNeededText: q.evidenceNeeded.join(', ')
+      evidenceNeededText: q.evidenceNeeded.join(', '),
     })) as any;
 
     return enriched;
@@ -261,7 +267,7 @@ export class AmazonTemplateProcessor {
   private processJsonHelpers(template: string, data: TemplateData): string {
     // Match helper expressions: {{helperName arg1 arg2 ...}}
     const helperRegex = /\{\{(\w+)(?:\s+([^}]+))?\}\}/g;
-    
+
     return template.replace(helperRegex, (match, helperName, argsString) => {
       try {
         // Check if this is a registered helper
@@ -273,7 +279,7 @@ export class AmazonTemplateProcessor {
         // Parse arguments
         const args = argsString ? argsString.trim().split(/\s+/) : [];
         const evaluatedArgs = evaluateHelperArgs(args, data);
-        
+
         // Process helper
         const result = this.helperRegistry.processHelper(helperName, evaluatedArgs, data);
         return String(result);
@@ -312,30 +318,32 @@ export class AmazonTemplateProcessor {
   private processLoops(template: string, data: TemplateData): string {
     // Handle {{#each array}} loops
     const loopRegex = /\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/g;
-    
+
     return template.replace(loopRegex, (match, arrayPath, content) => {
       const array = this.getNestedProperty(data, arrayPath.trim());
       if (!Array.isArray(array)) return '';
 
-      return array.map((item, index) => {
-        let itemContent = content;
-        
-        // Replace {{this}} with current item
-        itemContent = itemContent.replace(/\{\{this\}\}/g, String(item));
-        
-        // Replace {{@index}} with current index
-        itemContent = itemContent.replace(/\{\{@index\}\}/g, String(index));
-        
-        // Replace item properties if item is object
-        if (typeof item === 'object' && item !== null) {
-          Object.keys(item).forEach(key => {
-            const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
-            itemContent = itemContent.replace(regex, String(item[key]));
-          });
-        }
-        
-        return itemContent;
-      }).join('');
+      return array
+        .map((item, index) => {
+          let itemContent = content;
+
+          // Replace {{this}} with current item
+          itemContent = itemContent.replace(/\{\{this\}\}/g, String(item));
+
+          // Replace {{@index}} with current index
+          itemContent = itemContent.replace(/\{\{@index\}\}/g, String(index));
+
+          // Replace item properties if item is object
+          if (typeof item === 'object' && item !== null) {
+            Object.keys(item).forEach(key => {
+              const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+              itemContent = itemContent.replace(regex, String(item[key]));
+            });
+          }
+
+          return itemContent;
+        })
+        .join('');
     });
   }
 
@@ -345,7 +353,7 @@ export class AmazonTemplateProcessor {
   private processConditionals(template: string, data: TemplateData): string {
     // Handle {{#if condition}} blocks
     const ifRegex = /\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g;
-    
+
     return template.replace(ifRegex, (match, condition, content) => {
       const value = this.getNestedProperty(data, condition.trim());
       return value ? content : '';
@@ -366,7 +374,7 @@ export class AmazonTemplateProcessor {
     if (expression === 'scenarioMetrics') {
       return data.scenarioMetrics;
     }
-    
+
     // Fallback to nested property access
     const value = this.getNestedProperty(data, expression);
     if (value === undefined) {
@@ -397,8 +405,8 @@ export class AmazonTemplateProcessor {
   }
 
   private generateKeyOutcome(context: TemplateContext): string {
-    const roiAssumption = context.ledger.assumptions.find(a => 
-      a.name.toLowerCase().includes('roi') || a.name.toLowerCase().includes('return')
+    const roiAssumption = context.ledger.assumptions.find(
+      a => a.name.toLowerCase().includes('roi') || a.name.toLowerCase().includes('return')
     );
     return roiAssumption ? `${roiAssumption.value}% ROI improvement` : 'Significant business value';
   }
@@ -412,7 +420,7 @@ export class AmazonTemplateProcessor {
   }
 
   private generateCompGapSentence(context: TemplateContext): string {
-    return context.competitors?.length 
+    return context.competitors?.length
       ? `Current solutions from ${context.competitors.join(', ')} lack key capabilities.`
       : 'No existing solutions adequately address this market need.';
   }
@@ -425,7 +433,7 @@ export class AmazonTemplateProcessor {
     return [
       `Core ${context.featureName} functionality`,
       'Integrated analytics and reporting',
-      'Seamless user experience'
+      'Seamless user experience',
     ];
   }
 
@@ -434,11 +442,7 @@ export class AmazonTemplateProcessor {
   }
 
   private generateGuardrails(context: TemplateContext): string[] {
-    return [
-      'Performance monitoring and alerts',
-      'User feedback collection',
-      'Rollback procedures'
-    ];
+    return ['Performance monitoring and alerts', 'User feedback collection', 'Rollback procedures'];
   }
 
   private generateNSMetric(context: TemplateContext): string {
@@ -446,8 +450,8 @@ export class AmazonTemplateProcessor {
   }
 
   private generateNSTarget(context: TemplateContext): string {
-    const userAssumption = context.ledger.assumptions.find(a => 
-      a.name.toLowerCase().includes('user') || a.name.toLowerCase().includes('adoption')
+    const userAssumption = context.ledger.assumptions.find(
+      a => a.name.toLowerCase().includes('user') || a.name.toLowerCase().includes('adoption')
     );
     return userAssumption ? String(userAssumption.value) : '10,000';
   }
@@ -462,10 +466,11 @@ export class AmazonTemplateProcessor {
    * Generate assumption table markdown
    */
   private generateAssumptionTable(ledger: AssumptionLedger): string {
-    const header = '| ID | Name | Value | Certainty | Sources |\n|----|------|-------|-----------|---------|';
-    const rows = ledger.assumptions.map(a => 
-      `| ${a.id} | ${a.name} | ${a.value} | ${a.certainty} | ${a.sourceUrls.length} |`
-    ).join('\n');
+    const header =
+      '| ID | Name | Value | Certainty | Sources |\n|----|------|-------|-----------|---------|';
+    const rows = ledger.assumptions
+      .map(a => `| ${a.id} | ${a.name} | ${a.value} | ${a.certainty} | ${a.sourceUrls.length} |`)
+      .join('\n');
     return `${header}\n${rows}`;
   }
 
@@ -474,11 +479,13 @@ export class AmazonTemplateProcessor {
    */
   private generateScenarioTable(scenarios: ScenarioResults): string {
     const header = '| Metric | Bear | Base | Bull | Unit |\n|--------|------|------|------|------|';
-    const rows = scenarios.scenarios.base.map((baseRow, index) => {
-      const bearRow = scenarios.scenarios.bear[index];
-      const bullRow = scenarios.scenarios.bull[index];
-      return `| ${baseRow.metric} | ${bearRow.bear} | **${baseRow.base}** | ${bullRow.bull} | ${baseRow.unit || ''} |`;
-    }).join('\n');
+    const rows = scenarios.scenarios.base
+      .map((baseRow, index) => {
+        const bearRow = scenarios.scenarios.bear[index];
+        const bullRow = scenarios.scenarios.bull[index];
+        return `| ${baseRow.metric} | ${bearRow.bear} | **${baseRow.base}** | ${bullRow.bull} | ${baseRow.unit || ''} |`;
+      })
+      .join('\n');
     return `${header}\n${rows}`;
   }
 
@@ -486,8 +493,9 @@ export class AmazonTemplateProcessor {
    * Generate ROI table markdown
    */
   private generateROITable(scenarios: ScenarioResults): string {
-    const header = '| Scenario | Investment | Revenue | ROI | Confidence |\n|----------|------------|---------|-----|------------|';
-    
+    const header =
+      '| Scenario | Investment | Revenue | ROI | Confidence |\n|----------|------------|---------|-----|------------|';
+
     const investmentMetric = scenarios.scenarios.base.find(s => s.metric === 'Investment');
     const revenueMetric = scenarios.scenarios.base.find(s => s.metric === 'Revenue');
     const roiMetric = scenarios.scenarios.base.find(s => s.metric === 'ROI');
@@ -497,18 +505,22 @@ export class AmazonTemplateProcessor {
       return `${header}\n| Bear | $500K | $1.2M | 140% | Low |\n| **Base** | **$750K** | **$2.1M** | **180%** | Medium |\n| Bull | $1M | $3.5M | 250% | High |`;
     }
 
-    const bearInvestment = scenarios.scenarios.bear.find(s => s.metric === 'Investment')?.bear || investmentMetric.base;
-    const bearRevenue = scenarios.scenarios.bear.find(s => s.metric === 'Revenue')?.bear || revenueMetric.base;
+    const bearInvestment =
+      scenarios.scenarios.bear.find(s => s.metric === 'Investment')?.bear || investmentMetric.base;
+    const bearRevenue =
+      scenarios.scenarios.bear.find(s => s.metric === 'Revenue')?.bear || revenueMetric.base;
     const bearROI = scenarios.scenarios.bear.find(s => s.metric === 'ROI')?.bear || roiMetric.base;
 
-    const bullInvestment = scenarios.scenarios.bull.find(s => s.metric === 'Investment')?.bull || investmentMetric.base;
-    const bullRevenue = scenarios.scenarios.bull.find(s => s.metric === 'Revenue')?.bull || revenueMetric.base;
+    const bullInvestment =
+      scenarios.scenarios.bull.find(s => s.metric === 'Investment')?.bull || investmentMetric.base;
+    const bullRevenue =
+      scenarios.scenarios.bull.find(s => s.metric === 'Revenue')?.bull || revenueMetric.base;
     const bullROI = scenarios.scenarios.bull.find(s => s.metric === 'ROI')?.bull || roiMetric.base;
 
     const rows = [
       `| **Bear** | ${bearInvestment} | ${bearRevenue} | ${bearROI} | Low |`,
       `| **Base** | **${investmentMetric.base}** | **${revenueMetric.base}** | **${roiMetric.base}** | Medium |`,
-      `| **Bull** | ${bullInvestment} | ${bullRevenue} | ${bullROI} | High |`
+      `| **Bull** | ${bullInvestment} | ${bullRevenue} | ${bullROI} | High |`,
     ].join('\n');
 
     return `${header}\n${rows}`;
@@ -518,18 +530,22 @@ export class AmazonTemplateProcessor {
    * Generate top sensitivities list
    */
   private generateTopSensitivities(scenarios: ScenarioResults): string {
-    return scenarios.elasticities.slice(0, 3).map(e => 
-      `- ${e.assumption} ${e.assumptionChange} → ${e.outcomeMetric} ${e.outcomeChange}`
-    ).join('\n');
+    return scenarios.elasticities
+      .slice(0, 3)
+      .map(e => `- ${e.assumption} ${e.assumptionChange} → ${e.outcomeMetric} ${e.outcomeChange}`)
+      .join('\n');
   }
 
   /**
    * Generate citations list markdown
    */
   private generateCitationsList(citations: Citation[]): string {
-    return citations.map((citation, index) => 
-      `${index + 1}. [${citation.title}](${citation.url}) - ${citation.sourceType} (${citation.rating || 'B'})`
-    ).join('\n');
+    return citations
+      .map(
+        (citation, index) =>
+          `${index + 1}. [${citation.title}](${citation.url}) - ${citation.sourceType} (${citation.rating || 'B'})`
+      )
+      .join('\n');
   }
 
   /**

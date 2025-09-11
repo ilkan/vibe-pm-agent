@@ -44,8 +44,11 @@ export class RealMarketDataFetcher {
   /**
    * Get reliable data sources based on topic
    */
-  private getReliableDataSources(topic: string, industry?: string): Array<{url: string, name: string}> {
-    const sources: Array<{url: string, name: string}> = [];
+  private getReliableDataSources(
+    topic: string,
+    industry?: string
+  ): Array<{ url: string; name: string }> {
+    const sources: Array<{ url: string; name: string }> = [];
 
     // Always try these reliable financial/business sources
     sources.push(
@@ -55,7 +58,11 @@ export class RealMarketDataFetcher {
     );
 
     // Add fintech-specific sources
-    if (topic.toLowerCase().includes('fintech') || topic.toLowerCase().includes('finance') || industry?.toLowerCase().includes('fintech')) {
+    if (
+      topic.toLowerCase().includes('fintech') ||
+      topic.toLowerCase().includes('finance') ||
+      industry?.toLowerCase().includes('fintech')
+    ) {
       sources.push(
         { url: 'https://www.finextra.com/rss/headlines.aspx', name: 'Finextra' },
         { url: 'https://www.pymnts.com/feed/', name: 'PYMNTS' }
@@ -63,7 +70,11 @@ export class RealMarketDataFetcher {
     }
 
     // Add tech sources for app-related queries
-    if (topic.toLowerCase().includes('app') || topic.toLowerCase().includes('mobile') || topic.toLowerCase().includes('ai')) {
+    if (
+      topic.toLowerCase().includes('app') ||
+      topic.toLowerCase().includes('mobile') ||
+      topic.toLowerCase().includes('ai')
+    ) {
       sources.push(
         { url: 'https://techcrunch.com/feed/', name: 'TechCrunch' },
         { url: 'https://venturebeat.com/feed/', name: 'VentureBeat' }
@@ -76,27 +87,35 @@ export class RealMarketDataFetcher {
   /**
    * Fetch data from a specific source
    */
-  private async fetchFromSource(source: {url: string, name: string}): Promise<MarketDataSource | null> {
+  private async fetchFromSource(source: {
+    url: string;
+    name: string;
+  }): Promise<MarketDataSource | null> {
     return new Promise((resolve, reject) => {
       const url = new URL(source.url);
-      
+
       const options = {
         hostname: url.hostname,
         path: url.pathname + url.search,
         method: 'GET',
         headers: {
           'User-Agent': this.userAgent,
-          'Accept': 'application/rss+xml, application/xml, text/xml, text/html',
+          Accept: 'application/rss+xml, application/xml, text/xml, text/html',
           'Accept-Language': 'en-US,en;q=0.9',
         },
         rejectUnauthorized: false,
         timeout: 15000,
       };
 
-      const req = https.request(options, (res) => {
+      const req = https.request(options, res => {
         // Handle redirects
-        if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-          resolve(this.fetchFromSource({url: res.headers.location, name: source.name}));
+        if (
+          res.statusCode &&
+          res.statusCode >= 300 &&
+          res.statusCode < 400 &&
+          res.headers.location
+        ) {
+          resolve(this.fetchFromSource({ url: res.headers.location, name: source.name }));
           return;
         }
 
@@ -106,8 +125,8 @@ export class RealMarketDataFetcher {
         }
 
         let data = '';
-        
-        res.on('data', (chunk) => {
+
+        res.on('data', chunk => {
           data += chunk;
         });
 
@@ -121,7 +140,7 @@ export class RealMarketDataFetcher {
         });
       });
 
-      req.on('error', (error) => {
+      req.on('error', error => {
         reject(new Error(`Request to ${source.name} failed: ${error.message}`));
       });
 
@@ -137,7 +156,10 @@ export class RealMarketDataFetcher {
   /**
    * Extract market data from RSS/XML/HTML content
    */
-  private extractMarketData(content: string, source: {url: string, name: string}): MarketDataSource | null {
+  private extractMarketData(
+    content: string,
+    source: { url: string; name: string }
+  ): MarketDataSource | null {
     // Clean content and extract text
     const textContent = content
       .replace(/<!\[CDATA\[/g, '')
@@ -150,7 +172,7 @@ export class RealMarketDataFetcher {
 
     // Extract market metrics
     const marketMetrics: string[] = [];
-    
+
     // Patterns for financial data
     const patterns = [
       /\$[\d,.]+ (?:billion|million|trillion|bn|mn)/gi,
@@ -169,14 +191,17 @@ export class RealMarketDataFetcher {
     });
 
     // Extract relevant sentences
-    const sentences = textContent.split(/[.!?]+/).filter(s => 
-      s.length > 30 && 
-      (s.toLowerCase().includes('market') || 
-       s.toLowerCase().includes('revenue') || 
-       s.toLowerCase().includes('billion') || 
-       s.toLowerCase().includes('million') ||
-       s.toLowerCase().includes('growth'))
-    );
+    const sentences = textContent
+      .split(/[.!?]+/)
+      .filter(
+        s =>
+          s.length > 30 &&
+          (s.toLowerCase().includes('market') ||
+            s.toLowerCase().includes('revenue') ||
+            s.toLowerCase().includes('billion') ||
+            s.toLowerCase().includes('million') ||
+            s.toLowerCase().includes('growth'))
+      );
 
     const relevantContent = sentences.slice(0, 3).join('. ').substring(0, 400);
 
@@ -213,10 +238,11 @@ This could be due to:
     }
 
     const citations = results.map((result, index) => {
-      const metricsText = result.marketMetrics.length > 0 
-        ? `\n    Market Metrics: ${result.marketMetrics.join(', ')}`
-        : '';
-      
+      const metricsText =
+        result.marketMetrics.length > 0
+          ? `\n    Market Metrics: ${result.marketMetrics.join(', ')}`
+          : '';
+
       return `[${index + 1}] ${result.title}
     Source: ${result.source}
     URL: ${result.url}
@@ -227,7 +253,7 @@ This could be due to:
     // Collect all market metrics
     const allMetrics = results.flatMap(r => r.marketMetrics);
     let marketDataSection = '';
-    
+
     if (allMetrics.length > 0) {
       marketDataSection = `
 ## Real Market Metrics (From Financial Sources)

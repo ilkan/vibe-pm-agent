@@ -1,4 +1,11 @@
-import { Assumption, AssumptionLedger, ConfidenceBreakdown, ConfidenceScore, ScenarioRow, HardQuestion } from '../../models/assumptions';
+import {
+  Assumption,
+  AssumptionLedger,
+  ConfidenceBreakdown,
+  ConfidenceScore,
+  ScenarioRow,
+  HardQuestion,
+} from '../../models/assumptions';
 
 describe('Models Type Compilation Tests', () => {
   test('Assumption type should compile with all required fields', () => {
@@ -11,9 +18,9 @@ describe('Models Type Compilation Tests', () => {
       certainty: 'High',
       lastChecked: new Date('2025-01-01'),
       category: 'market',
-      impact: 'critical'
+      impact: 'critical',
     };
-    
+
     expect(assumption.id).toBe('test-1');
     expect(assumption.certainty).toBe('High');
   });
@@ -27,9 +34,9 @@ describe('Models Type Compilation Tests', () => {
       certainty: 'Medium',
       lastChecked: new Date(),
       category: 'market',
-      impact: 'important'
+      impact: 'important',
     };
-    
+
     expect(assumption.id).toBe('test-2');
     expect(assumption.unit).toBeUndefined();
   });
@@ -45,15 +52,15 @@ describe('Models Type Compilation Tests', () => {
           certainty: 'Low',
           lastChecked: new Date(),
           category: 'market',
-          impact: 'supporting'
-        }
+          impact: 'supporting',
+        },
       ],
       coverage_pct: 85,
       lastUpdated: new Date(),
       totalClaims: 10,
-      backedClaims: 8
+      backedClaims: 8,
     };
-    
+
     expect(ledger.assumptions).toHaveLength(1);
   });
 
@@ -64,9 +71,9 @@ describe('Models Type Compilation Tests', () => {
       diversity: 0.7,
       agreement: 0.85,
       coverage: 0.75,
-      sensitivity: 0.6
+      sensitivity: 0.6,
     };
-    
+
     expect(breakdown.evidence).toBe(0.8);
   });
 
@@ -79,12 +86,12 @@ describe('Models Type Compilation Tests', () => {
         diversity: 0.7,
         agreement: 0.85,
         coverage: 0.75,
-        sensitivity: 0.6
+        sensitivity: 0.6,
       },
       explanation: 'High confidence based on recent market data',
-      lowConfidence: false
+      lowConfidence: false,
     };
-    
+
     expect(confidence.total).toBe(75);
     expect(confidence.explanation).toContain('High confidence');
   });
@@ -94,9 +101,9 @@ describe('Models Type Compilation Tests', () => {
       metric: 'Revenue',
       bear: 500000,
       base: 1000000,
-      bull: 2000000
+      bull: 2000000,
     };
-    
+
     expect(scenario.metric).toBe('Revenue');
     expect(typeof scenario.bear).toBe('number');
   });
@@ -106,9 +113,9 @@ describe('Models Type Compilation Tests', () => {
       metric: 'Market Position',
       bear: 'Follower',
       base: 'Challenger',
-      bull: 'Leader'
+      bull: 'Leader',
     };
-    
+
     expect(scenario.metric).toBe('Market Position');
     expect(typeof scenario.bear).toBe('string');
   });
@@ -120,9 +127,9 @@ describe('Models Type Compilation Tests', () => {
       targetAssumptions: ['A1', 'A2'],
       category: 'competitive',
       severity: 'critical',
-      evidenceNeeded: ['competitor-analysis.pdf', 'market-research.doc']
+      evidenceNeeded: ['competitor-analysis.pdf', 'market-research.doc'],
     };
-    
+
     expect(question.category).toBe('competitive');
     expect(question.severity).toBe('critical');
     expect(question.evidenceNeeded).toHaveLength(2);
@@ -135,9 +142,9 @@ describe('Models Type Compilation Tests', () => {
       targetAssumptions: [],
       category: 'execution',
       severity: 'important',
-      evidenceNeeded: []
+      evidenceNeeded: [],
     };
-    
+
     expect(question.category).toBe('execution');
     expect(question.evidenceNeeded).toHaveLength(0);
   });

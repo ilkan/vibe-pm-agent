@@ -1,18 +1,21 @@
 /**
  * Integration Tests: Amazon Template Pipeline Integration
- * 
+ *
  * Tests the complete pipeline from mechanism services to template rendering
  * Verifies that assumption ledger, confidence scoring, scenario analysis, and hard questions
  * are properly wired into the template rendering pipeline
  */
 
-import { AmazonTemplateProcessor, TemplateContext } from '../../components/amazon-template-processor';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  AmazonTemplateProcessor,
+  TemplateContext,
+} from '../../components/amazon-template-processor';
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
-  BusinessInputs 
+  BusinessInputs,
 } from '../../services/amazon';
 // Import MCP tools - using dynamic imports to avoid module resolution issues
 // import { createStakeholderCommunication } from '../../mcp/tools/create_stakeholder_communication';
@@ -33,12 +36,12 @@ describe('Amazon Template Pipeline Integration', () => {
     confidenceService = new ConfidenceService();
     scenarioService = new ScenarioService();
     hardQuestionsService = new HardQuestionsService();
-    
+
     mockContext = {
       timestamp: Date.now(),
       sessionId: 'test-session-123',
       toolName: 'test-tool',
-      requestId: 'test-request-456'
+      requestId: 'test-request-456',
     };
   });
 
@@ -60,14 +63,14 @@ describe('Amazon Template Pipeline Integration', () => {
             url: 'https://research.gartner.com/analytics-market-2024',
             title: 'Analytics and Business Intelligence Market Forecast 2024-2026',
             sourceType: 'industry_report',
-            rating: 'A'
-          }
+            rating: 'A',
+          },
         ],
         assumptions: [
           'Market will grow 15% annually',
           'Enterprise adoption rate will be 25%',
-          'Average deal size will be $50K'
-        ]
+          'Average deal size will be $50K',
+        ],
       };
 
       // Act - Run all mechanism services
@@ -79,7 +82,7 @@ describe('Amazon Template Pipeline Integration', () => {
         citations: businessInputs.citations || [],
         ledgerCoveragePct: assumptionLedger.coverage_pct,
         assumptionCount: assumptionLedger.assumptions.length,
-        sensitivityRisk: 'medium' as const
+        sensitivityRisk: 'medium' as const,
       };
       const confidenceResult = await confidenceService.computeConfidence(confidenceContext);
       expect(confidenceResult.success).toBe(true);
@@ -91,10 +94,10 @@ describe('Amazon Template Pipeline Integration', () => {
           revenue: 1000000,
           costs: 500000,
           roi: 100,
-          npv: 500000
+          npv: 500000,
         },
         topIds: assumptionLedger.assumptions.slice(0, 3).map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       };
       const scenarioResult = await scenarioService.runScenarios(scenarioContext);
       expect(scenarioResult.success).toBe(true);
@@ -107,7 +110,7 @@ describe('Amazon Template Pipeline Integration', () => {
           .slice(0, 3)
           .map(a => a.id),
         businessContext: 'AI-powered analytics platform for enterprise data teams',
-        competitiveContext: 'Tableau, PowerBI, Looker'
+        competitiveContext: 'Tableau, PowerBI, Looker',
       };
       const questionsResult = await hardQuestionsService.generateQuestions(questionContext);
       expect(questionsResult.success).toBe(true);
@@ -127,7 +130,7 @@ describe('Amazon Template Pipeline Integration', () => {
         citations: businessInputs.citations || [],
         inputsHash: 'test-hash-123',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'test123'
+        shortHash: 'test123',
       };
 
       // Act - Render PR/FAQ template with wired mechanisms
@@ -136,7 +139,7 @@ describe('Amazon Template Pipeline Integration', () => {
       // Assert - Verify mechanism integration
       expect(prfaqDocument).toContain('AI-Powered Analytics Platform');
       expect(prfaqDocument).toContain('Enterprise Data Teams');
-      
+
       // Verify assumption ledger integration
       expect(prfaqDocument).toContain('## Evidence Mechanisms');
       expect(prfaqDocument).toContain('### Assumption Ledger');
@@ -149,7 +152,9 @@ describe('Amazon Template Pipeline Integration', () => {
       // Verify confidence scoring integration
       expect(prfaqDocument).toContain('### Confidence Score');
       expect(prfaqDocument).toContain(`**Overall Confidence:** ${confidenceScore.total}/100`);
-      expect(prfaqDocument).toContain(`Evidence Quality: ${confidenceScore.breakdown.evidence}/100`);
+      expect(prfaqDocument).toContain(
+        `Evidence Quality: ${confidenceScore.breakdown.evidence}/100`
+      );
       expect(prfaqDocument).toContain(`Data Recency: ${confidenceScore.breakdown.recency}/100`);
 
       // Verify scenario analysis integration
@@ -197,8 +202,8 @@ describe('Amazon Template Pipeline Integration', () => {
         citations: [],
         assumptions: [
           'Mobile payment adoption will increase 20% annually',
-          'Small businesses will pay $99/month for integrated solution'
-        ]
+          'Small businesses will pay $99/month for integrated solution',
+        ],
       };
 
       // Act - Run mechanism services and render template
@@ -207,19 +212,19 @@ describe('Amazon Template Pipeline Integration', () => {
         citations: [],
         ledgerCoveragePct: ledgerResult.data!.coverage_pct,
         assumptionCount: ledgerResult.data!.assumptions.length,
-        sensitivityRisk: 'low' as const
+        sensitivityRisk: 'low' as const,
       });
       const scenarioResult = await scenarioService.runScenarios({
         ledger: ledgerResult.data!,
         basicCalc: { revenue: 500000, costs: 300000, roi: 67, npv: 200000 },
         topIds: ledgerResult.data!.assumptions.slice(0, 2).map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       });
       const questionsResult = await hardQuestionsService.generateQuestions({
         ledger: ledgerResult.data!,
         weakestIds: ledgerResult.data!.assumptions.slice(0, 2).map(a => a.id),
         businessContext: 'Mobile payment platform for small businesses',
-        competitiveContext: 'Square, Stripe, PayPal'
+        competitiveContext: 'Square, Stripe, PayPal',
       });
 
       const templateContext: TemplateContext = {
@@ -234,7 +239,7 @@ describe('Amazon Template Pipeline Integration', () => {
         citations: [],
         inputsHash: 'test-hash-456',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'test456'
+        shortHash: 'test456',
       };
 
       const onePagerDocument = templateProcessor.renderDecisionOnePager(templateContext);
@@ -242,7 +247,7 @@ describe('Amazon Template Pipeline Integration', () => {
       // Assert - Verify mechanism integration in Decision One-Pager
       expect(onePagerDocument).toContain('Mobile Payment Platform');
       expect(onePagerDocument).toContain('Small Business Owners');
-      
+
       // Verify all evidence mechanisms are present
       expect(onePagerDocument).toContain('## Evidence Mechanisms');
       expect(onePagerDocument).toContain('### Assumption Ledger');
@@ -264,7 +269,7 @@ describe('Amazon Template Pipeline Integration', () => {
         customer: '',
         competitors: [],
         citations: [],
-        assumptions: []
+        assumptions: [],
       };
 
       const templateContext: TemplateContext = {
@@ -276,7 +281,7 @@ describe('Amazon Template Pipeline Integration', () => {
           coverage_pct: 0,
           lastUpdated: new Date(),
           totalClaims: 0,
-          backedClaims: 0
+          backedClaims: 0,
         },
         confidence: {
           total: 0,
@@ -286,26 +291,26 @@ describe('Amazon Template Pipeline Integration', () => {
             diversity: 0,
             agreement: 0,
             coverage: 0,
-            sensitivity: 0
+            sensitivity: 0,
           },
           explanation: 'No data available',
-          lowConfidence: true
+          lowConfidence: true,
         },
         scenarios: {
           scenarios: {
             bear: [],
             base: [],
-            bull: []
+            bull: [],
           },
           elasticities: [],
           keyDrivers: [],
-          sensitivityPct: 0.2
+          sensitivityPct: 0.2,
         },
         hardQuestions: [],
         citations: [],
         inputsHash: 'test-hash-empty',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'empty123'
+        shortHash: 'empty123',
       };
 
       // Act - Render template with empty/failed mechanism data
@@ -315,16 +320,16 @@ describe('Amazon Template Pipeline Integration', () => {
       expect(prfaqDocument).toContain('Test Feature');
       expect(prfaqDocument).toContain('Test Customer');
       expect(prfaqDocument).toContain('## Evidence Mechanisms');
-      
+
       // Should still render sections even with empty data
       expect(prfaqDocument).toContain('### Assumption Ledger');
       expect(prfaqDocument).toContain('### Confidence Score');
       expect(prfaqDocument).toContain('**Overall Confidence:** 0/100');
       expect(prfaqDocument).toContain('⚠️ Human Review Recommended');
-      
+
       // Should handle empty scenarios gracefully
       expect(prfaqDocument).toContain('### Scenario Range');
-      
+
       // Should handle empty hard questions gracefully
       expect(prfaqDocument).toContain('### Hard Questions');
     });
@@ -350,13 +355,13 @@ describe('Amazon Template Pipeline Integration', () => {
               sourceUrls: [],
               lastChecked: new Date(),
               category: 'market',
-              impact: 'critical'
-            }
+              impact: 'critical',
+            },
           ],
           coverage_pct: 100,
           lastUpdated: new Date(),
           totalClaims: 1,
-          backedClaims: 1
+          backedClaims: 1,
         },
         confidence: {
           total: 85,
@@ -366,16 +371,16 @@ describe('Amazon Template Pipeline Integration', () => {
             diversity: 85,
             agreement: 90,
             coverage: 100,
-            sensitivity: 75
+            sensitivity: 75,
           },
           explanation: 'High confidence based on solid evidence',
-          lowConfidence: false
+          lowConfidence: false,
         },
         scenarios: {
           scenarios: {
             bear: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }],
             base: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }],
-            bull: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }]
+            bull: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }],
           },
           elasticities: [
             {
@@ -383,11 +388,11 @@ describe('Amazon Template Pipeline Integration', () => {
               assumptionChange: '±20%',
               outcomeMetric: 'Revenue',
               outcomeChange: '±15%',
-              sensitivity: 0.75
-            }
+              sensitivity: 0.75,
+            },
           ],
           keyDrivers: [],
-          sensitivityPct: 0.2
+          sensitivityPct: 0.2,
         },
         hardQuestions: [
           {
@@ -396,13 +401,13 @@ describe('Amazon Template Pipeline Integration', () => {
             targetAssumptions: ['A1'],
             category: 'market',
             severity: 'critical',
-            evidenceNeeded: ['Market research', 'Customer interviews']
-          }
+            evidenceNeeded: ['Market research', 'Customer interviews'],
+          },
         ],
         citations: [],
         inputsHash: 'test-hash-problematic',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'prob123'
+        shortHash: 'prob123',
       };
 
       // Act - Should not throw error even with problematic content
@@ -422,7 +427,7 @@ describe('Amazon Template Pipeline Integration', () => {
       const businessInputs: BusinessInputs = {
         featureName: 'Validation Test Feature',
         customer: 'Test Customer Segment',
-        assumptions: ['Test assumption 1', 'Test assumption 2']
+        assumptions: ['Test assumption 1', 'Test assumption 2'],
       };
 
       const ledgerResult = await assumptionLedgerService.normalizeLedger(businessInputs);
@@ -430,19 +435,19 @@ describe('Amazon Template Pipeline Integration', () => {
         citations: [],
         ledgerCoveragePct: ledgerResult.data!.coverage_pct,
         assumptionCount: ledgerResult.data!.assumptions.length,
-        sensitivityRisk: 'medium' as const
+        sensitivityRisk: 'medium' as const,
       });
       const scenarioResult = await scenarioService.runScenarios({
         ledger: ledgerResult.data!,
         basicCalc: { revenue: 1000000, costs: 500000, roi: 100, npv: 500000 },
         topIds: ledgerResult.data!.assumptions.slice(0, 2).map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       });
       const questionsResult = await hardQuestionsService.generateQuestions({
         ledger: ledgerResult.data!,
         weakestIds: ledgerResult.data!.assumptions.slice(0, 1).map(a => a.id),
         businessContext: 'Test context',
-        competitiveContext: 'Test competition'
+        competitiveContext: 'Test competition',
       });
 
       const templateContext: TemplateContext = {
@@ -456,7 +461,7 @@ describe('Amazon Template Pipeline Integration', () => {
         citations: [],
         inputsHash: 'validation-test-hash',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'valid123'
+        shortHash: 'valid123',
       };
 
       // Act
@@ -469,7 +474,7 @@ describe('Amazon Template Pipeline Integration', () => {
         '### Assumption Ledger',
         '### Confidence Score',
         '### Scenario',
-        '### Hard Questions'
+        '### Hard Questions',
       ];
 
       requiredSections.forEach(section => {
@@ -478,12 +483,7 @@ describe('Amazon Template Pipeline Integration', () => {
       });
 
       // Verify front-matter contains mechanism metadata
-      const requiredFrontMatterFields = [
-        'confidence:',
-        'assumptions:',
-        'scenarios:',
-        'paths:'
-      ];
+      const requiredFrontMatterFields = ['confidence:', 'assumptions:', 'scenarios:', 'paths:'];
 
       requiredFrontMatterFields.forEach(field => {
         expect(prfaqDocument).toContain(field);

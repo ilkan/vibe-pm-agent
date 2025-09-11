@@ -97,7 +97,9 @@ export async function generateManagementOnePager(
         recencyScore: citationMetrics.recency_score,
         qualityScore: qualityReport.overallScore,
         overallConfidence: confidenceScores.overallConfidence,
-        validationsPassed: citationResult.validationResults.filter(r => r.accessibilityStatus.isAccessible).length,
+        validationsPassed: citationResult.validationResults.filter(
+          r => r.accessibilityStatus.isAccessible
+        ).length,
       });
     }
 

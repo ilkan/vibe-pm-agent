@@ -1,20 +1,27 @@
 /**
  * MCP Tool: create_stakeholder_communication
- * 
+ *
  * Routes to PR/FAQ or Decision One-Pager based on communication_type
  * Integrates Amazon Working Backwards mechanism services with template processor
  */
 
-import { MCPToolResult, MCPToolContext, CreateStakeholderCommunicationArgs } from '../../models/mcp';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  MCPToolResult,
+  MCPToolContext,
+  CreateStakeholderCommunicationArgs,
+} from '../../models/mcp';
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
   SteeringWriter,
-  BusinessInputs 
+  BusinessInputs,
 } from '../../services/amazon';
-import { AmazonTemplateProcessor, TemplateContext } from '../../components/amazon-template-processor';
+import {
+  AmazonTemplateProcessor,
+  TemplateContext,
+} from '../../components/amazon-template-processor';
 import { MCPResponseFormatter, MCPLogger, MCPErrorHandler } from '../../utils/mcp-error-handling';
 import { AmazonModeManager } from '../../components/amazon-mode-manager';
 import { AmazonModeConfig } from '../../models/amazon-config';
@@ -23,7 +30,7 @@ import { AIAgentPipeline } from '../../pipeline/ai-agent-pipeline';
 /**
  * MCP Tool: create_stakeholder_communication
  *
- * Creates stakeholder communication documents (PR/FAQ or Decision One-Pager) 
+ * Creates stakeholder communication documents (PR/FAQ or Decision One-Pager)
  * using Amazon Working Backwards methodology with comprehensive evidence mechanisms.
  * Routes to appropriate template based on communication_type parameter.
  *
@@ -36,13 +43,17 @@ export async function createStakeholderCommunication(
   context: MCPToolContext
 ): Promise<MCPToolResult> {
   try {
-    MCPLogger.debug('Starting stakeholder communication generation with Amazon Working Backwards (default mode)', context, {
-      businessCaseLength: args.business_case.length,
-      communicationType: args.communication_type,
-      audience: args.audience,
-      steeringOptions: args.steering_options,
-      citationOptions: args.citation_options,
-    });
+    MCPLogger.debug(
+      'Starting stakeholder communication generation with Amazon Working Backwards (default mode)',
+      context,
+      {
+        businessCaseLength: args.business_case.length,
+        communicationType: args.communication_type,
+        audience: args.audience,
+        steeringOptions: args.steering_options,
+        citationOptions: args.citation_options,
+      }
+    );
 
     // Initialize Amazon Mode Manager with configuration options
     const amazonModeConfig: Partial<AmazonModeConfig> = {
@@ -51,12 +62,13 @@ export async function createStakeholderCommunication(
       fallbackToStandard: true, // Always enable fallback for reliability
       includeEvidenceMechanisms: args.include_evidence_mechanisms !== false,
       templates: {
-        useAmazonTemplates: args.communication_type === 'pr_faq' || args.communication_type === 'executive_onepager',
+        useAmazonTemplates:
+          args.communication_type === 'pr_faq' || args.communication_type === 'executive_onepager',
         enhanceStandardTemplates: true,
         selectionStrategy: 'amazon_first',
       },
     };
-    
+
     const amazonModeManager = new AmazonModeManager(amazonModeConfig);
     const pipeline = new AIAgentPipeline();
     const steeringWriter = new SteeringWriter();
@@ -64,14 +76,17 @@ export async function createStakeholderCommunication(
     // Standard mode generator for fallback compatibility
     const standardGenerator = async (businessCase: string, type: string, audience: string) => {
       MCPLogger.debug('Using standard mode for stakeholder communication generation', context);
-      
+
       // Use existing pipeline methods based on communication type
       switch (type) {
         case 'pr_faq':
           const prfaqResult = await pipeline.generatePRFAQ(businessCase, businessCase, undefined);
           return `${prfaqResult.press_release_markdown}\n\n${prfaqResult.faq_markdown}\n\n${prfaqResult.launch_checklist_markdown}`;
         case 'executive_onepager':
-          const onepagerResult = await pipeline.generateManagementOnePager(businessCase, businessCase);
+          const onepagerResult = await pipeline.generateManagementOnePager(
+            businessCase,
+            businessCase
+          );
           return onepagerResult.one_pager_markdown;
         default:
           return `# ${type.replace('_', ' ').toUpperCase()}: Stakeholder Communication\n\n${businessCase}`;
@@ -79,7 +94,10 @@ export async function createStakeholderCommunication(
     };
 
     // Generate stakeholder communication using Amazon Mode Manager (with fallback to standard)
-    MCPLogger.debug('Generating stakeholder communication with Amazon Working Backwards methodology', context);
+    MCPLogger.debug(
+      'Generating stakeholder communication with Amazon Working Backwards methodology',
+      context
+    );
     const amazonResult = await amazonModeManager.generateStakeholderCommunication(
       args.business_case,
       args.communication_type,
@@ -88,7 +106,9 @@ export async function createStakeholderCommunication(
     );
 
     if (!amazonResult.success) {
-      throw new Error(`Stakeholder communication generation failed: ${amazonResult.error?.message}`);
+      throw new Error(
+        `Stakeholder communication generation failed: ${amazonResult.error?.message}`
+      );
     }
 
     const enhancedContent = amazonResult.data!;
@@ -113,7 +133,7 @@ export async function createStakeholderCommunication(
       try {
         const businessInputs = await extractBusinessInputsFromBusinessCase(args.business_case);
         const inputsHash = await generateInputsHash(businessInputs);
-        
+
         const steeringPackage = {
           featureSlug: args.steering_options.feature_name || `${artifactType}-${args.audience}`,
           artifactType: artifactType as any,
@@ -149,18 +169,20 @@ export async function createStakeholderCommunication(
             paths: {
               assumptions_json: `./attachments/assumptions-${inputsHash.slice(0, 8)}.json`,
               citations_json: `./attachments/citations-${inputsHash.slice(0, 8)}.json`,
-              scenarios_json: `./attachments/scenarios-${inputsHash.slice(0, 8)}.json`
-            }
+              scenarios_json: `./attachments/scenarios-${inputsHash.slice(0, 8)}.json`,
+            },
           },
           bodyMarkdown: document,
-          attachments: enhancedContent.attachments || []
+          attachments: enhancedContent.attachments || [],
         };
 
         steeringResult = await steeringWriter.writeSteering(steeringPackage);
 
         MCPLogger.info('Steering file creation attempted', context, {
           created: steeringResult.success,
-          message: steeringResult.success ? 'Steering files created successfully' : steeringResult.error?.message,
+          message: steeringResult.success
+            ? 'Steering files created successfully'
+            : steeringResult.error?.message,
         });
       } catch (steeringError) {
         MCPLogger.warn('Steering file creation failed', context, {
@@ -184,7 +206,9 @@ export async function createStakeholderCommunication(
     // Format the response with Amazon mode metadata
     const result = MCPResponseFormatter.formatSuccess(finalContent, 'markdown', {
       executionTime: Date.now() - context.timestamp,
-      quotaUsed: amazonResult.usedAmazonMode ? getQuotaUsage(args.communication_type) : Math.max(1, getQuotaUsage(args.communication_type) - 1),
+      quotaUsed: amazonResult.usedAmazonMode
+        ? getQuotaUsage(args.communication_type)
+        : Math.max(1, getQuotaUsage(args.communication_type) - 1),
       steeringFileCreated: steeringResult?.success || false,
       confidenceScore: enhancedContent.metadata.confidenceScore,
       amazonMode: {
@@ -192,27 +216,33 @@ export async function createStakeholderCommunication(
         fallbackReason: amazonResult.fallbackReason,
         performanceMetrics: amazonResult.performanceMetrics,
       },
-      citations: args.citation_options?.include_citations !== false ? {
-        total_citations: enhancedContent.metadata.assumptionCount || 0,
-        credibility_score: 85,
-        recency_score: 75,
-        diversity_score: 70,
-        bibliography_included: true,
-        quality_score: enhancedContent.metadata.confidenceScore || 0,
-        overall_confidence: enhancedContent.metadata.confidenceScore || 0,
-        compliance_status: (enhancedContent.metadata.confidenceScore || 0) < 60 ? 'warning' : 'compliant'
-      } : undefined,
+      citations:
+        args.citation_options?.include_citations !== false
+          ? {
+              total_citations: enhancedContent.metadata.assumptionCount || 0,
+              credibility_score: 85,
+              recency_score: 75,
+              diversity_score: 70,
+              bibliography_included: true,
+              quality_score: enhancedContent.metadata.confidenceScore || 0,
+              overall_confidence: enhancedContent.metadata.confidenceScore || 0,
+              compliance_status:
+                (enhancedContent.metadata.confidenceScore || 0) < 60 ? 'warning' : 'compliant',
+            }
+          : undefined,
     });
 
     // Add steering file information to metadata if created
     if (steeringResult?.success && steeringResult.data && steeringResult.data.filename) {
       result.metadata = {
         ...result.metadata,
-        steeringFiles: [{
-          filename: steeringResult.data.filename,
-          action: 'created',
-          fullPath: steeringResult.data.fullPath,
-        }],
+        steeringFiles: [
+          {
+            filename: steeringResult.data.filename,
+            action: 'created',
+            fullPath: steeringResult.data.fullPath,
+          },
+        ],
       };
     }
 
@@ -225,14 +255,19 @@ export async function createStakeholderCommunication(
     });
 
     return MCPErrorHandler.createErrorResponse(
-      error instanceof Error ? error : new Error('Unknown error in create_stakeholder_communication'),
+      error instanceof Error
+        ? error
+        : new Error('Unknown error in create_stakeholder_communication'),
       context
     );
   }
 }
 
 // Helper functions for template generation and data extraction
-function generateBoardPresentationWithMechanisms(templateContext: TemplateContext, audience: string): string {
+function generateBoardPresentationWithMechanisms(
+  templateContext: TemplateContext,
+  audience: string
+): string {
   return `---
 title: "Board Presentation — ${templateContext.featureName}"
 artifact_type: board_presentation
@@ -278,7 +313,10 @@ ${generateScenarioTable(templateContext.scenarios)}
 ${templateContext.hardQuestions.map((q: any) => `**Q${q.id}**: ${q.question}`).join('\n')}`;
 }
 
-function generateTeamAnnouncementWithMechanisms(templateContext: TemplateContext, audience: string): string {
+function generateTeamAnnouncementWithMechanisms(
+  templateContext: TemplateContext,
+  audience: string
+): string {
   return `---
 title: "Team Announcement — ${templateContext.featureName}"
 artifact_type: team_announcement
@@ -311,13 +349,23 @@ paths:
 **Assumptions Covered**: ${templateContext.ledger.coverage_pct}%
 
 ### Key Assumptions
-${templateContext.ledger.assumptions.slice(0, 3).map((a: any) => `- **${a.name}**: ${a.value} (${a.certainty})`).join('\n')}
+${templateContext.ledger.assumptions
+  .slice(0, 3)
+  .map((a: any) => `- **${a.name}**: ${a.value} (${a.certainty})`)
+  .join('\n')}
 
 ### Questions We're Addressing
-${templateContext.hardQuestions.slice(0, 3).map((q: any) => `- ${q.question}`).join('\n')}`;
+${templateContext.hardQuestions
+  .slice(0, 3)
+  .map((q: any) => `- ${q.question}`)
+  .join('\n')}`;
 }
 
-function generateFallbackDocument(templateContext: TemplateContext, communicationType: string, audience: string): string {
+function generateFallbackDocument(
+  templateContext: TemplateContext,
+  communicationType: string,
+  audience: string
+): string {
   const title = getDocumentTitle(communicationType);
   return `# ${title}: ${templateContext.featureName}
 
@@ -336,37 +384,41 @@ ${templateContext.hardQuestions.map((q: any) => `**Q${q.id}**: ${q.question}`).j
 }
 
 function extractProblemStatement(businessCase: string): string {
-  const patterns = [
-    /problem:\s*([^\n.]+)/i,
-    /challenge:\s*([^\n.]+)/i,
-    /issue:\s*([^\n.]+)/i
-  ];
-  
+  const patterns = [/problem:\s*([^\n.]+)/i, /challenge:\s*([^\n.]+)/i, /issue:\s*([^\n.]+)/i];
+
   for (const pattern of patterns) {
     const match = businessCase.match(pattern);
     if (match) return match[1].trim();
   }
-  
+
   return 'Address key business challenges';
 }
 
 function generateAssumptionLedgerTable(ledger: any): string {
-  const header = '| ID | Name | Value | Certainty | Sources |\n|----|----|-------|-----------|---------|';
-  const rows = ledger.assumptions.map((a: any) => 
-    `| ${a.id} | ${a.name} | ${a.value} | ${a.certainty} | ${a.sourceUrls.length} |`
-  ).join('\n');
+  const header =
+    '| ID | Name | Value | Certainty | Sources |\n|----|----|-------|-----------|---------|';
+  const rows = ledger.assumptions
+    .map(
+      (a: any) => `| ${a.id} | ${a.name} | ${a.value} | ${a.certainty} | ${a.sourceUrls.length} |`
+    )
+    .join('\n');
   return header + '\n' + rows;
 }
 
 function generateScenarioTable(scenarios: any): string {
   const header = '| Metric | Bear | Base | Bull |\n|--------|------|------|------|';
-  const rows = scenarios.scenarios.base.map((row: any, i: number) => 
-    `| ${row.metric} | ${scenarios.scenarios.bear[i]?.bear || 'N/A'} | **${row.base}** | ${scenarios.scenarios.bull[i]?.bull || 'N/A'} |`
-  ).join('\n');
+  const rows = scenarios.scenarios.base
+    .map(
+      (row: any, i: number) =>
+        `| ${row.metric} | ${scenarios.scenarios.bear[i]?.bear || 'N/A'} | **${row.base}** | ${scenarios.scenarios.bull[i]?.bull || 'N/A'} |`
+    )
+    .join('\n');
   return header + '\n' + rows;
 }
 
-async function extractBusinessInputsFromBusinessCase(businessCase: string): Promise<BusinessInputs> {
+async function extractBusinessInputsFromBusinessCase(
+  businessCase: string
+): Promise<BusinessInputs> {
   return {
     featureName: extractFeatureName(businessCase) || 'Feature',
     customer: extractCustomer(businessCase) || 'Customer',
@@ -376,7 +428,7 @@ async function extractBusinessInputsFromBusinessCase(businessCase: string): Prom
     opsCost: extractOperationalCost(businessCase),
     timeline: extractTimeline(businessCase),
     citations: [],
-    assumptions: extractAssumptions(businessCase)
+    assumptions: extractAssumptions(businessCase),
   };
 }
 
@@ -387,27 +439,37 @@ function extractFinancialModel(businessCase: string): any {
     revenue,
     costs,
     roi: ((revenue - costs) / costs) * 100,
-    npv: revenue - costs
+    npv: revenue - costs,
   };
 }
 
 function getDocumentTitle(communicationType: string): string {
   switch (communicationType) {
-    case 'pr_faq': return 'PR/FAQ';
-    case 'executive_onepager': return 'Decision One-Pager';
-    case 'board_presentation': return 'Board Presentation';
-    case 'team_announcement': return 'Team Announcement';
-    default: return 'Stakeholder Communication';
+    case 'pr_faq':
+      return 'PR/FAQ';
+    case 'executive_onepager':
+      return 'Decision One-Pager';
+    case 'board_presentation':
+      return 'Board Presentation';
+    case 'team_announcement':
+      return 'Team Announcement';
+    default:
+      return 'Stakeholder Communication';
   }
 }
 
 function getQuotaUsage(communicationType: string): number {
   switch (communicationType) {
-    case 'pr_faq': return 4;
-    case 'executive_onepager': return 3;
-    case 'board_presentation': return 3;
-    case 'team_announcement': return 2;
-    default: return 3;
+    case 'pr_faq':
+      return 4;
+    case 'executive_onepager':
+      return 3;
+    case 'board_presentation':
+      return 3;
+    case 'team_announcement':
+      return 2;
+    default:
+      return 3;
   }
 }
 
@@ -419,12 +481,8 @@ async function generateInputsHash(inputs: BusinessInputs): Promise<string> {
 
 // Helper extraction functions
 function extractFeatureName(text: string): string | undefined {
-  const patterns = [
-    /(?:feature|product|solution):\s*([^\n.]+)/i,
-    /# ([^\n]+)/,
-    /## ([^\n]+)/
-  ];
-  
+  const patterns = [/(?:feature|product|solution):\s*([^\n.]+)/i, /# ([^\n]+)/, /## ([^\n]+)/];
+
   for (const pattern of patterns) {
     const match = text.match(pattern);
     if (match) return match[1]?.trim();
@@ -481,16 +539,16 @@ function extractAssumptions(text: string): string[] {
     /assume[s]?\s+(?:that\s+)?([^.]+)/gi,
     /we believe\s+(?:that\s+)?([^.]+)/gi,
     /expect\s+(?:that\s+)?([^.]+)/gi,
-    /estimate\s+(?:that\s+)?([^.]+)/gi
+    /estimate\s+(?:that\s+)?([^.]+)/gi,
   ];
-  
+
   assumptionPatterns.forEach(pattern => {
     let match;
     while ((match = pattern.exec(text)) !== null) {
       assumptions.push(match[1].trim());
     }
   });
-  
+
   return assumptions;
 }
 
@@ -515,12 +573,14 @@ export const createStakeholderCommunicationSchema = {
     },
     amazon_mode: {
       type: 'boolean',
-      description: 'Enable Amazon Working Backwards methodology (default: true for backward compatibility)',
+      description:
+        'Enable Amazon Working Backwards methodology (default: true for backward compatibility)',
       default: true,
     },
     include_evidence_mechanisms: {
       type: 'boolean',
-      description: 'Include assumption ledger, confidence scoring, scenarios, and hard questions (default: true)',
+      description:
+        'Include assumption ledger, confidence scoring, scenarios, and hard questions (default: true)',
       default: true,
     },
     steering_options: {

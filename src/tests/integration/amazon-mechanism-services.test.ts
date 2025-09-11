@@ -3,12 +3,12 @@
  */
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
-  type BusinessInputs 
+  type BusinessInputs,
 } from '../../services/amazon/index';
 import { ConfidenceContext } from '../../models/confidence';
 import { ScenarioContext } from '../../models/scenarios';
@@ -47,7 +47,7 @@ describe('Amazon Mechanism Services Integration', () => {
           date: '2024-01-15',
           rating: 'A',
           snippet: 'Analytics market growing at 15% CAGR',
-          sourceType: 'industry_report'
+          sourceType: 'industry_report',
         },
         {
           url: 'https://forrester.com/enterprise-analytics',
@@ -55,7 +55,7 @@ describe('Amazon Mechanism Services Integration', () => {
           date: '2024-02-01',
           rating: 'A',
           snippet: 'AI-powered analytics seeing rapid adoption',
-          sourceType: 'research'
+          sourceType: 'research',
         },
         {
           url: 'https://techcrunch.com/analytics-funding',
@@ -63,13 +63,13 @@ describe('Amazon Mechanism Services Integration', () => {
           date: '2024-01-30',
           rating: 'B',
           snippet: 'Investors bullish on analytics space',
-          sourceType: 'news'
-        }
+          sourceType: 'news',
+        },
       ],
       assumptions: [
         'Enterprise customers will pay premium for AI features',
-        'Market adoption of AI analytics will accelerate in 2024'
-      ]
+        'Market adoption of AI analytics will accelerate in 2024',
+      ],
     };
   });
 
@@ -85,7 +85,7 @@ describe('Amazon Mechanism Services Integration', () => {
         citations: sampleInputs.citations!,
         ledgerCoveragePct: ledger.coverage_pct,
         assumptionCount: ledger.assumptions.length,
-        sensitivityRisk: 'medium'
+        sensitivityRisk: 'medium',
       };
 
       const confidenceResult = await confidenceService.computeConfidence(confidenceContext);
@@ -99,15 +99,19 @@ describe('Amazon Mechanism Services Integration', () => {
           revenue: sampleInputs.pricing! * sampleInputs.users! * (sampleInputs.convRate! / 100),
           costs: sampleInputs.devCost! + sampleInputs.opsCost!,
           roi: 0, // Will be calculated
-          npv: 0   // Will be calculated
+          npv: 0, // Will be calculated
         },
         topIds: ledger.assumptions.filter(a => a.impact === 'critical').map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       };
 
       // Calculate ROI and NPV
-      scenarioContext.basicCalc.roi = ((scenarioContext.basicCalc.revenue - scenarioContext.basicCalc.costs) / scenarioContext.basicCalc.costs) * 100;
-      scenarioContext.basicCalc.npv = scenarioContext.basicCalc.revenue - scenarioContext.basicCalc.costs;
+      scenarioContext.basicCalc.roi =
+        ((scenarioContext.basicCalc.revenue - scenarioContext.basicCalc.costs) /
+          scenarioContext.basicCalc.costs) *
+        100;
+      scenarioContext.basicCalc.npv =
+        scenarioContext.basicCalc.revenue - scenarioContext.basicCalc.costs;
 
       const scenarioResult = await scenarioService.runScenarios(scenarioContext);
       expect(scenarioResult.success).toBe(true);
@@ -118,7 +122,7 @@ describe('Amazon Mechanism Services Integration', () => {
         ledger,
         weakestIds: ledger.assumptions.filter(a => a.certainty === 'Low').map(a => a.id),
         businessContext: `${sampleInputs.featureName} for ${sampleInputs.customer}`,
-        competitiveContext: `Competing with ${sampleInputs.competitors?.join(', ')}`
+        competitiveContext: `Competing with ${sampleInputs.competitors?.join(', ')}`,
       };
 
       const questionsResult = await questionsService.generateQuestions(questionContext);
@@ -144,7 +148,7 @@ describe('Amazon Mechanism Services Integration', () => {
       const confidenceContext: ConfidenceContext = {
         citations: sampleInputs.citations!,
         ledgerCoveragePct: ledger.coverage_pct,
-        assumptionCount: ledger.assumptions.length
+        assumptionCount: ledger.assumptions.length,
       };
 
       const confidenceResult = await confidenceService.computeConfidence(confidenceContext);
@@ -154,7 +158,7 @@ describe('Amazon Mechanism Services Integration', () => {
         ledger,
         basicCalc: { revenue: 1000000, costs: 500000, roi: 100, npv: 500000 },
         topIds: ledger.assumptions.slice(0, 3).map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       };
 
       const scenarioResult = await scenarioService.runScenarios(scenarioContext);
@@ -163,21 +167,23 @@ describe('Amazon Mechanism Services Integration', () => {
       const questionContext: QuestionContext = {
         ledger,
         weakestIds: ledger.assumptions.filter(a => a.certainty === 'Low').map(a => a.id),
-        businessContext: sampleInputs.featureName
+        businessContext: sampleInputs.featureName,
       };
 
       const questionsResult = await questionsService.generateQuestions(questionContext);
       const questions = questionsResult.data!;
 
       // Verify cross-mechanism consistency
-      
+
       // Confidence should reflect ledger coverage
       expect(confidence.breakdown.coverage).toBe(ledger.coverage_pct);
 
       // Scenarios should reference ledger assumptions
-      expect(scenarios.keyDrivers.every(driver => 
-        ledger.assumptions.some(a => a.id === driver.assumptionId)
-      )).toBe(true);
+      expect(
+        scenarios.keyDrivers.every(driver =>
+          ledger.assumptions.some(a => a.id === driver.assumptionId)
+        )
+      ).toBe(true);
 
       // Questions should target actual assumption IDs
       const allAssumptionIds = ledger.assumptions.map(a => a.id);
@@ -195,7 +201,7 @@ describe('Amazon Mechanism Services Integration', () => {
       // Test with minimal inputs
       const minimalInputs: BusinessInputs = {
         featureName: 'Minimal Feature',
-        customer: 'Test Customer'
+        customer: 'Test Customer',
       };
 
       const ledgerResult = await assumptionService.normalizeLedger(minimalInputs);
@@ -205,7 +211,7 @@ describe('Amazon Mechanism Services Integration', () => {
       const confidenceContext: ConfidenceContext = {
         citations: [],
         ledgerCoveragePct: ledger.coverage_pct,
-        assumptionCount: ledger.assumptions.length
+        assumptionCount: ledger.assumptions.length,
       };
 
       const confidenceResult = await confidenceService.computeConfidence(confidenceContext);
@@ -215,7 +221,7 @@ describe('Amazon Mechanism Services Integration', () => {
         ledger,
         basicCalc: { revenue: 0, costs: 0, roi: 0, npv: 0 },
         topIds: [],
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       };
 
       const scenarioResult = await scenarioService.runScenarios(scenarioContext);
@@ -224,7 +230,7 @@ describe('Amazon Mechanism Services Integration', () => {
       const questionContext: QuestionContext = {
         ledger,
         weakestIds: [],
-        businessContext: minimalInputs.featureName
+        businessContext: minimalInputs.featureName,
       };
 
       const questionsResult = await questionsService.generateQuestions(questionContext);
@@ -245,24 +251,26 @@ describe('Amazon Mechanism Services Integration', () => {
       // Results should be identical (deterministic)
       expect(run1Results.ledger.assumptions.length).toBe(run2Results.ledger.assumptions.length);
       expect(run1Results.ledger.coverage_pct).toBe(run2Results.ledger.coverage_pct);
-      
+
       expect(run1Results.confidence.total).toBe(run2Results.confidence.total);
       expect(run1Results.confidence.breakdown).toEqual(run2Results.confidence.breakdown);
-      
+
       expect(run1Results.scenarios.sensitivityPct).toBe(run2Results.scenarios.sensitivityPct);
-      expect(run1Results.scenarios.scenarios.base.length).toBe(run2Results.scenarios.scenarios.base.length);
-      
+      expect(run1Results.scenarios.scenarios.base.length).toBe(
+        run2Results.scenarios.scenarios.base.length
+      );
+
       expect(run1Results.questions.length).toBe(run2Results.questions.length);
     });
 
     it('should complete full pipeline within performance requirements', async () => {
       const startTime = Date.now();
-      
+
       await runFullPipeline(sampleInputs);
-      
+
       const endTime = Date.now();
       const executionTime = endTime - startTime;
-      
+
       // Should complete within 2 seconds (2000ms) for integration test
       expect(executionTime).toBeLessThan(2000);
     });
@@ -276,7 +284,7 @@ describe('Amazon Mechanism Services Integration', () => {
       const confidenceContext: ConfidenceContext = {
         citations: sampleInputs.citations!,
         ledgerCoveragePct: ledger.coverage_pct,
-        assumptionCount: ledger.assumptions.length
+        assumptionCount: ledger.assumptions.length,
       };
 
       const confidenceResult = await confidenceService.computeConfidence(confidenceContext);
@@ -294,7 +302,7 @@ describe('Amazon Mechanism Services Integration', () => {
         ledger,
         basicCalc: { revenue: 1000000, costs: 500000, roi: 100, npv: 500000 },
         topIds: ledger.assumptions.filter(a => a.impact === 'critical').map(a => a.id),
-        scenarioPct: 0.2
+        scenarioPct: 0.2,
       };
 
       const scenarioResult = await scenarioService.runScenarios(scenarioContext);
@@ -315,7 +323,7 @@ describe('Amazon Mechanism Services Integration', () => {
       const questionContext: QuestionContext = {
         ledger,
         weakestIds: ledger.assumptions.filter(a => a.certainty === 'Low').map(a => a.id),
-        businessContext: sampleInputs.featureName
+        businessContext: sampleInputs.featureName,
       };
 
       const questionsResult = await questionsService.generateQuestions(questionContext);
@@ -339,7 +347,7 @@ describe('Amazon Mechanism Services Integration', () => {
     const confidenceContext: ConfidenceContext = {
       citations: inputs.citations || [],
       ledgerCoveragePct: ledger.coverage_pct,
-      assumptionCount: ledger.assumptions.length
+      assumptionCount: ledger.assumptions.length,
     };
 
     const confidenceResult = await confidenceService.computeConfidence(confidenceContext);
@@ -351,16 +359,20 @@ describe('Amazon Mechanism Services Integration', () => {
         revenue: (inputs.pricing || 0) * (inputs.users || 0) * ((inputs.convRate || 0) / 100),
         costs: (inputs.devCost || 0) + (inputs.opsCost || 0),
         roi: 0,
-        npv: 0
+        npv: 0,
       },
       topIds: ledger.assumptions.filter(a => a.impact === 'critical').map(a => a.id),
-      scenarioPct: 0.2
+      scenarioPct: 0.2,
     };
 
-    scenarioContext.basicCalc.roi = scenarioContext.basicCalc.revenue > 0 && scenarioContext.basicCalc.costs > 0 
-      ? ((scenarioContext.basicCalc.revenue - scenarioContext.basicCalc.costs) / scenarioContext.basicCalc.costs) * 100 
-      : 0;
-    scenarioContext.basicCalc.npv = scenarioContext.basicCalc.revenue - scenarioContext.basicCalc.costs;
+    scenarioContext.basicCalc.roi =
+      scenarioContext.basicCalc.revenue > 0 && scenarioContext.basicCalc.costs > 0
+        ? ((scenarioContext.basicCalc.revenue - scenarioContext.basicCalc.costs) /
+            scenarioContext.basicCalc.costs) *
+          100
+        : 0;
+    scenarioContext.basicCalc.npv =
+      scenarioContext.basicCalc.revenue - scenarioContext.basicCalc.costs;
 
     const scenarioResult = await scenarioService.runScenarios(scenarioContext);
     const scenarios = scenarioResult.data!;
@@ -369,7 +381,7 @@ describe('Amazon Mechanism Services Integration', () => {
       ledger,
       weakestIds: ledger.assumptions.filter(a => a.certainty === 'Low').map(a => a.id),
       businessContext: inputs.featureName,
-      competitiveContext: inputs.competitors?.join(', ')
+      competitiveContext: inputs.competitors?.join(', '),
     };
 
     const questionsResult = await questionsService.generateQuestions(questionContext);
@@ -379,7 +391,7 @@ describe('Amazon Mechanism Services Integration', () => {
       ledger,
       confidence,
       scenarios,
-      questions
+      questions,
     };
   }
 });

@@ -428,7 +428,7 @@ export interface CitationOptions {
   include_bibliography?: boolean;
   /** Maximum age of citations in months */
   max_citation_age_months?: number;
-  
+
   // Enhanced validation options
   /** Whether to validate source accessibility */
   validate_sources?: boolean;

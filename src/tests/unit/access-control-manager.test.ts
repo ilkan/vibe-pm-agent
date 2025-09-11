@@ -2,7 +2,14 @@
  * Unit tests for Access Control Manager
  */
 
-import { AccessControlManager, User, Role, Permission, AccessRequest, AccessContext } from '../../components/access-control-manager';
+import {
+  AccessControlManager,
+  User,
+  Role,
+  Permission,
+  AccessRequest,
+  AccessContext,
+} from '../../components/access-control-manager';
 
 describe('AccessControlManager', () => {
   let accessControl: AccessControlManager;
@@ -18,7 +25,7 @@ describe('AccessControlManager', () => {
       id: 'test-permission',
       resource: 'audit_trail',
       action: 'read',
-      conditions: []
+      conditions: [],
     };
 
     // Create test role
@@ -27,7 +34,7 @@ describe('AccessControlManager', () => {
       name: 'test_role',
       description: 'Test role for unit tests',
       permissions: [testPermission],
-      isSystemRole: false
+      isSystemRole: false,
     };
 
     // Create test user
@@ -36,7 +43,7 @@ describe('AccessControlManager', () => {
       email: 'test@example.com',
       roles: [testRole],
       permissions: [],
-      isActive: true
+      isActive: true,
     });
   });
 
@@ -51,7 +58,7 @@ describe('AccessControlManager', () => {
         email: 'newuser@example.com',
         roles: [],
         permissions: [],
-        isActive: true
+        isActive: true,
       };
 
       const user = await accessControl.addUser(userData);
@@ -72,13 +79,14 @@ describe('AccessControlManager', () => {
       expect(eventSpy).toHaveBeenCalledWith({
         userId: testUser.id,
         roles: ['admin'],
-        permissions: ['test-permission']
+        permissions: ['test-permission'],
       });
     });
 
     it('should throw error when updating non-existent user', async () => {
-      await expect(accessControl.updateUserAccess('non-existent', [], []))
-        .rejects.toThrow('User not found');
+      await expect(accessControl.updateUserAccess('non-existent', [], [])).rejects.toThrow(
+        'User not found'
+      );
     });
   });
 
@@ -110,7 +118,7 @@ describe('AccessControlManager', () => {
 
     it('should revoke session tokens', async () => {
       const token = await accessControl.createSession(testUser.id, 1);
-      
+
       const revoked = accessControl.revokeSession(token);
       expect(revoked).toBe(true);
 
@@ -121,7 +129,7 @@ describe('AccessControlManager', () => {
     it('should emit session events', async () => {
       const createdSpy = jest.fn();
       const revokedSpy = jest.fn();
-      
+
       accessControl.on('sessionCreated', createdSpy);
       accessControl.on('sessionRevoked', revokedSpy);
 
@@ -140,7 +148,7 @@ describe('AccessControlManager', () => {
         resource: 'audit_trail',
         action: 'read',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(request);
@@ -155,7 +163,7 @@ describe('AccessControlManager', () => {
         resource: 'audit_trail',
         action: 'delete', // User doesn't have delete permission
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(request);
@@ -173,7 +181,7 @@ describe('AccessControlManager', () => {
         resource: 'audit_trail',
         action: 'read',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(request);
@@ -188,7 +196,7 @@ describe('AccessControlManager', () => {
         resource: 'audit_trail',
         action: 'read',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(request);
@@ -206,7 +214,7 @@ describe('AccessControlManager', () => {
         email: 'regular@example.com',
         roles: [],
         permissions: [],
-        isActive: true
+        isActive: true,
       });
 
       const request: AccessRequest = {
@@ -214,7 +222,7 @@ describe('AccessControlManager', () => {
         resource: 'audit_trail',
         action: 'read',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(request);
@@ -229,7 +237,7 @@ describe('AccessControlManager', () => {
         email: 'regular2@example.com',
         roles: [],
         permissions: [],
-        isActive: true
+        isActive: true,
       });
 
       const request: AccessRequest = {
@@ -237,7 +245,7 @@ describe('AccessControlManager', () => {
         resource: 'compliance_report',
         action: 'read',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(request);
@@ -252,7 +260,7 @@ describe('AccessControlManager', () => {
         email: 'regular3@example.com',
         roles: [],
         permissions: [],
-        isActive: true
+        isActive: true,
       });
 
       const request: AccessRequest = {
@@ -260,7 +268,7 @@ describe('AccessControlManager', () => {
         resource: 'citation_data',
         action: 'read',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(request);
@@ -274,7 +282,7 @@ describe('AccessControlManager', () => {
         email: 'regular4@example.com',
         roles: [],
         permissions: [],
-        isActive: true
+        isActive: true,
       });
 
       const request: AccessRequest = {
@@ -282,7 +290,7 @@ describe('AccessControlManager', () => {
         resource: 'citation_data',
         action: 'update',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(request);
@@ -299,7 +307,7 @@ describe('AccessControlManager', () => {
         resource: 'audit_trail',
         action: 'read',
         context: { ipAddress: '192.168.1.1' },
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       await accessControl.checkAccess(request);
@@ -322,15 +330,15 @@ describe('AccessControlManager', () => {
           resource: 'audit_trail',
           action: 'read',
           context: {},
-          timestamp: new Date()
+          timestamp: new Date(),
         },
         {
           userId: testUser.id,
           resource: 'compliance_report',
           action: 'read',
           context: {},
-          timestamp: new Date()
-        }
+          timestamp: new Date(),
+        },
       ];
 
       for (const request of requests) {
@@ -356,17 +364,19 @@ describe('AccessControlManager', () => {
         resource: 'audit_trail',
         action: 'read',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       await accessControl.checkAccess(request);
 
-      expect(logSpy).toHaveBeenCalledWith(expect.objectContaining({
-        userId: testUser.id,
-        resource: 'audit_trail',
-        action: 'read',
-        granted: expect.any(Boolean)
-      }));
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: testUser.id,
+          resource: 'audit_trail',
+          action: 'read',
+          granted: expect.any(Boolean),
+        })
+      );
     });
   });
 
@@ -377,7 +387,7 @@ describe('AccessControlManager', () => {
         resource: 'audit_trail',
         action: 'delete',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(request);
@@ -398,9 +408,9 @@ describe('AccessControlManager', () => {
           {
             field: 'ipAddress',
             operator: 'equals',
-            value: '192.168.1.1'
-          }
-        ]
+            value: '192.168.1.1',
+          },
+        ],
       };
 
       const userWithConditions = await accessControl.addUser({
@@ -408,7 +418,7 @@ describe('AccessControlManager', () => {
         email: 'conditional@example.com',
         roles: [],
         permissions: [conditionalPermission],
-        isActive: true
+        isActive: true,
       });
 
       // Request with matching condition
@@ -417,7 +427,7 @@ describe('AccessControlManager', () => {
         resource: 'test_resource',
         action: 'read',
         context: { ipAddress: '192.168.1.1' },
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const matchingResult = await accessControl.checkAccess(matchingRequest);
@@ -429,7 +439,7 @@ describe('AccessControlManager', () => {
         resource: 'test_resource',
         action: 'read',
         context: { ipAddress: '192.168.1.2' },
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const nonMatchingResult = await accessControl.checkAccess(nonMatchingRequest);
@@ -444,7 +454,7 @@ describe('AccessControlManager', () => {
         resource: 'test',
         action: 'read',
         context: {},
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       const result = await accessControl.checkAccess(malformedRequest);
@@ -472,15 +482,17 @@ describe('AccessControlManager', () => {
         resource: 'audit_trail',
         action: 'read',
         context: { requestId: i },
-        timestamp: new Date()
+        timestamp: new Date(),
       }));
 
       const startTime = Date.now();
       const results = await Promise.all(
-        requests.map(request => accessControl.checkAccess({
-          ...request,
-          context: { additionalData: { requestId: request.context.requestId } }
-        }))
+        requests.map(request =>
+          accessControl.checkAccess({
+            ...request,
+            context: { additionalData: { requestId: request.context.requestId } },
+          })
+        )
       );
       const endTime = Date.now();
 
@@ -496,7 +508,7 @@ describe('AccessControlManager', () => {
           resource: 'test_resource',
           action: 'read',
           context: { additionalData: { iteration: i } },
-          timestamp: new Date()
+          timestamp: new Date(),
         });
       }
 

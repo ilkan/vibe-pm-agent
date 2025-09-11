@@ -1,6 +1,6 @@
 /**
  * Comprehensive Test Suite for Enhanced Citation System
- * 
+ *
  * This test suite validates all requirements from the enhanced citation system specification:
  * - Requirement 1: Comprehensive citations with credibility ratings and confidence scores
  * - Requirement 2: Enhanced citation quality with source validation
@@ -20,7 +20,13 @@ import { SecureDocumentHandler } from '../../components/secure-document-handler'
 import { DataAnonymizationService } from '../../components/data-anonymization-service';
 import { AccessControlManager } from '../../components/access-control-manager';
 import { SecureCredentialManager } from '../../components/secure-credential-manager';
-import { Citation, CitationSourceType, CredibilityAssessment, QualityReport, ConfidenceScore } from '../../models/citations';
+import {
+  Citation,
+  CitationSourceType,
+  CredibilityAssessment,
+  QualityReport,
+  ConfidenceScore,
+} from '../../models/citations';
 
 describe('Enhanced Citation System - Comprehensive Requirements Validation', () => {
   let aiDiscoveryEngine: AICitationDiscoveryEngine;
@@ -73,7 +79,8 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         expect(requirement.confidenceThreshold).toBeGreaterThan(0);
       }
 
-      const sourceCandidates = await aiDiscoveryEngine.discoverRelevantSources(citationRequirements);
+      const sourceCandidates =
+        await aiDiscoveryEngine.discoverRelevantSources(citationRequirements);
       expect(sourceCandidates.length).toBeGreaterThan(0);
 
       for (const candidate of sourceCandidates) {
@@ -87,7 +94,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
     });
 
     test('should provide confidence scores based on evidence quality and source reliability', async () => {
-      const testClaim = "The global SaaS market is expected to reach $623 billion by 2023";
+      const testClaim = 'The global SaaS market is expected to reach $623 billion by 2023';
       const mockSources: Citation[] = [
         {
           id: 'test-1',
@@ -97,12 +104,15 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'A',
           sourceType: CitationSourceType.INDUSTRY_REPORT,
           author: 'Market Research Firm',
-          summary: 'Comprehensive analysis of SaaS market trends'
-        }
+          summary: 'Comprehensive analysis of SaaS market trends',
+        },
       ];
 
-      const confidenceScore = await confidenceScoringEngine.calculateClaimConfidence(testClaim, mockSources);
-      
+      const confidenceScore = await confidenceScoringEngine.calculateClaimConfidence(
+        testClaim,
+        mockSources
+      );
+
       expect(confidenceScore.overall).toBeGreaterThanOrEqual(0);
       expect(confidenceScore.overall).toBeLessThanOrEqual(100);
       expect(confidenceScore.breakdown).toHaveProperty('sourceQuality');
@@ -124,7 +134,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
       `;
 
       const documentConfidence = await confidenceScoringEngine.aggregateDocumentConfidence([]);
-      
+
       expect(documentConfidence.overallConfidence).toBeGreaterThanOrEqual(0);
       expect(documentConfidence.overallConfidence).toBeLessThanOrEqual(100);
       expect(documentConfidence.claimConfidences).toBeInstanceOf(Map);
@@ -138,9 +148,14 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
     test('should validate source accessibility and suggest alternatives for broken links', async () => {
       const testUrl = 'https://example.com/test-source';
       const accessibilityStatus = await sourceValidationEngine.validateSourceAccessibility(testUrl);
-      
+
       expect(accessibilityStatus.isAccessible).toBeDefined();
-      expect(accessibilityStatus.accessType).toBeOneOf(['free', 'paywall', 'subscription', 'broken']);
+      expect(accessibilityStatus.accessType).toBeOneOf([
+        'free',
+        'paywall',
+        'subscription',
+        'broken',
+      ]);
       expect(accessibilityStatus.lastChecked).toBeInstanceOf(Date);
       expect(accessibilityStatus.alternativeAccess).toBeInstanceOf(Array);
       expect(accessibilityStatus.cacheAvailable).toBeDefined();
@@ -154,7 +169,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'B',
           sourceType: CitationSourceType.INDUSTRY_REPORT,
           author: 'Test Author',
-          summary: 'Test summary'
+          summary: 'Test summary',
         });
         expect(alternatives).toBeInstanceOf(Array);
       }
@@ -170,7 +185,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'A',
           sourceType: CitationSourceType.CONSULTING_REPORT,
           author: 'McKinsey & Company',
-          summary: 'Comprehensive market analysis'
+          summary: 'Comprehensive market analysis',
         },
         {
           id: 'test-2',
@@ -180,12 +195,12 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'B',
           sourceType: CitationSourceType.INDUSTRY_REPORT,
           author: 'Industry Association',
-          summary: 'Historical industry data'
-        }
+          summary: 'Historical industry data',
+        },
       ];
 
       const qualityReport = await qualityAssessmentSystem.assessCitationQuality(testCitations);
-      
+
       expect(qualityReport.overallScore).toBeGreaterThanOrEqual(0);
       expect(qualityReport.overallScore).toBeLessThanOrEqual(100);
       expect(qualityReport.metrics).toHaveProperty('sourceCredibility');
@@ -205,16 +220,17 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'C',
           sourceType: CitationSourceType.BLOG_POST,
           author: 'Unknown Author',
-          summary: 'Outdated information'
-        }
+          summary: 'Outdated information',
+        },
       ];
 
-      const qualityReport = await qualityAssessmentSystem.assessCitationQuality(lowQualityCitations);
+      const qualityReport =
+        await qualityAssessmentSystem.assessCitationQuality(lowQualityCitations);
       const recommendations = await qualityAssessmentSystem.recommendImprovements(qualityReport);
-      
+
       expect(recommendations).toBeInstanceOf(Array);
       expect(recommendations.length).toBeGreaterThan(0);
-      
+
       for (const recommendation of recommendations) {
         expect(recommendation).toHaveProperty('type');
         expect(recommendation).toHaveProperty('priority');
@@ -232,15 +248,17 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         credibilityRating: 'B',
         sourceType: CitationSourceType.INDUSTRY_REPORT,
         author: 'Research Firm',
-        summary: 'Outdated market data'
+        summary: 'Outdated market data',
       };
 
       const alternatives = await sourceValidationEngine.findAlternativeSources(outdatedSource);
-      
+
       expect(alternatives).toBeInstanceOf(Array);
       if (alternatives.length > 0) {
         for (const alternative of alternatives) {
-          expect(alternative.publishedDate.getTime()).toBeGreaterThan(outdatedSource.publishedDate.getTime());
+          expect(alternative.publishedDate.getTime()).toBeGreaterThan(
+            outdatedSource.publishedDate.getTime()
+          );
           expect(['A', 'B']).toContain(alternative.credibilityRating);
         }
       }
@@ -256,7 +274,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         source_diversity_requirement: 75,
         recency_requirement_months: 12,
         industry_focus: 'SaaS',
-        geographic_scope: 'Global'
+        geographic_scope: 'Global',
       };
 
       expect(mockCitationOptions.minimum_confidence).toBeGreaterThanOrEqual(0);
@@ -276,7 +294,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         credibilityRating: 'A',
         sourceType: CitationSourceType.CONSULTING_REPORT,
         author: 'Test Author',
-        summary: 'Test citation for format validation'
+        summary: 'Test citation for format validation',
       };
 
       // Test different citation formats
@@ -299,17 +317,17 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         credibilityRating: 'A',
         sourceType: CitationSourceType.INDUSTRY_REPORT,
         author: 'Test Author',
-        summary: 'Citation for audit trail testing'
+        summary: 'Citation for audit trail testing',
       };
 
       await auditTrailManager.logCitationUsage(testDocumentId, testCitation, 'test-user');
       const auditTrail = await auditTrailManager.getAuditTrail(testDocumentId);
-      
+
       expect(auditTrail).toBeDefined();
       expect(auditTrail.documentId).toBe(testDocumentId);
       expect(auditTrail.entries).toBeInstanceOf(Array);
       expect(auditTrail.entries.length).toBeGreaterThan(0);
-      
+
       const entry = auditTrail.entries[0];
       expect(entry.timestamp).toBeInstanceOf(Date);
       expect(entry.action).toBeDefined();
@@ -320,12 +338,16 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
     test('should log validation results with timestamps and methodology', async () => {
       const testUrl = 'https://example.com/validation-test';
       const validationResult = await sourceValidationEngine.validateSourceAccessibility(testUrl);
-      
+
       expect(validationResult.lastChecked).toBeInstanceOf(Date);
       expect(validationResult.isAccessible).toBeDefined();
-      
+
       // Verify audit trail captures validation
-      const auditEntry = await auditTrailManager.logValidationResult(testUrl, validationResult, 'accessibility_check');
+      const auditEntry = await auditTrailManager.logValidationResult(
+        testUrl,
+        validationResult,
+        'accessibility_check'
+      );
       expect(auditEntry.timestamp).toBeInstanceOf(Date);
       expect(auditEntry.methodology).toBe('accessibility_check');
       expect(auditEntry.result).toEqual(validationResult);
@@ -341,14 +363,14 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         credibilityRating: 'B',
         sourceType: CitationSourceType.BLOG_POST,
         author: 'Original Author',
-        summary: 'Original citation'
+        summary: 'Original citation',
       };
 
       const updatedCitation: Citation = {
         ...originalCitation,
         title: 'Updated Citation',
         credibilityRating: 'A',
-        sourceType: CitationSourceType.INDUSTRY_REPORT
+        sourceType: CitationSourceType.INDUSTRY_REPORT,
       };
 
       await auditTrailManager.logCitationChange(
@@ -362,7 +384,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
       const changeHistory = await auditTrailManager.getCitationChangeHistory(originalCitation.id);
       expect(changeHistory).toBeInstanceOf(Array);
       expect(changeHistory.length).toBeGreaterThan(0);
-      
+
       const change = changeHistory[0];
       expect(change.userId).toBe('test-user');
       expect(change.reason).toBe('Upgraded to more credible source');
@@ -381,17 +403,24 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'A',
           sourceType: CitationSourceType.CONSULTING_REPORT,
           author: 'McKinsey & Company',
-          summary: 'High quality consulting report'
-        }
+          summary: 'High quality consulting report',
+        },
       ];
 
-      const validationReport = await auditTrailManager.generateValidationReport(testDocumentId, testCitations);
-      
+      const validationReport = await auditTrailManager.generateValidationReport(
+        testDocumentId,
+        testCitations
+      );
+
       expect(validationReport.documentId).toBe(testDocumentId);
       expect(validationReport.overallQualityScore).toBeGreaterThanOrEqual(0);
       expect(validationReport.overallQualityScore).toBeLessThanOrEqual(100);
       expect(validationReport.citationValidations).toBeInstanceOf(Array);
-      expect(validationReport.complianceStatus).toBeOneOf(['compliant', 'warning', 'non-compliant']);
+      expect(validationReport.complianceStatus).toBeOneOf([
+        'compliant',
+        'warning',
+        'non-compliant',
+      ]);
       expect(validationReport.recommendations).toBeInstanceOf(Array);
       expect(validationReport.generatedAt).toBeInstanceOf(Date);
     });
@@ -407,10 +436,10 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
       `;
 
       const unsupportedClaims = await aiDiscoveryEngine.identifyUnsupportedClaims(testContent);
-      
+
       expect(unsupportedClaims).toBeInstanceOf(Array);
       expect(unsupportedClaims.length).toBeGreaterThan(0);
-      
+
       for (const claim of unsupportedClaims) {
         expect(claim.text).toBeDefined();
         expect(claim.claimType).toBeOneOf(['quantitative', 'qualitative', 'comparative']);
@@ -424,13 +453,16 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         claim: 'SaaS market growth has accelerated',
         claimType: 'qualitative' as const,
         evidenceStrength: 'moderate' as const,
-        requiredSourceTypes: [CitationSourceType.INDUSTRY_REPORT, CitationSourceType.CONSULTING_REPORT],
+        requiredSourceTypes: [
+          CitationSourceType.INDUSTRY_REPORT,
+          CitationSourceType.CONSULTING_REPORT,
+        ],
         confidenceThreshold: 75,
-        industryRelevance: ['SaaS', 'Software', 'Technology']
+        industryRelevance: ['SaaS', 'Software', 'Technology'],
       };
 
       const sourceCandidates = await aiDiscoveryEngine.discoverRelevantSources([testRequirement]);
-      
+
       expect(sourceCandidates).toBeInstanceOf(Array);
       if (sourceCandidates.length > 0) {
         for (const candidate of sourceCandidates) {
@@ -453,15 +485,17 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         credibilityRating: 'A',
         sourceType: CitationSourceType.INDUSTRY_REPORT,
         author: 'Research Firm',
-        summary: 'Outdated SaaS market analysis'
+        summary: 'Outdated SaaS market analysis',
       };
 
       const alternatives = await aiDiscoveryEngine.findRecentAlternatives(outdatedSource);
-      
+
       expect(alternatives).toBeInstanceOf(Array);
       if (alternatives.length > 0) {
         for (const alternative of alternatives) {
-          expect(alternative.publishedDate.getTime()).toBeGreaterThan(outdatedSource.publishedDate.getTime());
+          expect(alternative.publishedDate.getTime()).toBeGreaterThan(
+            outdatedSource.publishedDate.getTime()
+          );
           expect(alternative.credibilityRating).toBeOneOf(['A', 'B']);
           expect(alternative.sourceType).toBe(outdatedSource.sourceType);
         }
@@ -478,7 +512,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'A',
           sourceType: CitationSourceType.CONSULTING_REPORT,
           author: 'Consulting Firm A',
-          summary: 'Market will grow 50% next year'
+          summary: 'Market will grow 50% next year',
         },
         {
           id: 'source-2',
@@ -488,18 +522,24 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'A',
           sourceType: CitationSourceType.INDUSTRY_REPORT,
           author: 'Research Firm B',
-          summary: 'Market will grow 15% next year'
-        }
+          summary: 'Market will grow 15% next year',
+        },
       ];
 
-      const conflictAnalysis = await aiDiscoveryEngine.analyzeConflictingEvidence(conflictingSources);
-      
+      const conflictAnalysis =
+        await aiDiscoveryEngine.analyzeConflictingEvidence(conflictingSources);
+
       expect(conflictAnalysis.conflictDetected).toBe(true);
       expect(conflictAnalysis.conflictingSources).toHaveLength(2);
       expect(conflictAnalysis.confidenceImpact).toBeGreaterThanOrEqual(0);
       expect(conflictAnalysis.confidenceImpact).toBeLessThanOrEqual(100);
       expect(conflictAnalysis.resolutionStrategy).toBeDefined();
-      expect(conflictAnalysis.recommendedApproach).toBeOneOf(['weighted_average', 'conservative_estimate', 'range_estimate', 'additional_sources']);
+      expect(conflictAnalysis.recommendedApproach).toBeOneOf([
+        'weighted_average',
+        'conservative_estimate',
+        'range_estimate',
+        'additional_sources',
+      ]);
     });
   });
 
@@ -512,7 +552,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
       `;
 
       const anonymizedContent = await dataAnonymizationService.anonymizeContent(sensitiveContent);
-      
+
       expect(anonymizedContent).not.toContain('$50M');
       expect(anonymizedContent).not.toContain('john.smith@email.com');
       expect(anonymizedContent).not.toContain('PROJECT-ALPHA-2024');
@@ -527,9 +567,17 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
       const testDocumentId = 'secure-doc-123';
 
       // Test user access control
-      const userAccess = await accessControlManager.checkAccess(testUser, 'audit_trail', testDocumentId);
-      const adminAccess = await accessControlManager.checkAccess(adminUser, 'audit_trail', testDocumentId);
-      
+      const userAccess = await accessControlManager.checkAccess(
+        testUser,
+        'audit_trail',
+        testDocumentId
+      );
+      const adminAccess = await accessControlManager.checkAccess(
+        adminUser,
+        'audit_trail',
+        testDocumentId
+      );
+
       expect(userAccess).toBeDefined();
       expect(adminAccess).toBeDefined();
       expect(adminAccess.level).toBeGreaterThanOrEqual(userAccess.level);
@@ -539,12 +587,12 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
       const testCredentials = {
         apiKey: 'test-api-key-12345',
         endpoint: 'https://api.example.com',
-        service: 'market-data-provider'
+        service: 'market-data-provider',
       };
 
       await secureCredentialManager.storeCredentials('market-data', testCredentials);
       const retrievedCredentials = await secureCredentialManager.getCredentials('market-data');
-      
+
       expect(retrievedCredentials).toBeDefined();
       expect(retrievedCredentials.service).toBe(testCredentials.service);
       expect(retrievedCredentials.endpoint).toBe(testCredentials.endpoint);
@@ -557,10 +605,10 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
     test('should process citation enhancement within acceptable time limits', async () => {
       const largeDocument = 'Large document content '.repeat(1000); // ~25KB document
       const startTime = Date.now();
-      
+
       const citationRequirements = await aiDiscoveryEngine.analyzeCitationNeeds(largeDocument);
       const processingTime = Date.now() - startTime;
-      
+
       // Should complete within 30 seconds for documents up to 5,000 words
       expect(processingTime).toBeLessThan(30000);
       expect(citationRequirements).toBeInstanceOf(Array);
@@ -572,20 +620,20 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         'https://example.com/test-2',
         'https://example.com/test-3',
         'https://example.com/test-4',
-        'https://example.com/test-5'
+        'https://example.com/test-5',
       ];
 
       const startTime = Date.now();
-      const validationPromises = testUrls.map(url => 
+      const validationPromises = testUrls.map(url =>
         sourceValidationEngine.validateSourceAccessibility(url)
       );
-      
+
       const results = await Promise.all(validationPromises);
       const processingTime = Date.now() - startTime;
-      
+
       expect(results).toHaveLength(testUrls.length);
       expect(processingTime).toBeLessThan(10000); // Should handle 5 concurrent requests in under 10 seconds
-      
+
       for (const result of results) {
         expect(result.isAccessible).toBeDefined();
         expect(result.lastChecked).toBeInstanceOf(Date);
@@ -604,7 +652,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'A',
           sourceType: CitationSourceType.CONSULTING_REPORT,
           author: 'McKinsey & Company',
-          summary: 'Comprehensive market analysis'
+          summary: 'Comprehensive market analysis',
         },
         {
           id: 'quality-test-2',
@@ -614,12 +662,12 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
           credibilityRating: 'A',
           sourceType: CitationSourceType.INDUSTRY_REPORT,
           author: 'Gartner Research',
-          summary: 'Industry trend analysis'
-        }
+          summary: 'Industry trend analysis',
+        },
       ];
 
       const qualityReport = await qualityAssessmentSystem.assessCitationQuality(testCitations);
-      
+
       // Target: Average citation quality score of 85+ (0-100 scale)
       expect(qualityReport.overallScore).toBeGreaterThanOrEqual(85);
     });
@@ -629,7 +677,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
         'https://www.mckinsey.com',
         'https://www.gartner.com',
         'https://www.forrester.com',
-        'https://invalid-url-that-should-fail.nonexistent'
+        'https://invalid-url-that-should-fail.nonexistent',
       ];
 
       let correctValidations = 0;
@@ -645,7 +693,7 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
       }
 
       const accuracy = (correctValidations / totalValidations) * 100;
-      
+
       // Target: 95%+ accuracy in source accessibility and credibility assessment
       expect(accuracy).toBeGreaterThanOrEqual(95);
     });
@@ -659,13 +707,15 @@ describe('Enhanced Citation System - Comprehensive Requirements Validation', () 
       `;
 
       const citationRequirements = await aiDiscoveryEngine.analyzeCitationNeeds(testDocument);
-      const quantitativeClaims = citationRequirements.filter(req => req.claimType === 'quantitative');
+      const quantitativeClaims = citationRequirements.filter(
+        req => req.claimType === 'quantitative'
+      );
       const qualitativeClaims = citationRequirements.filter(req => req.claimType === 'qualitative');
 
       // Target: 100% of quantitative claims and 90% of qualitative claims include supporting citations
       expect(quantitativeClaims.length).toBeGreaterThan(0);
       expect(qualitativeClaims.length).toBeGreaterThan(0);
-      
+
       // All quantitative claims should have citation requirements
       for (const claim of quantitativeClaims) {
         expect(claim.requiredSourceTypes.length).toBeGreaterThan(0);

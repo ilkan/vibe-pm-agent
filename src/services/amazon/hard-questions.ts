@@ -4,11 +4,7 @@
  */
 
 import { BaseService, Result } from '../_base';
-import { 
-  HardQuestion, 
-  QuestionContext, 
-  EvidenceRecommendation 
-} from '../../models/questions';
+import { HardQuestion, QuestionContext, EvidenceRecommendation } from '../../models/questions';
 import { performanceCache } from '../../utils/performance-cache';
 import { performanceMonitor } from '../../utils/performance-monitor';
 
@@ -64,11 +60,11 @@ export class HardQuestionsService extends BaseService {
     return this.handleAsync(async () => {
       return questions.sort((a, b) => {
         // Priority order: critical > important > clarifying
-        const severityOrder = { 'critical': 3, 'important': 2, 'clarifying': 1 };
+        const severityOrder = { critical: 3, important: 2, clarifying: 1 };
         const severityDiff = severityOrder[b.severity] - severityOrder[a.severity];
-        
+
         if (severityDiff !== 0) return severityDiff;
-        
+
         // Secondary sort by number of target assumptions (more assumptions = higher impact)
         return b.targetAssumptions.length - a.targetAssumptions.length;
       });
@@ -89,13 +85,13 @@ export class HardQuestionsService extends BaseService {
               type: 'data_source',
               description: 'Industry market research reports from Gartner, IDC, or Forrester',
               priority: 'high',
-              estimatedEffort: '1-2 weeks'
+              estimatedEffort: '1-2 weeks',
             },
             {
               type: 'validation_method',
               description: 'Customer interviews and surveys to validate demand assumptions',
               priority: 'high',
-              estimatedEffort: '2-3 weeks'
+              estimatedEffort: '2-3 weeks',
             }
           );
           break;
@@ -106,13 +102,13 @@ export class HardQuestionsService extends BaseService {
               type: 'data_source',
               description: 'Comparable company financial analysis and benchmarking data',
               priority: 'high',
-              estimatedEffort: '1 week'
+              estimatedEffort: '1 week',
             },
             {
               type: 'validation_method',
               description: 'Financial model sensitivity analysis and Monte Carlo simulation',
               priority: 'medium',
-              estimatedEffort: '1-2 weeks'
+              estimatedEffort: '1-2 weeks',
             }
           );
           break;
@@ -123,13 +119,13 @@ export class HardQuestionsService extends BaseService {
               type: 'research_study',
               description: 'Competitive intelligence analysis and market positioning study',
               priority: 'high',
-              estimatedEffort: '2-3 weeks'
+              estimatedEffort: '2-3 weeks',
             },
             {
               type: 'data_source',
               description: 'Patent analysis and competitive feature comparison',
               priority: 'medium',
-              estimatedEffort: '1 week'
+              estimatedEffort: '1 week',
             }
           );
           break;
@@ -140,13 +136,13 @@ export class HardQuestionsService extends BaseService {
               type: 'validation_method',
               description: 'Technical feasibility assessment and prototype development',
               priority: 'high',
-              estimatedEffort: '3-4 weeks'
+              estimatedEffort: '3-4 weeks',
             },
             {
               type: 'data_source',
               description: 'Resource capacity analysis and team skill assessment',
               priority: 'medium',
-              estimatedEffort: '1 week'
+              estimatedEffort: '1 week',
             }
           );
           break;
@@ -157,13 +153,13 @@ export class HardQuestionsService extends BaseService {
               type: 'data_source',
               description: 'Market timing signals and trend analysis data',
               priority: 'high',
-              estimatedEffort: '1-2 weeks'
+              estimatedEffort: '1-2 weeks',
             },
             {
               type: 'validation_method',
               description: 'Regulatory and compliance timeline assessment',
               priority: 'medium',
-              estimatedEffort: '1 week'
+              estimatedEffort: '1 week',
             }
           );
           break;
@@ -190,7 +186,10 @@ export class HardQuestionsService extends BaseService {
           targetAssumptions: [assumptionId],
           category: this.mapAssumptionCategoryToQuestionCategory(assumption.category),
           severity: assumption.impact === 'critical' ? 'critical' : 'important',
-          evidenceNeeded: [`Credible sources for ${assumption.name}`, 'Independent validation of the assumption']
+          evidenceNeeded: [
+            `Credible sources for ${assumption.name}`,
+            'Independent validation of the assumption',
+          ],
         });
       }
     });
@@ -211,20 +210,30 @@ export class HardQuestionsService extends BaseService {
     if (marketAssumptions.length > 0) {
       questions.push({
         id: id++,
-        question: 'What if the market size is significantly smaller than projected? How would this impact the business case?',
+        question:
+          'What if the market size is significantly smaller than projected? How would this impact the business case?',
         targetAssumptions: marketIds,
         category: 'market',
         severity: 'critical',
-        evidenceNeeded: ['Third-party market research', 'Bottom-up market sizing analysis', 'Customer demand validation']
+        evidenceNeeded: [
+          'Third-party market research',
+          'Bottom-up market sizing analysis',
+          'Customer demand validation',
+        ],
       });
 
       questions.push({
         id: id++,
-        question: 'Why is now the right time for this solution? What if market timing assumptions are wrong?',
+        question:
+          'Why is now the right time for this solution? What if market timing assumptions are wrong?',
         targetAssumptions: marketIds,
         category: 'timing',
         severity: 'important',
-        evidenceNeeded: ['Market trend analysis', 'Competitive timing assessment', 'Customer readiness indicators']
+        evidenceNeeded: [
+          'Market trend analysis',
+          'Competitive timing assessment',
+          'Customer readiness indicators',
+        ],
       });
     }
 
@@ -244,20 +253,26 @@ export class HardQuestionsService extends BaseService {
     if (financialAssumptions.length > 0) {
       questions.push({
         id: id++,
-        question: 'What if development costs are 50% higher than estimated? How does this affect ROI and payback period?',
+        question:
+          'What if development costs are 50% higher than estimated? How does this affect ROI and payback period?',
         targetAssumptions: financialIds,
         category: 'financial',
         severity: 'critical',
-        evidenceNeeded: ['Historical cost analysis', 'Vendor quotes', 'Resource planning details']
+        evidenceNeeded: ['Historical cost analysis', 'Vendor quotes', 'Resource planning details'],
       });
 
       questions.push({
         id: id++,
-        question: 'How confident are we in the revenue projections? What are the key risks to achieving these numbers?',
+        question:
+          'How confident are we in the revenue projections? What are the key risks to achieving these numbers?',
         targetAssumptions: financialIds,
         category: 'financial',
         severity: 'critical',
-        evidenceNeeded: ['Revenue model validation', 'Customer willingness-to-pay research', 'Pricing sensitivity analysis']
+        evidenceNeeded: [
+          'Revenue model validation',
+          'Customer willingness-to-pay research',
+          'Pricing sensitivity analysis',
+        ],
       });
     }
 
@@ -276,20 +291,30 @@ export class HardQuestionsService extends BaseService {
 
     questions.push({
       id: id++,
-      question: 'Do we have the technical capabilities and resources to execute this successfully? What are the key execution risks?',
+      question:
+        'Do we have the technical capabilities and resources to execute this successfully? What are the key execution risks?',
       targetAssumptions: technicalIds,
       category: 'execution',
       severity: 'important',
-      evidenceNeeded: ['Technical feasibility study', 'Resource capacity analysis', 'Risk assessment matrix']
+      evidenceNeeded: [
+        'Technical feasibility study',
+        'Resource capacity analysis',
+        'Risk assessment matrix',
+      ],
     });
 
     questions.push({
       id: id++,
-      question: 'What if the timeline is unrealistic? How would delays impact the business case and competitive position?',
+      question:
+        'What if the timeline is unrealistic? How would delays impact the business case and competitive position?',
       targetAssumptions: technicalIds,
       category: 'timing',
       severity: 'important',
-      evidenceNeeded: ['Detailed project timeline', 'Historical delivery performance', 'Critical path analysis']
+      evidenceNeeded: [
+        'Detailed project timeline',
+        'Historical delivery performance',
+        'Critical path analysis',
+      ],
     });
 
     return questions;
@@ -298,7 +323,9 @@ export class HardQuestionsService extends BaseService {
   /**
    * Map assumption category to question category
    */
-  private mapAssumptionCategoryToQuestionCategory(assumptionCategory: 'market' | 'financial' | 'technical' | 'competitive'): 'market' | 'financial' | 'competitive' | 'execution' | 'timing' {
+  private mapAssumptionCategoryToQuestionCategory(
+    assumptionCategory: 'market' | 'financial' | 'technical' | 'competitive'
+  ): 'market' | 'financial' | 'competitive' | 'execution' | 'timing' {
     switch (assumptionCategory) {
       case 'technical':
         return 'execution';
@@ -320,27 +347,39 @@ export class HardQuestionsService extends BaseService {
     const questions: HardQuestion[] = [];
     let id = startId;
 
-    const competitiveAssumptions = context.ledger.assumptions.filter(a => a.category === 'competitive');
+    const competitiveAssumptions = context.ledger.assumptions.filter(
+      a => a.category === 'competitive'
+    );
     const competitiveIds = competitiveAssumptions.map(a => a.id);
 
     if (context.competitiveContext) {
       questions.push({
         id: id++,
-        question: 'How will competitors respond to this launch? What if they launch a similar solution first or at the same time?',
+        question:
+          'How will competitors respond to this launch? What if they launch a similar solution first or at the same time?',
         targetAssumptions: competitiveIds,
         category: 'competitive',
         severity: 'important',
-        evidenceNeeded: ['Competitive intelligence analysis', 'Competitor roadmap research', 'Market response scenarios']
+        evidenceNeeded: [
+          'Competitive intelligence analysis',
+          'Competitor roadmap research',
+          'Market response scenarios',
+        ],
       });
     }
 
     questions.push({
       id: id++,
-      question: 'What makes this solution defensible against competitive threats? How sustainable is our competitive advantage?',
+      question:
+        'What makes this solution defensible against competitive threats? How sustainable is our competitive advantage?',
       targetAssumptions: competitiveIds,
       category: 'competitive',
       severity: 'important',
-      evidenceNeeded: ['Competitive differentiation analysis', 'Intellectual property assessment', 'Moat sustainability study']
+      evidenceNeeded: [
+        'Competitive differentiation analysis',
+        'Intellectual property assessment',
+        'Moat sustainability study',
+      ],
     });
 
     return questions;

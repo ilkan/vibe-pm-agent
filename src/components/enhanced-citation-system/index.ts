@@ -1,6 +1,6 @@
 /**
  * Enhanced Citation System - Unified Integration
- * 
+ *
  * This module integrates all citation enhancement components into a unified system
  * that provides comprehensive citation management, validation, and quality assessment.
  */
@@ -60,7 +60,7 @@ export interface SimpleDocumentAnalysis {
 
 /**
  * Enhanced Citation System - Main Integration Class
- * 
+ *
  * Orchestrates all citation enhancement components to provide a unified
  * citation management and validation system.
  */
@@ -116,28 +116,28 @@ export class EnhancedCitationSystem {
     try {
       // Step 1: Extract existing citations from content
       const existingCitations = await this.extractExistingCitations(content);
-      
+
       // Step 2: Get recommended citations from citation service
       const recommendedCitations = await this.citationService.findRelevantCitations({
         keywords: this.extractKeywords(content),
         industry: this.extractIndustry(documentType),
         minimum_confidence: CitationConfidence.MEDIUM,
       });
-      
+
       // Step 3: Combine and validate citations
       const allCitations = [...existingCitations, ...recommendedCitations];
       const validatedCitations = await this.validateCitations(allCitations);
-      
+
       // Step 4: Calculate quality score
       const qualityScore = this.calculateQualityScore(validatedCitations);
-      
+
       // Step 5: Generate recommendations
       const recommendations = this.generateSimpleRecommendations(
         validatedCitations,
         qualityScore,
         options.minimumConfidence || 70
       );
-      
+
       // Step 6: Create audit trail if enabled
       let auditTrail: string | undefined;
       if (this.config.enableAuditTrail) {
@@ -155,7 +155,6 @@ export class EnhancedCitationSystem {
         auditTrail,
         processingTime: Math.max(processingTime, 1), // Ensure minimum 1ms
       };
-
     } catch (error) {
       const processingTime = Date.now() - startTime;
       ErrorHandler.logError(error, {
@@ -182,12 +181,12 @@ export class EnhancedCitationSystem {
    */
   async validateCitations(citations: Citation[]): Promise<Citation[]> {
     const validatedCitations: Citation[] = [];
-    
+
     for (const citation of citations) {
       try {
         // Basic validation - check if URL is accessible
         const isAccessible = await this.isUrlAccessible(citation.url);
-        
+
         if (isAccessible) {
           validatedCitations.push(citation);
         } else {
@@ -200,7 +199,7 @@ export class EnhancedCitationSystem {
         validatedCitations.push(citation);
       }
     }
-    
+
     return validatedCitations;
   }
 
@@ -212,20 +211,20 @@ export class EnhancedCitationSystem {
     documentId?: string
   ): Promise<SimpleDocumentAnalysis> {
     const id = documentId || this.generateDocumentId(content);
-    
+
     try {
       // Extract existing citations
       const existingCitations = await this.extractExistingCitations(content);
-      
+
       // Get recommended sources
       const recommendedSources = await this.citationService.findRelevantCitations({
         keywords: this.extractKeywords(content),
         industry: 'analysis',
       });
-      
+
       // Identify quality gaps
       const qualityGaps = this.identifyQualityGaps(content, existingCitations);
-      
+
       // Calculate overall confidence
       const overallConfidence = this.calculateOverallConfidence(existingCitations);
 
@@ -236,12 +235,18 @@ export class EnhancedCitationSystem {
         qualityGaps,
         recommendedSources,
         overallConfidence,
-        complianceStatus: qualityGaps.length === 0 ? 'compliant' : qualityGaps.length <= 2 ? 'warning' : 'non-compliant',
+        complianceStatus:
+          qualityGaps.length === 0
+            ? 'compliant'
+            : qualityGaps.length <= 2
+              ? 'warning'
+              : 'non-compliant',
       };
-
     } catch (error) {
       ErrorHandler.logError(error, { documentId: id, stage: 'citation_analysis' });
-      throw new Error(`Citation analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Citation analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -271,17 +276,22 @@ export class EnhancedCitationSystem {
         keywords: [topic],
         minimum_confidence: CitationConfidence.MEDIUM,
       });
-      
+
       // Validate citations
       const validatedCitations = await this.validateCitations(citations);
-      
+
       // Calculate quality score
       const qualityScore = this.calculateQualityScore(validatedCitations);
-      
+
       // Categorize evidence
-      const primaryEvidence = validatedCitations.slice(0, Math.ceil(validatedCitations.length * 0.6));
-      const supportingEvidence = validatedCitations.slice(Math.ceil(validatedCitations.length * 0.6));
-      
+      const primaryEvidence = validatedCitations.slice(
+        0,
+        Math.ceil(validatedCitations.length * 0.6)
+      );
+      const supportingEvidence = validatedCitations.slice(
+        Math.ceil(validatedCitations.length * 0.6)
+      );
+
       return {
         topic,
         evidenceStrength: qualityScore >= 80 ? 'strong' : qualityScore >= 60 ? 'moderate' : 'weak',
@@ -290,10 +300,11 @@ export class EnhancedCitationSystem {
         supportingEvidence,
         recommendations: this.generateSimpleRecommendations(validatedCitations, qualityScore, 70),
       };
-
     } catch (error) {
       ErrorHandler.logError(error, { topic, stage: 'evidence_package_generation' });
-      throw new Error(`Evidence package generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Evidence package generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -321,19 +332,19 @@ export class EnhancedCitationSystem {
     try {
       // Validate all citations
       const validatedCitations = await this.validateCitations(citations);
-      
+
       // Calculate quality score
       const qualityScore = this.calculateQualityScore(validatedCitations);
-      
+
       // Identify issues
       const issues: string[] = [];
       const recommendations: string[] = [];
-      
+
       if (qualityScore < (auditCriteria.qualityThresholds?.minimum || 60)) {
         issues.push(`Overall quality score (${qualityScore}) below minimum threshold`);
         recommendations.push('Improve citation quality by adding more credible sources');
       }
-      
+
       const validCount = validatedCitations.length;
       if (validCount < citations.length) {
         issues.push(`${citations.length - validCount} citations may have accessibility issues`);
@@ -346,15 +357,17 @@ export class EnhancedCitationSystem {
         totalCitations: citations.length,
         validCitations: validCount,
         qualityScore,
-        complianceStatus: issues.length === 0 ? 'compliant' : issues.length <= 2 ? 'warning' : 'non-compliant',
+        complianceStatus:
+          issues.length === 0 ? 'compliant' : issues.length <= 2 ? 'warning' : 'non-compliant',
         issues,
         recommendations,
         summary: `Audited ${citations.length} citations. ${validCount} valid, overall quality: ${qualityScore}%`,
       };
-
     } catch (error) {
       ErrorHandler.logError(error, { citationCount: citations.length, stage: 'citation_audit' });
-      throw new Error(`Citation audit failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Citation audit failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -391,7 +404,7 @@ export class EnhancedCitationSystem {
     // Simple extraction - look for URLs and references
     const urlRegex = /https?:\/\/[^\s\)]+/g;
     const urls = content.match(urlRegex) || [];
-    
+
     return urls.map((url, index) => ({
       id: `extracted-${index}`,
       title: `Reference ${index + 1}`,
@@ -420,28 +433,28 @@ export class EnhancedCitationSystem {
 
   private calculateQualityScore(citations: Citation[]): number {
     if (citations.length === 0) return 0;
-    
+
     let totalScore = 0;
     for (const citation of citations) {
       let score = 50; // Base score
-      
+
       // Higher score for authoritative domains
       if (citation.domain.includes('edu') || citation.domain.includes('gov')) {
         score += 30;
       } else if (citation.domain.includes('org')) {
         score += 20;
       }
-      
+
       // Higher score for high confidence sources
       if (citation.confidence === CitationConfidence.HIGH) {
         score += 20;
       } else if (citation.confidence === CitationConfidence.MEDIUM) {
         score += 10;
       }
-      
+
       totalScore += Math.min(score, 100);
     }
-    
+
     return Math.round(totalScore / citations.length);
   }
 
@@ -451,65 +464,88 @@ export class EnhancedCitationSystem {
     minimumConfidence: number
   ): string[] {
     const recommendations: string[] = [];
-    
+
     if (qualityScore < minimumConfidence) {
-      recommendations.push(`Quality score (${qualityScore}%) is below target (${minimumConfidence}%)`);
+      recommendations.push(
+        `Quality score (${qualityScore}%) is below target (${minimumConfidence}%)`
+      );
       recommendations.push('Consider adding more authoritative sources');
     }
-    
+
     if (citations.length < 3) {
       recommendations.push('Add more citations to strengthen evidence base');
     }
-    
+
     const lowConfidenceCitations = citations.filter(c => c.confidence === CitationConfidence.LOW);
     if (lowConfidenceCitations.length > 0) {
       recommendations.push(`Replace ${lowConfidenceCitations.length} low-confidence citations`);
     }
-    
+
     return recommendations;
   }
 
   private identifyQualityGaps(content: string, citations: Citation[]): string[] {
     const gaps: string[] = [];
-    
+
     // Check for quantitative claims without citations
     const quantitativeRegex = /\d+%|\$\d+|\d+\.\d+/g;
     const quantitativeClaims = content.match(quantitativeRegex) || [];
-    
+
     if (quantitativeClaims.length > citations.length) {
       gaps.push('Quantitative claims lack supporting citations');
     }
-    
+
     if (citations.length === 0) {
       gaps.push('No citations found in document');
     }
-    
+
     return gaps;
   }
 
   private calculateOverallConfidence(citations: Citation[]): number {
     if (citations.length === 0) return 0;
-    
+
     const confidenceValues = citations.map(c => {
       switch (c.confidence) {
-        case CitationConfidence.HIGH: return 90;
-        case CitationConfidence.MEDIUM: return 70;
-        case CitationConfidence.LOW: return 40;
-        default: return 50;
+        case CitationConfidence.HIGH:
+          return 90;
+        case CitationConfidence.MEDIUM:
+          return 70;
+        case CitationConfidence.LOW:
+          return 40;
+        default:
+          return 50;
       }
     });
-    
-    return Math.round(confidenceValues.reduce((sum, val) => sum + val, 0) / confidenceValues.length);
+
+    return Math.round(
+      confidenceValues.reduce((sum, val) => sum + val, 0) / confidenceValues.length
+    );
   }
 
   private extractKeywords(content: string): string[] {
     // Simple keyword extraction - look for important business terms
     const businessKeywords = [
-      'market', 'growth', 'revenue', 'customer', 'strategy', 'competitive',
-      'analysis', 'performance', 'roi', 'investment', 'digital', 'transformation',
-      'innovation', 'productivity', 'efficiency', 'cost', 'savings', 'benchmark'
+      'market',
+      'growth',
+      'revenue',
+      'customer',
+      'strategy',
+      'competitive',
+      'analysis',
+      'performance',
+      'roi',
+      'investment',
+      'digital',
+      'transformation',
+      'innovation',
+      'productivity',
+      'efficiency',
+      'cost',
+      'savings',
+      'benchmark',
     ];
-    
+
     const contentLower = content.toLowerCase();
     return businessKeywords.filter(keyword => contentLower.includes(keyword));
   }
@@ -517,18 +553,16 @@ export class EnhancedCitationSystem {
   private extractIndustry(documentType: string): string {
     // Map document types to industries
     const industryMap: Record<string, string> = {
-      'business_case': 'business',
-      'market_analysis': 'market_research',
-      'competitive_analysis': 'strategy',
-      'executive_onepager': 'management',
-      'pr_faq': 'communications',
+      business_case: 'business',
+      market_analysis: 'market_research',
+      competitive_analysis: 'strategy',
+      executive_onepager: 'management',
+      pr_faq: 'communications',
     };
-    
+
     return industryMap[documentType] || 'general';
   }
 }
 
 // Export the main class and related interfaces
-export {
-  EnhancedCitationSystem as default,
-};
+export { EnhancedCitationSystem as default };

@@ -2,7 +2,12 @@
  * Unit tests for Secure Credential Manager
  */
 
-import { SecureCredentialManager, Credential, SecureCredentialOptions, CredentialMetadata } from '../../components/secure-credential-manager';
+import {
+  SecureCredentialManager,
+  Credential,
+  SecureCredentialOptions,
+  CredentialMetadata,
+} from '../../components/secure-credential-manager';
 
 describe('SecureCredentialManager', () => {
   let credentialManager: SecureCredentialManager;
@@ -16,11 +21,11 @@ describe('SecureCredentialManager', () => {
         keyDerivation: 'pbkdf2',
         iterations: 10000,
         saltLength: 32,
-        ivLength: 16
+        ivLength: 16,
       },
       auditLogging: true,
       maxRetentionDays: 90,
-      requireApprovalForAccess: false
+      requireApprovalForAccess: false,
     };
 
     credentialManager = new SecureCredentialManager(defaultOptions);
@@ -43,16 +48,20 @@ describe('SecureCredentialManager', () => {
           allowedDomains: ['api.test.com'],
           tags: ['test'],
           owner: 'test-user',
-          team: 'engineering'
+          team: 'engineering',
         },
         permissions: [],
-        isActive: true
+        isActive: true,
       };
 
       const plainTextValue = 'sk_test_1234567890abcdef';
       const userId = 'user-123';
 
-      const credentialId = await credentialManager.storeCredential(credentialData, plainTextValue, userId);
+      const credentialId = await credentialManager.storeCredential(
+        credentialData,
+        plainTextValue,
+        userId
+      );
 
       expect(credentialId).toBeDefined();
       expect(typeof credentialId).toBe('string');
@@ -74,17 +83,21 @@ describe('SecureCredentialManager', () => {
           allowedDomains: [],
           tags: [],
           owner: 'test-user',
-          team: 'test'
+          team: 'test',
         },
         permissions: [],
-        isActive: true
+        isActive: true,
       };
 
-      const credentialId = await credentialManager.storeCredential(credentialData, 'test-value', 'user-123');
+      const credentialId = await credentialManager.storeCredential(
+        credentialData,
+        'test-value',
+        'user-123'
+      );
 
       expect(eventSpy).toHaveBeenCalledWith({
         credentialId,
-        userId: 'user-123'
+        userId: 'user-123',
       });
     });
 
@@ -94,11 +107,12 @@ describe('SecureCredentialManager', () => {
         description: 'Invalid credential',
         metadata: {} as CredentialMetadata,
         permissions: [],
-        isActive: true
+        isActive: true,
       };
 
-      await expect(credentialManager.storeCredential(invalidCredentialData as any, 'test-value', 'user-123'))
-        .rejects.toThrow('Failed to store credential');
+      await expect(
+        credentialManager.storeCredential(invalidCredentialData as any, 'test-value', 'user-123')
+      ).rejects.toThrow('Failed to store credential');
     });
   });
 
@@ -117,17 +131,23 @@ describe('SecureCredentialManager', () => {
           allowedDomains: ['api.test.com'],
           tags: ['test'],
           owner: 'test-user',
-          team: 'engineering'
+          team: 'engineering',
         },
-        permissions: [{
-          userId: 'user-123',
-          role: 'user',
-          actions: ['read', 'use']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: 'user-123',
+            role: 'user',
+            actions: ['read', 'use'],
+          },
+        ],
+        isActive: true,
       };
 
-      testCredentialId = await credentialManager.storeCredential(credentialData, 'test-secret-value', 'user-123');
+      testCredentialId = await credentialManager.storeCredential(
+        credentialData,
+        'test-secret-value',
+        'user-123'
+      );
     });
 
     it('should retrieve and decrypt credential', async () => {
@@ -142,24 +162,18 @@ describe('SecureCredentialManager', () => {
     });
 
     it('should deny access for users without permissions', async () => {
-      await expect(credentialManager.retrieveCredential(
-        testCredentialId,
-        'unauthorized-user',
-        'api_call',
-        {}
-      )).rejects.toThrow('Insufficient permissions to access credential');
+      await expect(
+        credentialManager.retrieveCredential(testCredentialId, 'unauthorized-user', 'api_call', {})
+      ).rejects.toThrow('Insufficient permissions to access credential');
     });
 
     it('should deny access to inactive credentials', async () => {
       // Deactivate the credential
       await credentialManager.updateCredential(testCredentialId, { isActive: false });
 
-      await expect(credentialManager.retrieveCredential(
-        testCredentialId,
-        'user-123',
-        'api_call',
-        {}
-      )).rejects.toThrow('Credential is inactive');
+      await expect(
+        credentialManager.retrieveCredential(testCredentialId, 'user-123', 'api_call', {})
+      ).rejects.toThrow('Credential is inactive');
     });
 
     it('should deny access to expired credentials', async () => {
@@ -167,12 +181,9 @@ describe('SecureCredentialManager', () => {
       const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
       await credentialManager.updateCredential(testCredentialId, { expiresAt: pastDate });
 
-      await expect(credentialManager.retrieveCredential(
-        testCredentialId,
-        'user-123',
-        'api_call',
-        {}
-      )).rejects.toThrow('Credential has expired');
+      await expect(
+        credentialManager.retrieveCredential(testCredentialId, 'user-123', 'api_call', {})
+      ).rejects.toThrow('Credential has expired');
     });
 
     it('should emit events when retrieving credentials', async () => {
@@ -184,13 +195,13 @@ describe('SecureCredentialManager', () => {
       expect(eventSpy).toHaveBeenCalledWith({
         credentialId: testCredentialId,
         userId: 'user-123',
-        purpose: 'api_call'
+        purpose: 'api_call',
       });
     });
 
     it('should log usage when retrieving credentials', async () => {
       await credentialManager.retrieveCredential(testCredentialId, 'user-123', 'api_call', {
-        apiEndpoint: 'https://api.test.com'
+        apiEndpoint: 'https://api.test.com',
       });
 
       const logs = credentialManager.getUsageLogs({ credentialId: testCredentialId });
@@ -219,17 +230,23 @@ describe('SecureCredentialManager', () => {
           allowedDomains: ['api.test.com'],
           tags: ['test'],
           owner: 'test-user',
-          team: 'engineering'
+          team: 'engineering',
         },
-        permissions: [{
-          userId: 'user-123',
-          role: 'admin',
-          actions: ['read', 'use', 'update']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: 'user-123',
+            role: 'admin',
+            actions: ['read', 'use', 'update'],
+          },
+        ],
+        isActive: true,
       };
 
-      testCredentialId = await credentialManager.storeCredential(credentialData, 'original-value', 'user-123');
+      testCredentialId = await credentialManager.storeCredential(
+        credentialData,
+        'original-value',
+        'user-123'
+      );
     });
 
     it('should update credential metadata', async () => {
@@ -241,14 +258,19 @@ describe('SecureCredentialManager', () => {
           allowedDomains: ['api.prod.com'],
           tags: ['production'],
           owner: 'prod-user',
-          team: 'operations'
-        }
+          team: 'operations',
+        },
       };
 
       await credentialManager.updateCredential(testCredentialId, updates, undefined, 'user-123');
 
       // Verify update by checking if we can still retrieve (indicating successful update)
-      const value = await credentialManager.retrieveCredential(testCredentialId, 'user-123', 'test', {});
+      const value = await credentialManager.retrieveCredential(
+        testCredentialId,
+        'user-123',
+        'test',
+        {}
+      );
       expect(value).toBe('original-value');
     });
 
@@ -257,28 +279,40 @@ describe('SecureCredentialManager', () => {
 
       await credentialManager.updateCredential(testCredentialId, {}, newValue, 'user-123');
 
-      const retrievedValue = await credentialManager.retrieveCredential(testCredentialId, 'user-123', 'test', {});
+      const retrievedValue = await credentialManager.retrieveCredential(
+        testCredentialId,
+        'user-123',
+        'test',
+        {}
+      );
       expect(retrievedValue).toBe(newValue);
     });
 
     it('should deny updates for users without permissions', async () => {
-      await expect(credentialManager.updateCredential(
-        testCredentialId,
-        { description: 'Unauthorized update' },
-        undefined,
-        'unauthorized-user'
-      )).rejects.toThrow('Insufficient permissions to update credential');
+      await expect(
+        credentialManager.updateCredential(
+          testCredentialId,
+          { description: 'Unauthorized update' },
+          undefined,
+          'unauthorized-user'
+        )
+      ).rejects.toThrow('Insufficient permissions to update credential');
     });
 
     it('should emit events when updating credentials', async () => {
       const eventSpy = jest.fn();
       credentialManager.on('credentialUpdated', eventSpy);
 
-      await credentialManager.updateCredential(testCredentialId, { description: 'Updated' }, undefined, 'user-123');
+      await credentialManager.updateCredential(
+        testCredentialId,
+        { description: 'Updated' },
+        undefined,
+        'user-123'
+      );
 
       expect(eventSpy).toHaveBeenCalledWith({
         credentialId: testCredentialId,
-        userId: 'user-123'
+        userId: 'user-123',
       });
     });
   });
@@ -298,29 +332,37 @@ describe('SecureCredentialManager', () => {
           allowedDomains: ['api.test.com'],
           tags: ['test'],
           owner: 'test-user',
-          team: 'engineering'
+          team: 'engineering',
         },
-        permissions: [{
-          userId: 'user-123',
-          role: 'admin',
-          actions: ['read', 'use', 'delete']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: 'user-123',
+            role: 'admin',
+            actions: ['read', 'use', 'delete'],
+          },
+        ],
+        isActive: true,
       };
 
-      testCredentialId = await credentialManager.storeCredential(credentialData, 'delete-test-value', 'user-123');
+      testCredentialId = await credentialManager.storeCredential(
+        credentialData,
+        'delete-test-value',
+        'user-123'
+      );
     });
 
     it('should delete credential', async () => {
       await credentialManager.deleteCredential(testCredentialId, 'user-123');
 
-      await expect(credentialManager.retrieveCredential(testCredentialId, 'user-123', 'test', {}))
-        .rejects.toThrow('Credential not found');
+      await expect(
+        credentialManager.retrieveCredential(testCredentialId, 'user-123', 'test', {})
+      ).rejects.toThrow('Credential not found');
     });
 
     it('should deny deletion for users without permissions', async () => {
-      await expect(credentialManager.deleteCredential(testCredentialId, 'unauthorized-user'))
-        .rejects.toThrow('Insufficient permissions to delete credential');
+      await expect(
+        credentialManager.deleteCredential(testCredentialId, 'unauthorized-user')
+      ).rejects.toThrow('Insufficient permissions to delete credential');
     });
 
     it('should emit events when deleting credentials', async () => {
@@ -331,7 +373,7 @@ describe('SecureCredentialManager', () => {
 
       expect(eventSpy).toHaveBeenCalledWith({
         credentialId: testCredentialId,
-        userId: 'user-123'
+        userId: 'user-123',
       });
     });
   });
@@ -348,35 +390,62 @@ describe('SecureCredentialManager', () => {
           name: 'API Key 1',
           type: 'api_key' as const,
           provider: 'provider-1',
-          metadata: { environment: 'development' as const, scope: [], allowedDomains: [], tags: [], owner: 'user1', team: 'team1' }
+          metadata: {
+            environment: 'development' as const,
+            scope: [],
+            allowedDomains: [],
+            tags: [],
+            owner: 'user1',
+            team: 'team1',
+          },
         },
         {
           name: 'OAuth Token 1',
           type: 'oauth_token' as const,
           provider: 'provider-2',
-          metadata: { environment: 'production' as const, scope: [], allowedDomains: [], tags: [], owner: 'user2', team: 'team2' }
+          metadata: {
+            environment: 'production' as const,
+            scope: [],
+            allowedDomains: [],
+            tags: [],
+            owner: 'user2',
+            team: 'team2',
+          },
         },
         {
           name: 'API Key 2',
           type: 'api_key' as const,
           provider: 'provider-1',
-          metadata: { environment: 'staging' as const, scope: [], allowedDomains: [], tags: [], owner: 'user1', team: 'team1' }
-        }
+          metadata: {
+            environment: 'staging' as const,
+            scope: [],
+            allowedDomains: [],
+            tags: [],
+            owner: 'user1',
+            team: 'team1',
+          },
+        },
       ];
 
       for (const cred of credentials) {
         const credentialData = {
           ...cred,
           description: 'Test credential',
-          permissions: [{
-            userId: 'user-123',
-            role: 'user',
-            actions: ['read']
-          }],
-          isActive: true
+          permissions: [
+            {
+              userId: 'user-123',
+              role: 'user',
+              actions: ['read'],
+            },
+          ],
+          isActive: true,
         };
 
-        const id = await credentialManager.storeCredential(credentialData, 'test-value', 'user-123');
+        const id = await credentialManager.storeCredential(
+          credentialData,
+          'test-value',
+          'user-123'
+        );
         credentialIds.push(id);
       }
     });
@@ -393,7 +462,9 @@ describe('SecureCredentialManager', () => {
     });
 
     it('should filter credentials by type', async () => {
-      const apiKeyCredentials = await credentialManager.listCredentials('user-123', { type: 'api_key' });
+      const apiKeyCredentials = await credentialManager.listCredentials('user-123', {
+        type: 'api_key',
+      });
 
       expect(apiKeyCredentials.length).toBe(2);
       apiKeyCredentials.forEach(cred => {
@@ -402,7 +473,9 @@ describe('SecureCredentialManager', () => {
     });
 
     it('should filter credentials by provider', async () => {
-      const provider1Credentials = await credentialManager.listCredentials('user-123', { provider: 'provider-1' });
+      const provider1Credentials = await credentialManager.listCredentials('user-123', {
+        provider: 'provider-1',
+      });
 
       expect(provider1Credentials.length).toBe(2);
       provider1Credentials.forEach(cred => {
@@ -411,7 +484,9 @@ describe('SecureCredentialManager', () => {
     });
 
     it('should filter credentials by environment', async () => {
-      const devCredentials = await credentialManager.listCredentials('user-123', { environment: 'development' });
+      const devCredentials = await credentialManager.listCredentials('user-123', {
+        environment: 'development',
+      });
 
       expect(devCredentials.length).toBe(1);
       expect(devCredentials[0].metadata.environment).toBe('development');
@@ -439,17 +514,23 @@ describe('SecureCredentialManager', () => {
           allowedDomains: ['api.test.com'],
           tags: ['test'],
           owner: 'test-user',
-          team: 'engineering'
+          team: 'engineering',
         },
-        permissions: [{
-          userId: 'user-123',
-          role: 'admin',
-          actions: ['read', 'use', 'update']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: 'user-123',
+            role: 'admin',
+            actions: ['read', 'use', 'update'],
+          },
+        ],
+        isActive: true,
       };
 
-      testCredentialId = await credentialManager.storeCredential(credentialData, 'original-key', 'user-123');
+      testCredentialId = await credentialManager.storeCredential(
+        credentialData,
+        'original-key',
+        'user-123'
+      );
     });
 
     it('should rotate credential value', async () => {
@@ -457,7 +538,12 @@ describe('SecureCredentialManager', () => {
 
       await credentialManager.rotateCredential(testCredentialId, newValue, 'user-123');
 
-      const retrievedValue = await credentialManager.retrieveCredential(testCredentialId, 'user-123', 'test', {});
+      const retrievedValue = await credentialManager.retrieveCredential(
+        testCredentialId,
+        'user-123',
+        'test',
+        {}
+      );
       expect(retrievedValue).toBe(newValue);
     });
 
@@ -469,13 +555,14 @@ describe('SecureCredentialManager', () => {
 
       expect(eventSpy).toHaveBeenCalledWith({
         credentialId: testCredentialId,
-        userId: 'user-123'
+        userId: 'user-123',
       });
     });
 
     it('should deny rotation for users without permissions', async () => {
-      await expect(credentialManager.rotateCredential(testCredentialId, 'new-value', 'unauthorized-user'))
-        .rejects.toThrow('Insufficient permissions to rotate credential');
+      await expect(
+        credentialManager.rotateCredential(testCredentialId, 'new-value', 'unauthorized-user')
+      ).rejects.toThrow('Insufficient permissions to rotate credential');
     });
 
     it('should log rotation in usage logs', async () => {
@@ -505,22 +592,28 @@ describe('SecureCredentialManager', () => {
           allowedDomains: ['api.test.com'],
           tags: ['test'],
           owner: 'test-user',
-          team: 'engineering'
+          team: 'engineering',
         },
-        permissions: [{
-          userId: 'user-123',
-          role: 'user',
-          actions: ['read', 'use']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: 'user-123',
+            role: 'user',
+            actions: ['read', 'use'],
+          },
+        ],
+        isActive: true,
       };
 
-      testCredentialId = await credentialManager.storeCredential(credentialData, 'logging-test-value', 'user-123');
+      testCredentialId = await credentialManager.storeCredential(
+        credentialData,
+        'logging-test-value',
+        'user-123'
+      );
     });
 
     it('should log successful credential retrieval', async () => {
       await credentialManager.retrieveCredential(testCredentialId, 'user-123', 'api_call', {
-        apiEndpoint: 'https://api.test.com'
+        apiEndpoint: 'https://api.test.com',
       });
 
       const logs = credentialManager.getUsageLogs({ credentialId: testCredentialId });
@@ -534,7 +627,12 @@ describe('SecureCredentialManager', () => {
 
     it('should log failed credential access attempts', async () => {
       try {
-        await credentialManager.retrieveCredential(testCredentialId, 'unauthorized-user', 'api_call', {});
+        await credentialManager.retrieveCredential(
+          testCredentialId,
+          'unauthorized-user',
+          'api_call',
+          {}
+        );
       } catch (error) {
         // Expected to fail
       }
@@ -553,9 +651,9 @@ describe('SecureCredentialManager', () => {
       await credentialManager.retrieveCredential(testCredentialId, 'user-123', 'api_call_2', {});
 
       // Filter by purpose
-      const filteredLogs = credentialManager.getUsageLogs({ 
+      const filteredLogs = credentialManager.getUsageLogs({
         credentialId: testCredentialId,
-        userId: 'user-123'
+        userId: 'user-123',
       });
 
       expect(filteredLogs.length).toBeGreaterThan(0);
@@ -571,12 +669,14 @@ describe('SecureCredentialManager', () => {
 
       await credentialManager.retrieveCredential(testCredentialId, 'user-123', 'api_call', {});
 
-      expect(logSpy).toHaveBeenCalledWith(expect.objectContaining({
-        credentialId: testCredentialId,
-        userId: 'user-123',
-        action: 'retrieved',
-        success: true
-      }));
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          credentialId: testCredentialId,
+          userId: 'user-123',
+          action: 'retrieved',
+          success: true,
+        })
+      );
     });
   });
 
@@ -587,22 +687,22 @@ describe('SecureCredentialManager', () => {
         {
           name: 'Active Credential',
           isActive: true,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         },
         {
           name: 'Expired Credential',
           isActive: true,
-          expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000) // 1 day ago
+          expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
         },
         {
           name: 'Expiring Soon Credential',
           isActive: true,
-          expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now
+          expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
         },
         {
           name: 'Inactive Credential',
-          isActive: false
-        }
+          isActive: false,
+        },
       ];
 
       for (const cred of credentials) {
@@ -617,7 +717,7 @@ describe('SecureCredentialManager', () => {
             allowedDomains: [],
             tags: [],
             owner: 'test-user',
-            team: 'test'
+            team: 'test',
           },
           permissions: [],
         };
@@ -649,21 +749,32 @@ describe('SecureCredentialManager', () => {
           allowedDomains: [],
           tags: [],
           owner: 'test-user',
-          team: 'test'
+          team: 'test',
         },
-        permissions: [{
-          userId: 'user-123',
-          role: 'user',
-          actions: ['read', 'use']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: 'user-123',
+            role: 'user',
+            actions: ['read', 'use'],
+          },
+        ],
+        isActive: true,
       };
 
       const plainTextValue = 'super-secret-api-key-12345';
-      const credentialId = await credentialManager.storeCredential(credentialData, plainTextValue, 'user-123');
+      const credentialId = await credentialManager.storeCredential(
+        credentialData,
+        plainTextValue,
+        'user-123'
+      );
 
       // Retrieve and verify decryption
-      const decryptedValue = await credentialManager.retrieveCredential(credentialId, 'user-123', 'test', {});
+      const decryptedValue = await credentialManager.retrieveCredential(
+        credentialId,
+        'user-123',
+        'test',
+        {}
+      );
       expect(decryptedValue).toBe(plainTextValue);
     });
 
@@ -671,7 +782,7 @@ describe('SecureCredentialManager', () => {
       // Create manager with invalid encryption config
       const invalidOptions = {
         ...defaultOptions,
-        encryptionKey: 'invalid-short-key'
+        encryptionKey: 'invalid-short-key',
       };
 
       const invalidManager = new SecureCredentialManager(invalidOptions);
@@ -687,15 +798,16 @@ describe('SecureCredentialManager', () => {
           allowedDomains: [],
           tags: [],
           owner: 'test-user',
-          team: 'test'
+          team: 'test',
         },
         permissions: [],
-        isActive: true
+        isActive: true,
       };
 
       // Should handle encryption errors
-      await expect(invalidManager.storeCredential(credentialData, 'test-value', 'user-123'))
-        .rejects.toThrow();
+      await expect(
+        invalidManager.storeCredential(credentialData, 'test-value', 'user-123')
+      ).rejects.toThrow();
     });
   });
 
@@ -711,11 +823,13 @@ describe('SecureCredentialManager', () => {
         // Expected to throw
       }
 
-      expect(errorSpy).toHaveBeenCalledWith(expect.objectContaining({
-        action: 'retrieve',
-        credentialId: 'non-existent-id',
-        userId: 'user-123'
-      }));
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: 'retrieve',
+          credentialId: 'non-existent-id',
+          userId: 'user-123',
+        })
+      );
     });
 
     it('should handle concurrent access gracefully', async () => {
@@ -730,17 +844,23 @@ describe('SecureCredentialManager', () => {
           allowedDomains: [],
           tags: [],
           owner: 'test-user',
-          team: 'test'
+          team: 'test',
         },
-        permissions: [{
-          userId: 'user-123',
-          role: 'user',
-          actions: ['read', 'use']
-        }],
-        isActive: true
+        permissions: [
+          {
+            userId: 'user-123',
+            role: 'user',
+            actions: ['read', 'use'],
+          },
+        ],
+        isActive: true,
       };
 
-      const credentialId = await credentialManager.storeCredential(credentialData, 'concurrent-test-value', 'user-123');
+      const credentialId = await credentialManager.storeCredential(
+        credentialData,
+        'concurrent-test-value',
+        'user-123'
+      );
 
       // Multiple concurrent retrievals
       const promises = Array.from({ length: 10 }, () =>

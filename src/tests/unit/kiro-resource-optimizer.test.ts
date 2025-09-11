@@ -318,11 +318,17 @@ describe('KiroResourceOptimizer', () => {
       expect(analysis.vibeMode.efficiencyGains).toBeGreaterThan(0);
       expect(analysis.vibeMode.bestPractices.some(p => p.includes('rapid prototyping'))).toBe(true);
       expect(analysis.vibeMode.vibeCodingROI).toBeDefined();
-      expect(analysis.vibeMode.vibeCodingROI.developmentVelocity.velocityMultiplier).toBeGreaterThan(1);
+      expect(
+        analysis.vibeMode.vibeCodingROI.developmentVelocity.velocityMultiplier
+      ).toBeGreaterThan(1);
 
       expect(analysis.specMode.optimalUsage).toBeGreaterThan(0);
       expect(analysis.specMode.featureDeliveryRate).toBeGreaterThan(1);
-      expect(analysis.specMode.qualityImprovements.some(q => q.includes('Comprehensive feature documentation'))).toBe(true);
+      expect(
+        analysis.specMode.qualityImprovements.some(q =>
+          q.includes('Comprehensive feature documentation')
+        )
+      ).toBe(true);
       expect(analysis.specMode.specModeROI).toBeDefined();
       expect(analysis.specMode.specModeROI.comprehensiveFeatureDelivery).toBeGreaterThan(100);
 
@@ -336,8 +342,12 @@ describe('KiroResourceOptimizer', () => {
     it('should include enhanced best practices for Vibe mode', async () => {
       const analysis = await kiroResourceOptimizer.analyzeKiroModeEfficiency(mockWorkflow);
 
-      expect(analysis.vibeMode.bestPractices.some(p => p.includes('real-time collaboration'))).toBe(true);
-      expect(analysis.vibeMode.bestPractices.some(p => p.includes('technical debt incrementally'))).toBe(true);
+      expect(analysis.vibeMode.bestPractices.some(p => p.includes('real-time collaboration'))).toBe(
+        true
+      );
+      expect(
+        analysis.vibeMode.bestPractices.some(p => p.includes('technical debt incrementally'))
+      ).toBe(true);
       expect(analysis.vibeMode.bestPractices.length).toBeGreaterThan(4);
     });
 
@@ -404,9 +414,11 @@ describe('KiroResourceOptimizer', () => {
       expect(analysis.recommendations.some(r => r.includes('Cost Savings'))).toBe(true);
 
       // Check for Kiro Resource Optimization recommendations
-      expect(analysis.recommendations.some(r => 
-        r.includes('Kiro Resource Optimization') && r.includes('efficiency gains')
-      )).toBe(true);
+      expect(
+        analysis.recommendations.some(
+          r => r.includes('Kiro Resource Optimization') && r.includes('efficiency gains')
+        )
+      ).toBe(true);
 
       // Check for business metrics
       expect(analysis.recommendations.some(r => r.includes('Business Metrics'))).toBe(true);
@@ -438,12 +450,16 @@ describe('KiroResourceOptimizer', () => {
       const analysis = await kiroResourceOptimizer.generateKiroROIAnalysis(scenarios);
 
       // Should recommend Vibe mode due to higher savings
-      expect(analysis.recommendations.some(r => 
-        r.includes('Vibe Mode Advantage') && r.includes('development velocity')
-      )).toBe(true);
-      expect(analysis.recommendations.some(r => 
-        r.includes('Vibe Mode Business Impact') && r.includes('competitive advantage')
-      )).toBe(true);
+      expect(
+        analysis.recommendations.some(
+          r => r.includes('Vibe Mode Advantage') && r.includes('development velocity')
+        )
+      ).toBe(true);
+      expect(
+        analysis.recommendations.some(
+          r => r.includes('Vibe Mode Business Impact') && r.includes('competitive advantage')
+        )
+      ).toBe(true);
     });
 
     it('should recommend hybrid approach when savings are balanced', async () => {
@@ -466,12 +482,12 @@ describe('KiroResourceOptimizer', () => {
 
       const analysis = await kiroResourceOptimizer.generateKiroROIAnalysis(scenarios);
 
-      expect(analysis.recommendations.some(r => 
-        r.includes('Hybrid Approach Optimal')
-      )).toBe(true);
-      expect(analysis.recommendations.some(r => 
-        r.includes('Combined ROI') && r.includes('blended return')
-      )).toBe(true);
+      expect(analysis.recommendations.some(r => r.includes('Hybrid Approach Optimal'))).toBe(true);
+      expect(
+        analysis.recommendations.some(
+          r => r.includes('Combined ROI') && r.includes('blended return')
+        )
+      ).toBe(true);
     });
 
     it('should include enhanced risk assessment with Vibe Coding capabilities', async () => {
@@ -551,8 +567,9 @@ describe('KiroResourceOptimizer', () => {
     it('should maintain legacy method names', async () => {
       // Test that legacy methods still work
       const naiveResult = await kiroResourceOptimizer.estimateNaiveConsumption(mockWorkflow);
-      const optimizedResult = await kiroResourceOptimizer.estimateOptimizedConsumption(mockOptimizedWorkflow);
-      
+      const optimizedResult =
+        await kiroResourceOptimizer.estimateOptimizedConsumption(mockOptimizedWorkflow);
+
       expect(naiveResult).toBeDefined();
       expect(optimizedResult).toBeDefined();
       expect(naiveResult.scenario).toBe('kiro-optimized');

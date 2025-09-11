@@ -164,7 +164,9 @@ describe('MCP Enhanced Business Opportunity Handler', () => {
       const result = await server.handleAnalyzeBusinessOpportunity(invalidArgs, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text || result.content[0].json?.message || '').toContain('feature_idea is required');
+      expect(result.content[0].text || result.content[0].json?.message || '').toContain(
+        'feature_idea is required'
+      );
     });
 
     it('should include strategic fit assessment', async () => {

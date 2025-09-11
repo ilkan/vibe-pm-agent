@@ -1,18 +1,18 @@
 /**
  * MCP Tool: generate_business_case
- * 
+ *
  * Generates comprehensive business case with Amazon Working Backwards methodology
  * including assumption ledger, confidence scoring, scenario analysis, and hard questions
  */
 
 import { MCPToolResult, MCPToolContext, GenerateBusinessCaseArgs } from '../../models/mcp';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
   SteeringWriter,
-  BusinessInputs 
+  BusinessInputs,
 } from '../../services/amazon';
 import { AmazonTemplateProcessor } from '../../components/amazon-template-processor';
 import { MCPResponseFormatter, MCPLogger, MCPErrorHandler } from '../../utils/mcp-error-handling';
@@ -38,12 +38,16 @@ export async function generateBusinessCase(
   context: MCPToolContext
 ): Promise<MCPToolResult> {
   try {
-    MCPLogger.debug('Starting business case generation with Amazon Working Backwards (default mode)', context, {
-      opportunityAnalysisLength: args.opportunity_analysis.length,
-      hasFinancialInputs: !!args.financial_inputs,
-      steeringOptions: args.steering_options,
-      citationOptions: args.citation_options,
-    });
+    MCPLogger.debug(
+      'Starting business case generation with Amazon Working Backwards (default mode)',
+      context,
+      {
+        opportunityAnalysisLength: args.opportunity_analysis.length,
+        hasFinancialInputs: !!args.financial_inputs,
+        steeringOptions: args.steering_options,
+        citationOptions: args.citation_options,
+      }
+    );
 
     // Initialize Amazon Mode Manager with configuration options
     const amazonModeConfig: Partial<AmazonModeConfig> = {
@@ -52,7 +56,7 @@ export async function generateBusinessCase(
       fallbackToStandard: true, // Always enable fallback for reliability
       includeEvidenceMechanisms: args.include_evidence_mechanisms !== false,
     };
-    
+
     const amazonModeManager = new AmazonModeManager(amazonModeConfig);
     const pipeline = new AIAgentPipeline();
     const steeringWriter = new SteeringWriter();
@@ -67,137 +71,150 @@ export async function generateBusinessCase(
     const { result, report } = await performanceMonitor.timeOperation(
       'total_generation',
       async () => {
+        // Generate business case using Amazon Mode Manager (with fallback to standard)
+        MCPLogger.debug(
+          'Generating business case with Amazon Working Backwards methodology',
+          context
+        );
+        const amazonResult = await amazonModeManager.generateBusinessCase(
+          args.opportunity_analysis,
+          args.financial_inputs,
+          standardGenerator
+        );
 
-    // Generate business case using Amazon Mode Manager (with fallback to standard)
-    MCPLogger.debug('Generating business case with Amazon Working Backwards methodology', context);
-    const amazonResult = await amazonModeManager.generateBusinessCase(
-      args.opportunity_analysis,
-      args.financial_inputs,
-      standardGenerator
-    );
+        if (!amazonResult.success) {
+          throw new Error(`Business case generation failed: ${amazonResult.error?.message}`);
+        }
 
-    if (!amazonResult.success) {
-      throw new Error(`Business case generation failed: ${amazonResult.error?.message}`);
-    }
+        const enhancedContent = amazonResult.data!;
+        const enhancedBusinessCase = enhancedContent.content;
 
-    const enhancedContent = amazonResult.data!;
-    const enhancedBusinessCase = enhancedContent.content;
+        MCPLogger.info('Business case generated successfully', context, {
+          usedAmazonMode: amazonResult.usedAmazonMode,
+          fallbackReason: amazonResult.fallbackReason,
+          assumptionCount: enhancedContent.metadata.assumptionCount,
+          coveragePercent: enhancedContent.metadata.coveragePercent,
+          confidenceScore: enhancedContent.metadata.confidenceScore,
+          scenarioCount: enhancedContent.metadata.scenarioCount,
+          hardQuestionCount: enhancedContent.metadata.hardQuestionCount,
+          contentLength: enhancedBusinessCase.length,
+        });
 
-    MCPLogger.info('Business case generated successfully', context, {
-      usedAmazonMode: amazonResult.usedAmazonMode,
-      fallbackReason: amazonResult.fallbackReason,
-      assumptionCount: enhancedContent.metadata.assumptionCount,
-      coveragePercent: enhancedContent.metadata.coveragePercent,
-      confidenceScore: enhancedContent.metadata.confidenceScore,
-      scenarioCount: enhancedContent.metadata.scenarioCount,
-      hardQuestionCount: enhancedContent.metadata.hardQuestionCount,
-      contentLength: enhancedBusinessCase.length,
-    });
+        // 7. Write to Kiro steering if requested
+        let steeringResult;
+        if (args.steering_options?.create_steering_files && enhancedContent.attachments) {
+          try {
+            const businessInputs = await extractBusinessInputs(
+              args.opportunity_analysis,
+              args.financial_inputs
+            );
+            const inputsHash = await generateInputsHash(businessInputs);
 
-    // 7. Write to Kiro steering if requested
-    let steeringResult;
-    if (args.steering_options?.create_steering_files && enhancedContent.attachments) {
-      try {
-        const businessInputs = await extractBusinessInputs(args.opportunity_analysis, args.financial_inputs);
-        const inputsHash = await generateInputsHash(businessInputs);
-        
-        const steeringPackage = {
-          featureSlug: args.steering_options.feature_name || 'business-case',
-          artifactType: 'business_case' as const,
-          frontMatter: {
-            title: `Business Case — ${businessInputs.featureName}`,
-            artifact_type: 'business_case',
-            created_at: new Date().toISOString(),
-            inputs_hash: inputsHash,
-            profile: amazonResult.usedAmazonMode ? 'amazon' : 'standard',
-            mode: amazonResult.usedAmazonMode ? 'amazon' : 'standard',
-            fallback_reason: amazonResult.fallbackReason,
-            confidence: {
-              total: enhancedContent.metadata.confidenceScore || 0,
-              breakdown: {
-                evidence: 0,
-                recency: 0,
-                diversity: 0,
-                agreement: 0,
-                coverage: 0,
-                sensitivity: 0,
+            const steeringPackage = {
+              featureSlug: args.steering_options.feature_name || 'business-case',
+              artifactType: 'business_case' as const,
+              frontMatter: {
+                title: `Business Case — ${businessInputs.featureName}`,
+                artifact_type: 'business_case',
+                created_at: new Date().toISOString(),
+                inputs_hash: inputsHash,
+                profile: amazonResult.usedAmazonMode ? 'amazon' : 'standard',
+                mode: amazonResult.usedAmazonMode ? 'amazon' : 'standard',
+                fallback_reason: amazonResult.fallbackReason,
+                confidence: {
+                  total: enhancedContent.metadata.confidenceScore || 0,
+                  breakdown: {
+                    evidence: 0,
+                    recency: 0,
+                    diversity: 0,
+                    agreement: 0,
+                    coverage: 0,
+                    sensitivity: 0,
+                  },
+                },
+                assumptions: {
+                  ids: [], // Would be populated from actual assumption data
+                  coverage_pct: enhancedContent.metadata.coveragePercent || 0,
+                },
+                scenarios: {
+                  pct: 0.2, // Default ±20%
+                  metrics: ['Revenue', 'Costs', 'ROI', 'NPV'],
+                },
+                paths: {
+                  assumptions_json: `./attachments/assumptions-${inputsHash.slice(0, 8)}.json`,
+                  citations_json: `./attachments/citations-${inputsHash.slice(0, 8)}.json`,
+                  scenarios_json: `./attachments/scenarios-${inputsHash.slice(0, 8)}.json`,
+                },
               },
-            },
-            assumptions: {
-              ids: [], // Would be populated from actual assumption data
-              coverage_pct: enhancedContent.metadata.coveragePercent || 0,
-            },
-            scenarios: {
-              pct: 0.2, // Default ±20%
-              metrics: ['Revenue', 'Costs', 'ROI', 'NPV'],
-            },
-            paths: {
-              assumptions_json: `./attachments/assumptions-${inputsHash.slice(0, 8)}.json`,
-              citations_json: `./attachments/citations-${inputsHash.slice(0, 8)}.json`,
-              scenarios_json: `./attachments/scenarios-${inputsHash.slice(0, 8)}.json`
-            }
-          },
-          bodyMarkdown: enhancedBusinessCase,
-          attachments: enhancedContent.attachments || []
-        };
+              bodyMarkdown: enhancedBusinessCase,
+              attachments: enhancedContent.attachments || [],
+            };
 
-        steeringResult = await steeringWriter.writeSteering(steeringPackage);
+            steeringResult = await steeringWriter.writeSteering(steeringPackage);
 
-        MCPLogger.info('Steering file creation attempted', context, {
-          created: steeringResult.success,
-          message: steeringResult.success ? 'Steering files created successfully' : steeringResult.error?.message,
-        });
-      } catch (steeringError) {
-        MCPLogger.warn('Steering file creation failed', context, {
-          error: steeringError instanceof Error ? steeringError.message : 'Unknown error',
-        });
-      }
-    }
+            MCPLogger.info('Steering file creation attempted', context, {
+              created: steeringResult.success,
+              message: steeringResult.success
+                ? 'Steering files created successfully'
+                : steeringResult.error?.message,
+            });
+          } catch (steeringError) {
+            MCPLogger.warn('Steering file creation failed', context, {
+              error: steeringError instanceof Error ? steeringError.message : 'Unknown error',
+            });
+          }
+        }
 
-    // Add provenance header
-    const provenanceHeader = `# Generated-by: Kiro Spec Mode
+        // Add provenance header
+        const provenanceHeader = `# Generated-by: Kiro Spec Mode
 # Spec-ID: amazon_working_backwards
 # Model: claude-3.5-sonnet
 # Timestamp: ${new Date().toISOString()}
 # Tool: generate_business_case
 
 `;
-    const finalContent = provenanceHeader + enhancedBusinessCase;
+        const finalContent = provenanceHeader + enhancedBusinessCase;
 
-    // Format the response with Amazon mode metadata
-    const result = MCPResponseFormatter.formatSuccess(finalContent, 'markdown', {
-      executionTime: Date.now() - context.timestamp,
-      quotaUsed: amazonResult.usedAmazonMode ? 4 : 2, // Amazon mode uses more quota
-      steeringFileCreated: steeringResult?.success || false,
-      confidenceScore: enhancedContent.metadata.confidenceScore, // Required by task 8.4
-      amazonMode: {
-        enabled: amazonResult.usedAmazonMode,
-        fallbackReason: amazonResult.fallbackReason,
-        performanceMetrics: amazonResult.performanceMetrics,
-      },
-      citations: args.citation_options?.include_citations !== false ? {
-        total_citations: enhancedContent.metadata.assumptionCount || 0,
-        credibility_score: 85, // Placeholder - would be calculated from citations
-        recency_score: 75,
-        diversity_score: 70,
-        bibliography_included: true,
-        quality_score: enhancedContent.metadata.confidenceScore || 0,
-        overall_confidence: enhancedContent.metadata.confidenceScore || 0,
-        compliance_status: (enhancedContent.metadata.confidenceScore || 0) < 60 ? 'warning' : 'compliant'
-      } : undefined,
-    });
+        // Format the response with Amazon mode metadata
+        const result = MCPResponseFormatter.formatSuccess(finalContent, 'markdown', {
+          executionTime: Date.now() - context.timestamp,
+          quotaUsed: amazonResult.usedAmazonMode ? 4 : 2, // Amazon mode uses more quota
+          steeringFileCreated: steeringResult?.success || false,
+          confidenceScore: enhancedContent.metadata.confidenceScore, // Required by task 8.4
+          amazonMode: {
+            enabled: amazonResult.usedAmazonMode,
+            fallbackReason: amazonResult.fallbackReason,
+            performanceMetrics: amazonResult.performanceMetrics,
+          },
+          citations:
+            args.citation_options?.include_citations !== false
+              ? {
+                  total_citations: enhancedContent.metadata.assumptionCount || 0,
+                  credibility_score: 85, // Placeholder - would be calculated from citations
+                  recency_score: 75,
+                  diversity_score: 70,
+                  bibliography_included: true,
+                  quality_score: enhancedContent.metadata.confidenceScore || 0,
+                  overall_confidence: enhancedContent.metadata.confidenceScore || 0,
+                  compliance_status:
+                    (enhancedContent.metadata.confidenceScore || 0) < 60 ? 'warning' : 'compliant',
+                }
+              : undefined,
+        });
 
-    // Add steering file information to metadata if created
-    if (steeringResult?.success && steeringResult.data && steeringResult.data.filename) {
-      result.metadata = {
-        ...result.metadata,
-        steeringFiles: [{
-          filename: steeringResult.data.filename,
-          action: 'created',
-          fullPath: steeringResult.data.fullPath,
-        }],
-      };
-    }
+        // Add steering file information to metadata if created
+        if (steeringResult?.success && steeringResult.data && steeringResult.data.filename) {
+          result.metadata = {
+            ...result.metadata,
+            steeringFiles: [
+              {
+                filename: steeringResult.data.filename,
+                action: 'created',
+                fullPath: steeringResult.data.fullPath,
+              },
+            ],
+          };
+        }
 
         return result;
       },
@@ -209,7 +226,7 @@ export async function generateBusinessCase(
       performancePassed: report.passed,
       actualDuration: report.actualDuration,
       targetDuration: report.targetDuration,
-      cacheHit: report.cacheHit
+      cacheHit: report.cacheHit,
     });
 
     return result;
@@ -230,29 +247,31 @@ export async function generateBusinessCase(
  * Extract business inputs from opportunity analysis text and financial inputs
  */
 async function extractBusinessInputs(
-  opportunityAnalysis: string, 
+  opportunityAnalysis: string,
   financialInputs?: GenerateBusinessCaseArgs['financial_inputs']
 ): Promise<BusinessInputs> {
   // Parse the opportunity analysis to extract structured data
   // This is a simplified extraction - in practice, would use NLP or structured parsing
-  
+
   const featureName = extractFeatureName(opportunityAnalysis);
   const customer = extractCustomer(opportunityAnalysis);
   const competitors = extractCompetitors(opportunityAnalysis);
   const marketSize = extractMarketSize(opportunityAnalysis);
-  
+
   return {
     featureName: featureName || 'New Feature',
     customer: customer || 'Target Customer',
     competitors: competitors,
-    pricing: financialInputs?.expected_revenue ? financialInputs.expected_revenue / 10000 : undefined, // Estimate pricing
+    pricing: financialInputs?.expected_revenue
+      ? financialInputs.expected_revenue / 10000
+      : undefined, // Estimate pricing
     users: extractUsers(opportunityAnalysis),
     devCost: financialInputs?.development_cost,
     opsCost: financialInputs?.operational_cost,
     marketSize: marketSize,
     timeline: extractTimeline(opportunityAnalysis),
     citations: [], // Would be populated from opportunity analysis citations
-    assumptions: extractAssumptions(opportunityAnalysis)
+    assumptions: extractAssumptions(opportunityAnalysis),
   };
 }
 
@@ -294,20 +313,28 @@ ${confidenceScore.explanation}
 
 | Metric | Bear Case | Base Case | Bull Case | Unit |
 |--------|-----------|-----------|-----------|------|
-${scenarios.scenarios.base.map((row: any, i: number) => 
-  `| ${row.metric} | ${scenarios.scenarios.bear[i]?.bear || 'N/A'} | **${row.base}** | ${scenarios.scenarios.bull[i]?.bull || 'N/A'} | ${row.unit || ''} |`
-).join('\n')}
+${scenarios.scenarios.base
+  .map(
+    (row: any, i: number) =>
+      `| ${row.metric} | ${scenarios.scenarios.bear[i]?.bear || 'N/A'} | **${row.base}** | ${scenarios.scenarios.bull[i]?.bull || 'N/A'} | ${row.unit || ''} |`
+  )
+  .join('\n')}
 
 **Key Sensitivities**:
-${scenarios.elasticities.slice(0, 5).map((e: any) => 
-  `- ${e.assumption} ${e.assumptionChange} → ${e.outcomeMetric} ${e.outcomeChange}`
-).join('\n')}
+${scenarios.elasticities
+  .slice(0, 5)
+  .map(
+    (e: any) => `- ${e.assumption} ${e.assumptionChange} → ${e.outcomeMetric} ${e.outcomeChange}`
+  )
+  .join('\n')}
 
 ### Hard Questions
 
-${hardQuestions.map((q: any) => 
-  `**Q${q.id}**: ${q.question}\n*Evidence needed*: ${q.evidenceNeeded.join(', ')}\n`
-).join('\n')}
+${hardQuestions
+  .map(
+    (q: any) => `**Q${q.id}**: ${q.question}\n*Evidence needed*: ${q.evidenceNeeded.join(', ')}\n`
+  )
+  .join('\n')}
 
 ### Citations
 
@@ -321,11 +348,15 @@ ${hardQuestions.map((q: any) =>
  * Generate assumption ledger table in markdown format
  */
 function generateAssumptionLedgerTable(ledger: any): string {
-  const header = '| ID | Name | Value | Certainty | Sources |\n|----|----|-------|-----------|---------|';
-  const rows = ledger.assumptions.map((a: any) => 
-    `| ${a.id} | ${a.name} | ${a.value} ${a.unit || ''} | ${a.certainty} | ${a.sourceUrls.length} |`
-  ).join('\n');
-  
+  const header =
+    '| ID | Name | Value | Certainty | Sources |\n|----|----|-------|-----------|---------|';
+  const rows = ledger.assumptions
+    .map(
+      (a: any) =>
+        `| ${a.id} | ${a.name} | ${a.value} ${a.unit || ''} | ${a.certainty} | ${a.sourceUrls.length} |`
+    )
+    .join('\n');
+
   return header + '\n' + rows;
 }
 
@@ -380,22 +411,22 @@ function extractTimeline(text: string): string | undefined {
 function extractAssumptions(text: string): string[] {
   // Extract explicit assumptions or key claims from the text
   const assumptions: string[] = [];
-  
+
   // Look for assumption patterns
   const assumptionPatterns = [
     /assume[s]?\s+(?:that\s+)?([^.]+)/gi,
     /we believe\s+(?:that\s+)?([^.]+)/gi,
     /expect\s+(?:that\s+)?([^.]+)/gi,
-    /estimate\s+(?:that\s+)?([^.]+)/gi
+    /estimate\s+(?:that\s+)?([^.]+)/gi,
   ];
-  
+
   assumptionPatterns.forEach(pattern => {
     let match;
     while ((match = pattern.exec(text)) !== null) {
       assumptions.push(match[1].trim());
     }
   });
-  
+
   return assumptions;
 }
 
@@ -440,12 +471,14 @@ export const generateBusinessCaseSchema = {
     },
     amazon_mode: {
       type: 'boolean',
-      description: 'Enable Amazon Working Backwards methodology (default: true for backward compatibility)',
+      description:
+        'Enable Amazon Working Backwards methodology (default: true for backward compatibility)',
       default: true,
     },
     include_evidence_mechanisms: {
       type: 'boolean',
-      description: 'Include assumption ledger, confidence scoring, scenarios, and hard questions (default: true)',
+      description:
+        'Include assumption ledger, confidence scoring, scenarios, and hard questions (default: true)',
       default: true,
     },
     steering_options: {

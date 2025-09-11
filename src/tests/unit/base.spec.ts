@@ -34,7 +34,7 @@ describe('BaseService Error Handling', () => {
 
   test('should return success result', async () => {
     const result = await service.successOperation();
-    
+
     expect(result.success).toBe(true);
     expect(result.data).toBe('Operation completed');
     expect(result.error).toBeUndefined();
@@ -42,7 +42,7 @@ describe('BaseService Error Handling', () => {
 
   test('should return error result', async () => {
     const result = await service.errorOperation();
-    
+
     expect(result.success).toBe(false);
     expect(result.data).toBeUndefined();
     expect(result.error).toBeDefined();
@@ -52,7 +52,7 @@ describe('BaseService Error Handling', () => {
 
   test('should handle exceptions gracefully', async () => {
     const result = await service.exceptionOperation();
-    
+
     expect(result.success).toBe(false);
     expect(result.error).toBeDefined();
     expect(result.error?.code).toBe('UNKNOWN_ERROR');
@@ -61,7 +61,7 @@ describe('BaseService Error Handling', () => {
 
   test('should wrap errors correctly', async () => {
     const result = await service.wrappedOperation();
-    
+
     expect(result.success).toBe(false);
     expect(result.error).toBeDefined();
     expect(result.error?.code).toBe('WRAPPED_ERROR');
@@ -71,7 +71,7 @@ describe('BaseService Error Handling', () => {
 
   test('VError should contain all required properties', () => {
     const error = new VError('TEST_CODE', 'Test message');
-    
+
     expect(error.code).toBe('TEST_CODE');
     expect(error.message).toBe('Test message');
     expect(error.timestamp).toBeDefined();
@@ -81,7 +81,7 @@ describe('BaseService Error Handling', () => {
   test('VError should wrap original error', () => {
     const originalError = new Error('Original error');
     const error = new VError('TEST_CODE', 'Test message', originalError);
-    
+
     expect(error.originalError).toBe(originalError);
   });
 });

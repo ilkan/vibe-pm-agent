@@ -114,7 +114,7 @@ describe('SteeringFileManager', () => {
           ...mockSteeringFile.frontMatter,
           generatedBy: '', // Empty required field
           featureName: '', // Empty required field
-        }
+        },
       };
 
       const result = await manager.saveSteeringFile(invalidFile);

@@ -274,7 +274,7 @@ These claims need proper citation support for credibility.
       const result = await enhanceCitations(args, mockContext);
 
       expect(result.isError).toBeFalsy();
-      
+
       // Verify quality assessment in content
       const content = result.content[0].markdown!;
       expect(content).toContain('Citation Enhancement Summary');
@@ -311,7 +311,7 @@ These statements require proper citation support.
 
       expect(result.isError).toBeFalsy();
       expect(result.metadata?.enhancement?.unsupported_claims_found).toBeGreaterThan(0);
-      
+
       const content = result.content[0].markdown!;
       expect(content).toContain('Unsupported Claims Analysis');
     });
@@ -359,7 +359,7 @@ The content is descriptive rather than analytical.
         citation_options: {
           include_citations: false,
           minimum_citations: 10, // Conflicting with include_citations: false
-          assess_quality: true,   // Conflicting with no citations
+          assess_quality: true, // Conflicting with no citations
         },
       };
 
@@ -374,7 +374,10 @@ The content is descriptive rather than analytical.
   describe('Performance and Scalability', () => {
     it('should handle large documents efficiently', async () => {
       // Create a large document with multiple sections and claims
-      const largeContent = Array(20).fill(0).map((_, i) => `
+      const largeContent = Array(20)
+        .fill(0)
+        .map(
+          (_, i) => `
 ## Section ${i + 1}
 
 This section discusses important business metrics and performance indicators. Research shows that companies implementing these practices see significant improvements in operational efficiency. Market data indicates strong growth trends in this area.
@@ -386,7 +389,9 @@ Key findings include:
 - Implementation success rates above 85%
 
 These metrics demonstrate the value proposition for investment in this initiative.
-      `).join('\n');
+      `
+        )
+        .join('\n');
 
       const args = {
         document_content: `# Large Document Analysis\n\n${largeContent}`,
@@ -414,7 +419,7 @@ These metrics demonstrate the value proposition for investment in this initiativ
   describe('Real Citation Service Integration', () => {
     it('should work with actual CitationService instance', async () => {
       const citationService = new CitationService();
-      
+
       // Verify citation service has loaded default citations
       const testCriteria = {
         keywords: ['productivity', 'automation'],
