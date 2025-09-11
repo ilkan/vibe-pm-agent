@@ -32,7 +32,8 @@ describe('enhance_citations MCP Tool', () => {
 
     // Setup mock implementations
     mockCitationIntegration = new CitationIntegration() as jest.Mocked<CitationIntegration>;
-    mockAIDiscoveryEngine = new AICitationDiscoveryEngine() as jest.Mocked<AICitationDiscoveryEngine>;
+    mockAIDiscoveryEngine =
+      new AICitationDiscoveryEngine() as jest.Mocked<AICitationDiscoveryEngine>;
 
     // Mock CitationIntegration
     mockCitationIntegration.integrateCitations = jest.fn().mockResolvedValue({
@@ -67,7 +68,8 @@ describe('enhance_citations MCP Tool', () => {
         diversity_score: 70,
         credibility_score: 90,
       },
-      enhancedContent: 'Enhanced content with citations [1].\n\n## References\n\n[1] Test Citation 1. Test Org (2024).',
+      enhancedContent:
+        'Enhanced content with citations [1].\n\n## References\n\n[1] Test Citation 1. Test Org (2024).',
       qualityReport: {
         overallScore: 85,
         complianceStatus: 'compliant',
@@ -189,8 +191,12 @@ describe('enhance_citations MCP Tool', () => {
     ]);
 
     // Mock constructors
-    (CitationIntegration as jest.MockedClass<typeof CitationIntegration>).mockImplementation(() => mockCitationIntegration);
-    (AICitationDiscoveryEngine as jest.MockedClass<typeof AICitationDiscoveryEngine>).mockImplementation(() => mockAIDiscoveryEngine);
+    (CitationIntegration as jest.MockedClass<typeof CitationIntegration>).mockImplementation(
+      () => mockCitationIntegration
+    );
+    (
+      AICitationDiscoveryEngine as jest.MockedClass<typeof AICitationDiscoveryEngine>
+    ).mockImplementation(() => mockAIDiscoveryEngine);
   });
 
   describe('Input Validation', () => {
@@ -232,8 +238,14 @@ describe('enhance_citations MCP Tool', () => {
     });
 
     it('should accept valid document types', async () => {
-      const validTypes = ['business_case', 'market_analysis', 'executive_onepager', 'pr_faq', 'competitive_analysis'];
-      
+      const validTypes = [
+        'business_case',
+        'market_analysis',
+        'executive_onepager',
+        'pr_faq',
+        'competitive_analysis',
+      ];
+
       for (const docType of validTypes) {
         const args = {
           document_content: 'Test content with claims that need citations.',
@@ -341,8 +353,12 @@ describe('enhance_citations MCP Tool', () => {
       const result = await enhanceCitations(args, mockContext);
 
       expect(result.isError).toBeFalsy();
-      expect(mockAIDiscoveryEngine.analyzeCitationNeeds).toHaveBeenCalledWith(args.document_content);
-      expect(mockAIDiscoveryEngine.identifyUnsupportedClaims).toHaveBeenCalledWith(args.document_content);
+      expect(mockAIDiscoveryEngine.analyzeCitationNeeds).toHaveBeenCalledWith(
+        args.document_content
+      );
+      expect(mockAIDiscoveryEngine.identifyUnsupportedClaims).toHaveBeenCalledWith(
+        args.document_content
+      );
       expect(result.metadata?.enhancement?.citation_requirements_identified).toBe(1);
       expect(result.metadata?.enhancement?.unsupported_claims_found).toBe(1);
     });
@@ -365,7 +381,9 @@ describe('enhance_citations MCP Tool', () => {
 
     it('should handle AI discovery failures gracefully', async () => {
       mockAIDiscoveryEngine.analyzeCitationNeeds.mockRejectedValue(new Error('Discovery failed'));
-      mockAIDiscoveryEngine.identifyUnsupportedClaims.mockRejectedValue(new Error('Analysis failed'));
+      mockAIDiscoveryEngine.identifyUnsupportedClaims.mockRejectedValue(
+        new Error('Analysis failed')
+      );
 
       const args = {
         document_content: 'Document with discovery issues.',
@@ -524,7 +542,7 @@ describe('enhance_citations MCP Tool', () => {
 
     it('should define all expected properties', () => {
       const properties = enhanceCitationsSchema.properties;
-      
+
       expect(properties.document_content).toBeDefined();
       expect(properties.document_type).toBeDefined();
       expect(properties.enhancement_options).toBeDefined();
@@ -533,7 +551,7 @@ describe('enhance_citations MCP Tool', () => {
 
     it('should have proper constraints on document_content', () => {
       const docContentSchema = enhanceCitationsSchema.properties.document_content;
-      
+
       expect(docContentSchema.type).toBe('string');
       expect(docContentSchema.minLength).toBe(50);
       expect(docContentSchema.maxLength).toBe(50000);
@@ -541,7 +559,7 @@ describe('enhance_citations MCP Tool', () => {
 
     it('should have valid document_type enum', () => {
       const docTypeSchema = enhanceCitationsSchema.properties.document_type;
-      
+
       expect(docTypeSchema.type).toBe('string');
       expect(docTypeSchema.enum).toEqual([
         'business_case',

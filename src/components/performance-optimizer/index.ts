@@ -1,6 +1,6 @@
 /**
  * Performance Optimization and Caching System for Enhanced Citation System
- * 
+ *
  * This module provides intelligent caching, batch processing, and database query optimization
  * for the citation system. It includes proper resource management and test environment support.
  */
@@ -115,13 +115,13 @@ function detectTestEnvironment(): TestEnvironmentConfig {
   return {
     isTestEnvironment: process.env.NODE_ENV === 'test' || typeof jest !== 'undefined',
     disableTimers: process.env.DISABLE_TIMERS === 'true',
-    enableMockMode: process.env.MOCK_MODE === 'true'
+    enableMockMode: process.env.MOCK_MODE === 'true',
   };
 }
 
 /**
  * Intelligent caching system for source validation results
- * 
+ *
  * Provides high-performance caching with automatic cleanup, compression support,
  * and test environment awareness to prevent timer-related issues in tests.
  */
@@ -139,7 +139,7 @@ export class IntelligentCache<T> implements Destroyable {
    */
   constructor(config: Partial<CacheConfig> = {}) {
     this.testConfig = detectTestEnvironment();
-    
+
     this.config = {
       maxSize: 10000,
       ttl: 24 * 60 * 60 * 1000, // 24 hours
@@ -177,7 +177,7 @@ export class IntelligentCache<T> implements Destroyable {
    */
   get(key: string): T | null {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       this.stats.misses++;
       this.updateHitRate();
@@ -215,7 +215,7 @@ export class IntelligentCache<T> implements Destroyable {
 
     // Estimate memory footprint for cache management
     const size = this.estimateSize(data);
-    
+
     // Create cache entry with metadata for LRU tracking and statistics
     const entry: CacheEntry<T> = {
       data,
@@ -291,14 +291,14 @@ export class IntelligentCache<T> implements Destroyable {
    */
   getBulk(keys: string[]): Map<string, T> {
     const results = new Map<string, T>();
-    
+
     for (const key of keys) {
       const value = this.get(key);
       if (value !== null) {
         results.set(key, value);
       }
     }
-    
+
     return results;
   }
 
@@ -371,15 +371,17 @@ export class IntelligentCache<T> implements Destroyable {
    */
   private updateStats(): void {
     this.stats.totalEntries = this.cache.size;
-    this.stats.totalSize = Array.from(this.cache.values())
-      .reduce((sum, entry) => sum + entry.size, 0);
+    this.stats.totalSize = Array.from(this.cache.values()).reduce(
+      (sum, entry) => sum + entry.size,
+      0
+    );
 
     if (this.cache.size > 0) {
       const entries = Array.from(this.cache.values());
       this.stats.oldestEntry = Math.min(...entries.map(e => e.timestamp));
       this.stats.newestEntry = Math.max(...entries.map(e => e.timestamp));
-      this.stats.averageAccessCount = entries
-        .reduce((sum, e) => sum + e.accessCount, 0) / entries.length;
+      this.stats.averageAccessCount =
+        entries.reduce((sum, e) => sum + e.accessCount, 0) / entries.length;
     }
   }
 
@@ -407,7 +409,7 @@ export class IntelligentCache<T> implements Destroyable {
     if (this.isDestroyed || this.config.testMode) {
       return;
     }
-    
+
     this.cleanupTimer = ResourceManager.getInstance().registerInterval(
       setInterval(() => {
         if (!this.isDestroyed) {
@@ -446,25 +448,25 @@ export class IntelligentCache<T> implements Destroyable {
     if (this.isDestroyed) {
       return;
     }
-    
+
     this.isDestroyed = true;
-    
+
     // Unregister from resource manager
     ResourceManager.getInstance().unregisterComponent(this);
-    
+
     if (this.cleanupTimer) {
       ResourceManager.getInstance().unregisterInterval(this.cleanupTimer);
       clearInterval(this.cleanupTimer);
       this.cleanupTimer = undefined;
     }
-    
+
     this.clear();
   }
 }
 
 /**
  * Asynchronous batch processor for citation operations
- * 
+ *
  * Provides efficient batch processing with concurrency control, retry logic,
  * and performance monitoring for citation-related operations.
  */
@@ -501,7 +503,7 @@ export class AsyncBatchProcessor {
     operationType: string = 'batch_process'
   ): Promise<R[]> {
     const startTime = Date.now();
-    
+
     // Pre-allocate results array to maintain order correspondence with input
     const results: R[] = new Array(items.length);
     const errors: Error[] = [];
@@ -509,11 +511,11 @@ export class AsyncBatchProcessor {
     // Use semaphore pattern for concurrency control to prevent resource exhaustion
     // This is more efficient than batching for I/O-bound operations
     const semaphore = new Semaphore(this.config.maxConcurrency);
-    
+
     // Create promises for all items but control execution via semaphore
     const itemPromises = items.map(async (item, index) => {
       await semaphore.acquire(); // Wait for available slot
-      
+
       try {
         // Apply timeout to prevent hanging operations from blocking the batch
         const result = await this.withTimeout(processor(item), this.config.timeoutMs);
@@ -578,22 +580,24 @@ export class AsyncBatchProcessor {
 
     while (attempt < this.config.retryAttempts) {
       try {
-        const promises = batch.map(item => 
+        const promises = batch.map(item =>
           this.withTimeout(processor(item), this.config.timeoutMs)
         );
-        
+
         return await Promise.all(promises);
       } catch (error) {
         lastError = error as Error;
         attempt++;
-        
+
         if (attempt < this.config.retryAttempts) {
           await this.delay(this.config.retryDelay * attempt);
         }
       }
     }
 
-    throw lastError || new Error(`Batch processing failed after ${this.config.retryAttempts} attempts`);
+    throw (
+      lastError || new Error(`Batch processing failed after ${this.config.retryAttempts} attempts`)
+    );
   }
 
   /**
@@ -603,11 +607,11 @@ export class AsyncBatchProcessor {
    */
   private createBatches<T>(items: T[]): T[][] {
     const batches: T[][] = [];
-    
+
     for (let i = 0; i < items.length; i += this.config.batchSize) {
       batches.push(items.slice(i, i + this.config.batchSize));
     }
-    
+
     return batches;
   }
 
@@ -620,7 +624,7 @@ export class AsyncBatchProcessor {
   private withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
     return Promise.race([
       promise,
-      new Promise<T>((_, reject) => 
+      new Promise<T>((_, reject) =>
         setTimeout(() => reject(new Error('Operation timeout')), timeoutMs)
       ),
     ]);
@@ -716,7 +720,7 @@ class Semaphore {
 
   release(): void {
     this.permits++;
-    
+
     if (this.waitQueue.length > 0) {
       const resolve = this.waitQueue.shift();
       if (resolve) {
@@ -745,7 +749,11 @@ export class DatabaseQueryOptimizer {
    */
   private initializeIndexHints(): void {
     this.indexHints.set('citation_lookup', ['domain', 'source_type', 'published_at']);
-    this.indexHints.set('quality_assessment', ['confidence', 'credibility_score', 'last_validated']);
+    this.indexHints.set('quality_assessment', [
+      'confidence',
+      'credibility_score',
+      'last_validated',
+    ]);
     this.indexHints.set('validation_results', ['url', 'last_checked', 'accessibility_status']);
     this.indexHints.set('usage_tracking', ['citation_id', 'last_used', 'times_used']);
   }
@@ -753,16 +761,14 @@ export class DatabaseQueryOptimizer {
   /**
    * Optimize citation lookup queries
    */
-  async optimizedCitationLookup(
-    criteria: {
-      domains?: string[];
-      sourceTypes?: string[];
-      dateRange?: { start: Date; end: Date };
-      keywords?: string[];
-    }
-  ): Promise<Citation[]> {
+  async optimizedCitationLookup(criteria: {
+    domains?: string[];
+    sourceTypes?: string[];
+    dateRange?: { start: Date; end: Date };
+    keywords?: string[];
+  }): Promise<Citation[]> {
     const cacheKey = this.generateCacheKey('citation_lookup', criteria);
-    
+
     // Check cache first
     const cached = this.queryCache.get(cacheKey);
     if (cached) {
@@ -770,19 +776,19 @@ export class DatabaseQueryOptimizer {
     }
 
     const startTime = Date.now();
-    
+
     // Build optimized query
     const query = this.buildOptimizedQuery('citations', criteria, 'citation_lookup');
-    
+
     // Execute query (simulated)
     const results = await this.executeQuery(query);
-    
+
     // Cache results
     this.queryCache.set(cacheKey, results);
-    
+
     // Update query statistics
     this.updateQueryStats('citation_lookup', Date.now() - startTime);
-    
+
     return results;
   }
 
@@ -791,21 +797,21 @@ export class DatabaseQueryOptimizer {
    */
   async optimizedQualityLookup(citationIds: string[]): Promise<QualityReport[]> {
     const cacheKey = this.generateCacheKey('quality_assessment', { citationIds });
-    
+
     const cached = this.queryCache.get(cacheKey);
     if (cached) {
       return cached;
     }
 
     const startTime = Date.now();
-    
+
     // Use batch query for multiple citations
     const query = this.buildBatchQuery('quality_reports', citationIds, 'quality_assessment');
     const results = await this.executeQuery(query);
-    
+
     this.queryCache.set(cacheKey, results);
     this.updateQueryStats('quality_assessment', Date.now() - startTime);
-    
+
     return results;
   }
 
@@ -814,20 +820,20 @@ export class DatabaseQueryOptimizer {
    */
   async optimizedValidationLookup(urls: string[]): Promise<ValidationResult[]> {
     const cacheKey = this.generateCacheKey('validation_results', { urls });
-    
+
     const cached = this.queryCache.get(cacheKey);
     if (cached) {
       return cached;
     }
 
     const startTime = Date.now();
-    
+
     const query = this.buildBatchQuery('validation_results', urls, 'validation_results');
     const results = await this.executeQuery(query);
-    
+
     this.queryCache.set(cacheKey, results);
     this.updateQueryStats('validation_results', Date.now() - startTime);
-    
+
     return results;
   }
 
@@ -837,34 +843,38 @@ export class DatabaseQueryOptimizer {
   private buildOptimizedQuery(table: string, criteria: any, queryType: string): string {
     const hints = this.indexHints.get(queryType) || [];
     let query = `SELECT * FROM ${table}`;
-    
+
     // Add index hints
     if (hints.length > 0) {
       query += ` USE INDEX (${hints.join(', ')})`;
     }
-    
+
     // Add WHERE clauses based on criteria
     const conditions: string[] = [];
-    
+
     if (criteria.domains && criteria.domains.length > 0) {
       conditions.push(`domain IN (${criteria.domains.map((d: string) => `'${d}'`).join(', ')})`);
     }
-    
+
     if (criteria.sourceTypes && criteria.sourceTypes.length > 0) {
-      conditions.push(`source_type IN (${criteria.sourceTypes.map((t: string) => `'${t}'`).join(', ')})`);
+      conditions.push(
+        `source_type IN (${criteria.sourceTypes.map((t: string) => `'${t}'`).join(', ')})`
+      );
     }
-    
+
     if (criteria.dateRange) {
-      conditions.push(`published_at BETWEEN '${criteria.dateRange.start.toISOString()}' AND '${criteria.dateRange.end.toISOString()}'`);
+      conditions.push(
+        `published_at BETWEEN '${criteria.dateRange.start.toISOString()}' AND '${criteria.dateRange.end.toISOString()}'`
+      );
     }
-    
+
     if (conditions.length > 0) {
       query += ` WHERE ${conditions.join(' AND ')}`;
     }
-    
+
     // Add optimization hints
     query += ' ORDER BY published_at DESC LIMIT 1000';
-    
+
     return query;
   }
 
@@ -874,13 +884,13 @@ export class DatabaseQueryOptimizer {
   private buildBatchQuery(table: string, ids: string[], queryType: string): string {
     const hints = this.indexHints.get(queryType) || [];
     let query = `SELECT * FROM ${table}`;
-    
+
     if (hints.length > 0) {
       query += ` USE INDEX (${hints.join(', ')})`;
     }
-    
+
     query += ` WHERE id IN (${ids.map(id => `'${id}'`).join(', ')})`;
-    
+
     return query;
   }
 
@@ -890,7 +900,7 @@ export class DatabaseQueryOptimizer {
   private async executeQuery(query: string): Promise<any[]> {
     // Simulate database query execution
     await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
-    
+
     // Return mock results
     return [];
   }
@@ -907,10 +917,10 @@ export class DatabaseQueryOptimizer {
    */
   private updateQueryStats(queryType: string, duration: number): void {
     const stats = this.queryStats.get(queryType) || { count: 0, avgDuration: 0 };
-    
+
     stats.count++;
     stats.avgDuration = (stats.avgDuration * (stats.count - 1) + duration) / stats.count;
-    
+
     this.queryStats.set(queryType, stats);
   }
 
@@ -938,7 +948,7 @@ export class DatabaseQueryOptimizer {
 
 /**
  * Main performance optimization coordinator
- * 
+ *
  * Orchestrates multiple performance optimization components including caching,
  * batch processing, and database query optimization for the citation system.
  */
@@ -954,10 +964,7 @@ export class PerformanceOptimizer {
    * @param cacheConfig - Optional cache configuration
    * @param batchConfig - Optional batch processing configuration
    */
-  constructor(
-    cacheConfig?: Partial<CacheConfig>,
-    batchConfig?: Partial<BatchConfig>
-  ) {
+  constructor(cacheConfig?: Partial<CacheConfig>, batchConfig?: Partial<BatchConfig>) {
     this.validationCache = new IntelligentCache<ValidationResult>(cacheConfig);
     this.qualityCache = new IntelligentCache<QualityReport>(cacheConfig);
     this.citationCache = new IntelligentCache<EnhancedCitation>(cacheConfig);

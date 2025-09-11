@@ -1,6 +1,6 @@
 /**
  * Enhanced Citation System Integration Tests
- * 
+ *
  * Comprehensive end-to-end testing of the unified citation system
  */
 
@@ -61,17 +61,17 @@ describe('Enhanced Citation System Integration', () => {
       expect(result.qualityScore).toBeDefined();
       expect(result.recommendations).toBeDefined();
       expect(result.processingTime).toBeGreaterThan(0);
-      
+
       // Should have identified citation needs
       expect(result.enhancedCitations.length).toBeGreaterThanOrEqual(0);
-      
+
       // Should have quality assessment
       expect(result.qualityScore).toBeGreaterThanOrEqual(0);
       expect(result.qualityScore).toBeLessThanOrEqual(100);
-      
+
       // Should have actionable recommendations
       expect(result.recommendations.length).toBeGreaterThan(0);
-      
+
       // Should have audit trail if enabled
       expect(result.auditTrail).toBeDefined();
     }, 30000);
@@ -98,27 +98,28 @@ describe('Enhanced Citation System Integration', () => {
 
       expect(result.success).toBe(true);
       expect(result.originalCitations.length).toBeGreaterThan(0);
-      expect(result.enhancedCitations.length).toBeGreaterThanOrEqual(result.originalCitations.length);
-      
+      expect(result.enhancedCitations.length).toBeGreaterThanOrEqual(
+        result.originalCitations.length
+      );
+
       // Should assess quality of existing citations
       expect(result.qualityScore).toBeGreaterThanOrEqual(0);
     }, 25000);
 
     it('should handle empty or invalid documents gracefully', async () => {
       const emptyDocument = '';
-      
-      const result = await citationSystem.enhanceDocumentCitations(
-        emptyDocument,
-        'unknown'
-      );
+
+      const result = await citationSystem.enhanceDocumentCitations(emptyDocument, 'unknown');
 
       // Should handle gracefully without crashing
       expect(result.success).toBeDefined();
       expect(result.processingTime).toBeGreaterThan(0);
-      
+
       if (!result.success) {
         expect(result.error).toBeDefined();
-        expect(result.recommendations).toContain('Citation enhancement failed. Please try again or contact support.');
+        expect(result.recommendations).toContain(
+          'Citation enhancement failed. Please try again or contact support.'
+        );
       }
     });
   });
@@ -165,16 +166,13 @@ describe('Enhanced Citation System Integration', () => {
         geographicScope: 'global',
       };
 
-      const evidencePackage = await citationSystem.generateEvidencePackage(
-        topic,
-        requirements
-      );
+      const evidencePackage = await citationSystem.generateEvidencePackage(topic, requirements);
 
       expect(evidencePackage.topic).toBe(topic);
       expect(['weak', 'moderate', 'strong']).toContain(evidencePackage.evidenceStrength);
       expect(evidencePackage.overallConfidence).toBeGreaterThanOrEqual(0);
       expect(evidencePackage.overallConfidence).toBeLessThanOrEqual(100);
-      
+
       expect(evidencePackage.primaryEvidence).toBeDefined();
       expect(evidencePackage.supportingEvidence).toBeDefined();
       expect(evidencePackage.recommendations).toBeDefined();
@@ -183,16 +181,16 @@ describe('Enhanced Citation System Integration', () => {
 
     it('should handle topics with limited available sources', async () => {
       const obscureTopic = 'Quantum computing applications in medieval literature analysis';
-      
-      const evidencePackage = await citationSystem.generateEvidencePackage(
-        obscureTopic,
-        { minimumSources: 3, confidenceThreshold: 60 }
-      );
+
+      const evidencePackage = await citationSystem.generateEvidencePackage(obscureTopic, {
+        minimumSources: 3,
+        confidenceThreshold: 60,
+      });
 
       expect(evidencePackage.topic).toBe(obscureTopic);
       expect(evidencePackage.evidenceStrength).toBeDefined();
       expect(evidencePackage.overallConfidence).toBeGreaterThanOrEqual(0);
-      
+
       // Should still provide some structure even with limited sources
       expect(evidencePackage.primaryEvidence).toBeDefined();
       expect(evidencePackage.recommendations).toBeDefined();
@@ -246,10 +244,7 @@ describe('Enhanced Citation System Integration', () => {
         industryRequirements: 'consulting',
       };
 
-      const auditReport = await citationSystem.auditCitationQuality(
-        testCitations,
-        auditCriteria
-      );
+      const auditReport = await citationSystem.auditCitationQuality(testCitations, auditCriteria);
 
       expect(auditReport.auditId).toBeDefined();
       expect(auditReport.auditDate).toBeInstanceOf(Date);
@@ -259,11 +254,11 @@ describe('Enhanced Citation System Integration', () => {
       expect(auditReport.qualityScore).toBeGreaterThanOrEqual(0);
       expect(auditReport.qualityScore).toBeLessThanOrEqual(100);
       expect(['compliant', 'warning', 'non-compliant']).toContain(auditReport.complianceStatus);
-      
+
       expect(auditReport.issues).toBeDefined();
       expect(auditReport.recommendations).toBeDefined();
       expect(auditReport.summary).toBeDefined();
-      
+
       // Should provide actionable recommendations
       expect(auditReport.recommendations.length).toBeGreaterThan(0);
     }, 30000);
@@ -273,12 +268,12 @@ describe('Enhanced Citation System Integration', () => {
     it('should track performance metrics', async () => {
       // Perform several operations to generate metrics
       const testDocument = 'Test document for performance monitoring';
-      
+
       await citationSystem.enhanceDocumentCitations(testDocument, 'test');
       await citationSystem.analyzeDocumentCitations(testDocument);
-      
+
       const metrics = citationSystem.getPerformanceMetrics();
-      
+
       expect(metrics).toBeDefined();
       // Performance metrics structure will depend on PerformanceOptimizer implementation
       // This test ensures the method is callable and returns data
@@ -326,29 +321,22 @@ describe('Enhanced Citation System Integration', () => {
       expect(result).toBeDefined();
       expect(typeof result.success).toBe('boolean');
       expect(result.processingTime).toBeGreaterThan(0);
-      
+
       if (!result.success) {
         expect(result.error).toBeDefined();
-        expect(result.recommendations).toContain('Citation enhancement failed. Please try again or contact support.');
+        expect(result.recommendations).toContain(
+          'Citation enhancement failed. Please try again or contact support.'
+        );
       }
     });
 
     it('should handle malformed input gracefully', async () => {
-      const malformedInputs = [
-        null as any,
-        undefined as any,
-        123 as any,
-        {} as any,
-        [] as any,
-      ];
+      const malformedInputs = [null as any, undefined as any, 123 as any, {} as any, [] as any];
 
       for (const input of malformedInputs) {
         try {
-          const result = await citationSystem.enhanceDocumentCitations(
-            input,
-            'malformed-test'
-          );
-          
+          const result = await citationSystem.enhanceDocumentCitations(input, 'malformed-test');
+
           // Should handle gracefully
           expect(result).toBeDefined();
           expect(typeof result.success).toBe('boolean');
@@ -385,16 +373,16 @@ describe('Enhanced Citation System Integration', () => {
 
       // Verify all major components were involved
       expect(result.success).toBe(true);
-      
+
       // Should have enhanced citations
       expect(result.enhancedCitations).toBeDefined();
-      
+
       // Should have quality assessment
       expect(result.qualityScore).toBeGreaterThanOrEqual(0);
-      
+
       // Audit Trail should have recorded the operation
       expect(result.auditTrail).toBeDefined();
-      
+
       // System should provide actionable recommendations
       expect(result.recommendations).toBeDefined();
       expect(result.recommendations.length).toBeGreaterThan(0);

@@ -312,15 +312,21 @@ export class SimplePMAgentMCPServer {
 
     try {
       // FIRST: Fetch real market data
-      const realMarketData = await this.marketDataFetcher.fetchRealMarketData(idea, marketContext.industry);
-      
+      const realMarketData = await this.marketDataFetcher.fetchRealMarketData(
+        idea,
+        marketContext.industry
+      );
+
       // Extract real metrics from the fetched data
       const allMetrics = realMarketData.flatMap(source => source.marketMetrics);
-      const marketSizes = allMetrics.filter(metric => 
-        metric.toLowerCase().includes('billion') || metric.toLowerCase().includes('million')
+      const marketSizes = allMetrics.filter(
+        metric =>
+          metric.toLowerCase().includes('billion') || metric.toLowerCase().includes('million')
       );
-      const growthRates = allMetrics.filter(metric => 
-        metric.includes('%') && (metric.toLowerCase().includes('growth') || metric.toLowerCase().includes('increase'))
+      const growthRates = allMetrics.filter(
+        metric =>
+          metric.includes('%') &&
+          (metric.toLowerCase().includes('growth') || metric.toLowerCase().includes('increase'))
       );
 
       // Build analysis using REAL data
@@ -340,26 +346,33 @@ ${realMarketData.map(source => `• ${source.source}: ${source.marketMetrics.len
 ${allMetrics.length > 0 ? allMetrics.map(metric => `• ${metric}`).join('\n') : '• No specific market metrics found in current data sources'}
 
 ### Market Size & Opportunity
-${marketSizes.length > 0 ? 
-  `- **Current Market Data:** ${marketSizes.slice(0, 3).join(', ')}\n- **Source Analysis:** Based on real data from ${realMarketData.map(s => s.source).join(', ')}` :
-  '- **Market Size:** Current market data unavailable - requires additional research\n- **Data Sources Checked:** ' + realMarketData.map(s => s.source).join(', ')
+${
+  marketSizes.length > 0
+    ? `- **Current Market Data:** ${marketSizes.slice(0, 3).join(', ')}\n- **Source Analysis:** Based on real data from ${realMarketData.map(s => s.source).join(', ')}`
+    : '- **Market Size:** Current market data unavailable - requires additional research\n- **Data Sources Checked:** ' +
+      realMarketData.map(s => s.source).join(', ')
 }
 - **Competitive Landscape:** ${marketContext.competition || 'Competitive analysis required'}
 
 ### Growth Indicators
-${growthRates.length > 0 ? 
-  growthRates.slice(0, 2).map(rate => `• ${rate}`).join('\n') :
-  '• Growth rate data not found in current sources - requires market research'
+${
+  growthRates.length > 0
+    ? growthRates
+        .slice(0, 2)
+        .map(rate => `• ${rate}`)
+        .join('\n')
+    : '• Growth rate data not found in current sources - requires market research'
 }
 
 ## Business Justification
 
 ### Market Evidence
-${realMarketData.length > 0 ? 
-  `Based on real-time data from ${realMarketData.length} financial sources:\n${realMarketData.map(source => 
-    `• **${source.source}:** ${source.content.substring(0, 100)}...`
-  ).join('\n')}` :
-  'Real-time market data unavailable - analysis based on industry knowledge'
+${
+  realMarketData.length > 0
+    ? `Based on real-time data from ${realMarketData.length} financial sources:\n${realMarketData
+        .map(source => `• **${source.source}:** ${source.content.substring(0, 100)}...`)
+        .join('\n')}`
+    : 'Real-time market data unavailable - analysis based on industry knowledge'
 }
 
 ### Strategic Value
@@ -370,10 +383,11 @@ ${realMarketData.length > 0 ?
 ## Recommendation
 **Decision:** ${allMetrics.length > 0 ? 'GO - Supported by real market data' : 'CONDITIONAL GO - Requires additional market research'}
 
-**Rationale:** ${allMetrics.length > 0 ? 
-  `Analysis supported by real financial data from ${realMarketData.map(s => s.source).join(', ')}` :
-  'Limited real-time data available - recommend conducting targeted market research before proceeding'
-}
+**Rationale:** ${
+        allMetrics.length > 0
+          ? `Analysis supported by real financial data from ${realMarketData.map(s => s.source).join(', ')}`
+          : 'Limited real-time data available - recommend conducting targeted market research before proceeding'
+      }
 
 ## Real Data Sources & Citations
 
@@ -413,7 +427,6 @@ ${this.marketDataFetcher.generateRealCitations(realMarketData)}
       }
 
       return response;
-
     } catch (error) {
       // If real market data fetching fails completely, provide a minimal analysis
       const fallbackAnalysis = `# Business Opportunity Analysis
@@ -518,13 +531,15 @@ ${this.defineImplementationPhases(financialInputs)}
 3. Establish clear success metrics and monitoring systems
 4. Plan for iterative improvement based on user feedback
 
-${await this.generateBusinessCaseCitations(financialInputs).catch(error => `
+${await this.generateBusinessCaseCitations(financialInputs).catch(
+  error => `
 ## Financial Research Status
 
 Real-time financial data fetch encountered an issue: ${error.message}
 Analysis based on standard financial modeling practices.
 
-*Note: For current financial benchmarks, please verify through direct research.*`)}`;
+*Note: For current financial benchmarks, please verify through direct research.*`
+)}`;
 
     // Create steering file if requested
     let steeringResult = null;
@@ -1153,12 +1168,13 @@ Development teams will receive detailed specifications through Kiro Spec Mode, w
     try {
       // Fetch real market data from financial sources
       const marketData = await this.marketDataFetcher.fetchRealMarketData(idea, context.industry);
-      
+
       // Generate citations from real fetched data
       return this.marketDataFetcher.generateRealCitations(marketData);
-      
     } catch (error) {
-      throw new Error(`Failed to fetch real market data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to fetch real market data: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -1181,12 +1197,16 @@ Development teams will receive detailed specifications through Kiro Spec Mode, w
    */
   private async generateBusinessCaseCitations(inputs: any): Promise<string> {
     try {
-      const marketData = await this.marketDataFetcher.fetchRealMarketData('financial analysis ROI business case', 'business_consulting');
-      
+      const marketData = await this.marketDataFetcher.fetchRealMarketData(
+        'financial analysis ROI business case',
+        'business_consulting'
+      );
+
       return this.marketDataFetcher.generateRealCitations(marketData);
-      
     } catch (error) {
-      throw new Error(`Failed to fetch real financial data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to fetch real financial data: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 

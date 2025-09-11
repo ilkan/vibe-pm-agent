@@ -9,7 +9,11 @@ import {
   CitationSourceType,
   CitationConfidence,
 } from '../../models/citations';
-import { IntelligentCache, AsyncBatchProcessor, PerformanceMetrics } from '../performance-optimizer';
+import {
+  IntelligentCache,
+  AsyncBatchProcessor,
+  PerformanceMetrics,
+} from '../performance-optimizer';
 
 /**
  * Configuration for source validation
@@ -241,7 +245,10 @@ export class SourceValidationEngine {
         recommendations.push('Include specific key finding for business relevance');
       }
 
-      if (source.confidence === CitationConfidence.LOW && source.source_type === CitationSourceType.CONSULTING_STUDY) {
+      if (
+        source.confidence === CitationConfidence.LOW &&
+        source.source_type === CitationSourceType.CONSULTING_STUDY
+      ) {
         violations.push('Low confidence consulting study');
         recommendations.push('Verify consulting study credibility or find alternative source');
       }
@@ -315,7 +322,7 @@ export class SourceValidationEngine {
   async validateCitations(citations: Citation[]): Promise<ValidationResult[]> {
     return this.batchProcessor.processBatch(
       citations,
-      (citation) => this.validateCitation(citation),
+      citation => this.validateCitation(citation),
       'citation_validation'
     );
   }
@@ -326,7 +333,7 @@ export class SourceValidationEngine {
   async validateMultipleAccessibility(urls: string[]): Promise<AccessibilityStatus[]> {
     return this.batchProcessor.processBatch(
       urls,
-      (url) => this.validateSourceAccessibility(url),
+      url => this.validateSourceAccessibility(url),
       'accessibility_validation'
     );
   }
@@ -337,7 +344,7 @@ export class SourceValidationEngine {
   async assessMultipleCredibility(sources: Citation[]): Promise<CredibilityAssessment[]> {
     return this.batchProcessor.processBatch(
       sources,
-      (source) => this.assessSourceCredibility(source),
+      source => this.assessSourceCredibility(source),
       'credibility_assessment'
     );
   }
@@ -372,12 +379,14 @@ export class SourceValidationEngine {
         effectivenessRating: 0,
       },
       alternatives: {
-        similarSources: validationResult.alternativeSources.filter(s => s.organization === citation.organization),
-        updatedVersions: validationResult.alternativeSources.filter(s => 
-          new Date(s.published_at) > new Date(citation.published_at)
+        similarSources: validationResult.alternativeSources.filter(
+          s => s.organization === citation.organization
         ),
-        betterAlternatives: validationResult.alternativeSources.filter(s => 
-          s.confidence === CitationConfidence.HIGH
+        updatedVersions: validationResult.alternativeSources.filter(
+          s => new Date(s.published_at) > new Date(citation.published_at)
+        ),
+        betterAlternatives: validationResult.alternativeSources.filter(
+          s => s.confidence === CitationConfidence.HIGH
         ),
       },
     };
@@ -385,7 +394,9 @@ export class SourceValidationEngine {
 
   // Private helper methods
 
-  private async makeHttpRequest(url: string): Promise<{ ok: boolean; status: number; statusText: string }> {
+  private async makeHttpRequest(
+    url: string
+  ): Promise<{ ok: boolean; status: number; statusText: string }> {
     // Simulate HTTP request - in real implementation, use fetch or axios
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -409,9 +420,12 @@ export class SourceValidationEngine {
     });
   }
 
-  private determineAccessType(response: { ok: boolean; status: number }): 'free' | 'paywall' | 'subscription' | 'broken' {
+  private determineAccessType(response: {
+    ok: boolean;
+    status: number;
+  }): 'free' | 'paywall' | 'subscription' | 'broken' {
     if (!response.ok) return 'broken';
-    
+
     // In real implementation, analyze response content for paywall indicators
     if (Math.random() < 0.2) return 'paywall';
     if (Math.random() < 0.1) return 'subscription';
@@ -420,13 +434,13 @@ export class SourceValidationEngine {
 
   private async findAlternativeAccess(url: string, response?: any): Promise<string[]> {
     const alternatives: string[] = [];
-    
+
     // Add archive.org link
     alternatives.push(`https://web.archive.org/web/*/${url}`);
-    
+
     // Add cached Google link
     alternatives.push(`https://webcache.googleusercontent.com/search?q=cache:${url}`);
-    
+
     return alternatives;
   }
 
@@ -451,7 +465,11 @@ export class SourceValidationEngine {
     let trustScore = 50;
     let spamScore = 10;
 
-    if (this.knownHighQualityDomains.has(domain) || domain.endsWith('.edu') || domain.endsWith('.gov')) {
+    if (
+      this.knownHighQualityDomains.has(domain) ||
+      domain.endsWith('.edu') ||
+      domain.endsWith('.gov')
+    ) {
       authorityScore = 80 + Math.random() * 20;
       trustScore = 85 + Math.random() * 15;
       spamScore = Math.random() * 5;
@@ -556,10 +574,10 @@ export class SourceValidationEngine {
 
     return Math.round(
       factors.domainAuthority * weights.domainAuthority +
-      factors.authorCredentials * weights.authorCredentials +
-      factors.peerReviewStatus * weights.peerReviewStatus +
-      factors.citationFrequency * weights.citationFrequency +
-      factors.methodologyTransparency * weights.methodologyTransparency
+        factors.authorCredentials * weights.authorCredentials +
+        factors.peerReviewStatus * weights.peerReviewStatus +
+        factors.citationFrequency * weights.citationFrequency +
+        factors.methodologyTransparency * weights.methodologyTransparency
     );
   }
 
@@ -591,7 +609,10 @@ export class SourceValidationEngine {
     return riskFactors;
   }
 
-  private determineConfidenceLevel(overallScore: number, riskFactors: string[]): 'high' | 'medium' | 'low' {
+  private determineConfidenceLevel(
+    overallScore: number,
+    riskFactors: string[]
+  ): 'high' | 'medium' | 'low' {
     if (overallScore >= 80 && riskFactors.length === 0) return 'high';
     if (overallScore >= 60 && riskFactors.length <= 2) return 'medium';
     return 'low';
@@ -625,19 +646,19 @@ export class SourceValidationEngine {
   private calculateRelevanceScore(citation: Citation): number {
     // Simulate relevance calculation based on citation properties
     let score = 50;
-    
+
     if (citation.industry_focus && citation.industry_focus.length > 0) {
       score += 20;
     }
-    
+
     if (citation.key_finding) {
       score += 15;
     }
-    
+
     if (citation.methodology) {
       score += 15;
     }
-    
+
     return Math.min(100, score);
   }
 
@@ -661,9 +682,9 @@ export class SourceValidationEngine {
 
     return Math.round(
       validationResult.credibilityAssessment.overallScore * weights.credibility +
-      accessibilityScore * weights.accessibility +
-      complianceScore * weights.compliance +
-      recencyScore * weights.recency
+        accessibilityScore * weights.accessibility +
+        complianceScore * weights.compliance +
+        recencyScore * weights.recency
     );
   }
 
@@ -688,9 +709,9 @@ export class SourceValidationEngine {
   /**
    * Get cache statistics
    */
-  getCacheStats(): { 
-    accessibility: any; 
-    credibility: any; 
+  getCacheStats(): {
+    accessibility: any;
+    credibility: any;
     domainAuthority: any;
     batch: PerformanceMetrics[];
   } {

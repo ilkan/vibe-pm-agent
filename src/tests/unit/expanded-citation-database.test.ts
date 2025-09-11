@@ -1,5 +1,10 @@
 import { CitationService } from '../../components/citation-service';
-import { Citation, CitationSourceType, CitationConfidence, CitationSearchCriteria } from '../../models/citations';
+import {
+  Citation,
+  CitationSourceType,
+  CitationConfidence,
+  CitationSearchCriteria,
+} from '../../models/citations';
 
 describe('Expanded Citation Database', () => {
   let citationService: CitationService;
@@ -33,12 +38,12 @@ describe('Expanded Citation Database', () => {
         keywords: ['2024'],
         date_range: {
           start: '2024-01-01',
-          end: '2024-12-31'
-        }
+          end: '2024-12-31',
+        },
       });
 
       expect(recentCitations.length).toBeGreaterThanOrEqual(10);
-      
+
       // All should be from 2024
       recentCitations.forEach(citation => {
         expect(citation.published_at).toMatch(/^2024/);
@@ -47,16 +52,18 @@ describe('Expanded Citation Database', () => {
 
     it('should have diverse source types including consulting studies', () => {
       const stats = citationService.getDatabaseStatistics();
-      
+
       expect(stats.sourceTypeDistribution[CitationSourceType.CONSULTING_STUDY]).toBeGreaterThan(5);
       expect(stats.sourceTypeDistribution[CitationSourceType.INDUSTRY_REPORT]).toBeGreaterThan(3);
-      expect(stats.sourceTypeDistribution[CitationSourceType.RESEARCH_PUBLICATION]).toBeGreaterThan(2);
+      expect(stats.sourceTypeDistribution[CitationSourceType.RESEARCH_PUBLICATION]).toBeGreaterThan(
+        2
+      );
       expect(stats.sourceTypeDistribution[CitationSourceType.ACADEMIC_PAPER]).toBeGreaterThan(1);
     });
 
     it('should have high-quality sources with proper confidence ratings', () => {
       const stats = citationService.getDatabaseStatistics();
-      
+
       expect(stats.confidenceDistribution[CitationConfidence.HIGH]).toBeGreaterThan(10);
       expect(stats.qualityMetrics.averageQualityScore).toBeGreaterThan(85);
       expect(stats.qualityMetrics.highQualitySources).toBeGreaterThan(15);
@@ -73,20 +80,23 @@ describe('Expanded Citation Database', () => {
         published_at: '2024-06-15',
         source_type: CitationSourceType.CONSULTING_STUDY,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'High-performing companies achieve 25% better results through strategic planning and execution',
+        key_finding:
+          'High-performing companies achieve 25% better results through strategic planning and execution',
         organization: 'McKinsey & Company',
         methodology: 'Survey of 1,000+ executives across 20 industries',
         sample_size: 1000,
         geographic_scope: 'Global',
-        industry_focus: ['strategy', 'performance', 'consulting']
+        industry_focus: ['strategy', 'performance', 'consulting'],
       };
 
       const validation = citationService.validateSourceQuality(highQualityCitation);
-      
+
       expect(validation.isValid).toBe(true);
       expect(validation.qualityScore).toBeGreaterThan(90);
       expect(validation.issues).toHaveLength(0);
-      expect(validation.recommendations).toContain('Excellent source quality - suitable for high-stakes business documents');
+      expect(validation.recommendations).toContain(
+        'Excellent source quality - suitable for high-stakes business documents'
+      );
     });
 
     it('should identify issues with low-quality citations', () => {
@@ -103,11 +113,11 @@ describe('Expanded Citation Database', () => {
         methodology: undefined,
         sample_size: undefined,
         geographic_scope: undefined,
-        industry_focus: undefined
+        industry_focus: undefined,
       };
 
       const validation = citationService.validateSourceQuality(lowQualityCitation);
-      
+
       expect(validation.isValid).toBe(false);
       expect(validation.qualityScore).toBeLessThan(60);
       expect(validation.issues.length).toBeGreaterThan(3);
@@ -130,13 +140,15 @@ describe('Expanded Citation Database', () => {
         methodology: undefined, // Missing methodology
         sample_size: 25, // Too small
         geographic_scope: 'North America',
-        industry_focus: ['consumer', 'retail']
+        industry_focus: ['consumer', 'retail'],
       };
 
       const validation = citationService.validateSourceQuality(researchCitation);
-      
+
       expect(validation.issues).toContain('Missing methodology for research-based source');
-      expect(validation.issues).toContain('Sample size is missing or too small for reliable insights');
+      expect(validation.issues).toContain(
+        'Sample size is missing or too small for reliable insights'
+      );
     });
 
     it('should penalize outdated sources', () => {
@@ -153,20 +165,22 @@ describe('Expanded Citation Database', () => {
         methodology: 'Historical analysis of business trends',
         sample_size: 500,
         geographic_scope: 'Global',
-        industry_focus: ['strategy', 'trends']
+        industry_focus: ['strategy', 'trends'],
       };
 
       const validation = citationService.validateSourceQuality(outdatedCitation);
-      
+
       expect(validation.issues).toContain('Source is older than 3 years');
-      expect(validation.recommendations).toContain('Consider finding more recent sources on this topic');
+      expect(validation.recommendations).toContain(
+        'Consider finding more recent sources on this topic'
+      );
     });
   });
 
   describe('Validated Citation Addition', () => {
     it('should successfully add high-quality citations', () => {
       const initialCount = citationService.getDatabaseStatistics().totalCitations;
-      
+
       const newCitation: Citation = {
         id: 'test_new_citation',
         title: 'New Market Analysis: Emerging Technology Trends 2024',
@@ -175,16 +189,17 @@ describe('Expanded Citation Database', () => {
         published_at: '2024-08-01',
         source_type: CitationSourceType.CONSULTING_STUDY,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Emerging technologies will drive 40% of business value creation in the next 5 years',
+        key_finding:
+          'Emerging technologies will drive 40% of business value creation in the next 5 years',
         organization: 'Boston Consulting Group',
         methodology: 'Analysis of technology adoption across 500+ companies',
         sample_size: 500,
         geographic_scope: 'Global',
-        industry_focus: ['technology', 'innovation', 'strategy']
+        industry_focus: ['technology', 'innovation', 'strategy'],
       };
 
       const result = citationService.addValidatedCitation(newCitation);
-      
+
       expect(result.success).toBe(true);
       expect(result.validation.isValid).toBe(true);
       expect(citationService.getDatabaseStatistics().totalCitations).toBe(initialCount + 1);
@@ -192,7 +207,7 @@ describe('Expanded Citation Database', () => {
 
     it('should reject low-quality citations', () => {
       const initialCount = citationService.getDatabaseStatistics().totalCitations;
-      
+
       const badCitation: Citation = {
         id: 'test_bad_citation',
         title: 'Bad',
@@ -206,11 +221,11 @@ describe('Expanded Citation Database', () => {
         methodology: undefined,
         sample_size: undefined,
         geographic_scope: undefined,
-        industry_focus: undefined
+        industry_focus: undefined,
       };
 
       const result = citationService.addValidatedCitation(badCitation);
-      
+
       expect(result.success).toBe(false);
       expect(result.validation.isValid).toBe(false);
       expect(citationService.getDatabaseStatistics().totalCitations).toBe(initialCount);
@@ -231,7 +246,7 @@ describe('Expanded Citation Database', () => {
           methodology: 'Survey of 800+ market participants',
           sample_size: 800,
           geographic_scope: 'Global',
-          industry_focus: ['market_analysis', 'growth']
+          industry_focus: ['market_analysis', 'growth'],
         },
         {
           id: 'bulk_bad_1',
@@ -246,12 +261,12 @@ describe('Expanded Citation Database', () => {
           methodology: undefined,
           sample_size: undefined,
           geographic_scope: undefined,
-          industry_focus: undefined
-        }
+          industry_focus: undefined,
+        },
       ];
 
       const result = citationService.addValidatedCitations(citations);
-      
+
       expect(result.summary.total).toBe(2);
       expect(result.summary.successful).toBe(1);
       expect(result.summary.failed).toBe(1);
@@ -279,11 +294,11 @@ describe('Expanded Citation Database', () => {
 
     it('should find sources by industry focus', async () => {
       const aiSources = await citationService.findRelevantCitations({
-        keywords: ['ai', 'artificial intelligence']
+        keywords: ['ai', 'artificial intelligence'],
       });
 
       const digitalSources = await citationService.findRelevantCitations({
-        keywords: ['digital transformation']
+        keywords: ['digital transformation'],
       });
 
       expect(aiSources.length).toBeGreaterThan(0);
@@ -291,10 +306,11 @@ describe('Expanded Citation Database', () => {
 
       // Verify industry focus includes relevant terms
       aiSources.forEach(citation => {
-        const hasAIFocus = citation.industry_focus?.some((focus: string) => 
-          focus.toLowerCase().includes('ai') || 
-          focus.toLowerCase().includes('technology')
-        ) || citation.key_finding.toLowerCase().includes('ai');
+        const hasAIFocus =
+          citation.industry_focus?.some(
+            (focus: string) =>
+              focus.toLowerCase().includes('ai') || focus.toLowerCase().includes('technology')
+          ) || citation.key_finding.toLowerCase().includes('ai');
         expect(hasAIFocus).toBe(true);
       });
     });
@@ -302,12 +318,12 @@ describe('Expanded Citation Database', () => {
     it('should filter by source type effectively', async () => {
       const consultingStudies = await citationService.findRelevantCitations({
         keywords: ['strategy'],
-        source_types: [CitationSourceType.CONSULTING_STUDY]
+        source_types: [CitationSourceType.CONSULTING_STUDY],
       });
 
       const industryReports = await citationService.findRelevantCitations({
         keywords: ['market'],
-        source_types: [CitationSourceType.INDUSTRY_REPORT]
+        source_types: [CitationSourceType.INDUSTRY_REPORT],
       });
 
       expect(consultingStudies.length).toBeGreaterThan(0);
@@ -325,7 +341,7 @@ describe('Expanded Citation Database', () => {
     it('should filter by confidence level', async () => {
       const highConfidenceSources = await citationService.findRelevantCitations({
         keywords: ['business'],
-        minimum_confidence: CitationConfidence.HIGH
+        minimum_confidence: CitationConfidence.HIGH,
       });
 
       expect(highConfidenceSources.length).toBeGreaterThan(0);
@@ -339,8 +355,8 @@ describe('Expanded Citation Database', () => {
         keywords: ['technology'],
         date_range: {
           start: '2024-06-01',
-          end: '2024-12-31'
-        }
+          end: '2024-12-31',
+        },
       });
 
       expect(recent2024Sources.length).toBeGreaterThan(0);
@@ -370,8 +386,9 @@ describe('Expanded Citation Database', () => {
 
       expect(stats.qualityMetrics.averageQualityScore).toBeGreaterThan(80);
       expect(stats.qualityMetrics.highQualitySources).toBeGreaterThan(10);
-      expect(stats.qualityMetrics.highQualitySources + stats.qualityMetrics.mediumQualitySources)
-        .toBeGreaterThan(stats.qualityMetrics.lowQualitySources);
+      expect(
+        stats.qualityMetrics.highQualitySources + stats.qualityMetrics.mediumQualitySources
+      ).toBeGreaterThan(stats.qualityMetrics.lowQualitySources);
     });
 
     it('should show proper distribution of consulting firms', () => {
@@ -411,7 +428,7 @@ describe('Expanded Citation Database', () => {
       const businessCaseCitations = await citationService.findRelevantCitations({
         keywords: ['business', 'strategy'],
         source_types: businessCaseReqs.required_source_types,
-        minimum_confidence: businessCaseReqs.minimum_confidence_level
+        minimum_confidence: businessCaseReqs.minimum_confidence_level,
       });
 
       expect(businessCaseCitations.length).toBeGreaterThanOrEqual(3); // Should have at least some citations
@@ -419,7 +436,7 @@ describe('Expanded Citation Database', () => {
 
     it('should work with existing formatting methods', async () => {
       const citations = await citationService.findRelevantCitations({
-        keywords: ['business', 'strategy']
+        keywords: ['business', 'strategy'],
       });
 
       expect(citations.length).toBeGreaterThan(0);
@@ -439,7 +456,7 @@ describe('Expanded Citation Database', () => {
     it('should generate proper bibliography with expanded sources', async () => {
       const citations = await citationService.findRelevantCitations({
         keywords: ['digital transformation'],
-        source_types: [CitationSourceType.CONSULTING_STUDY]
+        source_types: [CitationSourceType.CONSULTING_STUDY],
       });
 
       expect(citations.length).toBeGreaterThan(0);
@@ -452,7 +469,7 @@ describe('Expanded Citation Database', () => {
 
     it('should calculate proper citation metrics for expanded database', async () => {
       const allCitations = await citationService.findRelevantCitations({
-        keywords: ['business', 'strategy', 'technology', 'ai', 'digital']
+        keywords: ['business', 'strategy', 'technology', 'ai', 'digital'],
       });
 
       const metrics = citationService.calculateCitationMetrics(allCitations);

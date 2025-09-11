@@ -1,6 +1,6 @@
 /**
  * Secure Document Handler
- * 
+ *
  * Provides secure handling of document content during citation processing
  * with data sanitization, encryption, and privacy protection.
  */
@@ -86,49 +86,50 @@ export class SecureDocumentHandler extends EventEmitter {
     context: DocumentSecurityContext
   ): Promise<DocumentProcessingResult> {
     const startTime = Date.now();
-    
+
     try {
       // Log document processing start
       this.logAuditEntry('document_processing_start', context, {
         contentLength: content.length,
-        sanitizationLevel: this.options.sanitizationLevel
+        sanitizationLevel: this.options.sanitizationLevel,
       });
 
       // Sanitize document content
       const sanitized = await this.sanitizeContent(content, context);
-      
+
       // Perform security analysis
       const securityReport = await this.analyzeSecurityThreats(sanitized.content, context);
-      
+
       // Encrypt sensitive content if needed
-      const processedContent = this.shouldEncrypt(securityReport) 
+      const processedContent = this.shouldEncrypt(securityReport)
         ? this.encryptContent(sanitized.content)
         : sanitized.content;
 
       const result: DocumentProcessingResult = {
         processedContent,
         securityReport,
-        auditTrail: this.getRecentAuditEntries(context.documentId)
+        auditTrail: this.getRecentAuditEntries(context.documentId),
       };
 
       // Log successful processing
       this.logAuditEntry('document_processing_complete', context, {
         processingTimeMs: Date.now() - startTime,
         riskLevel: securityReport.riskLevel,
-        threatsDetected: securityReport.detectedThreats.length
+        threatsDetected: securityReport.detectedThreats.length,
       });
 
       this.emit('documentProcessed', result);
       return result;
-
     } catch (error) {
       // Log processing error
       this.logAuditEntry('document_processing_error', context, {
         error: error instanceof Error ? error.message : 'Unknown error',
-        processingTimeMs: Date.now() - startTime
+        processingTimeMs: Date.now() - startTime,
       });
 
-      throw new Error(`Secure document processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Secure document processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -145,10 +146,11 @@ export class SecureDocumentHandler extends EventEmitter {
     const securityFlags: string[] = [];
 
     // Remove PII based on sanitization level
-    if (this.options.sanitizationLevel === 'basic' || 
-        this.options.sanitizationLevel === 'strict' || 
-        this.options.sanitizationLevel === 'paranoid') {
-      
+    if (
+      this.options.sanitizationLevel === 'basic' ||
+      this.options.sanitizationLevel === 'strict' ||
+      this.options.sanitizationLevel === 'paranoid'
+    ) {
       // Remove email addresses
       const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
       if (emailRegex.test(sanitizedContent)) {
@@ -172,9 +174,10 @@ export class SecureDocumentHandler extends EventEmitter {
       }
     }
 
-    if (this.options.sanitizationLevel === 'strict' || 
-        this.options.sanitizationLevel === 'paranoid') {
-      
+    if (
+      this.options.sanitizationLevel === 'strict' ||
+      this.options.sanitizationLevel === 'paranoid'
+    ) {
       // Remove credit card patterns
       const ccRegex = /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g;
       if (ccRegex.test(sanitizedContent)) {
@@ -201,7 +204,8 @@ export class SecureDocumentHandler extends EventEmitter {
       }
 
       // Remove URLs with sensitive patterns
-      const sensitiveUrlRegex = /(https?:\/\/[^\s]+(?:admin|login|password|secret|private|internal)[^\s]*)/gi;
+      const sensitiveUrlRegex =
+        /(https?:\/\/[^\s]+(?:admin|login|password|secret|private|internal)[^\s]*)/gi;
       if (sensitiveUrlRegex.test(sanitizedContent)) {
         sanitizedContent = sanitizedContent.replace(sensitiveUrlRegex, '[SENSITIVE_URL_REDACTED]');
         removedElements.push('sensitive_urls');
@@ -221,9 +225,9 @@ export class SecureDocumentHandler extends EventEmitter {
         originalLength,
         sanitizedLength: sanitizedContent.length,
         removedElements,
-        confidenceScore
+        confidenceScore,
       },
-      securityFlags
+      securityFlags,
     };
   }
 
@@ -249,7 +253,7 @@ export class SecureDocumentHandler extends EventEmitter {
         severity: 'high',
         location: 'document_content',
         description: 'Potential personally identifiable information detected',
-        mitigated: false
+        mitigated: false,
       });
       recommendations.push('Review content for PII and increase sanitization level');
     }
@@ -259,7 +263,7 @@ export class SecureDocumentHandler extends EventEmitter {
       /password\s*[:=]\s*[^\s]+/i,
       /api[_-]?key\s*[:=]\s*[^\s]+/i,
       /secret\s*[:=]\s*[^\s]+/i,
-      /token\s*[:=]\s*[^\s]+/i
+      /token\s*[:=]\s*[^\s]+/i,
     ];
 
     if (credentialPatterns.some(pattern => pattern.test(content))) {
@@ -268,7 +272,7 @@ export class SecureDocumentHandler extends EventEmitter {
         severity: 'critical',
         location: 'document_content',
         description: 'Potential credentials or API keys detected',
-        mitigated: false
+        mitigated: false,
       });
       recommendations.push('Remove all credentials before processing');
     }
@@ -278,7 +282,7 @@ export class SecureDocumentHandler extends EventEmitter {
       /confidential/i,
       /proprietary/i,
       /internal\s+only/i,
-      /trade\s+secret/i
+      /trade\s+secret/i,
     ];
 
     if (businessPatterns.some(pattern => pattern.test(content))) {
@@ -287,7 +291,7 @@ export class SecureDocumentHandler extends EventEmitter {
         severity: 'medium',
         location: 'document_content',
         description: 'Sensitive business information detected',
-        mitigated: false
+        mitigated: false,
       });
       recommendations.push('Consider data classification and access controls');
     }
@@ -299,7 +303,7 @@ export class SecureDocumentHandler extends EventEmitter {
       riskLevel,
       detectedThreats: threats,
       sanitizationActions,
-      recommendations
+      recommendations,
     };
   }
 
@@ -309,13 +313,13 @@ export class SecureDocumentHandler extends EventEmitter {
   private encryptContent(content: string): string {
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipher('aes-256-cbc', this.encryptionKey);
-    
+
     let encrypted = cipher.update(content, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    
+
     return JSON.stringify({
       encrypted,
-      iv: iv.toString('hex')
+      iv: iv.toString('hex'),
     });
   }
 
@@ -326,10 +330,10 @@ export class SecureDocumentHandler extends EventEmitter {
     try {
       const data = JSON.parse(encryptedData);
       const decipher = crypto.createDecipher('aes-256-cbc', this.encryptionKey);
-      
+
       let decrypted = decipher.update(data.encrypted, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
-      
+
       return decrypted;
     } catch (error) {
       throw new Error('Failed to decrypt content');
@@ -350,11 +354,11 @@ export class SecureDocumentHandler extends EventEmitter {
       userId: context.userId,
       documentId: context.documentId,
       details,
-      securityContext: context
+      securityContext: context,
     };
 
     this.auditLog.push(entry);
-    
+
     // Emit audit event
     this.emit('auditEntry', entry);
 
@@ -366,16 +370,14 @@ export class SecureDocumentHandler extends EventEmitter {
    * Get recent audit entries for a document
    */
   private getRecentAuditEntries(documentId: string): AuditEntry[] {
-    return this.auditLog
-      .filter(entry => entry.documentId === documentId)
-      .slice(-10); // Return last 10 entries
+    return this.auditLog.filter(entry => entry.documentId === documentId).slice(-10); // Return last 10 entries
   }
 
   /**
    * Clean up old audit entries based on retention policy
    */
   private cleanupAuditLog(): void {
-    const cutoffTime = new Date(Date.now() - (this.options.retentionPolicyHours * 60 * 60 * 1000));
+    const cutoffTime = new Date(Date.now() - this.options.retentionPolicyHours * 60 * 60 * 1000);
     this.auditLog = this.auditLog.filter(entry => entry.timestamp > cutoffTime);
   }
 
@@ -399,17 +401,17 @@ export class SecureDocumentHandler extends EventEmitter {
     removedCount: number
   ): number {
     const reductionRatio = (originalLength - sanitizedLength) / originalLength;
-    const baseConfidence = Math.max(0, 100 - (removedCount * 10));
-    return Math.min(100, baseConfidence - (reductionRatio * 20));
+    const baseConfidence = Math.max(0, 100 - removedCount * 10);
+    return Math.min(100, baseConfidence - reductionRatio * 20);
   }
 
   private containsPII(content: string): boolean {
     const piiPatterns = [
       /\b\d{3}-?\d{2}-?\d{4}\b/, // SSN
       /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/, // Email
-      /(\+?1[-.\s]?)?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})/ // Phone
+      /(\+?1[-.\s]?)?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})/, // Phone
     ];
-    
+
     return piiPatterns.some(pattern => pattern.test(content));
   }
 
@@ -418,9 +420,9 @@ export class SecureDocumentHandler extends EventEmitter {
       /password\s*[:=]\s*[^\s]+/i,
       /api[_-]?key\s*[:=]\s*[^\s]+/i,
       /secret\s*[:=]\s*[^\s]+/i,
-      /token\s*[:=]\s*[^\s]+/i
+      /token\s*[:=]\s*[^\s]+/i,
     ];
-    
+
     return credentialPatterns.some(pattern => pattern.test(content));
   }
 
@@ -430,9 +432,9 @@ export class SecureDocumentHandler extends EventEmitter {
       /proprietary/i,
       /internal\s+only/i,
       /trade\s+secret/i,
-      /\$[\d,]+\.?\d*/g // Currency amounts
+      /\$[\d,]+\.?\d*/g, // Currency amounts
     ];
-    
+
     return sensitivePatterns.some(pattern => pattern.test(content));
   }
 

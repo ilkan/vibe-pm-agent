@@ -1,6 +1,6 @@
 /**
  * MCP Tool: analyze_business_opportunity_enhanced
- * 
+ *
  * Enhanced business opportunity analysis with authoritative source integration
  * for improved confidence scoring and consulting-grade analysis quality.
  */
@@ -52,11 +52,11 @@ export async function analyzeBusinessOpportunityEnhanced(
 
     // Determine analysis type based on content
     const analysisType = determineAnalysisType(args.idea, args.market_context);
-    
+
     // Create enhanced prompt with authoritative source context
     const basePrompt = createBaseAnalysisPrompt(args);
     const enhancedPrompt = sourceEnhancer.enhancePrompt(basePrompt, analysisType);
-    
+
     // Add confidence scoring criteria
     const confidenceScoring = sourceEnhancer.generateConfidenceScoring();
     const fullPrompt = `${enhancedPrompt}\n\n${confidenceScoring}`;
@@ -69,11 +69,13 @@ export async function analyzeBusinessOpportunityEnhanced(
 
     // Execute enhanced analysis
     // Transform market context to match pipeline expectations
-    const transformedContext = args.market_context ? {
-      industry: args.market_context.industry || 'technology',
-      geography: ['global'], // Default to global
-      target_segment: 'enterprise' // Default segment
-    } : undefined;
+    const transformedContext = args.market_context
+      ? {
+          industry: args.market_context.industry || 'technology',
+          geography: ['global'], // Default to global
+          target_segment: 'enterprise', // Default segment
+        }
+      : undefined;
 
     const analysisResult = await pipeline.analyzeEnhancedBusinessOpportunity(
       args.idea,
@@ -85,7 +87,7 @@ export async function analyzeBusinessOpportunityEnhanced(
 
     // Convert structured result to markdown for analysis
     const markdownAnalysis = convertStructuredResultToMarkdown(analysisResult);
-    
+
     // Calculate enhanced confidence score
     const confidenceMetrics = calculateEnhancedConfidenceScore(markdownAnalysis);
 
@@ -112,7 +114,6 @@ export async function analyzeBusinessOpportunityEnhanced(
       confidenceBreakdown: confidenceMetrics.breakdown,
       sourcesUsed: confidenceMetrics.sourcesUsed,
     });
-
   } catch (error) {
     MCPLogger.error('analyze_business_opportunity_enhanced tool failed', error as Error, context);
     return MCPErrorHandler.createErrorResponse(
@@ -136,21 +137,29 @@ function convertStructuredResultToMarkdown(result: any): string {
 **Analysis Depth**: ${result.analysisDepth}
 
 ## Market Sizing Analysis
-${result.marketSizing ? `
+${
+  result.marketSizing
+    ? `
 **Total Addressable Market (TAM)**: $${(result.marketSizing.tam / 1000000000).toFixed(1)}B
 **Serviceable Addressable Market (SAM)**: $${(result.marketSizing.sam / 1000000).toFixed(0)}M
 **Serviceable Obtainable Market (SOM)**: $${(result.marketSizing.som / 1000000).toFixed(0)}M
 **Market Growth Rate**: ${result.marketSizing.growthRate || 'N/A'}%
 **Confidence**: ${result.marketSizing.confidence || 'medium'}
-` : 'Market sizing not available'}
+`
+    : 'Market sizing not available'
+}
 
 ## Competitive Analysis
-${result.competitiveAnalysis ? `
+${
+  result.competitiveAnalysis
+    ? `
 **Competitive Landscape**: ${result.competitiveAnalysis.landscape || 'Analyzed'}
 **Key Competitors**: ${result.competitiveAnalysis.competitors?.map((c: any) => c.name).join(', ') || 'Various players'}
 **Competitive Advantage**: ${result.competitiveAnalysis.advantages?.join(', ') || 'To be determined'}
 **Market Position**: ${result.competitiveAnalysis.positioning || 'Challenger'}
-` : 'Competitive analysis not available'}
+`
+    : 'Competitive analysis not available'
+}
 
 ## Strategic Fit Assessment
 **Alignment Score**: ${result.strategicFit?.alignmentScore || 'N/A'}/1.0
@@ -180,24 +189,36 @@ ${result.overallAssessment?.keyRisks?.map((risk: string) => `- ${risk}`).join('\
 }
 
 function determineAnalysisType(
-  idea: string, 
+  idea: string,
   marketContext?: AnalyzeBusinessOpportunityEnhancedArgs['market_context']
 ): 'market' | 'strategic' | 'financial' | 'operational' {
   const ideaLower = idea.toLowerCase();
-  
-  if (ideaLower.includes('market') || ideaLower.includes('customer') || ideaLower.includes('competition')) {
+
+  if (
+    ideaLower.includes('market') ||
+    ideaLower.includes('customer') ||
+    ideaLower.includes('competition')
+  ) {
     return 'market';
   }
-  if (ideaLower.includes('strategy') || ideaLower.includes('vision') || ideaLower.includes('mission')) {
+  if (
+    ideaLower.includes('strategy') ||
+    ideaLower.includes('vision') ||
+    ideaLower.includes('mission')
+  ) {
     return 'strategic';
   }
   if (ideaLower.includes('revenue') || ideaLower.includes('cost') || ideaLower.includes('roi')) {
     return 'financial';
   }
-  if (ideaLower.includes('process') || ideaLower.includes('efficiency') || ideaLower.includes('operation')) {
+  if (
+    ideaLower.includes('process') ||
+    ideaLower.includes('efficiency') ||
+    ideaLower.includes('operation')
+  ) {
     return 'operational';
   }
-  
+
   // Default to market analysis for general business opportunities
   return 'market';
 }
@@ -205,7 +226,7 @@ function determineAnalysisType(
 function createBaseAnalysisPrompt(args: AnalyzeBusinessOpportunityEnhancedArgs): string {
   const depth = args.analysis_depth || 'standard';
   const industry = args.market_context?.industry || 'technology';
-  
+
   return `
 # Enhanced Business Opportunity Analysis
 
@@ -289,10 +310,10 @@ function calculateEnhancedConfidenceScore(analysisResult: string): {
 
   // Calculate weighted overall score
   const overall = Math.round(
-    (breakdown.evidence * 0.3) +
-    (breakdown.methodology * 0.25) +
-    (breakdown.market_validation * 0.25) +
-    (breakdown.strategic_alignment * 0.2)
+    breakdown.evidence * 0.3 +
+      breakdown.methodology * 0.25 +
+      breakdown.market_validation * 0.25 +
+      breakdown.strategic_alignment * 0.2
   );
 
   return {
@@ -305,7 +326,7 @@ function calculateEnhancedConfidenceScore(analysisResult: string): {
 function detectAuthoritativeSources(content: string): string[] {
   const sources = [];
   const contentLower = content.toLowerCase();
-  
+
   if (contentLower.includes('mckinsey') || contentLower.includes('mece')) {
     sources.push('McKinsey & Company');
   }
@@ -322,64 +343,75 @@ function detectAuthoritativeSources(content: string): string[] {
     sources.push('World Economic Forum');
   }
   if (contentLower.includes('porter') || contentLower.includes('five forces')) {
-    sources.push('Porter\'s Strategic Frameworks');
+    sources.push("Porter's Strategic Frameworks");
   }
-  
+
   return sources;
 }
 
 function assessMethodologyRigor(content: string): number {
   let score = 50; // Base score
   const contentLower = content.toLowerCase();
-  
+
   // Check for structured frameworks
   if (contentLower.includes('mece') || contentLower.includes('mutually exclusive')) score += 15;
   if (contentLower.includes('porter') || contentLower.includes('five forces')) score += 10;
-  if (contentLower.includes('tam') && contentLower.includes('sam') && contentLower.includes('som')) score += 15;
+  if (contentLower.includes('tam') && contentLower.includes('sam') && contentLower.includes('som'))
+    score += 15;
   if (contentLower.includes('swot') || contentLower.includes('strengths, weaknesses')) score += 10;
   if (contentLower.includes('bcg matrix') || contentLower.includes('growth-share')) score += 10;
-  
+
   return Math.min(score, 100);
 }
 
 function assessEvidenceQuality(content: string): number {
   let score = 40; // Base score
   const contentLower = content.toLowerCase();
-  
+
   // Check for quantitative evidence
   if (contentLower.match(/\$[\d,]+[bmk]?/g)) score += 15; // Dollar amounts
   if (contentLower.match(/\d+%/g)) score += 10; // Percentages
-  if (contentLower.includes('market research') || contentLower.includes('industry report')) score += 15;
-  if (contentLower.includes('benchmark') || contentLower.includes('comparative analysis')) score += 10;
+  if (contentLower.includes('market research') || contentLower.includes('industry report'))
+    score += 15;
+  if (contentLower.includes('benchmark') || contentLower.includes('comparative analysis'))
+    score += 10;
   if (contentLower.includes('data') || contentLower.includes('statistics')) score += 10;
-  
+
   return Math.min(score, 100);
 }
 
 function assessMarketValidation(content: string): number {
   let score = 45; // Base score
   const contentLower = content.toLowerCase();
-  
+
   // Check for market analysis elements
-  if (contentLower.includes('market size') || contentLower.includes('addressable market')) score += 15;
-  if (contentLower.includes('competitive landscape') || contentLower.includes('competitor analysis')) score += 15;
-  if (contentLower.includes('customer segment') || contentLower.includes('target market')) score += 10;
+  if (contentLower.includes('market size') || contentLower.includes('addressable market'))
+    score += 15;
+  if (
+    contentLower.includes('competitive landscape') ||
+    contentLower.includes('competitor analysis')
+  )
+    score += 15;
+  if (contentLower.includes('customer segment') || contentLower.includes('target market'))
+    score += 10;
   if (contentLower.includes('market trend') || contentLower.includes('industry trend')) score += 10;
   if (contentLower.includes('demand') || contentLower.includes('market need')) score += 5;
-  
+
   return Math.min(score, 100);
 }
 
 function assessStrategicAlignment(content: string): number {
   let score = 50; // Base score
   const contentLower = content.toLowerCase();
-  
+
   // Check for strategic elements
   if (contentLower.includes('strategic fit') || contentLower.includes('alignment')) score += 15;
-  if (contentLower.includes('competitive advantage') || contentLower.includes('differentiation')) score += 15;
-  if (contentLower.includes('value proposition') || contentLower.includes('unique value')) score += 10;
+  if (contentLower.includes('competitive advantage') || contentLower.includes('differentiation'))
+    score += 15;
+  if (contentLower.includes('value proposition') || contentLower.includes('unique value'))
+    score += 10;
   if (contentLower.includes('go-to-market') || contentLower.includes('market entry')) score += 10;
-  
+
   return Math.min(score, 100);
 }
 
@@ -409,11 +441,12 @@ ${analysisResult}
 **Authoritative Sources Referenced**: ${confidenceMetrics.sourcesUsed.length > 0 ? confidenceMetrics.sourcesUsed.join(', ') : 'None detected - consider adding consulting framework references'}
 
 ### Quality Indicators
-${confidenceMetrics.overall >= 80 ? 
-  '- ✅ Analysis meets consulting-grade standards\n- ✅ Strong evidence base and methodology\n- ✅ Ready for executive presentation' :
-  confidenceMetrics.overall >= 60 ?
-  '- ⚠️ Analysis meets business standards but could be enhanced\n- ⚠️ Consider adding more quantitative evidence\n- ⚠️ May benefit from additional framework application' :
-  '- ❌ Analysis requires significant enhancement\n- ❌ Insufficient evidence or methodology rigor\n- ❌ Not recommended for executive presentation without revision'
+${
+  confidenceMetrics.overall >= 80
+    ? '- ✅ Analysis meets consulting-grade standards\n- ✅ Strong evidence base and methodology\n- ✅ Ready for executive presentation'
+    : confidenceMetrics.overall >= 60
+      ? '- ⚠️ Analysis meets business standards but could be enhanced\n- ⚠️ Consider adding more quantitative evidence\n- ⚠️ May benefit from additional framework application'
+      : '- ❌ Analysis requires significant enhancement\n- ❌ Insufficient evidence or methodology rigor\n- ❌ Not recommended for executive presentation without revision'
 }
 
 ---
@@ -518,5 +551,5 @@ export const analyzeBusinessOpportunityEnhancedSchema = {
   required: ['idea'],
 } as const;
 
-export const analyzeBusinessOpportunityEnhancedDescription = 
+export const analyzeBusinessOpportunityEnhancedDescription =
   'Enhanced business opportunity analysis with authoritative source integration from McKinsey, BCG, Bain, Gartner, and WEF for improved confidence scoring and consulting-grade analysis quality.';

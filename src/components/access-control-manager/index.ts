@@ -1,6 +1,6 @@
 /**
  * Access Control Manager
- * 
+ *
  * Provides role-based access control for audit trails, compliance reports,
  * and sensitive citation system operations.
  */
@@ -112,14 +112,14 @@ export class AccessControlManager extends EventEmitter {
    */
   async checkAccess(request: AccessRequest): Promise<AccessResult> {
     const startTime = Date.now();
-    
+
     try {
       // Get user
       const user = this.users.get(request.userId);
       if (!user || !user.isActive) {
         return this.logAccessResult(request, {
           granted: false,
-          reason: 'User not found or inactive'
+          reason: 'User not found or inactive',
         });
       }
 
@@ -130,11 +130,16 @@ export class AccessControlManager extends EventEmitter {
       }
 
       // Check role-based permissions
-      const hasPermission = await this.hasPermission(user, request.resource, request.action, request.context);
+      const hasPermission = await this.hasPermission(
+        user,
+        request.resource,
+        request.action,
+        request.context
+      );
       if (!hasPermission) {
         return this.logAccessResult(request, {
           granted: false,
-          reason: 'Insufficient permissions'
+          reason: 'Insufficient permissions',
         });
       }
 
@@ -148,13 +153,12 @@ export class AccessControlManager extends EventEmitter {
       return this.logAccessResult(request, {
         granted: true,
         reason: 'Access granted',
-        expiresAt: new Date(Date.now() + (24 * 60 * 60 * 1000)) // 24 hours
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       });
-
     } catch (error) {
       return this.logAccessResult(request, {
         granted: false,
-        reason: `Access check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        reason: `Access check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     }
   }
@@ -169,7 +173,7 @@ export class AccessControlManager extends EventEmitter {
     }
 
     const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + (expirationHours * 60 * 60 * 1000));
+    const expiresAt = new Date(Date.now() + expirationHours * 60 * 60 * 1000);
 
     this.sessionTokens.set(token, { userId, expiresAt });
 
@@ -219,7 +223,7 @@ export class AccessControlManager extends EventEmitter {
       ...userData,
       id: crypto.randomUUID(),
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.users.set(user.id, user);
@@ -305,8 +309,8 @@ export class AccessControlManager extends EventEmitter {
     context: AccessContext
   ): Promise<boolean> {
     // Check direct permissions
-    const directPermission = user.permissions.find(p => 
-      p.resource === resource && p.action === action
+    const directPermission = user.permissions.find(
+      p => p.resource === resource && p.action === action
     );
     if (directPermission) {
       return this.evaluatePermissionConditions(directPermission, context);
@@ -314,8 +318,8 @@ export class AccessControlManager extends EventEmitter {
 
     // Check role-based permissions
     for (const role of user.roles) {
-      const rolePermission = role.permissions.find(p => 
-        p.resource === resource && p.action === action
+      const rolePermission = role.permissions.find(
+        p => p.resource === resource && p.action === action
       );
       if (rolePermission) {
         const hasAccess = await this.evaluatePermissionConditions(rolePermission, context);
@@ -360,12 +364,12 @@ export class AccessControlManager extends EventEmitter {
           if (rule.action === 'deny') {
             return {
               granted: false,
-              reason: `Denied by security policy: ${policy.name} - ${rule.message}`
+              reason: `Denied by security policy: ${policy.name} - ${rule.message}`,
             };
           } else if (rule.action === 'require_approval') {
             return {
               granted: false,
-              reason: `Requires approval: ${policy.name} - ${rule.message}`
+              reason: `Requires approval: ${policy.name} - ${rule.message}`,
             };
           }
         }
@@ -402,14 +406,12 @@ export class AccessControlManager extends EventEmitter {
     request: AccessRequest
   ): Promise<AccessResult> {
     // Only admin and audit roles can access audit trails
-    const hasAuditRole = user.roles.some(role => 
-      role.name === 'admin' || role.name === 'auditor'
-    );
+    const hasAuditRole = user.roles.some(role => role.name === 'admin' || role.name === 'auditor');
 
     if (!hasAuditRole) {
       return {
         granted: false,
-        reason: 'Audit trail access requires admin or auditor role'
+        reason: 'Audit trail access requires admin or auditor role',
       };
     }
 
@@ -419,7 +421,7 @@ export class AccessControlManager extends EventEmitter {
       if (!hasAdminRole) {
         return {
           granted: false,
-          reason: 'Audit trail modification requires admin role'
+          reason: 'Audit trail modification requires admin role',
         };
       }
     }
@@ -435,14 +437,14 @@ export class AccessControlManager extends EventEmitter {
     request: AccessRequest
   ): Promise<AccessResult> {
     // Compliance reports require compliance officer or admin role
-    const hasComplianceRole = user.roles.some(role => 
-      role.name === 'admin' || role.name === 'compliance_officer' || role.name === 'auditor'
+    const hasComplianceRole = user.roles.some(
+      role => role.name === 'admin' || role.name === 'compliance_officer' || role.name === 'auditor'
     );
 
     if (!hasComplianceRole) {
       return {
         granted: false,
-        reason: 'Compliance report access requires appropriate role'
+        reason: 'Compliance report access requires appropriate role',
       };
     }
 
@@ -461,14 +463,14 @@ export class AccessControlManager extends EventEmitter {
       return { granted: true, reason: 'Citation data read access granted' };
     }
 
-    const hasEditRole = user.roles.some(role => 
-      role.name === 'admin' || role.name === 'editor' || role.name === 'researcher'
+    const hasEditRole = user.roles.some(
+      role => role.name === 'admin' || role.name === 'editor' || role.name === 'researcher'
     );
 
     if (!hasEditRole) {
       return {
         granted: false,
-        reason: 'Citation data modification requires editor role or higher'
+        reason: 'Citation data modification requires editor role or higher',
       };
     }
 
@@ -487,7 +489,7 @@ export class AccessControlManager extends EventEmitter {
       granted: result.granted,
       reason: result.reason,
       context: request.context,
-      timestamp: request.timestamp
+      timestamp: request.timestamp,
     };
 
     this.accessLogs.push(logEntry);
@@ -511,43 +513,43 @@ export class AccessControlManager extends EventEmitter {
         name: 'admin',
         description: 'Full system access',
         permissions: [],
-        isSystemRole: true
+        isSystemRole: true,
       },
       {
         id: 'auditor',
         name: 'auditor',
         description: 'Audit trail and compliance access',
         permissions: [],
-        isSystemRole: true
+        isSystemRole: true,
       },
       {
         id: 'compliance_officer',
         name: 'compliance_officer',
         description: 'Compliance reporting access',
         permissions: [],
-        isSystemRole: true
+        isSystemRole: true,
       },
       {
         id: 'editor',
         name: 'editor',
         description: 'Content editing permissions',
         permissions: [],
-        isSystemRole: true
+        isSystemRole: true,
       },
       {
         id: 'researcher',
         name: 'researcher',
         description: 'Research and citation access',
         permissions: [],
-        isSystemRole: true
+        isSystemRole: true,
       },
       {
         id: 'viewer',
         name: 'viewer',
         description: 'Read-only access',
         permissions: [],
-        isSystemRole: true
-      }
+        isSystemRole: true,
+      },
     ];
 
     defaultRoles.forEach(role => this.roles.set(role.id, role));
@@ -567,11 +569,11 @@ export class AccessControlManager extends EventEmitter {
             id: 'audit_delete_deny',
             condition: 'resource === "audit_trail" && action === "delete"',
             action: 'require_approval',
-            message: 'Audit trail deletion requires approval'
-          }
+            message: 'Audit trail deletion requires approval',
+          },
         ],
         isActive: true,
-        priority: 100
+        priority: 100,
       },
       {
         id: 'compliance_access',
@@ -582,12 +584,12 @@ export class AccessControlManager extends EventEmitter {
             id: 'compliance_read_restrict',
             condition: 'resource === "compliance_report" && action === "read"',
             action: 'allow',
-            message: 'Compliance report access allowed for authorized roles'
-          }
+            message: 'Compliance report access allowed for authorized roles',
+          },
         ],
         isActive: true,
-        priority: 90
-      }
+        priority: 90,
+      },
     ];
 
     defaultPolicies.forEach(policy => this.securityPolicies.set(policy.id, policy));
@@ -617,18 +619,14 @@ export class AccessControlManager extends EventEmitter {
     }
   }
 
-  private evaluateSecurityRule(
-    rule: SecurityRule,
-    request: AccessRequest,
-    user: User
-  ): boolean {
+  private evaluateSecurityRule(rule: SecurityRule, request: AccessRequest, user: User): boolean {
     // Simple condition evaluation - in production, use a proper expression evaluator
     try {
       const condition = rule.condition
         .replace(/resource/g, `"${request.resource}"`)
         .replace(/action/g, `"${request.action}"`)
         .replace(/userId/g, `"${request.userId}"`);
-      
+
       return eval(condition);
     } catch (error) {
       return false;

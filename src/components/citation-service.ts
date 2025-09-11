@@ -280,7 +280,8 @@ export class CitationService {
         published_at: '2024-07-25',
         source_type: CitationSourceType.CONSULTING_STUDY,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'AI, quantum computing, and next-gen software development are top investment priorities',
+        key_finding:
+          'AI, quantum computing, and next-gen software development are top investment priorities',
         organization: 'McKinsey Technology Council',
         methodology: 'Survey of 1,000+ technology leaders',
         sample_size: 1000,
@@ -297,7 +298,8 @@ export class CitationService {
         published_at: '2024-04-30',
         source_type: CitationSourceType.CONSULTING_STUDY,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Top innovators invest 2.4x more in digital capabilities than average companies',
+        key_finding:
+          'Top innovators invest 2.4x more in digital capabilities than average companies',
         organization: 'Boston Consulting Group',
         methodology: 'Survey of 1,000+ senior executives globally',
         sample_size: 1000,
@@ -395,7 +397,8 @@ export class CitationService {
         published_at: '2024-04-12',
         source_type: CitationSourceType.INDUSTRY_REPORT,
         confidence: CitationConfidence.HIGH,
-        key_finding: '73% of executives plan to increase investment in workforce reskilling by 2025',
+        key_finding:
+          '73% of executives plan to increase investment in workforce reskilling by 2025',
         organization: 'Deloitte Insights',
         methodology: 'Survey of 2,100+ C-suite executives globally',
         sample_size: 2100,
@@ -428,7 +431,8 @@ export class CitationService {
         published_at: '2024-01-15',
         source_type: CitationSourceType.SURVEY_DATA,
         confidence: CitationConfidence.HIGH,
-        key_finding: '73% of CEOs believe AI will significantly change their business within 3 years',
+        key_finding:
+          '73% of CEOs believe AI will significantly change their business within 3 years',
         organization: 'PwC',
         methodology: 'Survey of 4,700+ CEOs across 105 countries',
         sample_size: 4700,
@@ -463,7 +467,8 @@ export class CitationService {
         published_at: '2024-08-13',
         source_type: CitationSourceType.RESEARCH_PUBLICATION,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Generative AI reaches peak of inflated expectations, with 2-5 years to mainstream adoption',
+        key_finding:
+          'Generative AI reaches peak of inflated expectations, with 2-5 years to mainstream adoption',
         organization: 'Gartner Inc.',
         methodology: 'Analysis of 2,000+ emerging technologies and market signals',
         sample_size: 2000,
@@ -578,7 +583,8 @@ export class CitationService {
         published_at: '2024-02-20',
         source_type: CitationSourceType.ACADEMIC_PAPER,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Hybrid workers report 22% higher job satisfaction than fully remote or office workers',
+        key_finding:
+          'Hybrid workers report 22% higher job satisfaction than fully remote or office workers',
         organization: 'Harvard Business Review',
         methodology: 'Longitudinal study of 50,000+ knowledge workers over 3 years',
         sample_size: 50000,
@@ -595,12 +601,18 @@ export class CitationService {
         published_at: '2024-04-08',
         source_type: CitationSourceType.ACADEMIC_PAPER,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Platform businesses achieve 70% higher profit margins than traditional linear businesses',
+        key_finding:
+          'Platform businesses achieve 70% higher profit margins than traditional linear businesses',
         organization: 'MIT Sloan School of Management',
         methodology: 'Comparative analysis of 200+ platform vs. traditional businesses',
         sample_size: 200,
         geographic_scope: 'Global',
-        industry_focus: ['platform_strategy', 'digital_economy', 'network_effects', 'business_models'],
+        industry_focus: [
+          'platform_strategy',
+          'digital_economy',
+          'network_effects',
+          'business_models',
+        ],
       },
 
       // Stanford Business Sources
@@ -612,7 +624,8 @@ export class CitationService {
         published_at: '2024-07-03',
         source_type: CitationSourceType.ACADEMIC_PAPER,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Innovation ecosystems with strong university-industry partnerships show 3x higher startup success rates',
+        key_finding:
+          'Innovation ecosystems with strong university-industry partnerships show 3x higher startup success rates',
         organization: 'Stanford Graduate School of Business',
         methodology: 'Comparative study of 50+ global innovation ecosystems',
         sample_size: 50,
@@ -629,7 +642,8 @@ export class CitationService {
         published_at: '2024-05-14',
         source_type: CitationSourceType.INDUSTRY_REPORT,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Digital-first banks acquire customers 50% faster and at 60% lower cost than traditional banks',
+        key_finding:
+          'Digital-first banks acquire customers 50% faster and at 60% lower cost than traditional banks',
         organization: 'Ernst & Young',
         methodology: 'Analysis of 300+ fintech companies and traditional banks',
         sample_size: 300,
@@ -645,12 +659,18 @@ export class CitationService {
         published_at: '2024-06-28',
         source_type: CitationSourceType.CONSULTING_STUDY,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Digital health solutions reduce patient readmission rates by 25% and operational costs by 15%',
+        key_finding:
+          'Digital health solutions reduce patient readmission rates by 25% and operational costs by 15%',
         organization: 'Accenture',
         methodology: 'Analysis of digital health implementations across 150+ healthcare systems',
         sample_size: 150,
         geographic_scope: 'Global',
-        industry_focus: ['healthcare', 'digital_health', 'patient_outcomes', 'operational_efficiency'],
+        industry_focus: [
+          'healthcare',
+          'digital_health',
+          'patient_outcomes',
+          'operational_efficiency',
+        ],
       },
 
       {
@@ -661,7 +681,8 @@ export class CitationService {
         published_at: '2024-08-07',
         source_type: CitationSourceType.INDUSTRY_REPORT,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Omnichannel customers have 30% higher lifetime value than single-channel customers',
+        key_finding:
+          'Omnichannel customers have 30% higher lifetime value than single-channel customers',
         organization: 'KPMG',
         methodology: 'Customer journey analysis across 100+ retail brands',
         sample_size: 100,
@@ -677,12 +698,18 @@ export class CitationService {
         published_at: '2024-09-11',
         source_type: CitationSourceType.INDUSTRY_REPORT,
         confidence: CitationConfidence.HIGH,
-        key_finding: 'Smart factories achieve 20% higher productivity and 16% better quality metrics',
+        key_finding:
+          'Smart factories achieve 20% higher productivity and 16% better quality metrics',
         organization: 'Capgemini Research Institute',
         methodology: 'Survey and analysis of 1,000+ manufacturing executives',
         sample_size: 1000,
         geographic_scope: 'Global',
-        industry_focus: ['manufacturing', 'industry_4_0', 'smart_factory', 'digital_transformation'],
+        industry_focus: [
+          'manufacturing',
+          'industry_4_0',
+          'smart_factory',
+          'digital_transformation',
+        ],
       },
     ];
   }
@@ -1137,7 +1164,7 @@ export class CitationService {
     // Check publication date recency
     const publicationDate = new Date(citation.published_at);
     const monthsOld = (Date.now() - publicationDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
-    
+
     if (monthsOld > 36) {
       issues.push('Source is older than 3 years');
       qualityScore -= 10;
@@ -1146,18 +1173,37 @@ export class CitationService {
 
     // Check domain credibility
     const credibleDomains = [
-      'mckinsey.com', 'bcg.com', 'bain.com', 'deloitte.com', 'pwc.com', 'accenture.com',
-      'gartner.com', 'forrester.com', 'idc.com', 'hbr.org', 'mitsloan.mit.edu',
-      'gsb.stanford.edu', 'kellogg.northwestern.edu', 'wharton.upenn.edu'
+      'mckinsey.com',
+      'bcg.com',
+      'bain.com',
+      'deloitte.com',
+      'pwc.com',
+      'accenture.com',
+      'gartner.com',
+      'forrester.com',
+      'idc.com',
+      'hbr.org',
+      'mitsloan.mit.edu',
+      'gsb.stanford.edu',
+      'kellogg.northwestern.edu',
+      'wharton.upenn.edu',
     ];
 
     if (!credibleDomains.some(domain => citation.domain.includes(domain))) {
       qualityScore -= 5;
-      recommendations.push('Consider supplementing with sources from established consulting firms or research institutions');
+      recommendations.push(
+        'Consider supplementing with sources from established consulting firms or research institutions'
+      );
     }
 
     // Check methodology presence for research-based sources
-    if ([CitationSourceType.CONSULTING_STUDY, CitationSourceType.SURVEY_DATA, CitationSourceType.BENCHMARK_STUDY].includes(citation.source_type)) {
+    if (
+      [
+        CitationSourceType.CONSULTING_STUDY,
+        CitationSourceType.SURVEY_DATA,
+        CitationSourceType.BENCHMARK_STUDY,
+      ].includes(citation.source_type)
+    ) {
       if (!citation.methodology) {
         issues.push('Missing methodology for research-based source');
         qualityScore -= 15;
@@ -1185,11 +1231,15 @@ export class CitationService {
 
     // Provide quality-based recommendations
     if (qualityScore >= 90) {
-      recommendations.push('Excellent source quality - suitable for high-stakes business documents');
+      recommendations.push(
+        'Excellent source quality - suitable for high-stakes business documents'
+      );
     } else if (qualityScore >= 75) {
       recommendations.push('Good source quality - suitable for most business documents');
     } else if (qualityScore >= 60) {
-      recommendations.push('Moderate source quality - consider supplementing with additional sources');
+      recommendations.push(
+        'Moderate source quality - consider supplementing with additional sources'
+      );
     } else {
       recommendations.push('Low source quality - significant improvements needed before use');
     }
@@ -1198,7 +1248,7 @@ export class CitationService {
       isValid: qualityScore >= 60 && issues.length === 0,
       qualityScore: Math.max(0, qualityScore),
       issues,
-      recommendations
+      recommendations,
     };
   }
 
@@ -1210,12 +1260,12 @@ export class CitationService {
     validation: SourceQualityValidation;
   } {
     const validation = this.validateSourceQuality(citation);
-    
+
     if (validation.isValid) {
       this.addCitation(citation);
       return { success: true, validation };
     }
-    
+
     return { success: false, validation };
   }
 
@@ -1239,7 +1289,7 @@ export class CitationService {
     citations.forEach(citation => {
       const result = this.addValidatedCitation(citation);
       totalQualityScore += result.validation.qualityScore;
-      
+
       if (result.success) {
         successful.push(citation);
       } else {
@@ -1254,8 +1304,8 @@ export class CitationService {
         total: citations.length,
         successful: successful.length,
         failed: failed.length,
-        averageQualityScore: Math.round(totalQualityScore / citations.length)
-      }
+        averageQualityScore: Math.round(totalQualityScore / citations.length),
+      },
     };
   }
 
@@ -1276,29 +1326,41 @@ export class CitationService {
       averageQualityScore: number;
     };
   } {
-    const sourceTypeDistribution = this.citationDatabase.reduce((acc, citation) => {
-      acc[citation.source_type] = (acc[citation.source_type] || 0) + 1;
-      return acc;
-    }, {} as Record<CitationSourceType, number>);
+    const sourceTypeDistribution = this.citationDatabase.reduce(
+      (acc, citation) => {
+        acc[citation.source_type] = (acc[citation.source_type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<CitationSourceType, number>
+    );
 
-    const confidenceDistribution = this.citationDatabase.reduce((acc, citation) => {
-      acc[citation.confidence] = (acc[citation.confidence] || 0) + 1;
-      return acc;
-    }, {} as Record<CitationConfidence, number>);
+    const confidenceDistribution = this.citationDatabase.reduce(
+      (acc, citation) => {
+        acc[citation.confidence] = (acc[citation.confidence] || 0) + 1;
+        return acc;
+      },
+      {} as Record<CitationConfidence, number>
+    );
 
-    const organizationDistribution = this.citationDatabase.reduce((acc, citation) => {
-      if (citation.organization) {
-        acc[citation.organization] = (acc[citation.organization] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
+    const organizationDistribution = this.citationDatabase.reduce(
+      (acc, citation) => {
+        if (citation.organization) {
+          acc[citation.organization] = (acc[citation.organization] || 0) + 1;
+        }
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
-    const industryDistribution = this.citationDatabase.reduce((acc, citation) => {
-      citation.industry_focus?.forEach(industry => {
-        acc[industry] = (acc[industry] || 0) + 1;
-      });
-      return acc;
-    }, {} as Record<string, number>);
+    const industryDistribution = this.citationDatabase.reduce(
+      (acc, citation) => {
+        citation.industry_focus?.forEach(industry => {
+          acc[industry] = (acc[industry] || 0) + 1;
+        });
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     // Calculate average age in months
     const now = Date.now();
@@ -1309,9 +1371,13 @@ export class CitationService {
     const averageAge = Math.round(totalAge / this.citationDatabase.length);
 
     // Calculate quality metrics
-    const qualityScores = this.citationDatabase.map(citation => this.validateSourceQuality(citation).qualityScore);
-    const averageQualityScore = Math.round(qualityScores.reduce((sum, score) => sum + score, 0) / qualityScores.length);
-    
+    const qualityScores = this.citationDatabase.map(
+      citation => this.validateSourceQuality(citation).qualityScore
+    );
+    const averageQualityScore = Math.round(
+      qualityScores.reduce((sum, score) => sum + score, 0) / qualityScores.length
+    );
+
     const highQualitySources = qualityScores.filter(score => score >= 90).length;
     const mediumQualitySources = qualityScores.filter(score => score >= 75 && score < 90).length;
     const lowQualitySources = qualityScores.filter(score => score < 75).length;
@@ -1327,8 +1393,8 @@ export class CitationService {
         highQualitySources,
         mediumQualitySources,
         lowQualitySources,
-        averageQualityScore
-      }
+        averageQualityScore,
+      },
     };
   }
 

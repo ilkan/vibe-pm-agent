@@ -10,11 +10,7 @@ import {
   EvidenceStrength,
 } from '../../components/quality-assessment-system';
 
-import {
-  Citation,
-  CitationSourceType,
-  CitationConfidence,
-} from '../../models/citations';
+import { Citation, CitationSourceType, CitationConfidence } from '../../models/citations';
 
 describe('QualityAssessmentSystem', () => {
   let qualityAssessment: QualityAssessmentSystem;
@@ -102,10 +98,7 @@ describe('QualityAssessmentSystem', () => {
     ];
 
     // Mixed quality citations for most tests
-    mockCitations = [
-      ...highQualityCitations.slice(0, 2),
-      ...lowQualityCitations.slice(0, 1),
-    ];
+    mockCitations = [...highQualityCitations.slice(0, 2), ...lowQualityCitations.slice(0, 1)];
   });
 
   describe('assessCitationQuality', () => {
@@ -139,7 +132,7 @@ describe('QualityAssessmentSystem', () => {
       expect(result.overallScore).toBeLessThan(50);
       expect(result.complianceStatus).toBe('non-compliant');
       expect(result.qualityGaps.length).toBeGreaterThan(2);
-      
+
       const gapTypes = result.qualityGaps.map(gap => gap.gapType);
       expect(gapTypes).toContain(QualityGapType.INSUFFICIENT_SOURCES);
       expect(gapTypes).toContain(QualityGapType.LOW_CREDIBILITY);
@@ -162,7 +155,7 @@ describe('QualityAssessmentSystem', () => {
 
       expect(result.recommendations.length).toBeGreaterThanOrEqual(0);
       expect(result.recommendations.length).toBeGreaterThan(0);
-      
+
       const recommendation = result.recommendations[0];
       expect(recommendation.type).toBeDefined();
       expect(recommendation.priority).toBeDefined();
@@ -214,7 +207,9 @@ describe('QualityAssessmentSystem', () => {
 
       const methodologyGap = gaps.find(gap => gap.gapType === QualityGapType.METHODOLOGY_UNCLEAR);
       expect(methodologyGap).toBeDefined();
-      expect(methodologyGap!.recommendedActions).toContain('Find sources with clear methodology descriptions');
+      expect(methodologyGap!.recommendedActions).toContain(
+        'Find sources with clear methodology descriptions'
+      );
     });
 
     it('should identify diversity gaps', async () => {
@@ -228,7 +223,9 @@ describe('QualityAssessmentSystem', () => {
 
       const diversityGap = gaps.find(gap => gap.gapType === QualityGapType.LACK_DIVERSITY);
       expect(diversityGap).toBeDefined();
-      expect(diversityGap!.recommendedActions).toContain('Add sources from different organizations and perspectives');
+      expect(diversityGap!.recommendedActions).toContain(
+        'Add sources from different organizations and perspectives'
+      );
     });
 
     it('should identify broken links', async () => {
@@ -258,16 +255,18 @@ describe('QualityAssessmentSystem', () => {
 
   describe('recommendImprovements', () => {
     it('should recommend adding sources for insufficient citations', async () => {
-      const gaps: QualityGap[] = [{
-        gapType: QualityGapType.INSUFFICIENT_SOURCES,
-        severity: QualityGapSeverity.CRITICAL,
-        affectedClaims: ['All claims'],
-        affectedCitations: [],
-        description: 'Only 1 source provided',
-        impact: 'Insufficient evidence',
-        recommendedActions: ['Add more sources'],
-        priority: 9,
-      }];
+      const gaps: QualityGap[] = [
+        {
+          gapType: QualityGapType.INSUFFICIENT_SOURCES,
+          severity: QualityGapSeverity.CRITICAL,
+          affectedClaims: ['All claims'],
+          affectedCitations: [],
+          description: 'Only 1 source provided',
+          impact: 'Insufficient evidence',
+          recommendedActions: ['Add more sources'],
+          priority: 9,
+        },
+      ];
 
       const mockMetrics = {
         sourceCredibility: 50,
@@ -292,16 +291,18 @@ describe('QualityAssessmentSystem', () => {
     });
 
     it('should recommend replacing low-credibility sources', async () => {
-      const gaps: QualityGap[] = [{
-        gapType: QualityGapType.LOW_CREDIBILITY,
-        severity: QualityGapSeverity.HIGH,
-        affectedClaims: ['Key claims'],
-        affectedCitations: ['lq1'],
-        description: 'Low credibility sources',
-        impact: 'Reduces trustworthiness',
-        recommendedActions: ['Replace sources'],
-        priority: 8,
-      }];
+      const gaps: QualityGap[] = [
+        {
+          gapType: QualityGapType.LOW_CREDIBILITY,
+          severity: QualityGapSeverity.HIGH,
+          affectedClaims: ['Key claims'],
+          affectedCitations: ['lq1'],
+          description: 'Low credibility sources',
+          impact: 'Reduces trustworthiness',
+          recommendedActions: ['Replace sources'],
+          priority: 8,
+        },
+      ];
 
       const mockMetrics = {
         sourceCredibility: 40,
@@ -322,20 +323,24 @@ describe('QualityAssessmentSystem', () => {
       const replaceSourcesRec = recommendations.find(rec => rec.type === 'replace_sources');
       expect(replaceSourcesRec).toBeDefined();
       expect(replaceSourcesRec!.priority).toBe('high');
-      expect(replaceSourcesRec!.specificActions).toContain('Identify and remove sources with credibility scores below 60');
+      expect(replaceSourcesRec!.specificActions).toContain(
+        'Identify and remove sources with credibility scores below 60'
+      );
     });
 
     it('should recommend updating outdated sources', async () => {
-      const gaps: QualityGap[] = [{
-        gapType: QualityGapType.OUTDATED_SOURCES,
-        severity: QualityGapSeverity.MEDIUM,
-        affectedClaims: ['Historical claims'],
-        affectedCitations: ['lq2'],
-        description: 'Outdated sources',
-        impact: 'May not reflect current conditions',
-        recommendedActions: ['Update sources'],
-        priority: 6,
-      }];
+      const gaps: QualityGap[] = [
+        {
+          gapType: QualityGapType.OUTDATED_SOURCES,
+          severity: QualityGapSeverity.MEDIUM,
+          affectedClaims: ['Historical claims'],
+          affectedCitations: ['lq2'],
+          description: 'Outdated sources',
+          impact: 'May not reflect current conditions',
+          recommendedActions: ['Update sources'],
+          priority: 6,
+        },
+      ];
 
       const mockMetrics = {
         sourceCredibility: 70,

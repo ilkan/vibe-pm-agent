@@ -29,7 +29,7 @@ export abstract class BaseService {
   protected success<T>(data: T): Result<T> {
     return {
       success: true,
-      data
+      data,
     };
   }
 
@@ -39,7 +39,7 @@ export abstract class BaseService {
   protected error<T>(code: string, message: string): Result<T> {
     return {
       success: false,
-      error: new VError(code, message)
+      error: new VError(code, message),
     };
   }
 
@@ -50,7 +50,7 @@ export abstract class BaseService {
     const originalError = error instanceof Error ? error : new Error(String(error));
     return {
       success: false,
-      error: new VError(code, message, originalError)
+      error: new VError(code, message, originalError),
     };
   }
 

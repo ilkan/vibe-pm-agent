@@ -256,7 +256,7 @@ export class AuditTrailManager {
     }
   ): Promise<void> {
     const changes = this.detectChanges(previousState, newState);
-    
+
     const entry: AuditLogEntry = {
       id: this.generateId(),
       timestamp: new Date(),
@@ -336,7 +336,7 @@ export class AuditTrailManager {
     }
   ): Promise<void> {
     const severity = validationResult.isValid ? AuditSeverity.INFO : AuditSeverity.WARNING;
-    
+
     const entry: AuditLogEntry = {
       id: this.generateId(),
       timestamp: new Date(),
@@ -421,7 +421,7 @@ export class AuditTrailManager {
     }
   ): Promise<void> {
     const severity = qualityResult.overallScore >= 80 ? AuditSeverity.INFO : AuditSeverity.WARNING;
-    
+
     const entry: AuditLogEntry = {
       id: this.generateId(),
       timestamp: new Date(),
@@ -462,7 +462,7 @@ export class AuditTrailManager {
     }
   ): Promise<void> {
     const severity = complianceResult.isCompliant ? AuditSeverity.INFO : AuditSeverity.ERROR;
-    
+
     const entry: AuditLogEntry = {
       id: this.generateId(),
       timestamp: new Date(),
@@ -537,7 +537,9 @@ export class AuditTrailManager {
     }
 
     if (query.eventTypes && query.eventTypes.length > 0) {
-      filteredEntries = filteredEntries.filter(entry => query.eventTypes!.includes(entry.eventType));
+      filteredEntries = filteredEntries.filter(entry =>
+        query.eventTypes!.includes(entry.eventType)
+      );
     }
 
     if (query.severities && query.severities.length > 0) {
@@ -549,26 +551,30 @@ export class AuditTrailManager {
     }
 
     if (query.resourceIds && query.resourceIds.length > 0) {
-      filteredEntries = filteredEntries.filter(entry => query.resourceIds!.includes(entry.resourceId));
+      filteredEntries = filteredEntries.filter(entry =>
+        query.resourceIds!.includes(entry.resourceId)
+      );
     }
 
     if (query.resourceTypes && query.resourceTypes.length > 0) {
-      filteredEntries = filteredEntries.filter(entry => query.resourceTypes!.includes(entry.resourceType));
+      filteredEntries = filteredEntries.filter(entry =>
+        query.resourceTypes!.includes(entry.resourceType)
+      );
     }
 
     if (query.documentIds && query.documentIds.length > 0) {
-      filteredEntries = filteredEntries.filter(entry => 
-        entry.documentId && query.documentIds!.includes(entry.documentId)
+      filteredEntries = filteredEntries.filter(
+        entry => entry.documentId && query.documentIds!.includes(entry.documentId)
       );
     }
 
     // Sort results
     const sortBy = query.sortBy || 'timestamp';
     const sortOrder = query.sortOrder || 'desc';
-    
+
     filteredEntries.sort((a, b) => {
       let aValue: any, bValue: any;
-      
+
       switch (sortBy) {
         case 'timestamp':
           aValue = a.timestamp.getTime();
@@ -597,7 +603,7 @@ export class AuditTrailManager {
     // Apply pagination
     const offset = query.offset || 0;
     const limit = query.limit || 100;
-    
+
     return filteredEntries.slice(offset, offset + limit);
   }
 
@@ -606,7 +612,7 @@ export class AuditTrailManager {
    */
   async generateSummary(query?: AuditTrailQuery): Promise<AuditTrailSummary> {
     const entries = await this.queryAuditTrail(query || {});
-    
+
     if (entries.length === 0) {
       return {
         totalEvents: 0,
@@ -625,7 +631,10 @@ export class AuditTrailManager {
     }
 
     // Calculate distributions
-    const eventTypeDistribution: Record<AuditEventType, number> = {} as Record<AuditEventType, number>;
+    const eventTypeDistribution: Record<AuditEventType, number> = {} as Record<
+      AuditEventType,
+      number
+    >;
     const severityDistribution: Record<AuditSeverity, number> = {} as Record<AuditSeverity, number>;
     const userCounts: Map<string, number> = new Map();
     const resourceCounts: Map<string, { type: string; count: number }> = new Map();
@@ -633,13 +642,13 @@ export class AuditTrailManager {
     entries.forEach(entry => {
       // Event type distribution
       eventTypeDistribution[entry.eventType] = (eventTypeDistribution[entry.eventType] || 0) + 1;
-      
+
       // Severity distribution
       severityDistribution[entry.severity] = (severityDistribution[entry.severity] || 0) + 1;
-      
+
       // User counts
       userCounts.set(entry.user.userId, (userCounts.get(entry.user.userId) || 0) + 1);
-      
+
       // Resource counts
       const key = `${entry.resourceId}:${entry.resourceType}`;
       const existing = resourceCounts.get(key);
@@ -667,18 +676,21 @@ export class AuditTrailManager {
       .slice(0, 10);
 
     // Calculate compliance status
-    const complianceEntries = entries.filter(e => e.eventType === AuditEventType.COMPLIANCE_CHECKED);
+    const complianceEntries = entries.filter(
+      e => e.eventType === AuditEventType.COMPLIANCE_CHECKED
+    );
     const violationsCount = complianceEntries.reduce((sum, entry) => {
       const result = entry.newState as ComplianceCheckResult;
       return sum + (result?.violations?.length || 0);
     }, 0);
 
-    const avgComplianceScore = complianceEntries.length > 0 
-      ? complianceEntries.reduce((sum, entry) => {
-          const result = entry.newState as ComplianceCheckResult;
-          return sum + (result?.overallScore || 0);
-        }, 0) / complianceEntries.length
-      : 0;
+    const avgComplianceScore =
+      complianceEntries.length > 0
+        ? complianceEntries.reduce((sum, entry) => {
+            const result = entry.newState as ComplianceCheckResult;
+            return sum + (result?.overallScore || 0);
+          }, 0) / complianceEntries.length
+        : 0;
 
     return {
       totalEvents: entries.length,
@@ -744,11 +756,7 @@ export class AuditTrailManager {
 
     // Check each requirement
     for (const requirement of standard.requirements) {
-      const reqResult = await this.checkComplianceRequirement(
-        requirement,
-        auditEntries,
-        standard
-      );
+      const reqResult = await this.checkComplianceRequirement(requirement, auditEntries, standard);
       requirementResults.push(reqResult);
 
       if (!reqResult.isCompliant) {
@@ -820,10 +828,8 @@ export class AuditTrailManager {
 
     // Check evidence requirements
     for (const evidenceType of requirement.evidenceRequired) {
-      const hasEvidence = auditEntries.some(entry => 
-        this.matchesEvidenceType(entry, evidenceType)
-      );
-      
+      const hasEvidence = auditEntries.some(entry => this.matchesEvidenceType(entry, evidenceType));
+
       if (hasEvidence) {
         evidence.push({
           id: this.generateId(),
@@ -853,13 +859,10 @@ export class AuditTrailManager {
   /**
    * Generate comprehensive audit report
    */
-  async generateAuditReport(
-    config: AuditReportConfig,
-    user: AuditUser
-  ): Promise<AuditReport> {
+  async generateAuditReport(config: AuditReportConfig, user: AuditUser): Promise<AuditReport> {
     const entries = await this.queryAuditTrail(config.filters || {});
     const summary = await this.generateSummary(config.filters);
-    
+
     let complianceResults: ComplianceCheckResult[] | undefined;
     if (config.complianceStandards && config.complianceStandards.length > 0) {
       complianceResults = await this.validateCompliance(config.complianceStandards);
@@ -901,7 +904,7 @@ export class AuditTrailManager {
 
   private detectChanges(oldState: any, newState: any): string[] {
     const changes: string[] = [];
-    
+
     if (!oldState || !newState) {
       return changes;
     }
@@ -924,12 +927,15 @@ export class AuditTrailManager {
     return createHash('sha256').update(jsonString).digest('hex');
   }
 
-  private validateRule(rule: ValidationRule, auditEntries: AuditLogEntry[]): { isValid: boolean; errorMessage: string } {
+  private validateRule(
+    rule: ValidationRule,
+    auditEntries: AuditLogEntry[]
+  ): { isValid: boolean; errorMessage: string } {
     // This is a simplified validation - in a real implementation,
     // you would have more sophisticated rule evaluation
     const hasValidEntries = auditEntries.some(entry => {
       const fieldValue = this.getNestedValue(entry, rule.field);
-      
+
       switch (rule.operator) {
         case 'exists':
           return fieldValue !== undefined && fieldValue !== null;

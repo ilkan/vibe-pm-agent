@@ -1,6 +1,6 @@
 /**
  * Performance optimization utilities for AI Agent Pipeline
- * 
+ *
  * This module provides caching, parallel processing, and performance monitoring
  * capabilities for the AI agent pipeline with proper resource management.
  */
@@ -61,7 +61,7 @@ export class PipelineCache implements Destroyable {
    */
   constructor(config: Partial<CacheConfig> = {}) {
     const isTestEnvironment = process.env.NODE_ENV === 'test' || typeof jest !== 'undefined';
-    
+
     this.config = {
       maxSize: config.maxSize || 1000,
       defaultTTL: config.defaultTTL || 300000, // 5 minutes
@@ -188,18 +188,18 @@ export class PipelineCache implements Destroyable {
     if (this.isDestroyed) {
       return;
     }
-    
+
     this.isDestroyed = true;
-    
+
     // Unregister from resource manager
     ResourceManager.getInstance().unregisterComponent(this);
-    
+
     if (this.cleanupTimer) {
       ResourceManager.getInstance().unregisterInterval(this.cleanupTimer);
       clearInterval(this.cleanupTimer);
       this.cleanupTimer = undefined;
     }
-    
+
     this.cache.clear();
   }
 
@@ -230,7 +230,7 @@ export class PipelineCache implements Destroyable {
     if (this.isDestroyed || this.config.testMode) {
       return;
     }
-    
+
     this.cleanupTimer = ResourceManager.getInstance().registerInterval(
       setInterval(() => {
         if (!this.isDestroyed) {
@@ -340,7 +340,7 @@ export class ParallelProcessor {
 
 /**
  * Performance monitoring and metrics collection
- * 
+ *
  * Tracks execution times, cache performance, memory usage, and error rates
  * to provide insights into system performance and optimization opportunities.
  */
@@ -503,7 +503,7 @@ export class PerformanceMonitor {
 
 /**
  * Cache key generation utilities
- * 
+ *
  * Provides standardized cache key generation for different types of operations
  * to ensure consistent caching behavior across the application.
  */
@@ -577,7 +577,7 @@ export class CacheKeyGenerator {
    */
   private static hashString(str: string): string {
     let hash = 0;
-    
+
     // Use djb2 hash algorithm variant for good distribution and speed
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
@@ -588,7 +588,7 @@ export class CacheKeyGenerator {
       // This prevents overflow issues in JavaScript's number system
       hash = hash & hash;
     }
-    
+
     // Convert to positive number and encode in base36 for compact representation
     return Math.abs(hash).toString(36);
   }

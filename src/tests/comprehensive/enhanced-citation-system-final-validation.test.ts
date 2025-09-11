@@ -1,6 +1,6 @@
 /**
  * Enhanced Citation System - Final Validation Test Suite
- * 
+ *
  * This comprehensive test suite validates all requirements and features
  * of the Enhanced Citation System for task 14 completion.
  */
@@ -44,7 +44,7 @@ describe('Enhanced Citation System - Final Validation', () => {
       secureDocument: new SecureDocumentHandler(),
       dataAnonymization: new DataAnonymizationService(),
       accessControl: new AccessControlManager(),
-      credentialManager: new SecureCredentialManager()
+      credentialManager: new SecureCredentialManager(),
     };
   });
 
@@ -57,7 +57,7 @@ describe('Enhanced Citation System - Final Validation', () => {
   describe('System Health and Integration', () => {
     test('should have all core components initialized and functional', async () => {
       // Test AI Citation Discovery
-      const testContent = "The global SaaS market is expected to reach $623 billion by 2023.";
+      const testContent = 'The global SaaS market is expected to reach $623 billion by 2023.';
       const requirements = await testComponents.aiDiscovery.analyzeCitationNeeds(testContent);
       expect(requirements).toBeInstanceOf(Array);
       expect(requirements.length).toBeGreaterThan(0);
@@ -70,14 +70,16 @@ describe('Enhanced Citation System - Final Validation', () => {
 
       // Test Quality Assessment
       const mockCitation = createMockCitation();
-      const qualityReport = await testComponents.qualityAssessment.assessCitationQuality([mockCitation]);
+      const qualityReport = await testComponents.qualityAssessment.assessCitationQuality([
+        mockCitation,
+      ]);
       expect(qualityReport).toHaveProperty('overallScore');
       expect(qualityReport.overallScore).toBeGreaterThanOrEqual(0);
       expect(qualityReport.overallScore).toBeLessThanOrEqual(100);
 
       // Test Confidence Scoring
       const confidence = await testComponents.confidenceScoring.calculateClaimConfidence(
-        "Test claim", 
+        'Test claim',
         [mockCitation]
       );
       expect(confidence).toHaveProperty('overall');
@@ -104,22 +106,22 @@ describe('Enhanced Citation System - Final Validation', () => {
 
       // Step 3: Validate sources (using mock data for testing)
       const mockSources = [createMockCitation(), createMockCitation('B')];
-      const qualityReport = await testComponents.qualityAssessment.assessCitationQuality(mockSources);
+      const qualityReport =
+        await testComponents.qualityAssessment.assessCitationQuality(mockSources);
       expect(qualityReport.overallScore).toBeGreaterThan(0);
 
       // Step 4: Calculate confidence
-      const documentConfidence = await testComponents.confidenceScoring.aggregateDocumentConfidence([]);
+      const documentConfidence = await testComponents.confidenceScoring.aggregateDocumentConfidence(
+        []
+      );
       expect(documentConfidence).toHaveProperty('overallConfidence');
     });
   });
 
   describe('Requirements Validation', () => {
     test('Requirement 1: Comprehensive citations with credibility and confidence', async () => {
-      const testClaim = "The SaaS market will grow by 25% next year";
-      const mockSources = [
-        createMockCitation('A'),
-        createMockCitation('B')
-      ];
+      const testClaim = 'The SaaS market will grow by 25% next year';
+      const mockSources = [createMockCitation('A'), createMockCitation('B')];
 
       // Test comprehensive citations
       mockSources.forEach(source => {
@@ -129,7 +131,10 @@ describe('Enhanced Citation System - Final Validation', () => {
       });
 
       // Test confidence scoring
-      const confidence = await testComponents.confidenceScoring.calculateClaimConfidence(testClaim, mockSources);
+      const confidence = await testComponents.confidenceScoring.calculateClaimConfidence(
+        testClaim,
+        mockSources
+      );
       expect(confidence.overall).toBeGreaterThanOrEqual(0);
       expect(confidence.overall).toBeLessThanOrEqual(100);
       expect(confidence.breakdown).toHaveProperty('sourceQuality');
@@ -140,9 +145,10 @@ describe('Enhanced Citation System - Final Validation', () => {
 
     test('Requirement 2: Enhanced citation quality with source validation', async () => {
       const testUrl = 'https://example.com/test-source';
-      
+
       // Test source accessibility validation
-      const accessibility = await testComponents.sourceValidation.validateSourceAccessibility(testUrl);
+      const accessibility =
+        await testComponents.sourceValidation.validateSourceAccessibility(testUrl);
       expect(accessibility).toHaveProperty('isAccessible');
       expect(accessibility).toHaveProperty('accessType');
       expect(accessibility).toHaveProperty('lastChecked');
@@ -150,8 +156,9 @@ describe('Enhanced Citation System - Final Validation', () => {
 
       // Test quality scoring
       const mockCitations = [createMockCitation('A'), createMockCitation('C')];
-      const qualityReport = await testComponents.qualityAssessment.assessCitationQuality(mockCitations);
-      
+      const qualityReport =
+        await testComponents.qualityAssessment.assessCitationQuality(mockCitations);
+
       expect(qualityReport.overallScore).toBeGreaterThanOrEqual(0);
       expect(qualityReport.overallScore).toBeLessThanOrEqual(100);
       expect(qualityReport.metrics).toHaveProperty('sourceCredibility');
@@ -159,7 +166,8 @@ describe('Enhanced Citation System - Final Validation', () => {
       expect(qualityReport.metrics).toHaveProperty('recencyScore');
 
       // Test improvement recommendations
-      const recommendations = await testComponents.qualityAssessment.recommendImprovements(qualityReport);
+      const recommendations =
+        await testComponents.qualityAssessment.recommendImprovements(qualityReport);
       expect(recommendations).toBeInstanceOf(Array);
     });
 
@@ -170,7 +178,7 @@ describe('Enhanced Citation System - Final Validation', () => {
         source_diversity_requirement: 75,
         recency_requirement_months: 12,
         industry_focus: 'SaaS',
-        geographic_scope: 'Global'
+        geographic_scope: 'Global',
       };
 
       expect(enhancementOptions.minimum_confidence).toBeGreaterThanOrEqual(0);
@@ -193,7 +201,7 @@ describe('Enhanced Citation System - Final Validation', () => {
       // Test audit trail logging
       await testComponents.auditTrail.logCitationUsage(testDocumentId, testCitation, testUserId);
       const auditTrail = await testComponents.auditTrail.getAuditTrail(testDocumentId);
-      
+
       expect(auditTrail).toBeDefined();
       expect(auditTrail.documentId).toBe(testDocumentId);
       expect(auditTrail.entries).toBeInstanceOf(Array);
@@ -204,12 +212,12 @@ describe('Enhanced Citation System - Final Validation', () => {
         accessType: 'free' as const,
         lastChecked: new Date(),
         alternativeAccess: [],
-        cacheAvailable: false
+        cacheAvailable: false,
       };
 
       const auditEntry = await testComponents.auditTrail.logValidationResult(
-        testCitation.url, 
-        validationResult, 
+        testCitation.url,
+        validationResult,
         'test_validation'
       );
       expect(auditEntry.timestamp).toBeInstanceOf(Date);
@@ -224,7 +232,8 @@ describe('Enhanced Citation System - Final Validation', () => {
       `;
 
       // Test unsupported claims identification
-      const unsupportedClaims = await testComponents.aiDiscovery.identifyUnsupportedClaims(testContent);
+      const unsupportedClaims =
+        await testComponents.aiDiscovery.identifyUnsupportedClaims(testContent);
       expect(unsupportedClaims).toBeInstanceOf(Array);
 
       // Test source discovery
@@ -234,10 +243,12 @@ describe('Enhanced Citation System - Final Validation', () => {
         evidenceStrength: 'moderate' as const,
         requiredSourceTypes: [CitationSourceType.INDUSTRY_REPORT],
         confidenceThreshold: 75,
-        industryRelevance: ['SaaS', 'Software']
+        industryRelevance: ['SaaS', 'Software'],
       };
 
-      const sourceCandidates = await testComponents.aiDiscovery.discoverRelevantSources([testRequirement]);
+      const sourceCandidates = await testComponents.aiDiscovery.discoverRelevantSources([
+        testRequirement,
+      ]);
       expect(sourceCandidates).toBeInstanceOf(Array);
 
       // Test alternative source recommendations
@@ -255,13 +266,14 @@ describe('Enhanced Citation System - Final Validation', () => {
         Internal project code: PROJECT-ALPHA-2024
       `;
 
-      const anonymizedContent = await testComponents.dataAnonymization.anonymizeContent(sensitiveContent);
-      
+      const anonymizedContent =
+        await testComponents.dataAnonymization.anonymizeContent(sensitiveContent);
+
       // Verify PII is removed
       expect(anonymizedContent).not.toContain('$50M');
       expect(anonymizedContent).not.toContain('john.smith@email.com');
       expect(anonymizedContent).not.toContain('PROJECT-ALPHA-2024');
-      
+
       // Verify placeholders are used
       expect(anonymizedContent).toContain('[REVENUE_AMOUNT]');
       expect(anonymizedContent).toContain('[EMAIL_ADDRESS]');
@@ -273,9 +285,17 @@ describe('Enhanced Citation System - Final Validation', () => {
       const adminUser = 'admin-user';
       const testDocumentId = 'secure-doc-test';
 
-      const userAccess = await testComponents.accessControl.checkAccess(testUser, 'audit_trail', testDocumentId);
-      const adminAccess = await testComponents.accessControl.checkAccess(adminUser, 'audit_trail', testDocumentId);
-      
+      const userAccess = await testComponents.accessControl.checkAccess(
+        testUser,
+        'audit_trail',
+        testDocumentId
+      );
+      const adminAccess = await testComponents.accessControl.checkAccess(
+        adminUser,
+        'audit_trail',
+        testDocumentId
+      );
+
       expect(userAccess).toBeDefined();
       expect(adminAccess).toBeDefined();
       expect(adminAccess.level).toBeGreaterThanOrEqual(userAccess.level);
@@ -285,12 +305,13 @@ describe('Enhanced Citation System - Final Validation', () => {
       const testCredentials = {
         apiKey: 'test-api-key-12345',
         endpoint: 'https://api.example.com',
-        service: 'market-data-provider'
+        service: 'market-data-provider',
       };
 
       await testComponents.credentialManager.storeCredentials('market-data-test', testCredentials);
-      const retrievedCredentials = await testComponents.credentialManager.getCredentials('market-data-test');
-      
+      const retrievedCredentials =
+        await testComponents.credentialManager.getCredentials('market-data-test');
+
       expect(retrievedCredentials).toBeDefined();
       expect(retrievedCredentials.service).toBe(testCredentials.service);
       expect(retrievedCredentials.endpoint).toBe(testCredentials.endpoint);
@@ -303,10 +324,11 @@ describe('Enhanced Citation System - Final Validation', () => {
     test('should process citation enhancement within acceptable time limits', async () => {
       const largeDocument = 'Large document content '.repeat(500); // ~12KB document
       const startTime = Date.now();
-      
-      const citationRequirements = await testComponents.aiDiscovery.analyzeCitationNeeds(largeDocument);
+
+      const citationRequirements =
+        await testComponents.aiDiscovery.analyzeCitationNeeds(largeDocument);
       const processingTime = Date.now() - startTime;
-      
+
       // Should complete within reasonable time for test environment
       expect(processingTime).toBeLessThan(10000); // 10 seconds for test
       expect(citationRequirements).toBeInstanceOf(Array);
@@ -316,20 +338,20 @@ describe('Enhanced Citation System - Final Validation', () => {
       const testUrls = [
         'https://example.com/test-1',
         'https://example.com/test-2',
-        'https://example.com/test-3'
+        'https://example.com/test-3',
       ];
 
       const startTime = Date.now();
-      const validationPromises = testUrls.map(url => 
+      const validationPromises = testUrls.map(url =>
         testComponents.sourceValidation.validateSourceAccessibility(url)
       );
-      
+
       const results = await Promise.all(validationPromises);
       const processingTime = Date.now() - startTime;
-      
+
       expect(results).toHaveLength(testUrls.length);
       expect(processingTime).toBeLessThan(5000); // 5 seconds for concurrent operations
-      
+
       results.forEach(result => {
         expect(result.isAccessible).toBeDefined();
         expect(result.lastChecked).toBeInstanceOf(Date);
@@ -339,13 +361,11 @@ describe('Enhanced Citation System - Final Validation', () => {
 
   describe('Success Criteria Validation', () => {
     test('should achieve target citation quality scores', async () => {
-      const highQualityCitations = [
-        createMockCitation('A'),
-        createMockCitation('A')
-      ];
+      const highQualityCitations = [createMockCitation('A'), createMockCitation('A')];
 
-      const qualityReport = await testComponents.qualityAssessment.assessCitationQuality(highQualityCitations);
-      
+      const qualityReport =
+        await testComponents.qualityAssessment.assessCitationQuality(highQualityCitations);
+
       // Target: Average citation quality score of 85+ (0-100 scale)
       expect(qualityReport.overallScore).toBeGreaterThanOrEqual(70); // Adjusted for test environment
     });
@@ -354,7 +374,7 @@ describe('Enhanced Citation System - Final Validation', () => {
       const testSources = [
         'https://www.google.com',
         'https://www.github.com',
-        'https://invalid-url-that-should-fail.nonexistent'
+        'https://invalid-url-that-should-fail.nonexistent',
       ];
 
       let correctValidations = 0;
@@ -370,7 +390,7 @@ describe('Enhanced Citation System - Final Validation', () => {
       }
 
       const accuracy = (correctValidations / totalValidations) * 100;
-      
+
       // Target: High accuracy in source accessibility assessment
       expect(accuracy).toBeGreaterThanOrEqual(66); // At least 2/3 correct for test
     });
@@ -382,11 +402,12 @@ describe('Enhanced Citation System - Final Validation', () => {
         Enterprise AI adoption has accelerated, with 75% of companies implementing AI solutions.
       `;
 
-      const citationRequirements = await testComponents.aiDiscovery.analyzeCitationNeeds(testDocument);
-      
+      const citationRequirements =
+        await testComponents.aiDiscovery.analyzeCitationNeeds(testDocument);
+
       // Should identify citation needs for quantitative claims
       expect(citationRequirements.length).toBeGreaterThan(0);
-      
+
       // Should identify different types of claims
       const claimTypes = citationRequirements.map(req => req.claimType);
       expect(claimTypes).toContain('quantitative');
@@ -395,11 +416,7 @@ describe('Enhanced Citation System - Final Validation', () => {
 
   describe('Error Handling and Edge Cases', () => {
     test('should handle invalid URLs gracefully', async () => {
-      const invalidUrls = [
-        'not-a-url',
-        'http://',
-        'https://nonexistent-domain-12345.com'
-      ];
+      const invalidUrls = ['not-a-url', 'http://', 'https://nonexistent-domain-12345.com'];
 
       for (const url of invalidUrls) {
         const validation = await testComponents.sourceValidation.validateSourceAccessibility(url);
@@ -417,7 +434,8 @@ describe('Enhanced Citation System - Final Validation', () => {
       expect(emptyRequirements).toBeInstanceOf(Array);
 
       // Should handle minimal content
-      const minimalRequirements = await testComponents.aiDiscovery.analyzeCitationNeeds(minimalContent);
+      const minimalRequirements =
+        await testComponents.aiDiscovery.analyzeCitationNeeds(minimalContent);
       expect(minimalRequirements).toBeInstanceOf(Array);
     });
 
@@ -431,17 +449,22 @@ describe('Enhanced Citation System - Final Validation', () => {
         credibility_rating: 'A' as const,
         source_type: CitationSourceType.INDUSTRY_REPORT,
         author: '',
-        summary: ''
+        summary: '',
       };
 
       // Should not crash when processing invalid data
-      const qualityReport = await testComponents.qualityAssessment.assessCitationQuality([invalidCitation]);
+      const qualityReport = await testComponents.qualityAssessment.assessCitationQuality([
+        invalidCitation,
+      ]);
       expect(qualityReport).toHaveProperty('overallScore');
     });
   });
 
   // Helper function to create mock citations for testing
-  function createMockCitation(credibilityRating: 'A' | 'B' | 'C' = 'A', publishedDate?: Date): Citation {
+  function createMockCitation(
+    credibilityRating: 'A' | 'B' | 'C' = 'A',
+    publishedDate?: Date
+  ): Citation {
     return {
       id: `test-citation-${Math.random().toString(36).substr(2, 9)}`,
       title: 'Test Citation Title',
@@ -450,7 +473,7 @@ describe('Enhanced Citation System - Final Validation', () => {
       credibility_rating: credibilityRating,
       source_type: CitationSourceType.INDUSTRY_REPORT,
       author: 'Test Author',
-      summary: 'Test citation summary for validation testing'
+      summary: 'Test citation summary for validation testing',
     };
   }
 });

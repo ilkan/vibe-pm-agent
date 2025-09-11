@@ -114,9 +114,12 @@ export class CitationIntegration {
     );
 
     // Validate and enhance citations with quality assessment
-    const validationResults = await this.sourceValidationEngine.validateCitations(selectedBaseCitations);
+    const validationResults =
+      await this.sourceValidationEngine.validateCitations(selectedBaseCitations);
     const enhancedCitations = await Promise.all(
-      selectedBaseCitations.map(citation => this.sourceValidationEngine.createEnhancedCitation(citation))
+      selectedBaseCitations.map(citation =>
+        this.sourceValidationEngine.createEnhancedCitation(citation)
+      )
     );
 
     // Filter out citations that fail validation if required
@@ -125,7 +128,9 @@ export class CitationIntegration {
         return citation.validationStatus.credibilityAssessment.confidenceLevel === 'high';
       }
       if (citationOptions.minimum_confidence === 'medium') {
-        return ['high', 'medium'].includes(citation.validationStatus.credibilityAssessment.confidenceLevel);
+        return ['high', 'medium'].includes(
+          citation.validationStatus.credibilityAssessment.confidenceLevel
+        );
       }
       return true; // Include all for 'low' confidence requirement
     });
@@ -145,14 +150,16 @@ export class CitationIntegration {
     const metrics = this.citationService.calculateCitationMetrics(validatedCitations);
 
     // Perform quality assessment
-    const qualityReport = await this.qualityAssessmentSystem.assessCitationQuality(validatedCitations);
+    const qualityReport =
+      await this.qualityAssessmentSystem.assessCitationQuality(validatedCitations);
 
     // Calculate confidence scores for the document
     const claims = this.extractClaimsFromContent(content, documentType);
-    const claimConfidences = claims.map(claim => 
+    const claimConfidences = claims.map(claim =>
       this.confidenceScoringEngine.calculateClaimConfidence(claim, validatedCitations)
     );
-    const confidenceScores = this.confidenceScoringEngine.aggregateDocumentConfidence(claimConfidences);
+    const confidenceScores =
+      this.confidenceScoringEngine.aggregateDocumentConfidence(claimConfidences);
 
     // Enhance content with inline citations and confidence indicators
     const enhancedContent = this.enhanceContentWithCitations(
@@ -338,28 +345,28 @@ export class CitationIntegration {
    */
   private extractClaimsFromContent(content: string, documentType: string): string[] {
     const claims: string[] = [];
-    
+
     // Split content into sentences and identify claim-like statements
     const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
-    
+
     // Look for quantitative claims (containing numbers or percentages)
-    const quantitativeClaims = sentences.filter(sentence => 
+    const quantitativeClaims = sentences.filter(sentence =>
       /\d+%|\d+\.\d+%|\$\d+|\d+x|increase|decrease|growth|reduction/i.test(sentence)
     );
     claims.push(...quantitativeClaims.slice(0, 5)); // Limit to top 5
-    
+
     // Look for comparative claims
     const comparativeClaims = sentences.filter(sentence =>
       /better|worse|faster|slower|more|less|higher|lower|superior|inferior/i.test(sentence)
     );
     claims.push(...comparativeClaims.slice(0, 3)); // Limit to top 3
-    
+
     // Look for definitive statements
     const definitiveClaims = sentences.filter(sentence =>
       /will|must|should|proven|demonstrated|shows|indicates|reveals/i.test(sentence)
     );
     claims.push(...definitiveClaims.slice(0, 3)); // Limit to top 3
-    
+
     return [...new Set(claims)]; // Remove duplicates
   }
 
@@ -434,7 +441,7 @@ export class CitationIntegration {
   }> {
     // Use the enhanced quality assessment system
     const qualityReport = await this.qualityAssessmentSystem.assessCitationQuality(citations);
-    
+
     const issues = qualityReport.qualityGaps.map(gap => gap.description);
     const recommendations = qualityReport.recommendations.map(rec => rec.description);
 
@@ -454,7 +461,7 @@ export class CitationIntegration {
     const confidence = confidenceScores.overallConfidence;
     let confidenceLevel = 'Low';
     let confidenceColor = '🔴';
-    
+
     if (confidence >= 80) {
       confidenceLevel = 'High';
       confidenceColor = '🟢';
@@ -465,7 +472,7 @@ export class CitationIntegration {
 
     let section = `## Evidence Confidence Assessment\n\n`;
     section += `${confidenceColor} **Overall Confidence: ${confidenceLevel} (${confidence}%)**\n\n`;
-    
+
     if (confidenceScores.weakestClaims && confidenceScores.weakestClaims.length > 0) {
       section += `**Areas for Improvement:**\n`;
       confidenceScores.weakestClaims.slice(0, 2).forEach((claim: any) => {
@@ -483,7 +490,7 @@ export class CitationIntegration {
     }
 
     section += `*Confidence scores are based on source quality, evidence strength, methodology transparency, and data recency.*\n`;
-    
+
     return section;
   }
 
@@ -492,7 +499,7 @@ export class CitationIntegration {
    */
   getEnhancedCitationRequirements(documentType: string) {
     const baseRequirements = this.citationService.getCitationRequirements(documentType);
-    
+
     return {
       ...baseRequirements,
       validation: {
@@ -562,9 +569,10 @@ export class CitationIntegration {
     }
 
     // Calculate processing statistics
-    const validationsPassed = validationResults.filter(result => 
-      result.accessibilityStatus.isAccessible && 
-      result.credibilityAssessment.confidenceLevel !== 'low'
+    const validationsPassed = validationResults.filter(
+      result =>
+        result.accessibilityStatus.isAccessible &&
+        result.credibilityAssessment.confidenceLevel !== 'low'
     ).length;
 
     const averageQualityScore = qualityReport ? qualityReport.overallScore : 0;

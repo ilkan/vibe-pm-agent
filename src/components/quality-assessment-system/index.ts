@@ -50,7 +50,12 @@ export interface QualityGap {
  * Quality improvement recommendation
  */
 export interface QualityRecommendation {
-  type: 'add_sources' | 'replace_sources' | 'update_sources' | 'improve_methodology' | 'diversify_sources';
+  type:
+    | 'add_sources'
+    | 'replace_sources'
+    | 'update_sources'
+    | 'improve_methodology'
+    | 'diversify_sources';
   priority: 'low' | 'medium' | 'high' | 'critical';
   description: string;
   specificActions: string[];
@@ -282,7 +287,8 @@ export class QualityAssessmentSystem {
     const currentDate = new Date();
     const outdatedSources = citations.filter(c => {
       const publicationDate = new Date(c.published_at);
-      const monthsOld = (currentDate.getTime() - publicationDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+      const monthsOld =
+        (currentDate.getTime() - publicationDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
       return monthsOld > 36; // Older than 3 years
     });
 
@@ -304,9 +310,14 @@ export class QualityAssessmentSystem {
     }
 
     // Check for methodology transparency
-    const sourcesWithoutMethodology = citations.filter(c => 
-      !c.methodology && 
-      [CitationSourceType.RESEARCH_PUBLICATION, CitationSourceType.SURVEY_DATA, CitationSourceType.BENCHMARK_STUDY].includes(c.source_type)
+    const sourcesWithoutMethodology = citations.filter(
+      c =>
+        !c.methodology &&
+        [
+          CitationSourceType.RESEARCH_PUBLICATION,
+          CitationSourceType.SURVEY_DATA,
+          CitationSourceType.BENCHMARK_STUDY,
+        ].includes(c.source_type)
     );
 
     if (sourcesWithoutMethodology.length > 0) {
@@ -346,8 +357,8 @@ export class QualityAssessmentSystem {
     }
 
     // Check for broken links (simulated)
-    const potentiallyBrokenSources = citations.filter(c => 
-      !c.url || c.url.includes('broken') || c.url.includes('404')
+    const potentiallyBrokenSources = citations.filter(
+      c => !c.url || c.url.includes('broken') || c.url.includes('404')
     );
 
     if (potentiallyBrokenSources.length > 0) {
@@ -518,9 +529,10 @@ export class QualityAssessmentSystem {
    */
   calculateEvidenceStrength(citations: Citation[], claim: string): EvidenceStrength {
     // Filter citations relevant to the claim (simplified - in real implementation, use NLP)
-    const relevantCitations = citations.filter(c => 
-      c.key_finding.toLowerCase().includes(claim.toLowerCase()) ||
-      claim.toLowerCase().includes(c.key_finding.toLowerCase())
+    const relevantCitations = citations.filter(
+      c =>
+        c.key_finding.toLowerCase().includes(claim.toLowerCase()) ||
+        claim.toLowerCase().includes(c.key_finding.toLowerCase())
     );
 
     const sourceQuality = this.calculateSourceCredibility(relevantCitations);
@@ -540,14 +552,13 @@ export class QualityAssessmentSystem {
     };
 
     // Calculate overall strength
-    const overallScore = (
+    const overallScore =
       sourceQuality * 0.25 +
       sourceQuantity * 0.15 +
       sourceDiversity * 0.15 +
       methodologyRigor * 0.2 +
       sampleSizeAdequacy * 0.15 +
-      peerReviewStatus * 0.1
-    );
+      peerReviewStatus * 0.1;
 
     let overall: EvidenceStrength['overall'];
     if (overallScore >= 85) overall = 'very_strong';
@@ -578,24 +589,28 @@ export class QualityAssessmentSystem {
         accessibilityScore: 0,
         complianceScore: 0,
       },
-      qualityGaps: [{
-        gapType: QualityGapType.INSUFFICIENT_SOURCES,
-        severity: QualityGapSeverity.CRITICAL,
-        affectedClaims: ['All claims'],
-        affectedCitations: [],
-        description: 'No sources provided',
-        impact: 'Cannot validate any claims',
-        recommendedActions: ['Add credible sources to support analysis'],
-        priority: 10,
-      }],
-      recommendations: [{
-        type: 'add_sources',
-        priority: 'critical',
-        description: 'Add sources to enable quality assessment',
-        specificActions: ['Research and add relevant, credible sources'],
-        expectedImpact: 'Enable evidence-based analysis',
-        estimatedEffort: 'significant',
-      }],
+      qualityGaps: [
+        {
+          gapType: QualityGapType.INSUFFICIENT_SOURCES,
+          severity: QualityGapSeverity.CRITICAL,
+          affectedClaims: ['All claims'],
+          affectedCitations: [],
+          description: 'No sources provided',
+          impact: 'Cannot validate any claims',
+          recommendedActions: ['Add credible sources to support analysis'],
+          priority: 10,
+        },
+      ],
+      recommendations: [
+        {
+          type: 'add_sources',
+          priority: 'critical',
+          description: 'Add sources to enable quality assessment',
+          specificActions: ['Research and add relevant, credible sources'],
+          expectedImpact: 'Enable evidence-based analysis',
+          estimatedEffort: 'significant',
+        },
+      ],
       complianceStatus: 'non-compliant',
       assessmentDate: new Date(),
       citationCount: 0,
@@ -610,39 +625,41 @@ export class QualityAssessmentSystem {
     const credibilityScores = citations.map(citation => {
       const sourceTypeWeight = this.sourceTypeWeights.get(citation.source_type) || 0.5;
       const confidenceWeight = this.confidenceWeights.get(citation.confidence) || 0.5;
-      
+
       let baseScore = 70; // Higher base score for better results
-      
+
       // Adjust based on source type (multiplicative)
       baseScore = baseScore * sourceTypeWeight;
-      
+
       // Adjust based on confidence level (multiplicative)
       baseScore = baseScore * confidenceWeight;
-      
+
       // Bonus for having authors
       if (citation.authors && citation.authors.length > 0) {
         baseScore += 15;
       }
-      
+
       // Bonus for having methodology
       if (citation.methodology) {
         baseScore += 15;
       }
-      
+
       // Bonus for sample size
       if (citation.sample_size && citation.sample_size > 100) {
         baseScore += 10;
       }
-      
+
       // Bonus for organization
       if (citation.organization) {
         baseScore += 5;
       }
-      
+
       return Math.min(100, Math.max(0, baseScore));
     });
 
-    return Math.round(credibilityScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length);
+    return Math.round(
+      credibilityScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length
+    );
   }
 
   private calculateEvidenceDiversity(citations: Citation[]): number {
@@ -653,8 +670,14 @@ export class QualityAssessmentSystem {
     const uniqueOrganizations = new Set(citations.map(c => c.organization).filter(Boolean)).size;
 
     const domainDiversity = Math.min(100, (uniqueDomains / Math.max(3, citations.length)) * 100);
-    const sourceTypeDiversity = Math.min(100, (uniqueSourceTypes / Math.min(5, citations.length)) * 100);
-    const organizationDiversity = Math.min(100, (uniqueOrganizations / Math.max(2, citations.length)) * 100);
+    const sourceTypeDiversity = Math.min(
+      100,
+      (uniqueSourceTypes / Math.min(5, citations.length)) * 100
+    );
+    const organizationDiversity = Math.min(
+      100,
+      (uniqueOrganizations / Math.max(2, citations.length)) * 100
+    );
 
     return Math.round((domainDiversity + sourceTypeDiversity + organizationDiversity) / 3);
   }
@@ -666,19 +689,22 @@ export class QualityAssessmentSystem {
     const recencyScores = citations.map(citation => {
       // Handle invalid or empty dates
       if (!citation.published_at) return 0;
-      
+
       const publicationDate = new Date(citation.published_at);
-      
+
       // Handle invalid dates
       if (isNaN(publicationDate.getTime())) return 0;
-      
-      const monthsOld = (currentDate.getTime() - publicationDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
-      
+
+      const monthsOld =
+        (currentDate.getTime() - publicationDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+
       // Score decreases by 2 points per month, minimum 0, maximum 100
       return Math.max(0, Math.min(100, 100 - monthsOld * 2));
     });
 
-    return Math.round(recencyScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length);
+    return Math.round(
+      recencyScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length
+    );
   }
 
   private calculateMethodologyTransparency(citations: Citation[]): number {
@@ -699,14 +725,19 @@ export class QualityAssessmentSystem {
       }
 
       // Research publications should have methodology
-      if (citation.source_type === CitationSourceType.RESEARCH_PUBLICATION && !citation.methodology) {
+      if (
+        citation.source_type === CitationSourceType.RESEARCH_PUBLICATION &&
+        !citation.methodology
+      ) {
         score -= 20;
       }
 
       return Math.min(100, Math.max(0, score));
     });
 
-    return Math.round(methodologyScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length);
+    return Math.round(
+      methodologyScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length
+    );
   }
 
   private calculateSampleSizeAdequacy(citations: Citation[]): number {
@@ -714,7 +745,13 @@ export class QualityAssessmentSystem {
 
     const sampleSizeScores = citations.map(citation => {
       // Not all source types require sample sizes
-      if (![CitationSourceType.SURVEY_DATA, CitationSourceType.RESEARCH_PUBLICATION, CitationSourceType.BENCHMARK_STUDY].includes(citation.source_type)) {
+      if (
+        ![
+          CitationSourceType.SURVEY_DATA,
+          CitationSourceType.RESEARCH_PUBLICATION,
+          CitationSourceType.BENCHMARK_STUDY,
+        ].includes(citation.source_type)
+      ) {
         return 100; // N/A sources get full score
       }
 
@@ -730,7 +767,9 @@ export class QualityAssessmentSystem {
       return 30; // Small sample size
     });
 
-    return Math.round(sampleSizeScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length);
+    return Math.round(
+      sampleSizeScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length
+    );
   }
 
   private calculateAccessibilityScore(citations: Citation[]): number {
@@ -741,15 +780,17 @@ export class QualityAssessmentSystem {
       if (!citation.url || citation.url.includes('broken') || citation.url.includes('404')) {
         return 0; // Broken or missing URL
       }
-      
+
       if (citation.url.includes('paywall')) {
         return 60; // Behind paywall but accessible
       }
-      
+
       return 100; // Freely accessible
     });
 
-    return Math.round(accessibilityScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length);
+    return Math.round(
+      accessibilityScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length
+    );
   }
 
   private calculateComplianceScore(citations: Citation[]): number {
@@ -772,14 +813,19 @@ export class QualityAssessmentSystem {
       }
 
       // Check source type specific requirements
-      if (citation.source_type === CitationSourceType.RESEARCH_PUBLICATION && !citation.methodology) {
+      if (
+        citation.source_type === CitationSourceType.RESEARCH_PUBLICATION &&
+        !citation.methodology
+      ) {
         score -= 25; // Research without methodology
       }
 
       return Math.max(0, score);
     });
 
-    return Math.round(complianceScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length);
+    return Math.round(
+      complianceScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length
+    );
   }
 
   private calculateOverallQualityScore(metrics: QualityReport['metrics']): number {
@@ -793,7 +839,7 @@ export class QualityAssessmentSystem {
       complianceScore: 0.05,
     };
 
-    const score = 
+    const score =
       (metrics.sourceCredibility || 0) * weights.sourceCredibility +
       (metrics.evidenceDiversity || 0) * weights.evidenceDiversity +
       (metrics.recencyScore || 0) * weights.recencyScore +
@@ -805,7 +851,10 @@ export class QualityAssessmentSystem {
     return Math.round(isNaN(score) ? 0 : score);
   }
 
-  private determineComplianceStatus(overallScore: number, qualityGaps: QualityGap[]): 'compliant' | 'warning' | 'non-compliant' {
+  private determineComplianceStatus(
+    overallScore: number,
+    qualityGaps: QualityGap[]
+  ): 'compliant' | 'warning' | 'non-compliant' {
     const criticalGaps = qualityGaps.filter(gap => gap.severity === QualityGapSeverity.CRITICAL);
     const highGaps = qualityGaps.filter(gap => gap.severity === QualityGapSeverity.HIGH);
 
@@ -846,7 +895,10 @@ export class QualityAssessmentSystem {
     return strengths;
   }
 
-  private identifyImprovementAreas(metrics: QualityReport['metrics'], qualityGaps: QualityGap[]): string[] {
+  private identifyImprovementAreas(
+    metrics: QualityReport['metrics'],
+    qualityGaps: QualityGap[]
+  ): string[] {
     const improvements: string[] = [];
 
     if (metrics.sourceCredibility < 70) {
@@ -871,16 +923,26 @@ export class QualityAssessmentSystem {
 
     // Add specific areas from quality gaps
     const gapAreas = qualityGaps
-      .filter(gap => gap.severity === QualityGapSeverity.HIGH || gap.severity === QualityGapSeverity.CRITICAL)
+      .filter(
+        gap =>
+          gap.severity === QualityGapSeverity.HIGH || gap.severity === QualityGapSeverity.CRITICAL
+      )
       .map(gap => {
         switch (gap.gapType) {
-          case QualityGapType.INSUFFICIENT_SOURCES: return 'Number of supporting sources';
-          case QualityGapType.LOW_CREDIBILITY: return 'Source credibility and trustworthiness';
-          case QualityGapType.OUTDATED_SOURCES: return 'Source recency and relevance';
-          case QualityGapType.METHODOLOGY_UNCLEAR: return 'Research methodology clarity';
-          case QualityGapType.LACK_DIVERSITY: return 'Source diversity and perspective range';
-          case QualityGapType.BROKEN_LINKS: return 'Source accessibility and verification';
-          default: return 'General citation quality';
+          case QualityGapType.INSUFFICIENT_SOURCES:
+            return 'Number of supporting sources';
+          case QualityGapType.LOW_CREDIBILITY:
+            return 'Source credibility and trustworthiness';
+          case QualityGapType.OUTDATED_SOURCES:
+            return 'Source recency and relevance';
+          case QualityGapType.METHODOLOGY_UNCLEAR:
+            return 'Research methodology clarity';
+          case QualityGapType.LACK_DIVERSITY:
+            return 'Source diversity and perspective range';
+          case QualityGapType.BROKEN_LINKS:
+            return 'Source accessibility and verification';
+          default:
+            return 'General citation quality';
         }
       });
 
@@ -910,7 +972,9 @@ export class QualityAssessmentSystem {
       }
     });
 
-    return Math.round(peerReviewScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length);
+    return Math.round(
+      peerReviewScores.reduce((sum: number, score: number) => sum + score, 0) / citations.length
+    );
   }
 
   private identifyEvidenceGaps(citations: Citation[], claim: string): string[] {
@@ -926,14 +990,17 @@ export class QualityAssessmentSystem {
     }
 
     const hasRecentEvidence = citations.some(c => {
-      const monthsOld = (Date.now() - new Date(c.published_at).getTime()) / (1000 * 60 * 60 * 24 * 30);
+      const monthsOld =
+        (Date.now() - new Date(c.published_at).getTime()) / (1000 * 60 * 60 * 24 * 30);
       return monthsOld < 12;
     });
     if (!hasRecentEvidence) {
       gaps.push('Lack of recent evidence for current market conditions');
     }
 
-    const hasHighCredibilityEvidence = citations.some(c => c.confidence === CitationConfidence.HIGH);
+    const hasHighCredibilityEvidence = citations.some(
+      c => c.confidence === CitationConfidence.HIGH
+    );
     if (!hasHighCredibilityEvidence) {
       gaps.push('No high-credibility sources supporting the claim');
     }

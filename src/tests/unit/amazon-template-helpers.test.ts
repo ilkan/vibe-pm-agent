@@ -3,13 +3,13 @@
  * Tests for template helper functions including {{json ...}} helper
  */
 
-import { 
-  AmazonTemplateHelpers, 
-  TemplateHelperRegistry, 
-  parseHelperExpression, 
+import {
+  AmazonTemplateHelpers,
+  TemplateHelperRegistry,
+  parseHelperExpression,
   evaluateHelperArgs,
   validateAmazonTemplate,
-  AMAZON_TEMPLATE_VALIDATION_RULES
+  AMAZON_TEMPLATE_VALIDATION_RULES,
 } from '../../components/amazon-template-processor/helpers';
 
 describe('AmazonTemplateHelpers', () => {
@@ -36,8 +36,8 @@ describe('AmazonTemplateHelpers', () => {
       const obj = {
         confidence: {
           total: 85,
-          breakdown: { evidence: 90, recency: 80 }
-        }
+          breakdown: { evidence: 90, recency: 80 },
+        },
       };
       const result = helpers.json(obj);
       expect(result).toBe('{"confidence":{"total":85,"breakdown":{"evidence":90,"recency":80}}}');
@@ -51,7 +51,7 @@ describe('AmazonTemplateHelpers', () => {
     test('should handle circular references gracefully', () => {
       const obj: any = { name: 'test' };
       obj.self = obj; // Create circular reference
-      
+
       const result = helpers.json(obj);
       expect(result).toBe('{}'); // Should fallback to empty object
     });
@@ -182,7 +182,7 @@ describe('TemplateHelperRegistry', () => {
   test('should register custom helpers', () => {
     const customHelper = (text: string) => text.toUpperCase();
     registry.registerHelper('uppercase', customHelper);
-    
+
     expect(registry.hasHelper('uppercase')).toBe(true);
     expect(registry.getHelperNames()).toContain('uppercase');
   });
@@ -197,9 +197,11 @@ describe('TemplateHelperRegistry', () => {
   });
 
   test('should handle helper errors gracefully', () => {
-    const errorHelper = () => { throw new Error('Test error'); };
+    const errorHelper = () => {
+      throw new Error('Test error');
+    };
     registry.registerHelper('errorHelper', errorHelper);
-    
+
     expect(() => registry.processHelper('errorHelper', [], {})).toThrow('Test error');
   });
 });
@@ -234,7 +236,7 @@ describe('Helper Argument Evaluation', () => {
   const context = {
     confidence: { total: 85 },
     title: 'Test Title',
-    count: 5
+    count: 5,
   };
 
   test('should evaluate numeric arguments', () => {
@@ -363,7 +365,7 @@ title: "Test"
 describe('Validation Rules', () => {
   test('should have all required validation rules', () => {
     const ruleTypes = AMAZON_TEMPLATE_VALIDATION_RULES.map(rule => rule.type);
-    
+
     expect(ruleTypes).toContain('required_section');
     expect(ruleTypes).toContain('required_variable');
     expect(ruleTypes).toContain('helper_usage');

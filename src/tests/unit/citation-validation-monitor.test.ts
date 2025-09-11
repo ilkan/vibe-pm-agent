@@ -8,11 +8,7 @@ import {
   SourcePerformanceMetrics,
   QualityReport,
 } from '../../components/citation-validation-monitor';
-import {
-  Citation,
-  CitationSourceType,
-  CitationConfidence,
-} from '../../models/citations';
+import { Citation, CitationSourceType, CitationConfidence } from '../../models/citations';
 
 // Mock the SourceValidationEngine
 const mockValidateCitation = jest.fn();
@@ -30,7 +26,7 @@ describe('CitationValidationMonitor', () => {
     // Reset all mocks
     jest.clearAllMocks();
     mockValidateCitation.mockReset();
-    
+
     // Create test citations
     mockCitations = [
       {
@@ -193,25 +189,80 @@ describe('CitationValidationMonitor', () => {
       mockValidateCitation
         .mockResolvedValueOnce({
           citation: mockCitations[0],
-          accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-          credibilityAssessment: { overallScore: 85, factors: {}, riskFactors: [], confidenceLevel: 'high', assessmentDate: new Date() },
-          complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+          accessibilityStatus: {
+            isAccessible: true,
+            accessType: 'free',
+            lastChecked: new Date(),
+            alternativeAccess: [],
+            cacheAvailable: true,
+          },
+          credibilityAssessment: {
+            overallScore: 85,
+            factors: {},
+            riskFactors: [],
+            confidenceLevel: 'high',
+            assessmentDate: new Date(),
+          },
+          complianceStatus: {
+            isCompliant: true,
+            checkedStandards: [],
+            violations: [],
+            recommendations: [],
+            lastChecked: new Date(),
+          },
           alternativeSources: [],
           validationTimestamp: new Date(),
         })
         .mockResolvedValueOnce({
           citation: mockCitations[1],
-          accessibilityStatus: { isAccessible: false, accessType: 'broken', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: false, errorMessage: '404 Not Found' },
-          credibilityAssessment: { overallScore: 60, factors: {}, riskFactors: ['Low domain authority'], confidenceLevel: 'medium', assessmentDate: new Date() },
-          complianceStatus: { isCompliant: false, checkedStandards: [], violations: ['Missing author information'], recommendations: [], lastChecked: new Date() },
+          accessibilityStatus: {
+            isAccessible: false,
+            accessType: 'broken',
+            lastChecked: new Date(),
+            alternativeAccess: [],
+            cacheAvailable: false,
+            errorMessage: '404 Not Found',
+          },
+          credibilityAssessment: {
+            overallScore: 60,
+            factors: {},
+            riskFactors: ['Low domain authority'],
+            confidenceLevel: 'medium',
+            assessmentDate: new Date(),
+          },
+          complianceStatus: {
+            isCompliant: false,
+            checkedStandards: [],
+            violations: ['Missing author information'],
+            recommendations: [],
+            lastChecked: new Date(),
+          },
           alternativeSources: [],
           validationTimestamp: new Date(),
         })
         .mockResolvedValueOnce({
           citation: mockCitations[2],
-          accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-          credibilityAssessment: { overallScore: 40, factors: {}, riskFactors: ['High spam score detected'], confidenceLevel: 'low', assessmentDate: new Date() },
-          complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+          accessibilityStatus: {
+            isAccessible: true,
+            accessType: 'free',
+            lastChecked: new Date(),
+            alternativeAccess: [],
+            cacheAvailable: true,
+          },
+          credibilityAssessment: {
+            overallScore: 40,
+            factors: {},
+            riskFactors: ['High spam score detected'],
+            confidenceLevel: 'low',
+            assessmentDate: new Date(),
+          },
+          complianceStatus: {
+            isCompliant: true,
+            checkedStandards: [],
+            violations: [],
+            recommendations: [],
+            lastChecked: new Date(),
+          },
           alternativeSources: [],
           validationTimestamp: new Date(),
         });
@@ -231,9 +282,27 @@ describe('CitationValidationMonitor', () => {
       // Mock validation results with high broken link rate
       mockValidateCitation.mockResolvedValue({
         citation: mockCitations[0],
-        accessibilityStatus: { isAccessible: false, accessType: 'broken', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: false },
-        credibilityAssessment: { overallScore: 50, factors: {}, riskFactors: [], confidenceLevel: 'medium', assessmentDate: new Date() },
-        complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+        accessibilityStatus: {
+          isAccessible: false,
+          accessType: 'broken',
+          lastChecked: new Date(),
+          alternativeAccess: [],
+          cacheAvailable: false,
+        },
+        credibilityAssessment: {
+          overallScore: 50,
+          factors: {},
+          riskFactors: [],
+          confidenceLevel: 'medium',
+          assessmentDate: new Date(),
+        },
+        complianceStatus: {
+          isCompliant: true,
+          checkedStandards: [],
+          violations: [],
+          recommendations: [],
+          lastChecked: new Date(),
+        },
         alternativeSources: [],
         validationTimestamp: new Date(),
       });
@@ -258,9 +327,27 @@ describe('CitationValidationMonitor', () => {
       // Mock validation results with low quality scores
       mockValidateCitation.mockResolvedValue({
         citation: mockCitations[0],
-        accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-        credibilityAssessment: { overallScore: 30, factors: {}, riskFactors: ['Low credibility'], confidenceLevel: 'low', assessmentDate: new Date() },
-        complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+        accessibilityStatus: {
+          isAccessible: true,
+          accessType: 'free',
+          lastChecked: new Date(),
+          alternativeAccess: [],
+          cacheAvailable: true,
+        },
+        credibilityAssessment: {
+          overallScore: 30,
+          factors: {},
+          riskFactors: ['Low credibility'],
+          confidenceLevel: 'low',
+          assessmentDate: new Date(),
+        },
+        complianceStatus: {
+          isCompliant: true,
+          checkedStandards: [],
+          violations: [],
+          recommendations: [],
+          lastChecked: new Date(),
+        },
         alternativeSources: [],
         validationTimestamp: new Date(),
       });
@@ -285,9 +372,27 @@ describe('CitationValidationMonitor', () => {
       // Mock validation results with compliance violations
       mockValidateCitation.mockResolvedValue({
         citation: mockCitations[0],
-        accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-        credibilityAssessment: { overallScore: 70, factors: {}, riskFactors: [], confidenceLevel: 'medium', assessmentDate: new Date() },
-        complianceStatus: { isCompliant: false, checkedStandards: ['academic'], violations: ['Missing methodology'], recommendations: [], lastChecked: new Date() },
+        accessibilityStatus: {
+          isAccessible: true,
+          accessType: 'free',
+          lastChecked: new Date(),
+          alternativeAccess: [],
+          cacheAvailable: true,
+        },
+        credibilityAssessment: {
+          overallScore: 70,
+          factors: {},
+          riskFactors: [],
+          confidenceLevel: 'medium',
+          assessmentDate: new Date(),
+        },
+        complianceStatus: {
+          isCompliant: false,
+          checkedStandards: ['academic'],
+          violations: ['Missing methodology'],
+          recommendations: [],
+          lastChecked: new Date(),
+        },
         alternativeSources: [],
         validationTimestamp: new Date(),
       });
@@ -328,9 +433,28 @@ describe('CitationValidationMonitor', () => {
     it('should track source performance metrics', async () => {
       mockValidateCitation.mockResolvedValue({
         citation: mockCitations[0],
-        accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true, responseTime: 1500 },
-        credibilityAssessment: { overallScore: 80, factors: {}, riskFactors: [], confidenceLevel: 'high', assessmentDate: new Date() },
-        complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+        accessibilityStatus: {
+          isAccessible: true,
+          accessType: 'free',
+          lastChecked: new Date(),
+          alternativeAccess: [],
+          cacheAvailable: true,
+          responseTime: 1500,
+        },
+        credibilityAssessment: {
+          overallScore: 80,
+          factors: {},
+          riskFactors: [],
+          confidenceLevel: 'high',
+          assessmentDate: new Date(),
+        },
+        complianceStatus: {
+          isCompliant: true,
+          checkedStandards: [],
+          violations: [],
+          recommendations: [],
+          lastChecked: new Date(),
+        },
         alternativeSources: [],
         validationTimestamp: new Date(),
       });
@@ -355,9 +479,27 @@ describe('CitationValidationMonitor', () => {
       // First validation - success
       mockValidateCitation.mockResolvedValueOnce({
         citation: mockCitations[0],
-        accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-        credibilityAssessment: { overallScore: 80, factors: {}, riskFactors: [], confidenceLevel: 'high', assessmentDate: new Date() },
-        complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+        accessibilityStatus: {
+          isAccessible: true,
+          accessType: 'free',
+          lastChecked: new Date(),
+          alternativeAccess: [],
+          cacheAvailable: true,
+        },
+        credibilityAssessment: {
+          overallScore: 80,
+          factors: {},
+          riskFactors: [],
+          confidenceLevel: 'high',
+          assessmentDate: new Date(),
+        },
+        complianceStatus: {
+          isCompliant: true,
+          checkedStandards: [],
+          violations: [],
+          recommendations: [],
+          lastChecked: new Date(),
+        },
         alternativeSources: [],
         validationTimestamp: new Date(),
       });
@@ -365,9 +507,27 @@ describe('CitationValidationMonitor', () => {
       // Second validation - failure
       mockValidateCitation.mockResolvedValueOnce({
         citation: mockCitations[0],
-        accessibilityStatus: { isAccessible: false, accessType: 'broken', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: false },
-        credibilityAssessment: { overallScore: 50, factors: {}, riskFactors: [], confidenceLevel: 'medium', assessmentDate: new Date() },
-        complianceStatus: { isCompliant: false, checkedStandards: [], violations: ['Test violation'], recommendations: [], lastChecked: new Date() },
+        accessibilityStatus: {
+          isAccessible: false,
+          accessType: 'broken',
+          lastChecked: new Date(),
+          alternativeAccess: [],
+          cacheAvailable: false,
+        },
+        credibilityAssessment: {
+          overallScore: 50,
+          factors: {},
+          riskFactors: [],
+          confidenceLevel: 'medium',
+          assessmentDate: new Date(),
+        },
+        complianceStatus: {
+          isCompliant: false,
+          checkedStandards: [],
+          violations: ['Test violation'],
+          recommendations: [],
+          lastChecked: new Date(),
+        },
         alternativeSources: [],
         validationTimestamp: new Date(),
       });
@@ -391,25 +551,79 @@ describe('CitationValidationMonitor', () => {
       mockValidateCitation
         .mockResolvedValueOnce({
           citation: mockCitations[0],
-          accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-          credibilityAssessment: { overallScore: 85, factors: {}, riskFactors: [], confidenceLevel: 'high', assessmentDate: new Date() },
-          complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+          accessibilityStatus: {
+            isAccessible: true,
+            accessType: 'free',
+            lastChecked: new Date(),
+            alternativeAccess: [],
+            cacheAvailable: true,
+          },
+          credibilityAssessment: {
+            overallScore: 85,
+            factors: {},
+            riskFactors: [],
+            confidenceLevel: 'high',
+            assessmentDate: new Date(),
+          },
+          complianceStatus: {
+            isCompliant: true,
+            checkedStandards: [],
+            violations: [],
+            recommendations: [],
+            lastChecked: new Date(),
+          },
           alternativeSources: [],
           validationTimestamp: new Date(),
         })
         .mockResolvedValueOnce({
           citation: mockCitations[1],
-          accessibilityStatus: { isAccessible: false, accessType: 'broken', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: false },
-          credibilityAssessment: { overallScore: 60, factors: {}, riskFactors: [], confidenceLevel: 'medium', assessmentDate: new Date() },
-          complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+          accessibilityStatus: {
+            isAccessible: false,
+            accessType: 'broken',
+            lastChecked: new Date(),
+            alternativeAccess: [],
+            cacheAvailable: false,
+          },
+          credibilityAssessment: {
+            overallScore: 60,
+            factors: {},
+            riskFactors: [],
+            confidenceLevel: 'medium',
+            assessmentDate: new Date(),
+          },
+          complianceStatus: {
+            isCompliant: true,
+            checkedStandards: [],
+            violations: [],
+            recommendations: [],
+            lastChecked: new Date(),
+          },
           alternativeSources: [],
           validationTimestamp: new Date(),
         })
         .mockResolvedValueOnce({
           citation: mockCitations[2],
-          accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-          credibilityAssessment: { overallScore: 40, factors: {}, riskFactors: ['Low quality'], confidenceLevel: 'low', assessmentDate: new Date() },
-          complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+          accessibilityStatus: {
+            isAccessible: true,
+            accessType: 'free',
+            lastChecked: new Date(),
+            alternativeAccess: [],
+            cacheAvailable: true,
+          },
+          credibilityAssessment: {
+            overallScore: 40,
+            factors: {},
+            riskFactors: ['Low quality'],
+            confidenceLevel: 'low',
+            assessmentDate: new Date(),
+          },
+          complianceStatus: {
+            isCompliant: true,
+            checkedStandards: [],
+            violations: [],
+            recommendations: [],
+            lastChecked: new Date(),
+          },
           alternativeSources: [],
           validationTimestamp: new Date(),
         });
@@ -449,9 +663,27 @@ describe('CitationValidationMonitor', () => {
     it('should generate weekly quality report', async () => {
       mockValidateCitation.mockResolvedValue({
         citation: mockCitations[0],
-        accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-        credibilityAssessment: { overallScore: 75, factors: {}, riskFactors: [], confidenceLevel: 'high', assessmentDate: new Date() },
-        complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+        accessibilityStatus: {
+          isAccessible: true,
+          accessType: 'free',
+          lastChecked: new Date(),
+          alternativeAccess: [],
+          cacheAvailable: true,
+        },
+        credibilityAssessment: {
+          overallScore: 75,
+          factors: {},
+          riskFactors: [],
+          confidenceLevel: 'high',
+          assessmentDate: new Date(),
+        },
+        complianceStatus: {
+          isCompliant: true,
+          checkedStandards: [],
+          violations: [],
+          recommendations: [],
+          lastChecked: new Date(),
+        },
         alternativeSources: [],
         validationTimestamp: new Date(),
       });
@@ -465,9 +697,27 @@ describe('CitationValidationMonitor', () => {
     it('should generate monthly quality report', async () => {
       mockValidateCitation.mockResolvedValue({
         citation: mockCitations[0],
-        accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-        credibilityAssessment: { overallScore: 75, factors: {}, riskFactors: [], confidenceLevel: 'high', assessmentDate: new Date() },
-        complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+        accessibilityStatus: {
+          isAccessible: true,
+          accessType: 'free',
+          lastChecked: new Date(),
+          alternativeAccess: [],
+          cacheAvailable: true,
+        },
+        credibilityAssessment: {
+          overallScore: 75,
+          factors: {},
+          riskFactors: [],
+          confidenceLevel: 'high',
+          assessmentDate: new Date(),
+        },
+        complianceStatus: {
+          isCompliant: true,
+          checkedStandards: [],
+          violations: [],
+          recommendations: [],
+          lastChecked: new Date(),
+        },
         alternativeSources: [],
         validationTimestamp: new Date(),
       });
@@ -506,15 +756,33 @@ describe('CitationValidationMonitor', () => {
     it('should get validation status from cache', async () => {
       mockValidateCitation.mockResolvedValue({
         citation: mockCitations[0],
-        accessibilityStatus: { isAccessible: true, accessType: 'free', lastChecked: new Date(), alternativeAccess: [], cacheAvailable: true },
-        credibilityAssessment: { overallScore: 80, factors: {}, riskFactors: [], confidenceLevel: 'high', assessmentDate: new Date() },
-        complianceStatus: { isCompliant: true, checkedStandards: [], violations: [], recommendations: [], lastChecked: new Date() },
+        accessibilityStatus: {
+          isAccessible: true,
+          accessType: 'free',
+          lastChecked: new Date(),
+          alternativeAccess: [],
+          cacheAvailable: true,
+        },
+        credibilityAssessment: {
+          overallScore: 80,
+          factors: {},
+          riskFactors: [],
+          confidenceLevel: 'high',
+          assessmentDate: new Date(),
+        },
+        complianceStatus: {
+          isCompliant: true,
+          checkedStandards: [],
+          violations: [],
+          recommendations: [],
+          lastChecked: new Date(),
+        },
         alternativeSources: [],
         validationTimestamp: new Date(),
       });
 
       await monitor.validateCitationWithMonitoring(mockCitations[0]);
-      
+
       const allStatus = monitor.getValidationStatus();
       expect(allStatus).toHaveLength(1);
       expect(allStatus[0].citationId).toBe(mockCitations[0].id);
@@ -547,7 +815,11 @@ describe('CitationValidationMonitor', () => {
           qualityScoreHistory: [],
           availabilityHistory: [],
         },
-        trends: { responseTimeTrend: 'stable', qualityTrend: 'stable', availabilityTrend: 'stable' },
+        trends: {
+          responseTimeTrend: 'stable',
+          qualityTrend: 'stable',
+          availabilityTrend: 'stable',
+        },
         lastUpdated: new Date(Date.now() - 25 * 60 * 60 * 1000), // 25 hours ago
       };
 

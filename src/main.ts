@@ -469,7 +469,8 @@ export class AIAgentPipeline {
   ): Promise<ROIAnalysis> {
     try {
       const naiveForecast = await ErrorHandler.safeExecute(
-        () => this.kiroResourceOptimizer.estimateVibeConsumption(optimizedWorkflow.originalWorkflow),
+        () =>
+          this.kiroResourceOptimizer.estimateVibeConsumption(optimizedWorkflow.originalWorkflow),
         ErrorHandler.handleForecastingFailure(
           new Error('Naive forecast failed'),
           optimizedWorkflow.originalWorkflow
@@ -488,7 +489,8 @@ export class AIAgentPipeline {
 
       const zeroBasedForecast = analysis.zeroBasedSolution
         ? await ErrorHandler.safeExecute(
-            () => this.kiroResourceOptimizer.estimateZeroBasedKiroApproach(analysis.zeroBasedSolution!),
+            () =>
+              this.kiroResourceOptimizer.estimateZeroBasedKiroApproach(analysis.zeroBasedSolution!),
             optimizedForecast,
             { stage: 'forecasting', operation: 'zero_based_forecast' }
           )

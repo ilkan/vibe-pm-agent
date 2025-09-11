@@ -1,6 +1,6 @@
 /**
  * Jest test setup with enhanced resource management
- * 
+ *
  * This setup ensures proper cleanup of timers, resources, and test artifacts
  * to prevent hanging tests and memory leaks.
  */
@@ -18,7 +18,7 @@ jest.setTimeout(30000); // 30 seconds
 beforeEach(() => {
   // Use fake timers to prevent real timers from causing issues
   jest.useFakeTimers();
-  
+
   // Reset resource manager state
   ResourceManager.getInstance().reset();
 });
@@ -27,7 +27,7 @@ afterEach(async () => {
   // Run only pending timers and then use real timers
   jest.runOnlyPendingTimers();
   jest.useRealTimers();
-  
+
   // Clear all Jest mocks and timers
   jest.clearAllTimers();
   jest.clearAllMocks();
@@ -42,7 +42,7 @@ afterEach(async () => {
   // Clean up any test artifacts created during this test with timeout
   try {
     const cleanupPromise = cleanupAfterTest();
-    const timeoutPromise = new Promise((_, reject) => 
+    const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Cleanup timeout')), 10000)
     );
     await Promise.race([cleanupPromise, timeoutPromise]);

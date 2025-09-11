@@ -1,16 +1,28 @@
 /**
  * MCP Tool: validate_and_audit_citations
- * 
+ *
  * Comprehensive citation validation and quality auditing tool that combines
  * source validation, credibility assessment, and quality auditing in a single
- * consolidated workflow. Supports both individual source validation and 
+ * consolidated workflow. Supports both individual source validation and
  * full document citation auditing.
  */
 
 import { MCPToolResult, MCPToolContext, CitationOptions } from '../../models/mcp';
-import { Citation, EnhancedCitation, CitationSourceType, CitationConfidence } from '../../models/citations';
-import { SourceValidationEngine, ValidationResult } from '../../components/source-validation-engine';
-import { QualityAssessmentSystem, QualityReport, QualityGap } from '../../components/quality-assessment-system';
+import {
+  Citation,
+  EnhancedCitation,
+  CitationSourceType,
+  CitationConfidence,
+} from '../../models/citations';
+import {
+  SourceValidationEngine,
+  ValidationResult,
+} from '../../components/source-validation-engine';
+import {
+  QualityAssessmentSystem,
+  QualityReport,
+  QualityGap,
+} from '../../components/quality-assessment-system';
 import { MCPResponseFormatter, MCPLogger, MCPErrorHandler } from '../../utils/mcp-error-handling';
 
 /**
@@ -22,7 +34,12 @@ export interface ValidateAndAuditCitationsArgs {
   /** Optional document content for context-aware validation */
   document_content?: string;
   /** Type of document for appropriate validation standards */
-  document_type?: 'business_case' | 'market_analysis' | 'executive_onepager' | 'pr_faq' | 'competitive_analysis';
+  document_type?:
+    | 'business_case'
+    | 'market_analysis'
+    | 'executive_onepager'
+    | 'pr_faq'
+    | 'competitive_analysis';
   /** Validation configuration options */
   validation_options?: {
     /** Whether to check source accessibility */
@@ -116,7 +133,7 @@ export interface ValidationAndAuditResult {
 
 /**
  * MCP Tool: validate_and_audit_citations
- * 
+ *
  * Performs comprehensive validation and quality auditing of citations with
  * detailed reporting and improvement recommendations
  */
@@ -125,11 +142,13 @@ export async function validateAndAuditCitations(
   context: MCPToolContext
 ): Promise<MCPToolResult> {
   const startTime = Date.now();
-  
+
   try {
     // Validate required arguments
     if (!args || !args.citations || !Array.isArray(args.citations) || args.citations.length === 0) {
-      throw new Error('Validation failed: citations array is required and must contain at least one citation');
+      throw new Error(
+        'Validation failed: citations array is required and must contain at least one citation'
+      );
     }
 
     MCPLogger.debug('Starting comprehensive citation validation and audit', context, {
@@ -196,7 +215,7 @@ export async function validateAndAuditCitations(
 
     // Step 1: Perform comprehensive source validation
     MCPLogger.debug('Starting source validation phase', context);
-    
+
     const validationResults: ValidationResult[] = [];
     let accessibilityChecks = 0;
     let credibilityAssessments = 0;
@@ -236,7 +255,8 @@ export async function validateAndAuditCitations(
             lastChecked: new Date(),
             alternativeAccess: [],
             cacheAvailable: false,
-            errorMessage: validationError instanceof Error ? validationError.message : 'Validation failed',
+            errorMessage:
+              validationError instanceof Error ? validationError.message : 'Validation failed',
           },
           credibilityAssessment: {
             overallScore: 0,
@@ -264,7 +284,9 @@ export async function validateAndAuditCitations(
       }
     }
 
-    const validationPassed = validationResults.filter(r => r.accessibilityStatus.isAccessible).length;
+    const validationPassed = validationResults.filter(
+      r => r.accessibilityStatus.isAccessible
+    ).length;
     const validationFailed = validationResults.length - validationPassed;
 
     MCPLogger.info('Source validation completed', context, {
@@ -279,12 +301,12 @@ export async function validateAndAuditCitations(
 
     // Step 2: Perform comprehensive quality assessment
     MCPLogger.debug('Starting quality assessment phase', context);
-    
+
     let qualityReport: QualityReport;
-    
+
     if (auditOptions.perform_quality_assessment) {
       qualityReport = await qualityAssessmentSystem.assessCitationQuality(args.citations);
-      
+
       MCPLogger.info('Quality assessment completed', context, {
         overallScore: qualityReport.overallScore,
         complianceStatus: qualityReport.complianceStatus,
@@ -318,7 +340,7 @@ export async function validateAndAuditCitations(
 
     // Step 3: Generate evidence report
     MCPLogger.debug('Generating evidence report', context);
-    
+
     const evidenceReport = generateEvidenceReport(
       args.citations,
       validationResults,
@@ -340,8 +362,12 @@ export async function validateAndAuditCitations(
     };
 
     // Step 5: Create summary
-    const criticalIssues = qualityReport.qualityGaps.filter(gap => gap.severity === 'critical').length;
-    const highPriorityIssues = qualityReport.qualityGaps.filter(gap => gap.severity === 'high').length;
+    const criticalIssues = qualityReport.qualityGaps.filter(
+      gap => gap.severity === 'critical'
+    ).length;
+    const highPriorityIssues = qualityReport.qualityGaps.filter(
+      gap => gap.severity === 'high'
+    ).length;
 
     const summary = {
       total_citations: args.citations.length,
@@ -403,7 +429,6 @@ export async function validateAndAuditCitations(
         alternative_sources: evidenceReport.alternative_sources.length,
       },
     });
-
   } catch (error) {
     MCPLogger.error('validate_and_audit_citations tool failed', error as Error, context, {
       citationCount: args.citations?.length,
@@ -430,7 +455,7 @@ function generateEvidenceReport(
   // Determine evidence strength based on quality metrics
   let evidenceStrength: 'weak' | 'moderate' | 'strong' | 'very_strong';
   const overallScore = qualityReport.overallScore;
-  
+
   if (overallScore >= 85) evidenceStrength = 'very_strong';
   else if (overallScore >= 70) evidenceStrength = 'strong';
   else if (overallScore >= 55) evidenceStrength = 'moderate';
@@ -457,9 +482,10 @@ function generateEvidenceReport(
   // Collect alternative sources from validation results
   const alternativeSources = validationResults
     .flatMap(result => result.alternativeSources)
-    .filter((source, index, array) => 
-      // Remove duplicates based on URL
-      array.findIndex(s => s.url === source.url) === index
+    .filter(
+      (source, index, array) =>
+        // Remove duplicates based on URL
+        array.findIndex(s => s.url === source.url) === index
     )
     .slice(0, 5); // Top 5 alternatives
 
@@ -483,13 +509,13 @@ function formatValidationAndAuditResponse(
 
   // Executive Summary
   response += `# Citation Validation and Quality Audit Report\n\n`;
-  
+
   response += `## Executive Summary\n\n`;
   response += `**Overall Assessment**: ${result.summary.overall_quality_score}/100 (${result.evidence_report.evidence_strength.toUpperCase()} evidence)\n`;
   response += `**Compliance Status**: ${result.summary.compliance_status.toUpperCase()}\n`;
   response += `**Citations Processed**: ${result.summary.total_citations}\n`;
   response += `**Validation Success Rate**: ${Math.round((result.summary.validation_passed / result.summary.total_citations) * 100)}%\n`;
-  
+
   if (result.summary.critical_issues > 0) {
     response += `**⚠️ Critical Issues**: ${result.summary.critical_issues} require immediate attention\n`;
   }
@@ -504,7 +530,7 @@ function formatValidationAndAuditResponse(
     response += `### Accessibility Status\n`;
     response += `- ✅ **Accessible Sources**: ${result.summary.validation_passed}/${result.summary.total_citations}\n`;
     response += `- ❌ **Inaccessible Sources**: ${result.summary.validation_failed}/${result.summary.total_citations}\n`;
-    
+
     if (result.audit_trail.alternatives_found > 0) {
       response += `- 🔄 **Alternative Sources Found**: ${result.audit_trail.alternatives_found}\n`;
     }
@@ -513,7 +539,9 @@ function formatValidationAndAuditResponse(
     // Show failed validations if any
     if (result.summary.validation_failed > 0) {
       response += `### Failed Validations\n`;
-      const failedValidations = result.validation_results.filter(r => !r.accessibilityStatus.isAccessible);
+      const failedValidations = result.validation_results.filter(
+        r => !r.accessibilityStatus.isAccessible
+      );
       failedValidations.slice(0, 3).forEach((validation, index) => {
         response += `${index + 1}. **${validation.citation.title}**\n`;
         response += `   - URL: ${validation.citation.url}\n`;
@@ -552,7 +580,8 @@ function formatValidationAndAuditResponse(
     if (result.quality_report.qualityGaps.length > 0) {
       response += `### Quality Gaps Identified\n`;
       result.quality_report.qualityGaps.slice(0, 5).forEach((gap, index) => {
-        const severityIcon = gap.severity === 'critical' ? '🚨' : gap.severity === 'high' ? '⚠️' : '⚡';
+        const severityIcon =
+          gap.severity === 'critical' ? '🚨' : gap.severity === 'high' ? '⚠️' : '⚡';
         response += `${index + 1}. ${severityIcon} **${gap.description}** (${gap.severity.toUpperCase()})\n`;
         response += `   - Impact: ${gap.impact}\n`;
         if (gap.recommendedActions.length > 0) {
@@ -588,25 +617,26 @@ function formatValidationAndAuditResponse(
   // Recommendations
   if (reportOptions.include_recommendations && result.quality_report.recommendations.length > 0) {
     response += `## Improvement Recommendations\n\n`;
-    
+
     const priorityOrder = ['critical', 'high', 'medium', 'low'];
-    const sortedRecommendations = result.quality_report.recommendations.sort((a, b) => 
-      priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority)
+    const sortedRecommendations = result.quality_report.recommendations.sort(
+      (a, b) => priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority)
     );
 
     sortedRecommendations.slice(0, 5).forEach((rec, index) => {
-      const priorityIcon = rec.priority === 'critical' ? '🚨' : rec.priority === 'high' ? '⚠️' : '📋';
+      const priorityIcon =
+        rec.priority === 'critical' ? '🚨' : rec.priority === 'high' ? '⚠️' : '📋';
       response += `### ${index + 1}. ${priorityIcon} ${rec.description} (${rec.priority.toUpperCase()})\n`;
       response += `**Expected Impact**: ${rec.expectedImpact}\n`;
       response += `**Effort Required**: ${rec.estimatedEffort}\n`;
-      
+
       if (rec.specificActions.length > 0) {
         response += `**Actions**:\n`;
         rec.specificActions.slice(0, 3).forEach(action => {
           response += `- ${action}\n`;
         });
       }
-      
+
       if (rec.targetMetrics) {
         response += `**Target Improvements**:\n`;
         if (rec.targetMetrics.credibilityIncrease) {
@@ -695,7 +725,13 @@ export const validateAndAuditCitationsSchema = {
     },
     document_type: {
       type: 'string',
-      enum: ['business_case', 'market_analysis', 'executive_onepager', 'pr_faq', 'competitive_analysis'],
+      enum: [
+        'business_case',
+        'market_analysis',
+        'executive_onepager',
+        'pr_faq',
+        'competitive_analysis',
+      ],
       description: 'Type of document for appropriate validation standards',
     },
     validation_options: {
@@ -844,5 +880,5 @@ export const validateAndAuditCitationsSchema = {
 /**
  * Tool description for MCP registration
  */
-export const validateAndAuditCitationsDescription = 
+export const validateAndAuditCitationsDescription =
   'Comprehensive citation validation and quality auditing tool that combines source validation, credibility assessment, compliance checking, and quality auditing. Provides detailed evidence reports with accessibility validation, quality metrics, improvement recommendations, and alternative source suggestions for both individual citations and full document audits.';

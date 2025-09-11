@@ -4,18 +4,25 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { 
-  AssumptionLedgerService, 
-  ConfidenceService, 
-  ScenarioService, 
+import {
+  AssumptionLedgerService,
+  ConfidenceService,
+  ScenarioService,
   HardQuestionsService,
   SteeringWriter,
-  BusinessInputs 
+  BusinessInputs,
 } from '../../services/amazon';
-import { AmazonTemplateProcessor, TemplateContext } from '../../components/amazon-template-processor/index.js';
+import {
+  AmazonTemplateProcessor,
+  TemplateContext,
+} from '../../components/amazon-template-processor/index.js';
 import { generateBusinessCase } from '../../mcp/tools/generate_business_case';
 import { createStakeholderCommunication } from '../../mcp/tools/create_stakeholder_communication';
-import { MCPToolContext, GenerateBusinessCaseArgs, CreateStakeholderCommunicationArgs } from '../../models/mcp';
+import {
+  MCPToolContext,
+  GenerateBusinessCaseArgs,
+  CreateStakeholderCommunicationArgs,
+} from '../../models/mcp';
 import { performanceCache } from '../../utils/performance-cache';
 import { performanceMonitor } from '../../utils/performance-monitor';
 
@@ -32,7 +39,7 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
     sessionId: 'error-session-123',
     timestamp: Date.now(),
     requestId: 'error-req-456',
-    traceId: 'error-trace-789'
+    traceId: 'error-trace-789',
   };
 
   beforeEach(() => {
@@ -81,23 +88,23 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
         assumptions: [
           'DROP TABLE users; --',
           '{{constructor.constructor("return process")().exit()}}',
-          '<img src=x onerror=alert(1)>'
+          '<img src=x onerror=alert(1)>',
         ],
         citations: [
           {
             url: 'javascript:alert("xss")',
             title: '<script>malicious</script>',
-            sourceType: 'news'
-          }
-        ]
+            sourceType: 'news',
+          },
+        ],
       };
 
       const result = await assumptionLedgerService.normalizeLedger(maliciousInputs);
-      
+
       expect(result.success).toBe(true);
       // Should sanitize but not break functionality
       expect(result.data!.assumptions.length).toBeGreaterThan(0);
-      
+
       // Verify no script tags in output
       const templateContext: TemplateContext = {
         featureName: maliciousInputs.featureName,
@@ -106,21 +113,28 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
         ledger: result.data!,
         confidence: {
           total: 50,
-          breakdown: { evidence: 50, recency: 50, diversity: 50, agreement: 50, coverage: 50, sensitivity: 50 },
+          breakdown: {
+            evidence: 50,
+            recency: 50,
+            diversity: 50,
+            agreement: 50,
+            coverage: 50,
+            sensitivity: 50,
+          },
           explanation: 'Test',
-          lowConfidence: true
+          lowConfidence: true,
         },
         scenarios: {
           scenarios: { bear: [], base: [], bull: [] },
           elasticities: [],
           keyDrivers: [],
-          sensitivityPct: 20
+          sensitivityPct: 20,
         },
         hardQuestions: [],
         citations: maliciousInputs.citations || [],
         inputsHash: 'test',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'test'
+        shortHash: 'test',
       };
 
       const rendered = templateProcessor.renderPRFAQ(templateContext);
@@ -139,12 +153,12 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
         citations: Array.from({ length: 500 }, (_, i) => ({
           url: `https://example${i}.com/${'d'.repeat(1000)}`,
           title: 'E'.repeat(2000),
-          sourceType: 'research' as const
-        }))
+          sourceType: 'research' as const,
+        })),
       };
 
       const result = await assumptionLedgerService.normalizeLedger(largeInputs);
-      
+
       expect(result.success).toBe(true);
       // Should handle large inputs without crashing
       expect(result.data).toBeDefined();
@@ -157,11 +171,11 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
         pricing: 'not-a-number', // Should be number
         users: { invalid: 'object' }, // Should be number
         citations: 'not-an-array', // Should be array
-        assumptions: { not: 'array' } // Should be array
+        assumptions: { not: 'array' }, // Should be array
       } as any;
 
       const result = await assumptionLedgerService.normalizeLedger(invalidTypeInputs);
-      
+
       expect(result.success).toBe(false);
       expect(result.error?.message).toContain('Invalid input');
     });
@@ -171,14 +185,14 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
     it('should handle assumption ledger service failures gracefully', async () => {
       // Mock the service to fail
       const originalMethod = assumptionLedgerService.normalizeLedger;
-      (assumptionLedgerService.normalizeLedger as jest.Mock) = jest.fn().mockRejectedValue(
-        new Error('Database connection failed')
-      );
+      (assumptionLedgerService.normalizeLedger as jest.Mock) = jest
+        .fn()
+        .mockRejectedValue(new Error('Database connection failed'));
 
       try {
         const result = await assumptionLedgerService.normalizeLedger({
           featureName: 'Test Feature',
-          customer: 'Test Customer'
+          customer: 'Test Customer',
         });
 
         expect(result.success).toBe(false);
@@ -195,15 +209,15 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
           {
             url: 'invalid-url',
             title: null as any,
-            sourceType: 'invalid-type' as any
-          }
+            sourceType: 'invalid-type' as any,
+          },
         ],
         ledgerCoveragePct: -50, // Invalid negative percentage
-        assumptionCount: -10 // Invalid negative count
+        assumptionCount: -10, // Invalid negative count
       };
 
       const result = await confidenceService.computeConfidence(invalidContext);
-      
+
       expect(result.success).toBe(false);
       expect(result.error?.code).toBe('CONFIDENCE_CALCULATION_ERROR');
       expect(result.error?.message).toBeDefined();
@@ -221,26 +235,26 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
               certainty: 'High' as const,
               lastChecked: new Date(),
               category: 'financial' as const,
-              impact: 'critical' as const
-            }
+              impact: 'critical' as const,
+            },
           ],
           coverage_pct: 50,
           lastUpdated: new Date(),
           totalClaims: 1,
-          backedClaims: 0
+          backedClaims: 0,
         },
         basicCalc: {
           revenue: Infinity, // Invalid number
           costs: -Infinity, // Invalid number
           roi: NaN, // Invalid number
-          npv: undefined as any // Invalid type
+          npv: undefined as any, // Invalid type
         },
         topIds: ['A1'],
-        scenarioPct: 2.5 // Invalid percentage > 1
+        scenarioPct: 2.5, // Invalid percentage > 1
       };
 
       const result = await scenarioService.runScenarios(invalidScenarioContext);
-      
+
       expect(result.success).toBe(false);
       expect(result.error?.code).toBe('SCENARIO_ANALYSIS_ERROR');
     });
@@ -252,15 +266,15 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
           coverage_pct: 0,
           lastUpdated: new Date(),
           totalClaims: 0,
-          backedClaims: 0
+          backedClaims: 0,
         },
         weakestIds: ['NONEXISTENT1', 'NONEXISTENT2'], // Invalid IDs
         businessContext: null as any, // Invalid type
-        competitiveContext: undefined as any // Invalid type
+        competitiveContext: undefined as any, // Invalid type
       };
 
       const result = await hardQuestionsService.generateQuestions(invalidQuestionContext);
-      
+
       // Should handle gracefully and still generate some questions
       expect(result.success).toBe(true);
       expect(result.data!.length).toBeGreaterThan(0);
@@ -283,26 +297,26 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
               certainty: 'InvalidCertainty' as any,
               lastChecked: 'invalid-date' as any,
               category: 'invalid-category' as any,
-              impact: 'invalid-impact' as any
-            }
+              impact: 'invalid-impact' as any,
+            },
           ],
           coverage_pct: NaN,
           lastUpdated: null as any,
           totalClaims: undefined as any,
-          backedClaims: Infinity
+          backedClaims: Infinity,
         },
         confidence: {
           total: NaN,
           breakdown: null as any,
           explanation: undefined as any,
-          lowConfidence: 'not-boolean' as any
+          lowConfidence: 'not-boolean' as any,
         },
         scenarios: null as any,
         hardQuestions: 'not-an-array' as any,
         citations: undefined as any,
         inputsHash: null as any,
         isoTimestamp: 'invalid-date',
-        shortHash: undefined as any
+        shortHash: undefined as any,
       };
 
       expect(() => {
@@ -327,25 +341,32 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
           coverage_pct: 0,
           lastUpdated: new Date(),
           totalClaims: 0,
-          backedClaims: 0
+          backedClaims: 0,
         },
         confidence: {
           total: 50,
-          breakdown: { evidence: 50, recency: 50, diversity: 50, agreement: 50, coverage: 50, sensitivity: 50 },
+          breakdown: {
+            evidence: 50,
+            recency: 50,
+            diversity: 50,
+            agreement: 50,
+            coverage: 50,
+            sensitivity: 50,
+          },
           explanation: 'Test',
-          lowConfidence: true
+          lowConfidence: true,
         },
         scenarios: {
           scenarios: { bear: [], base: [], bull: [] },
           elasticities: [],
           keyDrivers: [],
-          sensitivityPct: 20
+          sensitivityPct: 20,
         },
         hardQuestions: [],
         citations: [],
         inputsHash: 'test',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'test'
+        shortHash: 'test',
       };
 
       // Should handle helper errors gracefully
@@ -358,15 +379,15 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
     it('should validate template structure and provide meaningful errors', () => {
       const requiredSections = ['Evidence Mechanisms', 'Assumption Ledger', 'Confidence Score'];
       const requiredVariables = ['featureName', 'customer', 'confidence.total'];
-      
+
       const invalidTemplate = 'Invalid template without required sections {{missingVariable}}';
-      
+
       const validation = templateProcessor.validateTemplate(
-        invalidTemplate, 
-        requiredSections, 
+        invalidTemplate,
+        requiredSections,
         requiredVariables
       );
-      
+
       expect(validation.isValid).toBe(false);
       expect(validation.missingSections.length).toBeGreaterThan(0);
       expect(validation.missingVariables.length).toBeGreaterThan(0);
@@ -382,13 +403,13 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
         citations: Array.from({ length: 20 }, (_, i) => ({
           url: `https://very-slow-source-${i}.com/timeout-test`,
           title: `Slow Source ${i}`,
-          sourceType: 'research' as const
-        }))
+          sourceType: 'research' as const,
+        })),
       };
 
       // Should complete even with slow/failing sources
       const result = await assumptionLedgerService.normalizeLedger(inputsWithSlowSources);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
     });
@@ -401,12 +422,12 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
           { url: 'not-a-url', title: 'Invalid URL 1', sourceType: 'news' },
           { url: 'ftp://invalid-protocol.com', title: 'Invalid Protocol', sourceType: 'research' },
           { url: 'https://', title: 'Incomplete URL', sourceType: 'industry_report' },
-          { url: 'https://valid-url.com', title: 'Valid URL', sourceType: 'research' }
-        ]
+          { url: 'https://valid-url.com', title: 'Valid URL', sourceType: 'research' },
+        ],
       };
 
       const result = await assumptionLedgerService.normalizeLedger(inputsWithInvalidUrls);
-      
+
       expect(result.success).toBe(true);
       // Should filter out invalid URLs but keep valid ones
       expect(result.data).toBeDefined();
@@ -415,21 +436,21 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
     it('should handle steering writer failures gracefully', async () => {
       // Mock steering writer to fail
       const originalWrite = steeringWriter.writeSteering;
-      (steeringWriter.writeSteering as jest.Mock) = jest.fn().mockRejectedValue(
-        new Error('File system permission denied')
-      );
+      (steeringWriter.writeSteering as jest.Mock) = jest
+        .fn()
+        .mockRejectedValue(new Error('File system permission denied'));
 
       try {
         const args: GenerateBusinessCaseArgs = {
           opportunity_analysis: 'Test analysis',
           steering_options: {
             create_steering_files: true,
-            feature_name: 'test-feature'
-          }
+            feature_name: 'test-feature',
+          },
         };
 
         const result = await generateBusinessCase(args, mockContext);
-        
+
         // Should still succeed even if steering write fails
         expect(result.isError).toBeFalsy();
         expect(result.metadata?.steeringFileCreated).toBe(false);
@@ -445,27 +466,28 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
       const memoryIntensiveInputs: BusinessInputs = {
         featureName: 'Memory Test Feature',
         customer: 'Test Customer',
-        assumptions: Array.from({ length: 10000 }, (_, i) => 
-          `Memory intensive assumption ${i}: ${'x'.repeat(1000)}`
+        assumptions: Array.from(
+          { length: 10000 },
+          (_, i) => `Memory intensive assumption ${i}: ${'x'.repeat(1000)}`
         ),
         citations: Array.from({ length: 1000 }, (_, i) => ({
           url: `https://memory-test-${i}.com`,
           title: `Memory Test Citation ${i}: ${'y'.repeat(500)}`,
           snippet: 'z'.repeat(2000),
-          sourceType: 'research' as const
-        }))
+          sourceType: 'research' as const,
+        })),
       };
 
       // Should handle large datasets without memory issues
       const result = await assumptionLedgerService.normalizeLedger(memoryIntensiveInputs);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
     });
 
     it('should clean up resources properly after errors', async () => {
       const initialCacheSize = performanceCache.getStats().totalEntries;
-      
+
       // Cause an error that might leave resources
       try {
         await assumptionLedgerService.normalizeLedger(null as any);
@@ -486,12 +508,12 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
         financial_inputs: {
           development_cost: -1000000, // Invalid negative cost
           expected_revenue: NaN, // Invalid number
-          time_to_market: -5 // Invalid negative time
-        }
+          time_to_market: -5, // Invalid negative time
+        },
       };
 
       const result = await generateBusinessCase(invalidArgs, mockContext);
-      
+
       expect(result.isError).toBe(true);
       expect(result.content).toHaveLength(1);
       expect(result.content[0].type).toBe('json');
@@ -504,11 +526,11 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
       const args: CreateStakeholderCommunicationArgs = {
         business_case: 'Valid business case content',
         communication_type: 'unsupported_type' as any,
-        audience: 'invalid_audience' as any
+        audience: 'invalid_audience' as any,
       };
 
       const result = await createStakeholderCommunication(args, mockContext);
-      
+
       expect(result.isError).toBe(true);
       expect(result.content[0].json?.message).toContain('Unsupported communication type');
     });
@@ -521,12 +543,12 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
           development_cost: Infinity,
           expected_revenue: -1000000,
           operational_cost: NaN,
-          time_to_market: 0
-        }
+          time_to_market: 0,
+        },
       };
 
       const result = await generateBusinessCase(problematicArgs, mockContext);
-      
+
       if (result.isError) {
         expect(result.content[0].json?.message).toBeDefined();
         expect(result.content[0].json?.context).toBeDefined();
@@ -546,25 +568,32 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
           coverage_pct: 0,
           lastUpdated: new Date(),
           totalClaims: 0,
-          backedClaims: 0
+          backedClaims: 0,
         },
         confidence: {
           total: 0,
-          breakdown: { evidence: 0, recency: 0, diversity: 0, agreement: 0, coverage: 0, sensitivity: 0 },
+          breakdown: {
+            evidence: 0,
+            recency: 0,
+            diversity: 0,
+            agreement: 0,
+            coverage: 0,
+            sensitivity: 0,
+          },
           explanation: 'No data available for confidence calculation',
-          lowConfidence: true
+          lowConfidence: true,
         },
         scenarios: {
           scenarios: { bear: [], base: [], bull: [] },
           elasticities: [],
           keyDrivers: [],
-          sensitivityPct: 0
+          sensitivityPct: 0,
         },
         hardQuestions: [],
         citations: [],
         inputsHash: 'fallback-test',
         isoTimestamp: new Date().toISOString(),
-        shortHash: 'fallback'
+        shortHash: 'fallback',
       };
 
       const prfaqResult = templateProcessor.renderPRFAQ(minimalContext);
@@ -583,19 +612,21 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
     it('should retry failed operations with exponential backoff', async () => {
       let attemptCount = 0;
       const originalMethod = assumptionLedgerService.normalizeLedger;
-      
-      (assumptionLedgerService.normalizeLedger as jest.Mock) = jest.fn().mockImplementation(async (inputs: any) => {
-        attemptCount++;
-        if (attemptCount < 3) {
-          throw new Error('Temporary service failure');
-        }
-        return originalMethod.call(assumptionLedgerService, inputs);
-      });
+
+      (assumptionLedgerService.normalizeLedger as jest.Mock) = jest
+        .fn()
+        .mockImplementation(async (inputs: any) => {
+          attemptCount++;
+          if (attemptCount < 3) {
+            throw new Error('Temporary service failure');
+          }
+          return originalMethod.call(assumptionLedgerService, inputs);
+        });
 
       try {
         const result = await assumptionLedgerService.normalizeLedger({
           featureName: 'Retry Test Feature',
-          customer: 'Test Customer'
+          customer: 'Test Customer',
         });
 
         // Should eventually succeed after retries
@@ -612,13 +643,11 @@ describe('Amazon Working Backwards - Comprehensive Error Handling', () => {
         customer: 'Test Customer',
         pricing: -100, // Invalid negative pricing
         users: 0, // Edge case zero users
-        citations: [
-          { url: 'invalid-url', title: 'Invalid Citation', sourceType: 'news' }
-        ]
+        citations: [{ url: 'invalid-url', title: 'Invalid Citation', sourceType: 'news' }],
       };
 
       const result = await assumptionLedgerService.normalizeLedger(diagnosticInputs);
-      
+
       if (!result.success) {
         expect(result.error?.message).toBeDefined();
         expect(result.error?.code).toBeDefined();

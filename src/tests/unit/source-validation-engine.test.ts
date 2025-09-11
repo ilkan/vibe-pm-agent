@@ -1,6 +1,9 @@
 // Unit tests for Source Validation Engine
 
-import { SourceValidationEngine, ValidationConfig } from '../../components/source-validation-engine';
+import {
+  SourceValidationEngine,
+  ValidationConfig,
+} from '../../components/source-validation-engine';
 import {
   Citation,
   CitationSourceType,
@@ -104,17 +107,21 @@ describe('SourceValidationEngine', () => {
     it('should provide alternative access methods', async () => {
       const result = await engine.validateSourceAccessibility('https://example.com/test');
 
-      expect(result.alternativeAccess).toContain('https://web.archive.org/web/*/https://example.com/test');
-      expect(result.alternativeAccess).toContain('https://webcache.googleusercontent.com/search?q=cache:https://example.com/test');
+      expect(result.alternativeAccess).toContain(
+        'https://web.archive.org/web/*/https://example.com/test'
+      );
+      expect(result.alternativeAccess).toContain(
+        'https://webcache.googleusercontent.com/search?q=cache:https://example.com/test'
+      );
     });
 
     it('should cache accessibility results', async () => {
       const url = 'https://example.com/cached';
-      
+
       // First call
       const result1 = await engine.validateSourceAccessibility(url);
       const stats1 = engine.getCacheStats();
-      
+
       // Second call should use cache
       const result2 = await engine.validateSourceAccessibility(url);
       const stats2 = engine.getCacheStats();
@@ -180,7 +187,7 @@ describe('SourceValidationEngine', () => {
       // First assessment
       await engine.assessSourceCredibility(mockCitation);
       const stats1 = engine.getCacheStats();
-      
+
       // Second assessment should use cache
       await engine.assessSourceCredibility(mockCitation);
       const stats2 = engine.getCacheStats();

@@ -13,7 +13,7 @@ describe('ScenarioService', () => {
 
   beforeEach(() => {
     service = new ScenarioService();
-    
+
     const sampleLedger: AssumptionLedger = {
       assumptions: [
         {
@@ -24,7 +24,7 @@ describe('ScenarioService', () => {
           certainty: 'High',
           lastChecked: new Date(),
           category: 'financial',
-          impact: 'critical'
+          impact: 'critical',
         },
         {
           id: 'A2',
@@ -34,27 +34,27 @@ describe('ScenarioService', () => {
           certainty: 'Medium',
           lastChecked: new Date(),
           category: 'financial',
-          impact: 'critical'
-        }
+          impact: 'critical',
+        },
       ],
       coverage_pct: 100,
       lastUpdated: new Date(),
       totalClaims: 2,
-      backedClaims: 2
+      backedClaims: 2,
     };
 
     const sampleFinancialModel: FinancialModel = {
       revenue: 1000000,
       costs: 500000,
       roi: 100,
-      npv: 500000
+      npv: 500000,
     };
 
     sampleContext = {
       ledger: sampleLedger,
       basicCalc: sampleFinancialModel,
       topIds: ['A1', 'A2'],
-      scenarioPct: 0.2
+      scenarioPct: 0.2,
     };
   });
 
@@ -64,7 +64,7 @@ describe('ScenarioService', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
-      
+
       const scenarios = result.data!;
       expect(scenarios.scenarios.bear).toBeDefined();
       expect(scenarios.scenarios.base).toBeDefined();
@@ -76,10 +76,10 @@ describe('ScenarioService', () => {
 
     it('should generate scenarios for all financial metrics', async () => {
       const result = await service.runScenarios(sampleContext);
-      
+
       expect(result.success).toBe(true);
       const scenarios = result.data!.scenarios;
-      
+
       const expectedMetrics = ['Revenue', 'Costs', 'ROI', 'NPV'];
       expectedMetrics.forEach(metric => {
         expect(scenarios.base.find(s => s.metric === metric)).toBeDefined();
@@ -90,40 +90,40 @@ describe('ScenarioService', () => {
 
     it('should apply correct percentage changes for bear scenarios', async () => {
       const result = await service.runScenarios(sampleContext);
-      
+
       expect(result.success).toBe(true);
       const scenarios = result.data!.scenarios;
-      
+
       const revenueBase = scenarios.base.find(s => s.metric === 'Revenue');
       const revenueBear = scenarios.bear.find(s => s.metric === 'Revenue');
-      
+
       expect(revenueBase?.base).toBe(1000000);
       expect(revenueBear?.bear).toBe(800000); // 20% reduction for positive metric
     });
 
     it('should apply correct percentage changes for bull scenarios', async () => {
       const result = await service.runScenarios(sampleContext);
-      
+
       expect(result.success).toBe(true);
       const scenarios = result.data!.scenarios;
-      
+
       const revenueBase = scenarios.base.find(s => s.metric === 'Revenue');
       const revenueBull = scenarios.bull.find(s => s.metric === 'Revenue');
-      
+
       expect(revenueBase?.base).toBe(1000000);
       expect(revenueBull?.bull).toBe(1200000); // 20% increase for positive metric
     });
 
     it('should handle cost metrics inversely (bear increases, bull decreases)', async () => {
       const result = await service.runScenarios(sampleContext);
-      
+
       expect(result.success).toBe(true);
       const scenarios = result.data!.scenarios;
-      
+
       const costsBase = scenarios.base.find(s => s.metric === 'Costs');
       const costsBear = scenarios.bear.find(s => s.metric === 'Costs');
       const costsBull = scenarios.bull.find(s => s.metric === 'Costs');
-      
+
       expect(costsBase?.base).toBe(500000);
       expect(costsBear?.bear).toBe(600000); // 20% increase for bear (worse case)
       expect(costsBull?.bull).toBe(400000); // 20% decrease for bull (better case)
@@ -136,15 +136,15 @@ describe('ScenarioService', () => {
           revenue: 0,
           costs: 0,
           roi: 0,
-          npv: 0
-        }
+          npv: 0,
+        },
       };
 
       const result = await service.runScenarios(zeroContext);
-      
+
       expect(result.success).toBe(true);
       const scenarios = result.data!.scenarios;
-      
+
       scenarios.base.forEach(scenario => {
         expect(scenario.base).toBe(0);
       });
@@ -158,9 +158,9 @@ describe('ScenarioService', () => {
 
     it('should handle errors gracefully', async () => {
       const invalidContext = null as any;
-      
+
       const result = await service.runScenarios(invalidContext);
-      
+
       expect(result.success).toBe(false);
       expect(result.error?.code).toBe('SCENARIO_ANALYSIS_ERROR');
     });
@@ -172,26 +172,26 @@ describe('ScenarioService', () => {
         revenue: 1000000,
         costs: 500000,
         roi: 100,
-        npv: 500000
+        npv: 500000,
       };
 
       const scenarios = {
         bear: [
           { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 },
-          { metric: 'ROI', bear: 80, base: 100, bull: 120 }
+          { metric: 'ROI', bear: 80, base: 100, bull: 120 },
         ],
         base: [
           { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 },
-          { metric: 'ROI', bear: 80, base: 100, bull: 120 }
+          { metric: 'ROI', bear: 80, base: 100, bull: 120 },
         ],
         bull: [
           { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 },
-          { metric: 'ROI', bear: 80, base: 100, bull: 120 }
-        ]
+          { metric: 'ROI', bear: 80, base: 100, bull: 120 },
+        ],
       };
 
       const elasticities = service.calculateElasticities(baseCase, scenarios, sampleContext);
-      
+
       expect(elasticities.length).toBeGreaterThan(0);
       expect(elasticities[0].assumptionChange).toBe('±20%');
       expect(elasticities[0].outcomeChange).toMatch(/±\d+(%|pp)/);
@@ -204,26 +204,26 @@ describe('ScenarioService', () => {
         revenue: 1000000,
         costs: 500000,
         roi: 100,
-        npv: 500000
+        npv: 500000,
       };
 
       const scenarios = {
         bear: [
           { metric: 'Revenue', bear: 900000, base: 1000000, bull: 1100000 }, // 10% change
-          { metric: 'ROI', bear: 70, base: 100, bull: 130 } // 30% change
+          { metric: 'ROI', bear: 70, base: 100, bull: 130 }, // 30% change
         ],
         base: [
           { metric: 'Revenue', bear: 900000, base: 1000000, bull: 1100000 },
-          { metric: 'ROI', bear: 70, base: 100, bull: 130 }
+          { metric: 'ROI', bear: 70, base: 100, bull: 130 },
         ],
         bull: [
           { metric: 'Revenue', bear: 900000, base: 1000000, bull: 1100000 },
-          { metric: 'ROI', bear: 70, base: 100, bull: 130 }
-        ]
+          { metric: 'ROI', bear: 70, base: 100, bull: 130 },
+        ],
       };
 
       const elasticities = service.calculateElasticities(baseCase, scenarios, sampleContext);
-      
+
       expect(elasticities.length).toBeGreaterThan(0);
       // Should be sorted by sensitivity (descending)
       for (let i = 0; i < elasticities.length - 1; i++) {
@@ -236,23 +236,17 @@ describe('ScenarioService', () => {
         revenue: 1000000,
         costs: 500000,
         roi: 100,
-        npv: 500000
+        npv: 500000,
       };
 
       const scenarios = {
-        bear: [
-          { metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }
-        ],
-        base: [
-          { metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }
-        ],
-        bull: [
-          { metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }
-        ]
+        bear: [{ metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }],
+        base: [{ metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }],
+        bull: [{ metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }],
       };
 
       const elasticities = service.calculateElasticities(baseCase, scenarios, sampleContext);
-      
+
       expect(elasticities).toHaveLength(0); // Should skip non-numeric values
     });
 
@@ -261,29 +255,29 @@ describe('ScenarioService', () => {
         revenue: 1000000,
         costs: 500000,
         roi: 100,
-        npv: 500000
+        npv: 500000,
       };
 
       const scenarios = {
         bear: [
           { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 },
-          { metric: 'ROI', bear: 80, base: 100, bull: 120 }
+          { metric: 'ROI', bear: 80, base: 100, bull: 120 },
         ],
         base: [
           { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 },
-          { metric: 'ROI', bear: 80, base: 100, bull: 120 }
+          { metric: 'ROI', bear: 80, base: 100, bull: 120 },
         ],
         bull: [
           { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 },
-          { metric: 'ROI', bear: 80, base: 100, bull: 120 }
-        ]
+          { metric: 'ROI', bear: 80, base: 100, bull: 120 },
+        ],
       };
 
       const elasticities = service.calculateElasticities(baseCase, scenarios, sampleContext);
-      
+
       const revenueElasticity = elasticities.find(e => e.outcomeMetric === 'Revenue');
       const roiElasticity = elasticities.find(e => e.outcomeMetric === 'ROI');
-      
+
       if (revenueElasticity) {
         expect(revenueElasticity.outcomeChange).toMatch(/±\d+%/); // Percentage for revenue
       }
@@ -301,19 +295,19 @@ describe('ScenarioService', () => {
           assumptionChange: '±20%',
           outcomeMetric: 'Revenue',
           outcomeChange: '±15%',
-          sensitivity: 15
+          sensitivity: 15,
         },
         {
           assumption: 'Development Cost',
           assumptionChange: '±20%',
           outcomeMetric: 'ROI',
           outcomeChange: '±10%',
-          sensitivity: 10
-        }
+          sensitivity: 10,
+        },
       ];
 
       const keyDrivers = service.identifyKeyDrivers(elasticities, sampleContext.ledger);
-      
+
       expect(keyDrivers).toHaveLength(2); // Two assumptions in elasticities
       expect(keyDrivers[0].assumption).toBe('Revenue'); // Highest sensitivity first
       expect(keyDrivers[1].assumption).toBe('Development Cost');
@@ -326,12 +320,12 @@ describe('ScenarioService', () => {
           assumptionChange: '±20%',
           outcomeMetric: 'Revenue',
           outcomeChange: '±15%',
-          sensitivity: 15
-        }
+          sensitivity: 15,
+        },
       ];
 
       const keyDrivers = service.identifyKeyDrivers(elasticities, sampleContext.ledger);
-      
+
       // Should be sorted by impact (descending)
       for (let i = 0; i < keyDrivers.length - 1; i++) {
         expect(keyDrivers[i].impact).toBeGreaterThanOrEqual(keyDrivers[i + 1].impact);
@@ -345,7 +339,7 @@ describe('ScenarioService', () => {
         assumptionChange: '±20%',
         outcomeMetric: 'Revenue',
         outcomeChange: '±15%',
-        sensitivity: 15 - i // Decreasing sensitivity
+        sensitivity: 15 - i, // Decreasing sensitivity
       }));
 
       const largeLedger: AssumptionLedger = {
@@ -357,16 +351,16 @@ describe('ScenarioService', () => {
           certainty: 'High' as const,
           lastChecked: new Date(),
           category: 'financial' as const,
-          impact: 'critical' as const
+          impact: 'critical' as const,
         })),
         coverage_pct: 100,
         lastUpdated: new Date(),
         totalClaims: 10,
-        backedClaims: 10
+        backedClaims: 10,
       };
 
       const keyDrivers = service.identifyKeyDrivers(manyElasticities, largeLedger);
-      
+
       expect(keyDrivers.length).toBeLessThanOrEqual(5); // Should limit to 5
     });
 
@@ -377,12 +371,12 @@ describe('ScenarioService', () => {
           assumptionChange: '±20%',
           outcomeMetric: 'Revenue',
           outcomeChange: '±15%',
-          sensitivity: 15
-        }
+          sensitivity: 15,
+        },
       ];
 
       const keyDrivers = service.identifyKeyDrivers(elasticities, sampleContext.ledger);
-      
+
       keyDrivers.forEach(driver => {
         expect(driver.description).toBeDefined();
         expect(driver.description.length).toBeGreaterThan(0);
@@ -398,18 +392,18 @@ describe('ScenarioService', () => {
           bear: [
             { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 },
             { metric: 'ROI', bear: 80, base: 100, bull: 120 },
-            { metric: 'Costs', bear: 600000, base: 500000, bull: 400000 }
+            { metric: 'Costs', bear: 600000, base: 500000, bull: 400000 },
           ],
           base: [
             { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 },
             { metric: 'ROI', bear: 80, base: 100, bull: 120 },
-            { metric: 'Costs', bear: 600000, base: 500000, bull: 400000 }
+            { metric: 'Costs', bear: 600000, base: 500000, bull: 400000 },
           ],
           bull: [
             { metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 },
             { metric: 'ROI', bear: 80, base: 100, bull: 120 },
-            { metric: 'Costs', bear: 600000, base: 500000, bull: 400000 }
-          ]
+            { metric: 'Costs', bear: 600000, base: 500000, bull: 400000 },
+          ],
         },
         elasticities: [
           {
@@ -417,22 +411,22 @@ describe('ScenarioService', () => {
             assumptionChange: '±20%',
             outcomeMetric: 'ROI',
             outcomeChange: '±15%',
-            sensitivity: 15
-          }
+            sensitivity: 15,
+          },
         ],
         keyDrivers: [
           {
             assumption: 'Revenue',
             assumptionId: 'A1',
             impact: 15,
-            description: 'Revenue shows high sensitivity'
-          }
+            description: 'Revenue shows high sensitivity',
+          },
         ],
-        sensitivityPct: 20
+        sensitivityPct: 20,
       };
 
       const result = await service.validateScenarios(validResults);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBe(true);
     });
@@ -441,22 +435,18 @@ describe('ScenarioService', () => {
       const invalidResults = {
         scenarios: {
           bear: [
-            { metric: 'Revenue', bear: 1200000, base: 1000000, bull: 800000 } // Inconsistent order
+            { metric: 'Revenue', bear: 1200000, base: 1000000, bull: 800000 }, // Inconsistent order
           ],
-          base: [
-            { metric: 'Revenue', bear: 1200000, base: 1000000, bull: 800000 }
-          ],
-          bull: [
-            { metric: 'Revenue', bear: 1200000, base: 1000000, bull: 800000 }
-          ]
+          base: [{ metric: 'Revenue', bear: 1200000, base: 1000000, bull: 800000 }],
+          bull: [{ metric: 'Revenue', bear: 1200000, base: 1000000, bull: 800000 }],
         },
         elasticities: [],
         keyDrivers: [],
-        sensitivityPct: 20
+        sensitivityPct: 20,
       };
 
       const result = await service.validateScenarios(invalidResults);
-      
+
       expect(result.success).toBe(false);
       expect(result.error?.message).toContain('consistency violation');
       expect(result.error?.message).toContain('positive metric');
@@ -466,22 +456,18 @@ describe('ScenarioService', () => {
       const invalidResults = {
         scenarios: {
           bear: [
-            { metric: 'Costs', bear: 400000, base: 500000, bull: 600000 } // Wrong order for costs
+            { metric: 'Costs', bear: 400000, base: 500000, bull: 600000 }, // Wrong order for costs
           ],
-          base: [
-            { metric: 'Costs', bear: 400000, base: 500000, bull: 600000 }
-          ],
-          bull: [
-            { metric: 'Costs', bear: 400000, base: 500000, bull: 600000 }
-          ]
+          base: [{ metric: 'Costs', bear: 400000, base: 500000, bull: 600000 }],
+          bull: [{ metric: 'Costs', bear: 400000, base: 500000, bull: 600000 }],
         },
         elasticities: [],
         keyDrivers: [],
-        sensitivityPct: 20
+        sensitivityPct: 20,
       };
 
       const result = await service.validateScenarios(invalidResults);
-      
+
       expect(result.success).toBe(false);
       expect(result.error?.message).toContain('consistency violation');
       expect(result.error?.message).toContain('cost metric');
@@ -492,7 +478,7 @@ describe('ScenarioService', () => {
         scenarios: {
           bear: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }],
           base: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }],
-          bull: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }]
+          bull: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }],
         },
         elasticities: [
           {
@@ -500,15 +486,15 @@ describe('ScenarioService', () => {
             assumptionChange: '±20%',
             outcomeMetric: 'ROI',
             outcomeChange: '±1500%', // Unrealistic
-            sensitivity: 1500
-          }
+            sensitivity: 1500,
+          },
         ],
         keyDrivers: [],
-        sensitivityPct: 20
+        sensitivityPct: 20,
       };
 
       const result = await service.validateScenarios(invalidResults);
-      
+
       expect(result.success).toBe(false);
       expect(result.error?.message).toContain('Unrealistic elasticity');
     });
@@ -518,18 +504,18 @@ describe('ScenarioService', () => {
         scenarios: {
           bear: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }],
           base: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }],
-          bull: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }]
+          bull: [{ metric: 'Revenue', bear: 800000, base: 1000000, bull: 1200000 }],
         },
         elasticities: [],
         keyDrivers: [
           { assumption: 'Low Impact', assumptionId: 'A1', impact: 5, description: 'Low' },
-          { assumption: 'High Impact', assumptionId: 'A2', impact: 15, description: 'High' } // Wrong order
+          { assumption: 'High Impact', assumptionId: 'A2', impact: 15, description: 'High' }, // Wrong order
         ],
-        sensitivityPct: 20
+        sensitivityPct: 20,
       };
 
       const result = await service.validateScenarios(invalidResults);
-      
+
       expect(result.success).toBe(false);
       expect(result.error?.message).toContain('Key drivers not properly sorted');
     });
@@ -537,23 +523,17 @@ describe('ScenarioService', () => {
     it('should handle string values in validation', async () => {
       const mixedResults = {
         scenarios: {
-          bear: [
-            { metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }
-          ],
-          base: [
-            { metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }
-          ],
-          bull: [
-            { metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }
-          ]
+          bear: [{ metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }],
+          base: [{ metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }],
+          bull: [{ metric: 'Revenue', bear: 'N/A', base: 1000000, bull: 1200000 }],
         },
         elasticities: [],
         keyDrivers: [],
-        sensitivityPct: 20
+        sensitivityPct: 20,
       };
 
       const result = await service.validateScenarios(mixedResults);
-      
+
       expect(result.success).toBe(true); // Should skip validation for non-numeric values
     });
   });
@@ -574,7 +554,7 @@ describe('ScenarioService', () => {
               certainty: 'High',
               lastChecked: new Date(),
               category: 'financial',
-              impact: 'critical'
+              impact: 'critical',
             },
             {
               id: 'A2',
@@ -585,21 +565,21 @@ describe('ScenarioService', () => {
               certainty: 'Medium',
               lastChecked: new Date(),
               category: 'market',
-              impact: 'critical'
-            }
-          ]
-        }
+              impact: 'critical',
+            },
+          ],
+        },
       };
 
       const result = await service.runScenarios(contextWithNumericAssumptions);
-      
+
       expect(result.success).toBe(true);
       const scenarios = result.data!;
-      
+
       // Should have elasticities that reference specific assumptions
       expect(scenarios.elasticities.length).toBeGreaterThan(0);
-      const hasSpecificAssumptions = scenarios.elasticities.some(e => 
-        e.assumption === 'Customer Acquisition Cost' || e.assumption === 'Conversion Rate'
+      const hasSpecificAssumptions = scenarios.elasticities.some(
+        e => e.assumption === 'Customer Acquisition Cost' || e.assumption === 'Conversion Rate'
       );
       expect(hasSpecificAssumptions).toBe(true);
     });
@@ -614,31 +594,31 @@ describe('ScenarioService', () => {
           certainty: 'High' as const,
           lastChecked: new Date(),
           category: 'financial' as const,
-          impact: 'critical' as const
+          impact: 'critical' as const,
         })),
         coverage_pct: 100,
         lastUpdated: new Date(),
         totalClaims: 10,
-        backedClaims: 10
+        backedClaims: 10,
       };
 
       const largeContext: ScenarioContext = {
         ...sampleContext,
-        ledger: largeLedger
+        ledger: largeLedger,
       };
 
       const result = await service.runScenarios(largeContext);
-      
+
       expect(result.success).toBe(true);
       expect(result.data!.keyDrivers.length).toBeLessThanOrEqual(5);
     });
 
     it('should include meaningful descriptions for key drivers', async () => {
       const result = await service.runScenarios(sampleContext);
-      
+
       expect(result.success).toBe(true);
       const keyDrivers = result.data!.keyDrivers;
-      
+
       keyDrivers.forEach(driver => {
         expect(driver.description).toBeDefined();
         expect(driver.description.length).toBeGreaterThan(10);

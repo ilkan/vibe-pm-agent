@@ -1,6 +1,6 @@
 /**
  * Authoritative Source Enhancer
- * 
+ *
  * Enhances business analysis prompts with context from world-class consulting
  * and research organizations to improve confidence scores and analysis quality.
  */
@@ -41,7 +41,10 @@ export class AuthoritativeSourceEnhancer {
   /**
    * Enhance business analysis prompt with authoritative source context
    */
-  enhancePrompt(basePrompt: string, analysisType: 'market' | 'strategic' | 'financial' | 'operational'): string {
+  enhancePrompt(
+    basePrompt: string,
+    analysisType: 'market' | 'strategic' | 'financial' | 'operational'
+  ): string {
     const contextualFrameworks = this.getRelevantFrameworks(analysisType);
     const industryBenchmarks = this.getIndustryBenchmarks(analysisType);
     const validationCriteria = this.getValidationCriteria(analysisType);
@@ -85,157 +88,157 @@ Provide confidence scores (0-100) with explicit reasoning based on authoritative
     return {
       mckinsey: {
         frameworks: [
-          "7S Framework for organizational effectiveness",
-          "Three Horizons of Growth model",
-          "MECE problem-solving methodology",
-          "Digital transformation playbook",
-          "Customer journey mapping",
-          "Value creation in digital economy"
+          '7S Framework for organizational effectiveness',
+          'Three Horizons of Growth model',
+          'MECE problem-solving methodology',
+          'Digital transformation playbook',
+          'Customer journey mapping',
+          'Value creation in digital economy',
         ],
         industryInsights: [
-          "Industry 4.0 transformation patterns",
-          "Digital customer engagement trends",
-          "Operational excellence benchmarks",
-          "Innovation investment patterns",
-          "Talent and skills evolution"
+          'Industry 4.0 transformation patterns',
+          'Digital customer engagement trends',
+          'Operational excellence benchmarks',
+          'Innovation investment patterns',
+          'Talent and skills evolution',
         ],
         digitalTrends: [
-          "AI and automation adoption curves",
-          "Platform business model evolution",
-          "Ecosystem orchestration strategies",
-          "Data monetization approaches"
-        ]
+          'AI and automation adoption curves',
+          'Platform business model evolution',
+          'Ecosystem orchestration strategies',
+          'Data monetization approaches',
+        ],
       },
       wef: {
         globalRisks: [
-          "Technology governance challenges",
-          "Cybersecurity threat landscape",
-          "Economic inequality impacts",
-          "Climate change business risks"
+          'Technology governance challenges',
+          'Cybersecurity threat landscape',
+          'Economic inequality impacts',
+          'Climate change business risks',
         ],
         futureOfWork: [
-          "Skills transformation requirements",
-          "Remote work productivity patterns",
-          "Human-AI collaboration models",
-          "Workforce reskilling strategies"
+          'Skills transformation requirements',
+          'Remote work productivity patterns',
+          'Human-AI collaboration models',
+          'Workforce reskilling strategies',
         ],
         industryTransformation: [
-          "Fourth Industrial Revolution impacts",
-          "Stakeholder capitalism principles",
-          "ESG integration requirements",
-          "Global supply chain resilience"
-        ]
+          'Fourth Industrial Revolution impacts',
+          'Stakeholder capitalism principles',
+          'ESG integration requirements',
+          'Global supply chain resilience',
+        ],
       },
       gartner: {
         technologyTrends: [
-          "Strategic technology trends",
-          "Hype cycle positioning",
-          "Technology adoption lifecycle",
-          "Digital business transformation"
+          'Strategic technology trends',
+          'Hype cycle positioning',
+          'Technology adoption lifecycle',
+          'Digital business transformation',
         ],
         marketForecasts: [
-          "IT spending forecasts by category",
-          "Emerging technology market sizing",
-          "Vendor landscape analysis",
-          "Technology ROI benchmarks"
+          'IT spending forecasts by category',
+          'Emerging technology market sizing',
+          'Vendor landscape analysis',
+          'Technology ROI benchmarks',
         ],
         hypecycle: [
-          "Innovation trigger identification",
-          "Peak of inflated expectations",
-          "Trough of disillusionment timing",
-          "Slope of enlightenment indicators",
-          "Plateau of productivity markers"
-        ]
+          'Innovation trigger identification',
+          'Peak of inflated expectations',
+          'Trough of disillusionment timing',
+          'Slope of enlightenment indicators',
+          'Plateau of productivity markers',
+        ],
       },
       bcg: {
         strategicFrameworks: [
-          "Growth-Share Matrix application",
-          "Experience curve economics",
-          "Time-based competition",
-          "Blue ocean strategy principles"
+          'Growth-Share Matrix application',
+          'Experience curve economics',
+          'Time-based competition',
+          'Blue ocean strategy principles',
         ],
         innovationPatterns: [
-          "Innovation to impact methodology",
-          "Digital acceleration patterns",
-          "Ecosystem advantage creation",
-          "Bionic company principles"
-        ]
+          'Innovation to impact methodology',
+          'Digital acceleration patterns',
+          'Ecosystem advantage creation',
+          'Bionic company principles',
+        ],
       },
       bain: {
         customerInsights: [
-          "Net Promoter Score methodology",
-          "Customer loyalty economics",
-          "Customer lifetime value optimization",
-          "Customer experience design"
+          'Net Promoter Score methodology',
+          'Customer loyalty economics',
+          'Customer lifetime value optimization',
+          'Customer experience design',
         ],
         operationalExcellence: [
-          "Full Potential Transformation",
-          "Results delivery methodology",
-          "Capability building approaches",
-          "Performance improvement systems"
-        ]
-      }
+          'Full Potential Transformation',
+          'Results delivery methodology',
+          'Capability building approaches',
+          'Performance improvement systems',
+        ],
+      },
     };
   }
 
   private getRelevantFrameworks(analysisType: string): string[] {
     const frameworks = [];
-    
+
     switch (analysisType) {
       case 'market':
         frameworks.push(
           "- Apply Porter's Five Forces for competitive landscape analysis",
-          "- Use TAM/SAM/SOM sizing with Gartner market forecasting methodology",
+          '- Use TAM/SAM/SOM sizing with Gartner market forecasting methodology',
           "- Reference McKinsey's digital transformation benchmarks",
-          "- Apply BCG Growth-Share Matrix for portfolio positioning"
+          '- Apply BCG Growth-Share Matrix for portfolio positioning'
         );
         break;
       case 'strategic':
         frameworks.push(
-          "- Use McKinsey 7S Framework for organizational alignment",
-          "- Apply Three Horizons of Growth for innovation portfolio",
-          "- Reference WEF Future of Work insights for capability requirements",
+          '- Use McKinsey 7S Framework for organizational alignment',
+          '- Apply Three Horizons of Growth for innovation portfolio',
+          '- Reference WEF Future of Work insights for capability requirements',
           "- Use Bain's Full Potential Transformation methodology"
         );
         break;
       case 'financial':
         frameworks.push(
-          "- Apply McKinsey value creation principles",
-          "- Use BCG experience curve for cost modeling",
-          "- Reference Gartner ROI benchmarks for technology investments",
-          "- Apply Bain customer lifetime value optimization"
+          '- Apply McKinsey value creation principles',
+          '- Use BCG experience curve for cost modeling',
+          '- Reference Gartner ROI benchmarks for technology investments',
+          '- Apply Bain customer lifetime value optimization'
         );
         break;
       case 'operational':
         frameworks.push(
-          "- Use McKinsey operational excellence benchmarks",
-          "- Apply Bain Results Delivery methodology",
-          "- Reference Gartner technology adoption lifecycle",
-          "- Use WEF Industry 4.0 transformation patterns"
+          '- Use McKinsey operational excellence benchmarks',
+          '- Apply Bain Results Delivery methodology',
+          '- Reference Gartner technology adoption lifecycle',
+          '- Use WEF Industry 4.0 transformation patterns'
         );
         break;
     }
-    
+
     return frameworks;
   }
 
   private getIndustryBenchmarks(analysisType: string): string[] {
     return [
-      "- Reference McKinsey Global Institute research for macro trends",
-      "- Use Gartner Magic Quadrant positioning for vendor analysis",
-      "- Apply WEF Global Competitiveness Index for market context",
-      "- Reference BCG innovation surveys for R&D benchmarks",
-      "- Use Bain customer loyalty benchmarks for retention modeling"
+      '- Reference McKinsey Global Institute research for macro trends',
+      '- Use Gartner Magic Quadrant positioning for vendor analysis',
+      '- Apply WEF Global Competitiveness Index for market context',
+      '- Reference BCG innovation surveys for R&D benchmarks',
+      '- Use Bain customer loyalty benchmarks for retention modeling',
     ];
   }
 
   private getValidationCriteria(analysisType: string): string[] {
     return [
-      "- Validate assumptions against McKinsey industry reports",
-      "- Cross-reference with Gartner technology forecasts",
-      "- Align with WEF global risk assessments",
-      "- Benchmark against BCG digital transformation studies",
-      "- Validate customer insights with Bain NPS methodology"
+      '- Validate assumptions against McKinsey industry reports',
+      '- Cross-reference with Gartner technology forecasts',
+      '- Align with WEF global risk assessments',
+      '- Benchmark against BCG digital transformation studies',
+      '- Validate customer insights with Bain NPS methodology',
     ];
   }
 

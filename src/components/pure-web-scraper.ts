@@ -26,15 +26,16 @@ export class PureWebScraper {
     try {
       // Step 1: Search DuckDuckGo for real URLs
       const searchUrls = await this.searchDuckDuckGo(query);
-      
+
       if (searchUrls.length === 0) {
         return []; // NO MOCK DATA - return empty if no real results
       }
 
       // Step 2: Actually scrape the found URLs
       const results: RealScrapedResult[] = [];
-      
-      for (const url of searchUrls.slice(0, 5)) { // Limit to 5 URLs
+
+      for (const url of searchUrls.slice(0, 5)) {
+        // Limit to 5 URLs
         try {
           const scraped = await this.scrapeRealUrl(url);
           if (scraped) {
@@ -47,7 +48,6 @@ export class PureWebScraper {
       }
 
       return results; // Return only real scraped data
-      
     } catch (error) {
       return []; // NO MOCK DATA - return empty on failure
     }
@@ -59,7 +59,7 @@ export class PureWebScraper {
   private async searchDuckDuckGo(query: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
       const searchUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query + ' market size revenue')}&format=json&no_html=1`;
-      
+
       const url = new URL(searchUrl);
       const options = {
         hostname: url.hostname,
@@ -67,15 +67,15 @@ export class PureWebScraper {
         method: 'GET',
         headers: {
           'User-Agent': this.userAgent,
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
         rejectUnauthorized: false, // Allow self-signed certificates for testing
       };
 
-      const req = https.request(options, (res) => {
+      const req = https.request(options, res => {
         let data = '';
-        
-        res.on('data', (chunk) => {
+
+        res.on('data', chunk => {
           data += chunk;
         });
 
@@ -128,22 +128,27 @@ export class PureWebScraper {
   private async scrapeRealUrl(url: string): Promise<RealScrapedResult | null> {
     return new Promise((resolve, reject) => {
       const urlObj = new URL(url);
-      
+
       const options = {
         hostname: urlObj.hostname,
         path: urlObj.pathname + urlObj.search,
         method: 'GET',
         headers: {
           'User-Agent': this.userAgent,
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
         },
         rejectUnauthorized: false, // Allow self-signed certificates for testing
       };
 
-      const req = https.request(options, (res) => {
+      const req = https.request(options, res => {
         // Handle redirects
-        if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        if (
+          res.statusCode &&
+          res.statusCode >= 300 &&
+          res.statusCode < 400 &&
+          res.headers.location
+        ) {
           resolve(this.scrapeRealUrl(res.headers.location));
           return;
         }
@@ -154,8 +159,8 @@ export class PureWebScraper {
         }
 
         let html = '';
-        
-        res.on('data', (chunk) => {
+
+        res.on('data', chunk => {
           html += chunk;
         });
 
@@ -239,8 +244,9 @@ Please conduct manual research or try again later.
 *No mock or estimated data provided - only real scraped data is reported.*`;
     }
 
-    const citations = results.map((result, index) => 
-      `[${index + 1}] ${result.title}
+    const citations = results.map(
+      (result, index) =>
+        `[${index + 1}] ${result.title}
     URL: ${result.url}
     Source: ${result.sourceHost}
     Scraped: ${result.scrapedTimestamp.split('T')[0]}
@@ -249,7 +255,7 @@ Please conduct manual research or try again later.
 
     const allNumbers = results.flatMap(r => r.extractedNumbers);
     let marketDataSection = '';
-    
+
     if (allNumbers.length > 0) {
       marketDataSection = `
 ## Real Market Data (Scraped)

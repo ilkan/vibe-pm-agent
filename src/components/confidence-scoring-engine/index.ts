@@ -1,6 +1,6 @@
 /**
  * Confidence Scoring Engine for Enhanced Citation System
- * 
+ *
  * This component provides transparent confidence scoring for claims and documents
  * based on evidence quality, source credibility, and data recency.
  */
@@ -33,8 +33,8 @@ export interface ConfidenceScore {
 export interface DocumentConfidence {
   overallConfidence: number;
   claimConfidences: Map<string, ConfidenceScore>;
-  weakestClaims: Array<{claim: string; confidence: number}>;
-  strongestClaims: Array<{claim: string; confidence: number}>;
+  weakestClaims: Array<{ claim: string; confidence: number }>;
+  strongestClaims: Array<{ claim: string; confidence: number }>;
   recommendationReliability: 'high' | 'medium' | 'low';
 }
 
@@ -97,9 +97,9 @@ const DEFAULT_CONFIG: ConfidenceScoringConfig = {
   weights: {
     sourceQuality: 0.35,
     evidenceStrength: 0.25,
-    methodologyClarity: 0.20,
-    sampleSizeAdequacy: 0.10,
-    recencyFactor: 0.10,
+    methodologyClarity: 0.2,
+    sampleSizeAdequacy: 0.1,
+    recencyFactor: 0.1,
   },
   thresholds: {
     highConfidence: 80,
@@ -138,10 +138,10 @@ export class ConfidenceScoringEngine {
     // Calculate weighted overall score
     const overall = Math.round(
       sourceQuality * this.config.weights.sourceQuality +
-      evidenceStrength * this.config.weights.evidenceStrength +
-      methodologyClarity * this.config.weights.methodologyClarity +
-      sampleSizeAdequacy * this.config.weights.sampleSizeAdequacy +
-      recencyFactor * this.config.weights.recencyFactor
+        evidenceStrength * this.config.weights.evidenceStrength +
+        methodologyClarity * this.config.weights.methodologyClarity +
+        sampleSizeAdequacy * this.config.weights.sampleSizeAdequacy +
+        recencyFactor * this.config.weights.recencyFactor
     );
 
     // Calculate confidence interval
@@ -230,7 +230,8 @@ export class ConfidenceScoringEngine {
 
     // Source credibility factor
     const credibilityScores = sources.map(s => this.getSourceCredibilityScore(s));
-    const avgCredibility = credibilityScores.reduce((sum, score) => sum + score, 0) / credibilityScores.length;
+    const avgCredibility =
+      credibilityScores.reduce((sum, score) => sum + score, 0) / credibilityScores.length;
     factors.push({
       name: 'Source Credibility',
       score: avgCredibility,
@@ -275,11 +276,14 @@ export class ConfidenceScoringEngine {
   /**
    * Generate comprehensive confidence report
    */
-  generateConfidenceReport(document: string, claims: Array<{claim: string; sources: Citation[]}>): ConfidenceReport {
+  generateConfidenceReport(
+    document: string,
+    claims: Array<{ claim: string; sources: Citation[] }>
+  ): ConfidenceReport {
     const claimAnalysis = claims.map(({ claim, sources }) => {
       const confidence = this.calculateClaimConfidence(claim, sources);
       const recommendations = this.generateClaimRecommendations(confidence, sources);
-      
+
       return {
         claim,
         confidence,
@@ -321,7 +325,8 @@ export class ConfidenceScoringEngine {
     if (sources.length === 0) return 0;
 
     const qualityScores: number[] = sources.map(source => this.getSourceCredibilityScore(source));
-    const averageQuality = qualityScores.reduce((sum: number, score: number) => sum + score, 0) / qualityScores.length;
+    const averageQuality =
+      qualityScores.reduce((sum: number, score: number) => sum + score, 0) / qualityScores.length;
 
     // Bonus for source diversity
     const uniqueDomains = new Set(sources.map(s => s.domain)).size;
@@ -340,22 +345,20 @@ export class ConfidenceScoringEngine {
     strengthScore += sourceCountScore;
 
     // Bonus for direct evidence
-    const directEvidenceSources = sources.filter(s => 
-      s.key_finding && s.key_finding.toLowerCase().includes(claim.toLowerCase().split(' ')[0])
+    const directEvidenceSources = sources.filter(
+      s => s.key_finding && s.key_finding.toLowerCase().includes(claim.toLowerCase().split(' ')[0])
     );
     const directEvidenceBonus = Math.min(30, (directEvidenceSources.length / sources.length) * 30);
     strengthScore += directEvidenceBonus;
 
     // Bonus for quantitative evidence
-    const quantitativeSources = sources.filter(s => 
-      s.key_finding && /\d+/.test(s.key_finding)
-    );
+    const quantitativeSources = sources.filter(s => s.key_finding && /\d+/.test(s.key_finding));
     const quantitativeBonus = Math.min(20, (quantitativeSources.length / sources.length) * 20);
     strengthScore += quantitativeBonus;
 
     // Bonus for peer-reviewed sources
-    const peerReviewedSources = sources.filter(s => 
-      s.source_type === 'academic_paper' || s.source_type === 'research_publication'
+    const peerReviewedSources = sources.filter(
+      s => s.source_type === 'academic_paper' || s.source_type === 'research_publication'
     );
     const peerReviewBonus = Math.min(10, (peerReviewedSources.length / sources.length) * 10);
     strengthScore += peerReviewBonus;
@@ -372,7 +375,7 @@ export class ConfidenceScoringEngine {
       // Check if methodology is documented
       if (source.methodology && source.methodology.trim().length > 0) {
         score += 50;
-        
+
         // Bonus for detailed methodology
         if (source.methodology.length > 100) {
           score += 20;
@@ -392,7 +395,10 @@ export class ConfidenceScoringEngine {
       return Math.min(100, score);
     });
 
-    return methodologyScores.reduce((sum: number, score: number) => sum + score, 0) / methodologyScores.length;
+    return (
+      methodologyScores.reduce((sum: number, score: number) => sum + score, 0) /
+      methodologyScores.length
+    );
   }
 
   private calculateSampleSizeScore(sources: Citation[]): number {
@@ -411,7 +417,10 @@ export class ConfidenceScoringEngine {
       return 20;
     });
 
-    return sampleSizeScores.reduce((sum: number, score: number) => sum + score, 0) / sampleSizeScores.length;
+    return (
+      sampleSizeScores.reduce((sum: number, score: number) => sum + score, 0) /
+      sampleSizeScores.length
+    );
   }
 
   private calculateRecencyScore(sources: Citation[]): number {
@@ -423,11 +432,13 @@ export class ConfidenceScoringEngine {
       const monthsOld = (now.getTime() - publishedDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
 
       // Exponential decay with configurable half-life
-      const decayFactor = Math.exp(-0.693 * monthsOld / this.config.recencyDecayMonths);
+      const decayFactor = Math.exp((-0.693 * monthsOld) / this.config.recencyDecayMonths);
       return Math.max(0, Math.min(100, decayFactor * 100));
     });
 
-    return recencyScores.reduce((sum: number, score: number) => sum + score, 0) / recencyScores.length;
+    return (
+      recencyScores.reduce((sum: number, score: number) => sum + score, 0) / recencyScores.length
+    );
   }
 
   private getSourceCredibilityScore(source: Citation): number {
@@ -452,7 +463,7 @@ export class ConfidenceScoringEngine {
       'academic_paper',
       'research_publication',
       'consulting_study',
-      'government_data'
+      'government_data',
     ];
     if (authoritativeTypes.includes(source.source_type)) {
       score += 15;
@@ -467,7 +478,7 @@ export class ConfidenceScoringEngine {
       'forrester.com',
       'deloitte.com',
       'pwc.com',
-      'accenture.com'
+      'accenture.com',
     ];
     if (authoritativeDomains.some(domain => source.domain.includes(domain))) {
       score += 10;
@@ -476,7 +487,10 @@ export class ConfidenceScoringEngine {
     return Math.min(100, score);
   }
 
-  private calculateConfidenceInterval(overall: number, sources: Citation[]): {lower: number; upper: number; level: number} {
+  private calculateConfidenceInterval(
+    overall: number,
+    sources: Citation[]
+  ): { lower: number; upper: number; level: number } {
     // Simple confidence interval calculation based on source count and quality variance
     const sourceCount = sources.length;
     const qualityScores = sources.map(s => this.getSourceCredibilityScore(s));
@@ -484,10 +498,10 @@ export class ConfidenceScoringEngine {
 
     // Standard error decreases with more sources
     const standardError = Math.sqrt(qualityVariance / sourceCount);
-    
+
     // 95% confidence interval
     const marginOfError = 1.96 * standardError;
-    
+
     return {
       lower: Math.max(0, overall - marginOfError),
       upper: Math.min(100, overall + marginOfError),
@@ -497,7 +511,7 @@ export class ConfidenceScoringEngine {
 
   private calculateVariance(values: number[]): number {
     if (values.length === 0) return 0;
-    
+
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
     const squaredDifferences = values.map(val => Math.pow(val - mean, 2));
     return squaredDifferences.reduce((sum, val) => sum + val, 0) / values.length;
@@ -513,7 +527,8 @@ export class ConfidenceScoringEngine {
 
     // Check for outdated sources
     const oldSources = sources.filter(s => {
-      const monthsOld = (new Date().getTime() - new Date(s.published_at).getTime()) / (1000 * 60 * 60 * 24 * 30);
+      const monthsOld =
+        (new Date().getTime() - new Date(s.published_at).getTime()) / (1000 * 60 * 60 * 24 * 30);
       return monthsOld > this.config.recencyDecayMonths;
     });
     if (oldSources.length > sources.length / 2) {
@@ -521,7 +536,9 @@ export class ConfidenceScoringEngine {
     }
 
     // Check for methodology gaps
-    const sourcesWithMethodology = sources.filter(s => s.methodology && s.methodology.trim().length > 0);
+    const sourcesWithMethodology = sources.filter(
+      s => s.methodology && s.methodology.trim().length > 0
+    );
     if (sourcesWithMethodology.length < sources.length / 2) {
       factors.push('Methodology gaps: Less than half of sources document their methodology');
     }
@@ -555,7 +572,9 @@ export class ConfidenceScoringEngine {
     }
 
     if (confidence.breakdown.sourceQuality < 60) {
-      recommendations.push('Seek higher-quality sources from established institutions or peer-reviewed publications');
+      recommendations.push(
+        'Seek higher-quality sources from established institutions or peer-reviewed publications'
+      );
     }
 
     if (confidence.breakdown.recencyFactor < 50) {
@@ -567,7 +586,9 @@ export class ConfidenceScoringEngine {
     }
 
     if (sources.length < this.config.minimumSourcesForHighConfidence) {
-      recommendations.push(`Add ${this.config.minimumSourcesForHighConfidence - sources.length} more sources for higher confidence`);
+      recommendations.push(
+        `Add ${this.config.minimumSourcesForHighConfidence - sources.length} more sources for higher confidence`
+      );
     }
 
     return recommendations;
@@ -597,7 +618,7 @@ export class ConfidenceScoringEngine {
     let hash = 0;
     for (let i = 0; i < document.length; i++) {
       const char = document.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return `doc_${Math.abs(hash).toString(16)}`;

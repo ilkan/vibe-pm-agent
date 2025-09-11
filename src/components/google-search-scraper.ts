@@ -15,7 +15,8 @@ export interface GoogleSearchResult {
 }
 
 export class GoogleSearchScraper {
-  private readonly userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+  private readonly userAgent =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
   /**
    * Search Google and scrape the actual result pages for real market data
@@ -24,14 +25,14 @@ export class GoogleSearchScraper {
     try {
       // Step 1: Get Google search results
       const searchResults = await this.searchGoogle(query);
-      
+
       if (searchResults.length === 0) {
         throw new Error('No Google search results found');
       }
 
       // Step 2: Scrape the actual websites from search results
       const scrapedResults: GoogleSearchResult[] = [];
-      
+
       for (const result of searchResults.slice(0, 5)) {
         try {
           const scrapedContent = await this.scrapeWebsite(result.url);
@@ -51,7 +52,9 @@ export class GoogleSearchScraper {
 
       return scrapedResults;
     } catch (error) {
-      throw new Error(`Google search and scrape failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Google search and scrape failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -62,25 +65,25 @@ export class GoogleSearchScraper {
     return new Promise((resolve, reject) => {
       // Use Google search URL
       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&num=10`;
-      
+
       const options = {
         hostname: 'www.google.com',
         path: `/search?q=${encodeURIComponent(query)}&num=10`,
         method: 'GET',
         headers: {
           'User-Agent': this.userAgent,
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
           'Accept-Encoding': 'identity',
-          'Connection': 'close',
+          Connection: 'close',
         },
         rejectUnauthorized: false,
       };
 
-      const req = https.request(options, (res) => {
+      const req = https.request(options, res => {
         let html = '';
-        
-        res.on('data', (chunk) => {
+
+        res.on('data', chunk => {
           html += chunk;
         });
 
@@ -94,7 +97,7 @@ export class GoogleSearchScraper {
         });
       });
 
-      req.on('error', (error) => {
+      req.on('error', error => {
         reject(new Error(`Google search request failed: ${error.message}`));
       });
 
@@ -173,23 +176,28 @@ export class GoogleSearchScraper {
     return new Promise((resolve, reject) => {
       try {
         const urlObj = new URL(url);
-        
+
         const options = {
           hostname: urlObj.hostname,
           path: urlObj.pathname + urlObj.search,
           method: 'GET',
           headers: {
             'User-Agent': this.userAgent,
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.5',
           },
           rejectUnauthorized: false,
           timeout: 10000,
         };
 
-        const req = https.request(options, (res) => {
+        const req = https.request(options, res => {
           // Handle redirects
-          if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          if (
+            res.statusCode &&
+            res.statusCode >= 300 &&
+            res.statusCode < 400 &&
+            res.headers.location
+          ) {
             resolve(this.scrapeWebsite(res.headers.location));
             return;
           }
@@ -200,8 +208,8 @@ export class GoogleSearchScraper {
           }
 
           let html = '';
-          
-          res.on('data', (chunk) => {
+
+          res.on('data', chunk => {
             html += chunk;
           });
 
@@ -218,7 +226,7 @@ export class GoogleSearchScraper {
           });
         });
 
-        req.on('error', (error) => {
+        req.on('error', error => {
           reject(error);
         });
 
@@ -277,10 +285,11 @@ This could be due to:
     }
 
     const citations = results.map((result, index) => {
-      const marketDataText = result.marketData && result.marketData.length > 0 
-        ? `\n    Market Data: ${result.marketData.join(', ')}`
-        : '';
-      
+      const marketDataText =
+        result.marketData && result.marketData.length > 0
+          ? `\n    Market Data: ${result.marketData.join(', ')}`
+          : '';
+
       return `[${index + 1}] ${result.title}
     URL: ${result.url}
     Snippet: ${result.snippet}${marketDataText}
@@ -290,7 +299,7 @@ This could be due to:
     // Collect all market data
     const allMarketData = results.flatMap(r => r.marketData || []);
     let marketDataSection = '';
-    
+
     if (allMarketData.length > 0) {
       marketDataSection = `
 ## Real Market Data (Scraped from Google Results)

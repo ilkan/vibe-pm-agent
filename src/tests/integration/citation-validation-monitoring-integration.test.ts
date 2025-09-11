@@ -8,11 +8,7 @@ import {
   QualityReport,
 } from '../../components/citation-validation-monitor';
 import { SourceValidationEngine } from '../../components/source-validation-engine';
-import {
-  Citation,
-  CitationSourceType,
-  CitationConfidence,
-} from '../../models/citations';
+import { Citation, CitationSourceType, CitationConfidence } from '../../models/citations';
 
 describe('Citation Validation and Monitoring Integration', () => {
   let monitor: CitationValidationMonitor;
@@ -163,7 +159,9 @@ describe('Citation Validation and Monitoring Integration', () => {
       }
 
       // Verify high-quality citation has good scores
-      const highQualityResult = validationResults.find(r => r.citationId === 'high-quality-citation');
+      const highQualityResult = validationResults.find(
+        r => r.citationId === 'high-quality-citation'
+      );
       expect(highQualityResult?.qualityScore).toBeGreaterThan(70);
 
       // Verify broken link citation has issues
@@ -174,7 +172,7 @@ describe('Citation Validation and Monitoring Integration', () => {
     it('should track performance metrics across multiple validations', async () => {
       // Run initial validation
       await monitor.validateCitationsWithMonitoring(testCitations);
-      
+
       // Wait a bit and run again to see trend changes
       await new Promise(resolve => setTimeout(resolve, 100));
       await monitor.validateCitationsWithMonitoring(testCitations);
@@ -247,7 +245,9 @@ describe('Citation Validation and Monitoring Integration', () => {
       for (const alert of alerts) {
         expect(alert).toMatchObject({
           id: expect.any(String),
-          type: expect.stringMatching(/^(broken_link|quality_degradation|compliance_violation|performance_issue)$/),
+          type: expect.stringMatching(
+            /^(broken_link|quality_degradation|compliance_violation|performance_issue)$/
+          ),
           severity: expect.stringMatching(/^(low|medium|high|critical)$/),
           citationId: expect.any(String),
           message: expect.any(String),
@@ -299,7 +299,7 @@ describe('Citation Validation and Monitoring Integration', () => {
   describe('Quality Report Generation', () => {
     it('should generate comprehensive daily quality report', async () => {
       await monitor.validateCitationsWithMonitoring(testCitations);
-      
+
       const report = await monitor.generateQualityReport('daily', testCitations);
 
       expect(report).toMatchObject({
@@ -330,7 +330,9 @@ describe('Citation Validation and Monitoring Integration', () => {
 
       // Verify summary calculations
       expect(report.summary.totalCitations).toBe(testCitations.length);
-      expect(report.summary.validCitations + report.summary.brokenLinks).toBeLessThanOrEqual(testCitations.length);
+      expect(report.summary.validCitations + report.summary.brokenLinks).toBeLessThanOrEqual(
+        testCitations.length
+      );
       expect(report.summary.averageQualityScore).toBeGreaterThanOrEqual(0);
       expect(report.summary.averageQualityScore).toBeLessThanOrEqual(100);
 
@@ -362,9 +364,12 @@ describe('Citation Validation and Monitoring Integration', () => {
       expect(monthlyReport.reportType).toBe('monthly');
 
       // Check time periods (daily < weekly < monthly)
-      const dailyPeriodLength = dailyReport.period.end.getTime() - dailyReport.period.start.getTime();
-      const weeklyPeriodLength = weeklyReport.period.end.getTime() - weeklyReport.period.start.getTime();
-      const monthlyPeriodLength = monthlyReport.period.end.getTime() - monthlyReport.period.start.getTime();
+      const dailyPeriodLength =
+        dailyReport.period.end.getTime() - dailyReport.period.start.getTime();
+      const weeklyPeriodLength =
+        weeklyReport.period.end.getTime() - weeklyReport.period.start.getTime();
+      const monthlyPeriodLength =
+        monthlyReport.period.end.getTime() - monthlyReport.period.start.getTime();
 
       expect(dailyPeriodLength).toBeLessThan(weeklyPeriodLength);
       expect(weeklyPeriodLength).toBeLessThan(monthlyPeriodLength);

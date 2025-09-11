@@ -1,6 +1,6 @@
 /**
  * Enhanced Citation System End-to-End Tests
- * 
+ *
  * Real-world testing with actual business documents and MCP tool integration
  */
 
@@ -86,34 +86,36 @@ describe('Enhanced Citation System E2E Tests', () => {
 
       expect(result.success).toBe(true);
       expect(result.enhancedCitations.length).toBeGreaterThan(0);
-      
+
       // Should identify multiple citation needs
-      const marketDataClaims = result.enhancedCitations.filter(c => 
-        c.title.toLowerCase().includes('market') || 
-        c.summary?.toLowerCase().includes('market')
+      const marketDataClaims = result.enhancedCitations.filter(
+        c => c.title.toLowerCase().includes('market') || c.summary?.toLowerCase().includes('market')
       );
       expect(marketDataClaims.length).toBeGreaterThan(0);
-      
+
       // Should have high-quality citations for financial claims
-      const financialCitations = result.enhancedCitations.filter(c =>
-        c.title.toLowerCase().includes('financial') ||
-        c.title.toLowerCase().includes('revenue') ||
-        c.summary?.toLowerCase().includes('cost')
+      const financialCitations = result.enhancedCitations.filter(
+        c =>
+          c.title.toLowerCase().includes('financial') ||
+          c.title.toLowerCase().includes('revenue') ||
+          c.summary?.toLowerCase().includes('cost')
       );
-      
+
       if (financialCitations.length > 0) {
-        const avgQuality = financialCitations.reduce((sum, c) => 
-          sum + (c.qualityMetrics?.overallQuality || 0), 0
-        ) / financialCitations.length;
+        const avgQuality =
+          financialCitations.reduce((sum, c) => sum + (c.qualityMetrics?.overallQuality || 0), 0) /
+          financialCitations.length;
         expect(avgQuality).toBeGreaterThan(60);
       }
-      
+
       // Should provide actionable recommendations
       expect(result.recommendations.length).toBeGreaterThan(0);
-      expect(result.recommendations.some(r => 
-        r.includes('market') || r.includes('financial') || r.includes('competitive')
-      )).toBe(true);
-      
+      expect(
+        result.recommendations.some(
+          r => r.includes('market') || r.includes('financial') || r.includes('competitive')
+        )
+      ).toBe(true);
+
       // Should have reasonable processing time
       expect(result.processingTime).toBeLessThan(30000); // 30 seconds max
     }, 45000);
@@ -175,26 +177,27 @@ describe('Enhanced Citation System E2E Tests', () => {
 
       expect(analysis.documentId).toBe('saas-market-analysis-q4-2024');
       expect(analysis.citationRequirements.length).toBeGreaterThan(5);
-      
+
       // Should identify quantitative claims requiring citations
-      const quantitativeClaims = analysis.citationRequirements.filter(req => 
-        req.claimType === 'quantitative'
+      const quantitativeClaims = analysis.citationRequirements.filter(
+        req => req.claimType === 'quantitative'
       );
       expect(quantitativeClaims.length).toBeGreaterThan(0);
-      
+
       // Should recommend sources for market data
       expect(analysis.recommendedSources.length).toBeGreaterThan(0);
-      const marketDataSources = analysis.recommendedSources.filter(source =>
-        source.source.toLowerCase().includes('gartner') ||
-        source.source.toLowerCase().includes('forrester') ||
-        source.source.toLowerCase().includes('idc') ||
-        source.title.toLowerCase().includes('market')
+      const marketDataSources = analysis.recommendedSources.filter(
+        source =>
+          source.source.toLowerCase().includes('gartner') ||
+          source.source.toLowerCase().includes('forrester') ||
+          source.source.toLowerCase().includes('idc') ||
+          source.title.toLowerCase().includes('market')
       );
       expect(marketDataSources.length).toBeGreaterThan(0);
-      
+
       // Should identify compliance status
       expect(['compliant', 'warning', 'non-compliant']).toContain(analysis.complianceStatus);
-      
+
       // Should have quality gaps for unsupported claims
       expect(analysis.qualityGaps.length).toBeGreaterThan(0);
     }, 30000);
@@ -228,17 +231,19 @@ describe('Enhanced Citation System E2E Tests', () => {
       expect(mcpResult.enhanced_document).toBeDefined();
       expect(mcpResult.citation_analysis).toBeDefined();
       expect(mcpResult.quality_report).toBeDefined();
-      
+
       // Should include enhanced citations in the document
-      expect(mcpResult.enhanced_document.length).toBeGreaterThan(mcpRequest.document_content.length);
-      
+      expect(mcpResult.enhanced_document.length).toBeGreaterThan(
+        mcpRequest.document_content.length
+      );
+
       // Should provide quality metrics
       expect(mcpResult.quality_report.overall_score).toBeGreaterThanOrEqual(0);
       expect(mcpResult.quality_report.overall_score).toBeLessThanOrEqual(100);
-      
+
       // Should include confidence scores
       expect(mcpResult.citation_analysis.confidence_scores).toBeDefined();
-      
+
       // Should provide recommendations
       expect(mcpResult.citation_analysis.recommendations).toBeDefined();
       expect(mcpResult.citation_analysis.recommendations.length).toBeGreaterThan(0);
@@ -288,7 +293,7 @@ describe('Enhanced Citation System E2E Tests', () => {
       expect(mcpResult).toBeDefined();
       expect(mcpResult.validation_results).toBeDefined();
       expect(mcpResult.validation_results.length).toBe(2);
-      
+
       // Should validate each citation
       mcpResult.validation_results.forEach(result => {
         expect(result.citation_id).toBeDefined();
@@ -297,13 +302,13 @@ describe('Enhanced Citation System E2E Tests', () => {
         expect(result.credibility_score).toBeLessThanOrEqual(100);
         expect(result.validation_timestamp).toBeDefined();
       });
-      
+
       // Should provide audit report
       expect(mcpResult.audit_report).toBeDefined();
       expect(mcpResult.audit_report.total_citations).toBe(2);
       expect(mcpResult.audit_report.overall_quality_score).toBeGreaterThanOrEqual(0);
       expect(mcpResult.audit_report.overall_quality_score).toBeLessThanOrEqual(100);
-      
+
       // Should include recommendations
       expect(mcpResult.audit_report.recommendations).toBeDefined();
       expect(Array.isArray(mcpResult.audit_report.recommendations)).toBe(true);
@@ -316,7 +321,10 @@ describe('Enhanced Citation System E2E Tests', () => {
       const largeDocument = `
         # Comprehensive Market Analysis Report
         
-        ${Array(50).fill(0).map((_, i) => `
+        ${Array(50)
+          .fill(0)
+          .map(
+            (_, i) => `
         ## Section ${i + 1}: Market Segment Analysis
         
         Market segment ${i + 1} shows ${Math.floor(Math.random() * 50) + 10}% growth rate.
@@ -329,7 +337,9 @@ describe('Enhanced Citation System E2E Tests', () => {
         - Growth rate: ${Math.floor(Math.random() * 20) + 5}% CAGR
         - Customer satisfaction: ${Math.floor(Math.random() * 30) + 70}%
         - Market penetration: ${Math.floor(Math.random() * 40) + 10}%
-        `).join('\n')}
+        `
+          )
+          .join('\n')}
       `;
 
       const startTime = Date.now();
@@ -342,20 +352,22 @@ describe('Enhanced Citation System E2E Tests', () => {
       expect(result.success).toBe(true);
       expect(processingTime).toBeLessThan(60000); // Should complete within 60 seconds
       expect(result.processingTime).toBeLessThan(60000);
-      
+
       // Should handle large documents without memory issues
       expect(result.enhancedCitations).toBeDefined();
       expect(result.qualityReport).toBeDefined();
       expect(result.recommendations).toBeDefined();
-      
+
       // Should provide reasonable number of citations (not excessive)
       expect(result.enhancedCitations.length).toBeLessThan(200);
       expect(result.enhancedCitations.length).toBeGreaterThan(0);
     }, 90000);
 
     it('should handle concurrent processing efficiently', async () => {
-      const documents = Array(5).fill(0).map((_, i) => ({
-        content: `
+      const documents = Array(5)
+        .fill(0)
+        .map((_, i) => ({
+          content: `
           # Business Analysis ${i + 1}
           
           Market analysis shows ${Math.floor(Math.random() * 50) + 10}% growth opportunity.
@@ -363,9 +375,9 @@ describe('Enhanced Citation System E2E Tests', () => {
           Competitive analysis reveals ${Math.floor(Math.random() * 5) + 2} major competitors.
           Financial projections suggest $${Math.floor(Math.random() * 10) + 1}M revenue potential.
         `,
-        type: 'business_analysis',
-        id: `concurrent-test-${i + 1}`,
-      }));
+          type: 'business_analysis',
+          id: `concurrent-test-${i + 1}`,
+        }));
 
       const startTime = Date.now();
       const promises = documents.map(doc =>
@@ -377,13 +389,13 @@ describe('Enhanced Citation System E2E Tests', () => {
 
       expect(results).toHaveLength(5);
       expect(totalTime).toBeLessThan(45000); // Should complete all within 45 seconds
-      
+
       // All requests should complete successfully or with graceful errors
       results.forEach((result, index) => {
         expect(result).toBeDefined();
         expect(typeof result.success).toBe('boolean');
         expect(result.processingTime).toBeGreaterThan(0);
-        
+
         if (result.success) {
           expect(result.enhancedCitations).toBeDefined();
           expect(result.qualityReport).toBeDefined();
@@ -422,24 +434,25 @@ describe('Enhanced Citation System E2E Tests', () => {
       );
 
       expect(result.success).toBe(true);
-      
+
       // Should meet quality thresholds
       expect(result.qualityReport.overallScore).toBeGreaterThanOrEqual(60);
-      
+
       // Should have diverse source types
       const sourceTypes = new Set(result.enhancedCitations.map(c => c.type));
       expect(sourceTypes.size).toBeGreaterThan(1);
-      
+
       // Should include authoritative sources
-      const authoritativeSources = result.enhancedCitations.filter(c =>
-        c.source.toLowerCase().includes('mckinsey') ||
-        c.source.toLowerCase().includes('gartner') ||
-        c.source.toLowerCase().includes('forrester') ||
-        c.source.toLowerCase().includes('bcg') ||
-        c.source.toLowerCase().includes('harvard')
+      const authoritativeSources = result.enhancedCitations.filter(
+        c =>
+          c.source.toLowerCase().includes('mckinsey') ||
+          c.source.toLowerCase().includes('gartner') ||
+          c.source.toLowerCase().includes('forrester') ||
+          c.source.toLowerCase().includes('bcg') ||
+          c.source.toLowerCase().includes('harvard')
       );
       expect(authoritativeSources.length).toBeGreaterThan(0);
-      
+
       // Should have high confidence scores for authoritative sources
       authoritativeSources.forEach(source => {
         const confidence = result.confidenceScores.get(source.id);
@@ -465,20 +478,23 @@ describe('Enhanced Citation System E2E Tests', () => {
       );
 
       expect(result.success).toBe(true);
-      
+
       // Should identify quality issues
       expect(result.qualityReport.qualityGaps.length).toBeGreaterThan(0);
-      
+
       // Should provide improvement recommendations
-      expect(result.recommendations.some(r => 
-        r.toLowerCase().includes('quality') ||
-        r.toLowerCase().includes('credible') ||
-        r.toLowerCase().includes('authoritative')
-      )).toBe(true);
-      
+      expect(
+        result.recommendations.some(
+          r =>
+            r.toLowerCase().includes('quality') ||
+            r.toLowerCase().includes('credible') ||
+            r.toLowerCase().includes('authoritative')
+        )
+      ).toBe(true);
+
       // Should suggest better sources
-      const betterSources = result.enhancedCitations.filter(c =>
-        c.qualityMetrics && c.qualityMetrics.overallQuality > 70
+      const betterSources = result.enhancedCitations.filter(
+        c => c.qualityMetrics && c.qualityMetrics.overallQuality > 70
       );
       expect(betterSources.length).toBeGreaterThan(0);
     }, 25000);
@@ -488,9 +504,18 @@ describe('Enhanced Citation System E2E Tests', () => {
     it('should maintain system stability under stress', async () => {
       // Simulate high load with multiple document types
       const stressTestDocuments = [
-        { content: 'Business case with financial projections and market analysis', type: 'business_case' },
-        { content: 'Competitive analysis with SWOT and market positioning', type: 'competitive_analysis' },
-        { content: 'Market research with customer surveys and trend analysis', type: 'market_analysis' },
+        {
+          content: 'Business case with financial projections and market analysis',
+          type: 'business_case',
+        },
+        {
+          content: 'Competitive analysis with SWOT and market positioning',
+          type: 'competitive_analysis',
+        },
+        {
+          content: 'Market research with customer surveys and trend analysis',
+          type: 'market_analysis',
+        },
         { content: 'Executive summary with strategic recommendations', type: 'executive_onepager' },
         { content: 'Product roadmap with feature prioritization', type: 'pr_faq' },
       ];
@@ -500,11 +525,9 @@ describe('Enhanced Citation System E2E Tests', () => {
 
       for (let i = 0; i < iterations; i++) {
         const iterationPromises = stressTestDocuments.map((doc, index) =>
-          citationSystem.enhanceDocumentCitations(
-            `${doc.content} - Iteration ${i + 1}`,
-            doc.type,
-            { userId: `stress-test-${i}-${index}` }
-          )
+          citationSystem.enhanceDocumentCitations(`${doc.content} - Iteration ${i + 1}`, doc.type, {
+            userId: `stress-test-${i}-${index}`,
+          })
         );
         allPromises.push(...iterationPromises);
       }
@@ -512,21 +535,21 @@ describe('Enhanced Citation System E2E Tests', () => {
       const results = await Promise.all(allPromises);
 
       expect(results).toHaveLength(stressTestDocuments.length * iterations);
-      
+
       // System should remain stable
       const successfulResults = results.filter(r => r.success);
       const failedResults = results.filter(r => !r.success);
-      
+
       // At least 80% should succeed under stress
       expect(successfulResults.length / results.length).toBeGreaterThan(0.8);
-      
+
       // Failed results should have proper error handling
       failedResults.forEach(result => {
         expect(result.error).toBeDefined();
         expect(result.recommendations).toBeDefined();
         expect(result.processingTime).toBeGreaterThan(0);
       });
-      
+
       // System should still be responsive
       const metrics = citationSystem.getPerformanceMetrics();
       expect(metrics).toBeDefined();

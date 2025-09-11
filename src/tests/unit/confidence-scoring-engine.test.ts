@@ -2,7 +2,12 @@
  * Unit tests for ConfidenceScoringEngine
  */
 
-import { ConfidenceScoringEngine, ConfidenceScore, DocumentConfidence, ConfidenceFactor } from '../../components/confidence-scoring-engine';
+import {
+  ConfidenceScoringEngine,
+  ConfidenceScore,
+  DocumentConfidence,
+  ConfidenceFactor,
+} from '../../components/confidence-scoring-engine';
 import { Citation, CitationSourceType, CitationConfidence } from '../../models/citations';
 
 describe('ConfidenceScoringEngine', () => {
@@ -15,7 +20,7 @@ describe('ConfidenceScoringEngine', () => {
   describe('calculateClaimConfidence', () => {
     it('should return zero confidence for no sources', () => {
       const result = engine.calculateClaimConfidence('Test claim', []);
-      
+
       expect(result.overall).toBe(0);
       expect(result.uncertaintyFactors).toContain('No supporting sources provided');
       expect(result.breakdown.sourceQuality).toBe(0);
@@ -23,22 +28,24 @@ describe('ConfidenceScoringEngine', () => {
     });
 
     it('should calculate confidence for single high-quality source', () => {
-      const sources: Citation[] = [{
-        id: '1',
-        title: 'High Quality Research',
-        url: 'https://mckinsey.com/research',
-        domain: 'mckinsey.com',
-        published_at: '2024-01-01',
-        source_type: CitationSourceType.CONSULTING_STUDY,
-        confidence: CitationConfidence.HIGH,
-        key_finding: 'Test claim shows 85% improvement',
-        methodology: 'Comprehensive survey of 1000 companies across 10 industries',
-        sample_size: 1000,
-        geographic_scope: 'Global',
-      }];
+      const sources: Citation[] = [
+        {
+          id: '1',
+          title: 'High Quality Research',
+          url: 'https://mckinsey.com/research',
+          domain: 'mckinsey.com',
+          published_at: '2024-01-01',
+          source_type: CitationSourceType.CONSULTING_STUDY,
+          confidence: CitationConfidence.HIGH,
+          key_finding: 'Test claim shows 85% improvement',
+          methodology: 'Comprehensive survey of 1000 companies across 10 industries',
+          sample_size: 1000,
+          geographic_scope: 'Global',
+        },
+      ];
 
       const result = engine.calculateClaimConfidence('Test claim improvement', sources);
-      
+
       expect(result.overall).toBeGreaterThan(65);
       expect(result.breakdown.sourceQuality).toBeGreaterThan(80);
       expect(result.breakdown.evidenceStrength).toBeGreaterThanOrEqual(60);
@@ -83,11 +90,11 @@ describe('ConfidenceScoringEngine', () => {
           confidence: CitationConfidence.HIGH,
           key_finding: 'Official statistics show 24% growth',
           sample_size: 10000,
-        }
+        },
       ];
 
       const result = engine.calculateClaimConfidence('Market growth of 25%', sources);
-      
+
       expect(result.overall).toBeGreaterThan(75);
       expect(result.breakdown.sourceQuality).toBeGreaterThan(80);
       expect(result.breakdown.evidenceStrength).toBeGreaterThan(60);
@@ -95,20 +102,22 @@ describe('ConfidenceScoringEngine', () => {
     });
 
     it('should penalize low-quality sources', () => {
-      const sources: Citation[] = [{
-        id: '1',
-        title: 'Blog Post',
-        url: 'https://random-blog.com/post',
-        domain: 'random-blog.com',
-        published_at: '2020-01-01', // Old source
-        source_type: CitationSourceType.COMPANY_BLOG,
-        confidence: CitationConfidence.LOW,
-        key_finding: 'Unverified claim',
-        // No methodology or sample size
-      }];
+      const sources: Citation[] = [
+        {
+          id: '1',
+          title: 'Blog Post',
+          url: 'https://random-blog.com/post',
+          domain: 'random-blog.com',
+          published_at: '2020-01-01', // Old source
+          source_type: CitationSourceType.COMPANY_BLOG,
+          confidence: CitationConfidence.LOW,
+          key_finding: 'Unverified claim',
+          // No methodology or sample size
+        },
+      ];
 
       const result = engine.calculateClaimConfidence('Unverified claim', sources);
-      
+
       expect(result.overall).toBeLessThan(50);
       expect(result.breakdown.sourceQuality).toBeLessThan(60);
       expect(result.breakdown.recencyFactor).toBeLessThan(30);
@@ -127,15 +136,23 @@ describe('ConfidenceScoringEngine', () => {
           confidence: CitationConfidence.LOW,
           key_finding: 'Some finding',
           // No methodology or sample size
-        }
+        },
       ];
 
       const result = engine.calculateClaimConfidence('Test claim', sources);
-      
-      expect(result.uncertaintyFactors).toContain('Limited sources: Only 1 sources supporting this claim');
-      expect(result.uncertaintyFactors).toContain('Outdated sources: More than half of sources are older than 24 months');
-      expect(result.uncertaintyFactors).toContain('Methodology gaps: Less than half of sources document their methodology');
-      expect(result.uncertaintyFactors).toContain('Sample size uncertainty: Less than half of sources report sample sizes');
+
+      expect(result.uncertaintyFactors).toContain(
+        'Limited sources: Only 1 sources supporting this claim'
+      );
+      expect(result.uncertaintyFactors).toContain(
+        'Outdated sources: More than half of sources are older than 24 months'
+      );
+      expect(result.uncertaintyFactors).toContain(
+        'Methodology gaps: Less than half of sources document their methodology'
+      );
+      expect(result.uncertaintyFactors).toContain(
+        'Sample size uncertainty: Less than half of sources report sample sizes'
+      );
     });
 
     it('should calculate confidence intervals based on source variance', () => {
@@ -159,11 +176,11 @@ describe('ConfidenceScoringEngine', () => {
           source_type: CitationSourceType.COMPANY_BLOG,
           confidence: CitationConfidence.LOW,
           key_finding: 'Finding',
-        }
+        },
       ];
 
       const result = engine.calculateClaimConfidence('Test claim', sources);
-      
+
       expect(result.confidenceInterval.lower).toBeLessThan(result.overall);
       expect(result.confidenceInterval.upper).toBeGreaterThan(result.overall);
       expect(result.confidenceInterval.level).toBe(95);
@@ -174,7 +191,7 @@ describe('ConfidenceScoringEngine', () => {
   describe('aggregateDocumentConfidence', () => {
     it('should return zero confidence for empty claims', () => {
       const result = engine.aggregateDocumentConfidence([]);
-      
+
       expect(result.overallConfidence).toBe(0);
       expect(result.claimConfidences.size).toBe(0);
       expect(result.weakestClaims).toHaveLength(0);
@@ -186,26 +203,44 @@ describe('ConfidenceScoringEngine', () => {
       const claimConfidences: ConfidenceScore[] = [
         {
           overall: 85,
-          breakdown: { sourceQuality: 90, evidenceStrength: 80, methodologyClarity: 85, sampleSizeAdequacy: 90, recencyFactor: 80 },
+          breakdown: {
+            sourceQuality: 90,
+            evidenceStrength: 80,
+            methodologyClarity: 85,
+            sampleSizeAdequacy: 90,
+            recencyFactor: 80,
+          },
           confidenceInterval: { lower: 80, upper: 90, level: 95 },
           uncertaintyFactors: [],
         },
         {
           overall: 65,
-          breakdown: { sourceQuality: 70, evidenceStrength: 60, methodologyClarity: 65, sampleSizeAdequacy: 70, recencyFactor: 60 },
+          breakdown: {
+            sourceQuality: 70,
+            evidenceStrength: 60,
+            methodologyClarity: 65,
+            sampleSizeAdequacy: 70,
+            recencyFactor: 60,
+          },
           confidenceInterval: { lower: 60, upper: 70, level: 95 },
           uncertaintyFactors: ['Limited sources'],
         },
         {
           overall: 45,
-          breakdown: { sourceQuality: 50, evidenceStrength: 40, methodologyClarity: 45, sampleSizeAdequacy: 50, recencyFactor: 40 },
+          breakdown: {
+            sourceQuality: 50,
+            evidenceStrength: 40,
+            methodologyClarity: 45,
+            sampleSizeAdequacy: 50,
+            recencyFactor: 40,
+          },
           confidenceInterval: { lower: 40, upper: 50, level: 95 },
           uncertaintyFactors: ['Low quality sources', 'Outdated data'],
-        }
+        },
       ];
 
       const result = engine.aggregateDocumentConfidence(claimConfidences);
-      
+
       expect(result.overallConfidence).toBe(65); // Average of 85, 65, 45
       expect(result.claimConfidences.size).toBe(3);
       expect(result.weakestClaims[0].confidence).toBe(45);
@@ -215,23 +250,59 @@ describe('ConfidenceScoringEngine', () => {
 
     it('should determine recommendation reliability correctly', () => {
       const highConfidenceScores: ConfidenceScore[] = [
-        { overall: 85, breakdown: {} as any, confidenceInterval: {} as any, uncertaintyFactors: [] },
-        { overall: 90, breakdown: {} as any, confidenceInterval: {} as any, uncertaintyFactors: [] },
+        {
+          overall: 85,
+          breakdown: {} as any,
+          confidenceInterval: {} as any,
+          uncertaintyFactors: [],
+        },
+        {
+          overall: 90,
+          breakdown: {} as any,
+          confidenceInterval: {} as any,
+          uncertaintyFactors: [],
+        },
       ];
 
       const mediumConfidenceScores: ConfidenceScore[] = [
-        { overall: 65, breakdown: {} as any, confidenceInterval: {} as any, uncertaintyFactors: [] },
-        { overall: 70, breakdown: {} as any, confidenceInterval: {} as any, uncertaintyFactors: [] },
+        {
+          overall: 65,
+          breakdown: {} as any,
+          confidenceInterval: {} as any,
+          uncertaintyFactors: [],
+        },
+        {
+          overall: 70,
+          breakdown: {} as any,
+          confidenceInterval: {} as any,
+          uncertaintyFactors: [],
+        },
       ];
 
       const lowConfidenceScores: ConfidenceScore[] = [
-        { overall: 35, breakdown: {} as any, confidenceInterval: {} as any, uncertaintyFactors: [] },
-        { overall: 40, breakdown: {} as any, confidenceInterval: {} as any, uncertaintyFactors: [] },
+        {
+          overall: 35,
+          breakdown: {} as any,
+          confidenceInterval: {} as any,
+          uncertaintyFactors: [],
+        },
+        {
+          overall: 40,
+          breakdown: {} as any,
+          confidenceInterval: {} as any,
+          uncertaintyFactors: [],
+        },
       ];
 
-      expect(engine.aggregateDocumentConfidence(highConfidenceScores).recommendationReliability).toBe('high');
-      expect(engine.aggregateDocumentConfidence(mediumConfidenceScores).recommendationReliability).toBe('medium');
-      expect(engine.aggregateDocumentConfidence(lowConfidenceScores).recommendationReliability).toBe('low');
+      expect(
+        engine.aggregateDocumentConfidence(highConfidenceScores).recommendationReliability
+      ).toBe('high');
+      expect(
+        engine.aggregateDocumentConfidence(mediumConfidenceScores).recommendationReliability
+      ).toBe('medium');
+      expect(
+        engine.aggregateDocumentConfidence(lowConfidenceScores).recommendationReliability
+      ).toBe('low');
     });
   });
 
@@ -261,11 +332,11 @@ describe('ConfidenceScoringEngine', () => {
           key_finding: 'Finding',
           methodology: 'Experimental design',
           sample_size: 500,
-        }
+        },
       ];
 
       const factors = engine.trackConfidenceFactors(sources);
-      
+
       expect(factors).toHaveLength(5);
       expect(factors.find(f => f.name === 'Source Diversity')).toBeDefined();
       expect(factors.find(f => f.name === 'Source Credibility')).toBeDefined();
@@ -301,12 +372,12 @@ describe('ConfidenceScoringEngine', () => {
           source_type: CitationSourceType.COMPANY_BLOG,
           confidence: CitationConfidence.MEDIUM,
           key_finding: 'Finding 2',
-        }
+        },
       ];
 
       const factors = engine.trackConfidenceFactors(sources);
       const diversityFactor = factors.find(f => f.name === 'Source Diversity')!;
-      
+
       expect(diversityFactor.score).toBe(50); // 1 unique domain out of 2 sources
       expect(diversityFactor.impact).toBe('high');
     });
@@ -317,37 +388,41 @@ describe('ConfidenceScoringEngine', () => {
       const claims = [
         {
           claim: 'Market is growing at 25%',
-          sources: [{
-            id: '1',
-            title: 'Market Research',
-            url: 'https://research.com/market',
-            domain: 'research.com',
-            published_at: '2024-01-01',
-            source_type: CitationSourceType.INDUSTRY_REPORT,
-            confidence: CitationConfidence.HIGH,
-            key_finding: 'Market growth of 25%',
-            methodology: 'Survey of 500 companies',
-            sample_size: 500,
-          }]
+          sources: [
+            {
+              id: '1',
+              title: 'Market Research',
+              url: 'https://research.com/market',
+              domain: 'research.com',
+              published_at: '2024-01-01',
+              source_type: CitationSourceType.INDUSTRY_REPORT,
+              confidence: CitationConfidence.HIGH,
+              key_finding: 'Market growth of 25%',
+              methodology: 'Survey of 500 companies',
+              sample_size: 500,
+            },
+          ],
         },
         {
           claim: 'Customer satisfaction is high',
-          sources: [{
-            id: '2',
-            title: 'Customer Survey',
-            url: 'https://survey.com/results',
-            domain: 'survey.com',
-            published_at: '2024-02-01',
-            source_type: CitationSourceType.SURVEY_DATA,
-            confidence: CitationConfidence.MEDIUM,
-            key_finding: 'High satisfaction scores',
-            sample_size: 1000,
-          }]
-        }
+          sources: [
+            {
+              id: '2',
+              title: 'Customer Survey',
+              url: 'https://survey.com/results',
+              domain: 'survey.com',
+              published_at: '2024-02-01',
+              source_type: CitationSourceType.SURVEY_DATA,
+              confidence: CitationConfidence.MEDIUM,
+              key_finding: 'High satisfaction scores',
+              sample_size: 1000,
+            },
+          ],
+        },
       ];
 
       const report = engine.generateConfidenceReport('Test document content', claims);
-      
+
       expect(report.documentId).toMatch(/^doc_[a-f0-9]+$/);
       expect(report.claimAnalysis).toHaveLength(2);
       expect(report.overallConfidence.overallConfidence).toBeGreaterThan(0);
@@ -368,27 +443,35 @@ describe('ConfidenceScoringEngine', () => {
       const claims = [
         {
           claim: 'Weak claim',
-          sources: [{
-            id: '1',
-            title: 'Blog Post',
-            url: 'https://blog.com/post',
-            domain: 'blog.com',
-            published_at: '2020-01-01', // Old
-            source_type: CitationSourceType.COMPANY_BLOG,
-            confidence: CitationConfidence.LOW,
-            key_finding: 'Weak finding',
-            // No methodology or sample size
-          }]
-        }
+          sources: [
+            {
+              id: '1',
+              title: 'Blog Post',
+              url: 'https://blog.com/post',
+              domain: 'blog.com',
+              published_at: '2020-01-01', // Old
+              source_type: CitationSourceType.COMPANY_BLOG,
+              confidence: CitationConfidence.LOW,
+              key_finding: 'Weak finding',
+              // No methodology or sample size
+            },
+          ],
+        },
       ];
 
       const report = engine.generateConfidenceReport('Test document', claims);
       const claimAnalysis = report.claimAnalysis[0];
-      
+
       expect(claimAnalysis.recommendations.length).toBeGreaterThan(0);
-      expect(claimAnalysis.recommendations).toContain('Consider adding more authoritative sources to strengthen this claim');
-      expect(claimAnalysis.recommendations).toContain('Seek higher-quality sources from established institutions or peer-reviewed publications');
-      expect(claimAnalysis.recommendations).toContain('Update with more recent sources to improve relevance');
+      expect(claimAnalysis.recommendations).toContain(
+        'Consider adding more authoritative sources to strengthen this claim'
+      );
+      expect(claimAnalysis.recommendations).toContain(
+        'Seek higher-quality sources from established institutions or peer-reviewed publications'
+      );
+      expect(claimAnalysis.recommendations).toContain(
+        'Update with more recent sources to improve relevance'
+      );
     });
   });
 
@@ -406,24 +489,26 @@ describe('ConfidenceScoringEngine', () => {
           highConfidence: 90,
           mediumConfidence: 70,
           lowConfidence: 50,
-        }
+        },
       });
 
-      const sources: Citation[] = [{
-        id: '1',
-        title: 'High Quality Source',
-        url: 'https://mckinsey.com/study',
-        domain: 'mckinsey.com',
-        published_at: '2024-01-01',
-        source_type: CitationSourceType.CONSULTING_STUDY,
-        confidence: CitationConfidence.HIGH,
-        key_finding: 'Test finding',
-        methodology: 'Comprehensive methodology',
-        sample_size: 1000,
-      }];
+      const sources: Citation[] = [
+        {
+          id: '1',
+          title: 'High Quality Source',
+          url: 'https://mckinsey.com/study',
+          domain: 'mckinsey.com',
+          published_at: '2024-01-01',
+          source_type: CitationSourceType.CONSULTING_STUDY,
+          confidence: CitationConfidence.HIGH,
+          key_finding: 'Test finding',
+          methodology: 'Comprehensive methodology',
+          sample_size: 1000,
+        },
+      ];
 
       const result = customEngine.calculateClaimConfidence('Test claim', sources);
-      
+
       // With higher weight on source quality, should get different score
       expect(result.overall).toBeGreaterThan(0);
       expect(result.breakdown.sourceQuality).toBeGreaterThan(80);
@@ -432,36 +517,40 @@ describe('ConfidenceScoringEngine', () => {
 
   describe('edge cases', () => {
     it('should handle sources with missing data gracefully', () => {
-      const sources: Citation[] = [{
-        id: '1',
-        title: 'Incomplete Source',
-        url: 'https://example.com/incomplete',
-        domain: 'example.com',
-        published_at: '2024-01-01',
-        source_type: CitationSourceType.COMPANY_BLOG,
-        confidence: CitationConfidence.MEDIUM,
-        key_finding: 'Some finding',
-        // Missing methodology, sample_size, etc.
-      }];
+      const sources: Citation[] = [
+        {
+          id: '1',
+          title: 'Incomplete Source',
+          url: 'https://example.com/incomplete',
+          domain: 'example.com',
+          published_at: '2024-01-01',
+          source_type: CitationSourceType.COMPANY_BLOG,
+          confidence: CitationConfidence.MEDIUM,
+          key_finding: 'Some finding',
+          // Missing methodology, sample_size, etc.
+        },
+      ];
 
       const result = engine.calculateClaimConfidence('Test claim', sources);
-      
+
       expect(result.overall).toBeGreaterThan(0);
       expect(result.breakdown.methodologyClarity).toBeLessThan(50);
       expect(result.breakdown.sampleSizeAdequacy).toBe(0);
     });
 
     it('should handle invalid dates gracefully', () => {
-      const sources: Citation[] = [{
-        id: '1',
-        title: 'Invalid Date Source',
-        url: 'https://example.com/source',
-        domain: 'example.com',
-        published_at: 'invalid-date',
-        source_type: CitationSourceType.COMPANY_BLOG,
-        confidence: CitationConfidence.MEDIUM,
-        key_finding: 'Finding',
-      }];
+      const sources: Citation[] = [
+        {
+          id: '1',
+          title: 'Invalid Date Source',
+          url: 'https://example.com/source',
+          domain: 'example.com',
+          published_at: 'invalid-date',
+          source_type: CitationSourceType.COMPANY_BLOG,
+          confidence: CitationConfidence.MEDIUM,
+          key_finding: 'Finding',
+        },
+      ];
 
       expect(() => {
         engine.calculateClaimConfidence('Test claim', sources);
@@ -481,7 +570,7 @@ describe('ConfidenceScoringEngine', () => {
       }));
 
       const result = engine.calculateClaimConfidence('Test claim', sources);
-      
+
       expect(result.overall).toBeGreaterThan(0);
       expect(result.breakdown.sourceQuality).toBeGreaterThan(50);
       expect(result.breakdown.evidenceStrength).toBeGreaterThan(50); // Should be decent due to many sources

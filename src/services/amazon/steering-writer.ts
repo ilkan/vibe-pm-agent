@@ -32,7 +32,12 @@ export interface BusinessInputs {
 
 export interface SteeringPackage {
   featureSlug: string;
-  artifactType: 'pr_faq' | 'decision_onepager' | 'business_case' | 'board_presentation' | 'team_announcement';
+  artifactType:
+    | 'pr_faq'
+    | 'decision_onepager'
+    | 'business_case'
+    | 'board_presentation'
+    | 'team_announcement';
   frontMatter: FrontMatter;
   bodyMarkdown: string;
   attachments: Attachment[];
@@ -119,7 +124,7 @@ export class SteeringWriter extends BaseService {
       const artifactFilename = `${pack.artifactType}-${shortHash}.md`;
       const artifactPath = join(baseDir, artifactFilename);
       const documentContent = this.formatDocument(pack.frontMatter, pack.bodyMarkdown);
-      
+
       await writeFile(artifactPath, documentContent, 'utf-8');
 
       // Write attachments
@@ -142,7 +147,7 @@ export class SteeringWriter extends BaseService {
         inputsHash: pack.frontMatter.inputs_hash,
         message: `Successfully wrote ${pack.artifactType} to ${artifactPath}`,
         filename: artifactFilename,
-        fullPath: artifactPath
+        fullPath: artifactPath,
       };
     }, 'STEERING_WRITE_ERROR');
   }
@@ -167,7 +172,7 @@ export class SteeringWriter extends BaseService {
       timeline: inputs.timeline || '',
       assumptions: (inputs.assumptions || []).sort(),
       // Include citation URLs for hash but not full content
-      citationUrls: (inputs.citations || []).map(c => c.url).sort()
+      citationUrls: (inputs.citations || []).map(c => c.url).sort(),
     };
 
     const inputString = JSON.stringify(normalizedInputs, null, 0);
@@ -179,7 +184,12 @@ export class SteeringWriter extends BaseService {
    */
   createSteeringPackage(
     featureName: string,
-    artifactType: 'pr_faq' | 'decision_onepager' | 'business_case' | 'board_presentation' | 'team_announcement',
+    artifactType:
+      | 'pr_faq'
+      | 'decision_onepager'
+      | 'business_case'
+      | 'board_presentation'
+      | 'team_announcement',
     bodyMarkdown: string,
     ledger: AssumptionLedger,
     confidence: ConfidenceScore,
@@ -201,21 +211,21 @@ export class SteeringWriter extends BaseService {
       profile: 'amazon',
       confidence: {
         total: confidence.total,
-        breakdown: confidence.breakdown
+        breakdown: confidence.breakdown,
       },
       assumptions: {
         ids: ledger.assumptions.map(a => a.id),
-        coverage_pct: ledger.coverage_pct
+        coverage_pct: ledger.coverage_pct,
       },
       scenarios: {
         pct: scenarios.sensitivityPct,
-        metrics: this.extractScenarioMetrics(scenarios)
+        metrics: this.extractScenarioMetrics(scenarios),
       },
       paths: {
         assumptions_json: `./attachments/assumptions-${shortHash}.json`,
         citations_json: `./attachments/citations-${shortHash}.json`,
-        scenarios_json: `./attachments/scenarios-${shortHash}.json`
-      }
+        scenarios_json: `./attachments/scenarios-${shortHash}.json`,
+      },
     };
 
     // Create attachments
@@ -223,23 +233,27 @@ export class SteeringWriter extends BaseService {
       {
         filename: `assumptions-${shortHash}.json`,
         content: JSON.stringify(ledger, null, 2),
-        type: 'assumptions'
+        type: 'assumptions',
       },
       {
         filename: `citations-${shortHash}.json`,
         content: JSON.stringify(citations, null, 2),
-        type: 'citations'
+        type: 'citations',
       },
       {
         filename: `scenarios-${shortHash}.json`,
-        content: JSON.stringify({
-          scenarios: scenarios.scenarios,
-          elasticities: scenarios.elasticities,
-          keyDrivers: scenarios.keyDrivers,
-          hardQuestions
-        }, null, 2),
-        type: 'scenarios'
-      }
+        content: JSON.stringify(
+          {
+            scenarios: scenarios.scenarios,
+            elasticities: scenarios.elasticities,
+            keyDrivers: scenarios.keyDrivers,
+            hardQuestions,
+          },
+          null,
+          2
+        ),
+        type: 'scenarios',
+      },
     ];
 
     return {
@@ -247,7 +261,7 @@ export class SteeringWriter extends BaseService {
       artifactType,
       frontMatter,
       bodyMarkdown,
-      attachments
+      attachments,
     };
   }
 
@@ -259,20 +273,14 @@ export class SteeringWriter extends BaseService {
     artifactFilename: string,
     attachmentPaths: string[]
   ): Promise<void> {
-    const baseDir = join(
-      this.workspaceRoot,
-      '.kiro',
-      'steering',
-      'working-backwards',
-      featureSlug
-    );
+    const baseDir = join(this.workspaceRoot, '.kiro', 'steering', 'working-backwards', featureSlug);
 
     const latestPath = join(baseDir, 'latest.json');
     const latestData = {
       lastUpdated: new Date().toISOString(),
       artifactFilename,
       attachmentPaths: attachmentPaths.map(path => path.replace(baseDir + '/', '')),
-      featureSlug
+      featureSlug,
     };
 
     await writeFile(latestPath, JSON.stringify(latestData, null, 2), 'utf-8');
@@ -326,7 +334,7 @@ export class SteeringWriter extends BaseService {
       `paths:`,
       `  assumptions_json: "${frontMatter.paths.assumptions_json}"`,
       `  citations_json: "${frontMatter.paths.citations_json}"`,
-      `  scenarios_json: "${frontMatter.paths.scenarios_json}"`
+      `  scenarios_json: "${frontMatter.paths.scenarios_json}"`,
     ];
 
     return yaml.join('\n') + '\n';

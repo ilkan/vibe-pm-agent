@@ -187,9 +187,12 @@ export class CitationValidationMonitor {
     this.validateCitationsWithMonitoring(citations);
 
     // Set up periodic validation
-    this.monitoringInterval = setInterval(() => {
-      this.validateCitationsWithMonitoring(citations);
-    }, this.config.validationInterval * 60 * 60 * 1000); // Convert hours to milliseconds
+    this.monitoringInterval = setInterval(
+      () => {
+        this.validateCitationsWithMonitoring(citations);
+      },
+      this.config.validationInterval * 60 * 60 * 1000
+    ); // Convert hours to milliseconds
   }
 
   /**
@@ -206,7 +209,9 @@ export class CitationValidationMonitor {
    * Validate citations with monitoring and alerting
    */
   async validateCitationsWithMonitoring(citations: Citation[]): Promise<ValidationStatus[]> {
-    const validationPromises = citations.map(citation => this.validateCitationWithMonitoring(citation));
+    const validationPromises = citations.map(citation =>
+      this.validateCitationWithMonitoring(citation)
+    );
     const results = await Promise.all(validationPromises);
 
     // Check for alerts
@@ -223,7 +228,7 @@ export class CitationValidationMonitor {
    */
   async validateCitationWithMonitoring(citation: Citation): Promise<ValidationStatus> {
     const startTime = Date.now();
-    
+
     try {
       const validationResult = await this.validationEngine.validateCitation(citation);
       const responseTime = Date.now() - startTime;
@@ -231,8 +236,9 @@ export class CitationValidationMonitor {
       const status: ValidationStatus = {
         citationId: citation.id,
         lastValidated: new Date(),
-        isValid: validationResult.accessibilityStatus.isAccessible && 
-                validationResult.complianceStatus.isCompliant,
+        isValid:
+          validationResult.accessibilityStatus.isAccessible &&
+          validationResult.complianceStatus.isCompliant,
         validationErrors: this.extractValidationErrors(validationResult),
         qualityScore: this.calculateQualityScore(validationResult),
         performanceMetrics: {
@@ -280,7 +286,7 @@ export class CitationValidationMonitor {
     const totalCitations = validationResults.length;
     const brokenLinks = validationResults.filter(r => !r.isValid).length;
     const lowQuality = validationResults.filter(r => r.qualityScore < 60).length;
-    const complianceViolations = validationResults.filter(r => 
+    const complianceViolations = validationResults.filter(r =>
       r.validationErrors.some(error => error.includes('compliance'))
     ).length;
 
@@ -322,7 +328,8 @@ export class CitationValidationMonitor {
 
     // Check individual citation performance issues
     for (const result of validationResults) {
-      if (result.performanceMetrics.responseTime > 30000) { // 30 seconds
+      if (result.performanceMetrics.responseTime > 30000) {
+        // 30 seconds
         await this.createAlert({
           type: 'performance_issue',
           severity: 'medium',
@@ -337,7 +344,9 @@ export class CitationValidationMonitor {
   /**
    * Create a quality alert
    */
-  private async createAlert(alertData: Omit<QualityAlert, 'id' | 'timestamp' | 'resolved'>): Promise<QualityAlert> {
+  private async createAlert(
+    alertData: Omit<QualityAlert, 'id' | 'timestamp' | 'resolved'>
+  ): Promise<QualityAlert> {
     const alert: QualityAlert = {
       id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date(),
@@ -346,10 +355,10 @@ export class CitationValidationMonitor {
     };
 
     this.alertsCache.set(alert.id, alert);
-    
+
     // In a real implementation, this would send notifications
     console.warn(`Citation Quality Alert [${alert.severity.toUpperCase()}]: ${alert.message}`);
-    
+
     return alert;
   }
 
@@ -371,11 +380,14 @@ export class CitationValidationMonitor {
         }
 
         // Update averages
-        existingMetrics.metrics.averageResponseTime = 
-          (existingMetrics.metrics.averageResponseTime + result.performanceMetrics.responseTime) / 2;
-        
-        existingMetrics.metrics.uptimePercentage = 
-          (existingMetrics.metrics.successfulValidations / existingMetrics.metrics.totalValidations) * 100;
+        existingMetrics.metrics.averageResponseTime =
+          (existingMetrics.metrics.averageResponseTime + result.performanceMetrics.responseTime) /
+          2;
+
+        existingMetrics.metrics.uptimePercentage =
+          (existingMetrics.metrics.successfulValidations /
+            existingMetrics.metrics.totalValidations) *
+          100;
 
         // Add to history (keep last 30 entries)
         existingMetrics.metrics.qualityScoreHistory.push({ date: now, score: result.qualityScore });
@@ -390,7 +402,9 @@ export class CitationValidationMonitor {
 
         // Update trends
         existingMetrics.trends = {
-          responseTimeTrend: this.calculateResponseTimeTrend(existingMetrics.metrics.qualityScoreHistory),
+          responseTimeTrend: this.calculateResponseTimeTrend(
+            existingMetrics.metrics.qualityScoreHistory
+          ),
           qualityTrend: result.trendData.qualityTrend,
           availabilityTrend: result.trendData.availabilityTrend,
         };
@@ -432,20 +446,21 @@ export class CitationValidationMonitor {
   ): Promise<QualityReport> {
     const now = new Date();
     const period = this.calculateReportPeriod(reportType, now);
-    
+
     // Get validation results for the period
     const validationResults = await this.validateCitationsWithMonitoring(citations);
-    
+
     // Calculate summary statistics
     const summary = {
       totalCitations: citations.length,
       validCitations: validationResults.filter(r => r.isValid).length,
       brokenLinks: validationResults.filter(r => !r.isValid).length,
       qualityIssues: validationResults.filter(r => r.qualityScore < 60).length,
-      complianceViolations: validationResults.filter(r => 
+      complianceViolations: validationResults.filter(r =>
         r.validationErrors.some(error => error.includes('compliance'))
       ).length,
-      averageQualityScore: validationResults.reduce((sum, r) => sum + r.qualityScore, 0) / validationResults.length,
+      averageQualityScore:
+        validationResults.reduce((sum, r) => sum + r.qualityScore, 0) / validationResults.length,
     };
 
     // Calculate trends
@@ -490,7 +505,7 @@ export class CitationValidationMonitor {
         .map(id => this.validationCache.get(id))
         .filter((status): status is ValidationStatus => status !== undefined);
     }
-    
+
     return Array.from(this.validationCache.values());
   }
 
@@ -503,7 +518,7 @@ export class CitationValidationMonitor {
         .map(id => this.performanceCache.get(id))
         .filter((metrics): metrics is SourcePerformanceMetrics => metrics !== undefined);
     }
-    
+
     return Array.from(this.performanceCache.values());
   }
 
@@ -535,7 +550,7 @@ export class CitationValidationMonitor {
    */
   clearExpiredCache(): void {
     const now = Date.now();
-    
+
     // Clear expired validation cache
     for (const [key, status] of this.validationCache.entries()) {
       const hoursOld = (now - status.lastValidated.getTime()) / (1000 * 60 * 60);
@@ -567,7 +582,9 @@ export class CitationValidationMonitor {
     const errors: string[] = [];
 
     if (!validationResult.accessibilityStatus.isAccessible) {
-      errors.push(`Source not accessible: ${validationResult.accessibilityStatus.errorMessage || 'Unknown error'}`);
+      errors.push(
+        `Source not accessible: ${validationResult.accessibilityStatus.errorMessage || 'Unknown error'}`
+      );
     }
 
     if (!validationResult.complianceStatus.isCompliant) {
@@ -594,8 +611,8 @@ export class CitationValidationMonitor {
 
     return Math.round(
       credibilityScore * weights.credibility +
-      accessibilityScore * weights.accessibility +
-      complianceScore * weights.compliance
+        accessibilityScore * weights.accessibility +
+        complianceScore * weights.compliance
     );
   }
 
@@ -608,7 +625,7 @@ export class CitationValidationMonitor {
 
   private calculateAvailabilityScore(validationResult: ValidationResult): number {
     if (!validationResult.accessibilityStatus.isAccessible) return 0;
-    
+
     const responseTime = validationResult.accessibilityStatus.responseTime || 5000;
     if (responseTime < 2000) return 100;
     if (responseTime < 5000) return 80;
@@ -622,7 +639,7 @@ export class CitationValidationMonitor {
 
     const recent = metrics.metrics.qualityScoreHistory.slice(-3);
     const trend = recent[2].score - recent[0].score;
-    
+
     if (trend > 5) return 'improving';
     if (trend < -5) return 'degrading';
     return 'stable';
@@ -634,24 +651,29 @@ export class CitationValidationMonitor {
 
     const recent = metrics.metrics.availabilityHistory.slice(-5);
     const availableCount = recent.filter(h => h.available).length;
-    
+
     if (availableCount >= 4) return 'improving';
     if (availableCount <= 2) return 'degrading';
     return 'stable';
   }
 
-  private calculateResponseTimeTrend(history: Array<{ date: Date; score: number }>): 'improving' | 'stable' | 'degrading' {
+  private calculateResponseTimeTrend(
+    history: Array<{ date: Date; score: number }>
+  ): 'improving' | 'stable' | 'degrading' {
     if (history.length < 3) return 'stable';
-    
+
     const recent = history.slice(-3);
     const trend = recent[2].score - recent[0].score;
-    
+
     if (trend > 0) return 'improving';
     if (trend < 0) return 'degrading';
     return 'stable';
   }
 
-  private calculateReportPeriod(reportType: 'daily' | 'weekly' | 'monthly', now: Date): { start: Date; end: Date } {
+  private calculateReportPeriod(
+    reportType: 'daily' | 'weekly' | 'monthly',
+    now: Date
+  ): { start: Date; end: Date } {
     const end = new Date(now);
     const start = new Date(now);
 
@@ -670,31 +692,41 @@ export class CitationValidationMonitor {
     return { start, end };
   }
 
-  private calculateOverallQualityTrend(results: ValidationStatus[]): 'improving' | 'stable' | 'degrading' {
+  private calculateOverallQualityTrend(
+    results: ValidationStatus[]
+  ): 'improving' | 'stable' | 'degrading' {
     const improvingCount = results.filter(r => r.trendData.qualityTrend === 'improving').length;
     const degradingCount = results.filter(r => r.trendData.qualityTrend === 'degrading').length;
-    
+
     if (improvingCount > degradingCount * 1.5) return 'improving';
     if (degradingCount > improvingCount * 1.5) return 'degrading';
     return 'stable';
   }
 
-  private calculateOverallAvailabilityTrend(results: ValidationStatus[]): 'improving' | 'stable' | 'degrading' {
-    const improvingCount = results.filter(r => r.trendData.availabilityTrend === 'improving').length;
-    const degradingCount = results.filter(r => r.trendData.availabilityTrend === 'degrading').length;
-    
+  private calculateOverallAvailabilityTrend(
+    results: ValidationStatus[]
+  ): 'improving' | 'stable' | 'degrading' {
+    const improvingCount = results.filter(
+      r => r.trendData.availabilityTrend === 'improving'
+    ).length;
+    const degradingCount = results.filter(
+      r => r.trendData.availabilityTrend === 'degrading'
+    ).length;
+
     if (improvingCount > degradingCount * 1.5) return 'improving';
     if (degradingCount > improvingCount * 1.5) return 'degrading';
     return 'stable';
   }
 
-  private calculateComplianceTrend(results: ValidationStatus[]): 'improving' | 'stable' | 'degrading' {
-    const complianceIssues = results.filter(r => 
+  private calculateComplianceTrend(
+    results: ValidationStatus[]
+  ): 'improving' | 'stable' | 'degrading' {
+    const complianceIssues = results.filter(r =>
       r.validationErrors.some(error => error.includes('compliance'))
     ).length;
-    
+
     const complianceRate = (results.length - complianceIssues) / results.length;
-    
+
     if (complianceRate > 0.95) return 'improving';
     if (complianceRate < 0.85) return 'degrading';
     return 'stable';
@@ -721,8 +753,12 @@ export class CitationValidationMonitor {
       .map(([issue, data]) => ({
         issue,
         count: data.count,
-        severity: data.count > results.length * 0.2 ? 'high' : 
-                 data.count > results.length * 0.1 ? 'medium' : 'low',
+        severity:
+          data.count > results.length * 0.2
+            ? 'high'
+            : data.count > results.length * 0.1
+              ? 'medium'
+              : 'low',
         affectedCitations: data.citations,
       }))
       .sort((a, b) => b.count - a.count)
@@ -738,7 +774,9 @@ export class CitationValidationMonitor {
 
     // Quality recommendations
     if (summary.averageQualityScore < 70) {
-      recommendations.push('Consider replacing low-quality sources with more authoritative alternatives');
+      recommendations.push(
+        'Consider replacing low-quality sources with more authoritative alternatives'
+      );
     }
 
     if (trends.qualityTrend === 'degrading') {
@@ -747,11 +785,15 @@ export class CitationValidationMonitor {
 
     // Availability recommendations
     if (summary.brokenLinks > summary.totalCitations * 0.1) {
-      recommendations.push('High number of broken links detected - implement automated link checking');
+      recommendations.push(
+        'High number of broken links detected - implement automated link checking'
+      );
     }
 
     if (trends.availabilityTrend === 'degrading') {
-      recommendations.push('Source availability is degrading - consider archiving important sources');
+      recommendations.push(
+        'Source availability is degrading - consider archiving important sources'
+      );
     }
 
     // Compliance recommendations
@@ -762,7 +804,9 @@ export class CitationValidationMonitor {
     // Issue-specific recommendations
     for (const issue of topIssues.slice(0, 3)) {
       if (issue.severity === 'high') {
-        recommendations.push(`Address high-priority issue: ${issue.issue} (affects ${issue.count} citations)`);
+        recommendations.push(
+          `Address high-priority issue: ${issue.issue} (affects ${issue.count} citations)`
+        );
       }
     }
 

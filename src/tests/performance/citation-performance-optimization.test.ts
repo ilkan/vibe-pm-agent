@@ -10,11 +10,7 @@ import {
 } from '../../components/performance-optimizer';
 import { SourceValidationEngine } from '../../components/source-validation-engine';
 import { QualityAssessmentSystem } from '../../components/quality-assessment-system';
-import {
-  Citation,
-  CitationSourceType,
-  CitationConfidence,
-} from '../../models/citations';
+import { Citation, CitationSourceType, CitationConfidence } from '../../models/citations';
 import { ValidationResult } from '../../components/source-validation-engine';
 
 describe('Citation Performance Optimization', () => {
@@ -74,7 +70,7 @@ describe('Citation Performance Optimization', () => {
       // Generate some cache activity
       cache.set('key1', 'value1');
       cache.set('key2', 'value2');
-      
+
       cache.get('key1'); // Hit
       cache.get('key3'); // Miss
       cache.get('key1'); // Hit
@@ -186,9 +182,9 @@ describe('Citation Performance Optimization', () => {
       const processor = jest.fn().mockImplementation(async (item: number) => {
         concurrentCount++;
         maxConcurrent = Math.max(maxConcurrent, concurrentCount);
-        
+
         await new Promise(resolve => setTimeout(resolve, 50));
-        
+
         concurrentCount--;
         return item * 2;
       });
@@ -268,7 +264,7 @@ describe('Citation Performance Optimization', () => {
 
       // First call should execute query
       const results1 = await queryOptimizer.optimizedCitationLookup(criteria);
-      
+
       // Second call should use cache
       const results2 = await queryOptimizer.optimizedCitationLookup(criteria);
 
@@ -281,7 +277,7 @@ describe('Citation Performance Optimization', () => {
 
     it('should track query performance statistics', async () => {
       const criteria = { domains: ['test.com'] };
-      
+
       await queryOptimizer.optimizedCitationLookup(criteria);
       await queryOptimizer.optimizedCitationLookup(criteria); // Cache hit
 
@@ -295,9 +291,9 @@ describe('Citation Performance Optimization', () => {
 
     it('should handle batch queries efficiently', async () => {
       const citationIds = ['id1', 'id2', 'id3'];
-      
+
       const results = await queryOptimizer.optimizedQualityLookup(citationIds);
-      
+
       expect(results).toBeDefined();
       expect(Array.isArray(results)).toBe(true);
 
@@ -403,7 +399,7 @@ describe('Citation Performance Optimization', () => {
 
       // First call should execute validation
       const result1 = await sourceValidationEngine.validateSourceAccessibility(url);
-      
+
       // Second call should use cache
       const result2 = await sourceValidationEngine.validateSourceAccessibility(url);
 
@@ -480,7 +476,7 @@ describe('Citation Performance Optimization', () => {
 
       // Performance targets
       expect(writeTime).toBeLessThan(100); // Should write 1000 items in < 100ms
-      expect(readTime).toBeLessThan(50);   // Should read 1000 items in < 50ms
+      expect(readTime).toBeLessThan(50); // Should read 1000 items in < 50ms
 
       const stats = cache.getStats();
       expect(stats.hitRate).toBe(100); // All reads should be hits
