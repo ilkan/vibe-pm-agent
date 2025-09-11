@@ -54,6 +54,13 @@ import {
   getToolMetadata,
   isValidToolName,
 } from './tools';
+import {
+  KIRO_TOOL_MAPPINGS,
+  isKiroTool,
+  getInternalToolName,
+  getAllKiroToolNames,
+  getKiroToolDescription,
+} from './tool-mappings';
 
 /**
  * PM Agent MCP Server implementation
@@ -126,26 +133,110 @@ export class PMAgentMCPServer {
   }
 
   /**
+   * Execute a registry tool by name
+   */
+  private async executeRegistryTool(
+    toolName: string,
+    args: any,
+    context: MCPToolContext
+  ): Promise<MCPToolResult> {
+    const tool = this.toolRegistry.getTool(toolName);
+    if (!tool) {
+      throw MCPErrorHandler.createError(
+        MCPErrorCode.TOOL_NOT_FOUND,
+        `Registry tool '${toolName}' not found`,
+        context
+      );
+    }
+
+    // Validate input for registry tools
+    const validation = this.toolRegistry.validateToolInput(toolName, args);
+    if (!validation.valid) {
+      throw MCPErrorHandler.createError(
+        MCPErrorCode.VALIDATION_FAILED,
+        `Invalid input: ${validation.errors?.join(', ')}`,
+        context,
+        { validationErrors: validation.errors, schema: tool.inputSchema }
+      );
+    }
+
+    // Execute the appropriate handler based on tool name
+    switch (toolName) {
+      case 'optimize_intent':
+        return await this.handleOptimizeIntent(args as OptimizeIntentArgs, context);
+      case 'analyze_workflow':
+        return await this.handleAnalyzeWorkflow(args as AnalyzeWorkflowArgs, context);
+      case 'generate_roi_analysis':
+        return await this.handleGenerateROI(args as GenerateROIArgs, context);
+      case 'get_consulting_summary':
+        return await this.handleConsultingSummary(args as ConsultingSummaryArgs, context);
+      case 'validate_idea_quick':
+        return await this.handleValidateIdeaQuick(args as ValidateIdeaQuickArgs, context);
+      case 'analyze_competitor_landscape':
+        return await this.handleAnalyzeCompetitorLandscape(args as any, context);
+      case 'calculate_market_sizing':
+        return await this.handleCalculateMarketSizing(args as any, context);
+      case 'analyze_business_opportunity':
+        return await this.handleAnalyzeBusinessOpportunity(args as any, context);
+      case 'generate_business_case':
+        return await this.handleGenerateBusinessCase(args as GenerateBusinessCaseArgs, context);
+      case 'create_stakeholder_communication':
+        return await this.handleCreateStakeholderCommunication(args as CreateStakeholderCommunicationArgs, context);
+      case 'assess_strategic_alignment':
+        return await this.handleAssessStrategicAlignment(args as AssessStrategicAlignmentArgs, context);
+      case 'optimize_resource_allocation':
+        return await this.handleOptimizeResourceAllocation(args as OptimizeResourceAllocationArgs, context);
+      case 'validate_market_timing':
+        return await this.handleValidateMarketTiming(args as ValidateMarketTimingArgs, context);
+      default:
+        throw MCPErrorHandler.createError(
+          MCPErrorCode.METHOD_NOT_FOUND,
+          `Tool handler for '${toolName}' not implemented`,
+          context
+        );
+    }
+  }
+
+  /**
    * Setup MCP tool handlers
    */
   private setupToolHandlers(): void {
-    // Register tool handlers with the MCP server using clean tool implementations
+    // Register tool handlers with the MCP server using Kiro-prefixed names
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      // Combine registry tools with clean tool implementations
-      const registryTools = this.toolRegistry.getAllTools().map(tool => ({
-        name: tool.name,
-        description: tool.description,
-        inputSchema: tool.inputSchema,
-      }));
-
-      const cleanTools = Object.entries(MCP_TOOLS_REGISTRY).map(([name, tool]) => ({
-        name,
-        description: tool.description,
-        inputSchema: tool.schema,
-      }));
+      // Get all Kiro-prefixed tools
+      const kiroTools = getAllKiroToolNames().map(kiroName => {
+        const internalName = getInternalToolName(kiroName);
+        
+        // Try to get schema from MCP_TOOLS_REGISTRY first
+        if (internalName && isValidToolName(internalName)) {
+          const toolMeta = getToolMetadata(internalName);
+          return {
+            name: kiroName,
+            description: getKiroToolDescription(kiroName),
+            inputSchema: toolMeta.schema,
+          };
+        }
+        
+        // Fallback to registry tools
+        const registryTool = this.toolRegistry.getTool(internalName || '');
+        if (registryTool) {
+          return {
+            name: kiroName,
+            description: getKiroToolDescription(kiroName),
+            inputSchema: registryTool.inputSchema,
+          };
+        }
+        
+        // Default schema if tool not found
+        return {
+          name: kiroName,
+          description: getKiroToolDescription(kiroName),
+          inputSchema: { type: 'object', properties: {} },
+        };
+      });
 
       return {
-        tools: [...registryTools, ...cleanTools],
+        tools: kiroTools,
       };
     });
 
@@ -166,8 +257,38 @@ export class PMAgentMCPServer {
         // Execute tool handler
         let result: MCPToolResult;
 
-        // Check if it's a clean tool implementation first
-        if (isValidToolName(name)) {
+        // Check if it's a Kiro-prefixed tool first
+        if (isKiroTool(name)) {
+          const internalName = getInternalToolName(name);
+          if (!internalName) {
+            throw MCPErrorHandler.createError(
+              MCPErrorCode.TOOL_NOT_FOUND,
+              `Kiro tool '${name}' has no internal mapping`,
+              context
+            );
+          }
+
+          MCPLogger.debug(`Executing Kiro tool: ${name} -> ${internalName}`, context);
+
+          // Try clean tool implementation first
+          if (isValidToolName(internalName)) {
+            const toolMeta = getToolMetadata(internalName);
+            result = await toolMeta.handler(args as any, context);
+          } else {
+            // Fallback to registry tool
+            const tool = this.toolRegistry.getTool(internalName);
+            if (!tool) {
+              throw MCPErrorHandler.createError(
+                MCPErrorCode.TOOL_NOT_FOUND,
+                `Internal tool '${internalName}' not found for Kiro tool '${name}'`,
+                context
+              );
+            }
+
+            // Execute registry tool handler
+            result = await this.executeRegistryTool(internalName, args, context);
+          }
+        } else if (isValidToolName(name)) {
           const toolMeta = getToolMetadata(name);
           MCPLogger.debug(`Executing clean tool: ${name}`, context);
           result = await toolMeta.handler(args as any, context);

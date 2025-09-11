@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noEmitOnError": false,
+    "strict": false
+  },
+  "include": [
+    "src/mcp/**/*",
+    "src/models/**/*",
+    "src/utils/mcp-error-handling.ts",
+    "src/utils/validation.ts",
+    "src/utils/error-handling.ts"
+  ],
+  "exclude": [
+    "src/components/**/*",
+    "src/pipeline/**/*",
+    "src/services/**/*",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}

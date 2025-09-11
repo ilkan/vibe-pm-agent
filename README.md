@@ -215,7 +215,7 @@ ENABLE_STREAMING=true    # Enable response streaming
 
 **Server Capabilities:**
 - **Transport**: Standard I/O (stdio) for MCP protocol communication
-- **Tools**: 15+ business intelligence and PM workflow tools
+- **Tools**: 21 business intelligence and PM workflow tools
 - **Resources**: 5 unique datasets with competitive intelligence
 - **Prompts**: 5 customizable prompt templates
 - **Streaming**: Real-time response streaming for large analyses
@@ -390,7 +390,7 @@ src/
 
 The Vibe PM Agent implements a comprehensive MCP (Model Context Protocol) server with the following features:
 
-- **🛠️ Tools**: 15+ business intelligence and PM workflow tools
+- **🛠️ Tools**: 21 business intelligence and PM workflow tools with clean, readable names
 - **📚 Resources**: Access to unique datasets and competitive intelligence
 - **📝 Prompts**: Customizable prompt templates for consistent output quality
 - **🔄 Streaming**: Real-time response streaming for large analyses
@@ -398,36 +398,48 @@ The Vibe PM Agent implements a comprehensive MCP (Model Context Protocol) server
 
 ### MCP Tools Reference
 
-#### Core Business Intelligence Tools
+**✨ All 21 tools feature clean, readable names without prefixes for better user experience in Kiro IDE.**
+
+#### Core Business Intelligence Tools (6 tools)
 
 | Tool Name | Description | Required Parameters | Optional Parameters | Output Format |
 |-----------|-------------|-------------------|-------------------|---------------|
-| **`analyze_business_opportunity`** | Market validation and strategic fit assessment with competitive intelligence | `feature_idea` (string) | `market_context`, `analysis_depth`, `citation_options`, `steering_options` | JSON with citations |
+| **`analyze_business_opportunity`** | Market validation and strategic fit assessment with competitive intelligence | `idea` (string) | `market_context`, `analysis_depth`, `citation_options`, `steering_options` | JSON with citations |
 | **`generate_business_case`** | Multi-scenario ROI analysis with risk assessment | `opportunity_analysis` (string) | `financial_inputs`, `citation_options`, `steering_options` | JSON with financial projections |
 | **`create_stakeholder_communication`** | Executive communications generation | `business_case` (string), `communication_type` (enum), `audience` (enum) | `citation_options`, `steering_options` | Formatted document |
 | **`assess_strategic_alignment`** | Company OKR and mission alignment evaluation | `feature_concept` (string) | `company_context`, `citation_options`, `steering_options` | JSON alignment score |
 | **`validate_market_timing`** | Market timing and competitive window analysis | `feature_idea` (string) | `market_signals`, `citation_options` | JSON timing assessment |
 | **`optimize_resource_allocation`** | Development efficiency and cost optimization | `current_workflow` (object) | `resource_constraints`, `optimization_goals`, `citation_options` | JSON optimization plan |
 
-#### PM Workflow Tools
+#### PM Workflow Tools (5 tools)
 
 | Tool Name | Description | Required Parameters | Optional Parameters | Output Format |
 |-----------|-------------|-------------------|-------------------|---------------|
-| **`generate_requirements`** | PM-grade requirements with MoSCoW prioritization | `raw_intent` (string) | `context`, `steering_options` | Structured requirements |
-| **`generate_design_options`** | Conservative/Balanced/Bold design alternatives | `requirements` (string) | `steering_options` | Design options matrix |
-| **`generate_task_plan`** | Phased implementation plan with guardrails | `design` (string) | `limits`, `steering_options` | Task breakdown |
-| **`generate_management_onepager`** | Executive one-pager using Pyramid Principle | `requirements` (string), `design` (string) | `roi_inputs`, `steering_options` | Executive summary |
-| **`generate_pr_faq`** | Amazon-style PR-FAQ document | `requirements` (string), `design` (string) | `target_date`, `steering_options` | PR-FAQ format |
+| **`generate_requirements`** | PM-grade requirements with EARS format and acceptance criteria | `feature_idea` (string) | `context`, `steering_options` | Structured requirements |
+| **`generate_design_options`** | Conservative/Balanced/Bold design alternatives with cost analysis | `requirements` (string) | `constraints`, `steering_options` | Design options matrix |
+| **`generate_task_plan`** | Phased implementation plan with detailed task breakdown | `design` (string) | `requirements`, `steering_options` | Task breakdown |
+| **`generate_management_onepager`** | Executive one-pager using Pyramid Principle | `project_info` (string) | `audience`, `steering_options` | Executive summary |
+| **`generate_pr_faq`** | Amazon-style PR-FAQ document with Working Backwards methodology | `product_info` (string) | `target_audience`, `steering_options` | PR-FAQ format |
 
-#### Legacy Workflow Tools
+#### Citation & Analysis Tools (5 tools)
 
 | Tool Name | Description | Required Parameters | Optional Parameters | Output Format |
 |-----------|-------------|-------------------|-------------------|---------------|
-| **`optimize_intent`** | Intent optimization with quota analysis | `intent` (string) | `parameters` | Optimized workflow |
-| **`analyze_workflow`** | Workflow analysis using consulting frameworks | `workflow` (object) | `techniques` | Analysis report |
-| **`generate_roi_analysis`** | ROI analysis with multiple scenarios | `workflow` (object) | `optimized_workflow`, `zero_based_solution` | Financial analysis |
-| **`get_consulting_summary`** | Consulting-grade summary generation | `analysis` (object) | `techniques` | Executive summary |
-| **`validate_idea_quick`** | Quick idea validation and feasibility check | `idea` (string) | `context` | Validation report |
+| **`enhance_citations`** | Enhances content with authoritative citations and source validation | `content` (string) | `sources` (array), `citation_options` | Enhanced content |
+| **`validate_and_audit_citations`** | Validates and audits citations for accuracy and credibility | `content` (string) | `strict_mode` (boolean) | Audit report |
+| **`monitor_market_conditions`** | Monitors and analyzes current market conditions and trends | `market` (string) | `indicators` (array) | Market analysis |
+| **`get_consulting_summary`** | Creates consulting-style executive summary from analysis data | `analysis_data` (string) | `summary_type` (string) | Executive summary |
+| **`validate_idea_quick`** | Performs quick validation of business ideas against criteria | `idea` (string) | `criteria` (array) | Validation report |
+
+#### Workflow Optimization Tools (5 tools)
+
+| Tool Name | Description | Required Parameters | Optional Parameters | Output Format |
+|-----------|-------------|-------------------|-------------------|---------------|
+| **`optimize_intent`** | Optimizes user intent for better clarity and actionability | `user_intent` (string) | `context` (object) | Optimized intent |
+| **`analyze_workflow`** | Analyzes workflows for optimization opportunities | `workflow_description` (string) | `optimization_goals` (array) | Analysis report |
+| **`generate_roi_analysis`** | Generates comprehensive ROI analysis with financial projections | `investment` (number) | `expected_returns` (object) | Financial analysis |
+| **`analyze_competitor_landscape`** | Analyzes competitive landscape and market positioning | `market_segment` (string) | `competitors` (array) | Competitive analysis |
+| **`calculate_market_sizing`** | Calculates market sizing using TAM-SAM-SOM methodology | `market` (string) | `methodology` (string) | Market sizing |
 
 ### MCP Resources
 
