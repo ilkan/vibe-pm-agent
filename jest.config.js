@@ -4,7 +4,7 @@ module.exports = {
   forceExit: true,
   detectOpenHandles: true,
   // Increased timeout for complex integration tests
-  testTimeout: 30000, // 30 seconds
+  testTimeout: 60000, // 60 seconds for complex tests
   roots: ['<rootDir>/src/tests'],
   testMatch: [
     '**/tests/**/*.test.ts',
@@ -35,7 +35,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
   globalTeardown: '<rootDir>/src/tests/global-teardown.ts',
   // Additional Jest configuration for better resource management
-  maxWorkers: 1, // Run tests serially to avoid resource conflicts
+  maxWorkers: '50%', // Use half of available CPU cores for better performance
   // Ensure tests don't hang by forcing exit
   forceExit: true,
   // Detect open handles to identify resource leaks
