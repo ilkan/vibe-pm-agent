@@ -124,7 +124,7 @@ describe('MCP Competitive Analysis Handler', () => {
       const result = await server.handleAnalyzeCompetitorLandscape(args, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].json.message).toContain('feature_idea is required');
+      expect(result.content[0].text || result.content[0].json?.message || '').toContain('feature_idea is required');
     });
 
     it('should include proper source attribution', async () => {

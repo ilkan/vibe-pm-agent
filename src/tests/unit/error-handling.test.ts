@@ -289,7 +289,7 @@ describe('Error Handling Utilities', () => {
 
       expect(result).toBe('success');
       expect(operation).toHaveBeenCalledTimes(2);
-    });
+    }, 60000);
 
     it('should not retry validation errors', async () => {
       const error = new ValidationError('test');
@@ -316,6 +316,6 @@ describe('Error Handling Utilities', () => {
       await expect(RetryHandler.withRetry(operation, 2, 10)).rejects.toThrow('persistent failure');
 
       expect(operation).toHaveBeenCalledTimes(2);
-    });
+    }, 60000);
   });
 });

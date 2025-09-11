@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { AmazonTemplateProcessor, TemplateContext } from '../../components/amazon-template-processor/index.js';
+import { AmazonTemplateProcessor, TemplateContext } from '../../components/amazon-template-processor/index';
 
 describe('Amazon Template Snapshots', () => {
   let templateProcessor: AmazonTemplateProcessor;

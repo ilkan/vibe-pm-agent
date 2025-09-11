@@ -761,7 +761,6 @@ describe('PMDocumentGenerator Core Infrastructure', () => {
       });
 
       // Dates should be valid and in reasonable order
-      const dates = result.launchChecklist.map(item => new Date(item.dueDate));
       const validDates = dates.filter(date => !isNaN(date.getTime()));
 
       expect(validDates.length).toBeGreaterThan(0);

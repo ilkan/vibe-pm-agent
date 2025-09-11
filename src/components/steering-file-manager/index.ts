@@ -73,8 +73,8 @@ export class SteeringFileManager {
 
     SteeringLogger.info('Starting steering file save operation', {
       filename: steeringFile.filename,
-      documentType: steeringFile.frontMatter.documentType,
-      featureName: steeringFile.frontMatter.featureName,
+      documentType: steeringFile.frontMatter?.documentType,
+      featureName: steeringFile.frontMatter?.featureName,
     });
 
     const result = await SteeringOperationWrapper.executeWithErrorHandling(async () => {

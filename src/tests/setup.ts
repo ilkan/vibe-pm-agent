@@ -39,13 +39,17 @@ afterEach(async () => {
     console.warn('Resource cleanup warning:', error instanceof Error ? error.message : error);
   }
 
-  // Clean up any test artifacts created during this test
+  // Clean up any test artifacts created during this test with timeout
   try {
-    await cleanupAfterTest();
+    const cleanupPromise = cleanupAfterTest();
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Cleanup timeout')), 10000)
+    );
+    await Promise.race([cleanupPromise, timeoutPromise]);
   } catch (error) {
     console.warn('Test cleanup warning:', error instanceof Error ? error.message : error);
   }
-});
+}, 15000);
 
 afterAll(async () => {
   // Force cleanup of any remaining handles

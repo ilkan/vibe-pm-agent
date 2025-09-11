@@ -417,7 +417,7 @@ describe('BusinessAnalyzer', () => {
 
       const solution = analyzer.applyZeroBasedDesign(intent);
 
-      expect(solution.assumptionsChallenged.length).toBeGreaterThan(0);
+      expect(solution.assumptionsChallenged?.length || 0).toBeGreaterThan(0);
       expect(solution.radicalApproach).toBeTruthy();
       expect(solution.potentialSavings).toBeGreaterThan(0);
       expect(['low', 'medium', 'high']).toContain(solution.implementationRisk);
@@ -436,7 +436,7 @@ describe('BusinessAnalyzer', () => {
 
       expect(solution.implementationRisk).toBe('low');
       expect(solution.potentialSavings).toBeLessThan(50);
-      expect(solution.assumptionsChallenged.length).toBe(1);
+      expect(solution.assumptionsChallenged?.length || 0).toBe(1);
     });
   });
 
@@ -444,18 +444,21 @@ describe('BusinessAnalyzer', () => {
     it('should categorize optimizations into impact/effort matrix', () => {
       const optimizations: Optimization[] = [
         {
+          id: 'opt-cache-ba',
           type: 'caching',
           description: 'Add caching layer',
           stepsAffected: ['step1'],
           estimatedSavings: { vibes: 50, specs: 0, percentage: 40 },
         },
         {
+          id: 'opt-decomp-ba',
           type: 'decomposition',
           description: 'Break into smaller specs',
           stepsAffected: ['step1', 'step2', 'step3'],
           estimatedSavings: { vibes: 100, specs: 20, percentage: 60 },
         },
         {
+          id: 'opt-batch-ba',
           type: 'batching',
           description: 'Batch similar operations',
           stepsAffected: ['step1', 'step2'],

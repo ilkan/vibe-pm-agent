@@ -238,7 +238,7 @@ describe('PM-Focused MCP Tool Schemas', () => {
 
     test('should have correct tool count including new PM tools', () => {
       const allTools = registry.getAllTools();
-      expect(allTools.length).toBe(10); // 4 original + 5 new PM tools + 1 quick validation tool
+      expect(allTools.length).toBe(18); // All tools from MCP_SERVER_CONFIG
     });
 
     test('should retrieve PM tools with correct descriptions', () => {

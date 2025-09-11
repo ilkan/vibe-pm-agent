@@ -464,6 +464,7 @@ describe('MCP Tool Handlers', () => {
         ...mockWorkflow,
         optimizations: [
           {
+            id: 'opt-batch-mcp',
             type: 'batching',
             description: 'Batch similar operations',
             stepsAffected: ['step-1'],
