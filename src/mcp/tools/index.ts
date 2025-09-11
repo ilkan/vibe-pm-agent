@@ -64,6 +64,8 @@ import {
   analyzeBusinessOpportunityEnhancedDescription,
 } from './analyze_business_opportunity_enhanced';
 
+import { monitorMarketConditions, monitorMarketConditionsMetadata } from './monitor_market_conditions';
+
 // Re-export for external use
 export {
   generateRequirements,
@@ -151,6 +153,11 @@ export const MCP_TOOLS_REGISTRY = {
     handler: analyzeBusinessOpportunityEnhanced,
     schema: analyzeBusinessOpportunityEnhancedSchema,
     description: analyzeBusinessOpportunityEnhancedDescription,
+  },
+  monitor_market_conditions: {
+    handler: monitorMarketConditions,
+    schema: monitorMarketConditionsMetadata.inputSchema,
+    description: monitorMarketConditionsMetadata.description,
   },
 } as const;
 

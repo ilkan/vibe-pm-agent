@@ -25,6 +25,13 @@ describe('MarketConditionDetector', () => {
     mockMarketSizing = createMockMarketSizing();
   });
 
+  afterEach(() => {
+    // Critical: Clean up detector to prevent memory leaks and hanging tests
+    if (detector) {
+      detector.destroy();
+    }
+  });
+
   describe('startMonitoring', () => {
     it('should start monitoring market conditions', () => {
       const marketSizingId = 'test-market-1';
@@ -691,6 +698,9 @@ describe('MarketConditionDetector', () => {
       );
 
       expect(daysDifference).toBeLessThanOrEqual(3);
+      
+      // Clean up custom detector to prevent memory leaks
+      customDetector.destroy();
     });
   });
 });

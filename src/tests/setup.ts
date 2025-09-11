@@ -16,17 +16,17 @@ jest.setTimeout(30000); // 30 seconds
 
 // Test setup configuration
 beforeEach(() => {
-  // Use fake timers to prevent real timers from causing issues
-  jest.useFakeTimers();
+  // Temporarily disable fake timers to fix hanging tests
+  // jest.useFakeTimers();
 
   // Reset resource manager state
   ResourceManager.getInstance().reset();
 });
 
 afterEach(async () => {
-  // Run only pending timers and then use real timers
-  jest.runOnlyPendingTimers();
-  jest.useRealTimers();
+  // Temporarily disable fake timer cleanup
+  // jest.runOnlyPendingTimers();
+  // jest.useRealTimers();
 
   // Clear all Jest mocks and timers
   jest.clearAllTimers();

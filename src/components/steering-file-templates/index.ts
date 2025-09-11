@@ -626,7 +626,7 @@ Track these metrics to validate market assumptions:
     const templatesByType = {} as Record<DocumentType, boolean>;
     let totalPlaceholders = 0;
 
-    for (const [type, template] of this.templates) {
+    for (const [type, template] of Array.from(this.templates.entries())) {
       templatesByType[type] = true;
       totalPlaceholders += template.requiredPlaceholders.length;
     }

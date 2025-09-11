@@ -1,9 +1,9 @@
 /**
  * FrontMatterProcessor Component
  *
- * Handles the generation of front-matter metadata for steering files based on
+ * Handles the generation of front-matter metadata for documents based on
  * document type and context. Determines appropriate inclusion rules and formats
- * metadata according to Kiro steering file conventions.
+ * metadata according to document conventions.
  */
 
 import { FrontMatter, SteeringContext, DocumentType, InclusionRule } from '../../models/steering';
@@ -49,7 +49,7 @@ const DEFAULT_INCLUSION_RULES: Record<DocumentType, InclusionRule> = {
 };
 
 /**
- * Processor for generating front-matter metadata for steering files
+ * Processor for generating front-matter metadata for documents
  */
 export class FrontMatterProcessor {
   private config: FrontMatterConfig;
@@ -64,7 +64,7 @@ export class FrontMatterProcessor {
   }
 
   /**
-   * Generates front-matter for a steering file based on context and document type
+   * Generates front-matter for a document based on context and document type
    */
   generateFrontMatter(documentType: DocumentType, context: SteeringContext): FrontMatter {
     const inclusionRule = this.determineInclusionRule(documentType, context);
