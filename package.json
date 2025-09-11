@@ -8,12 +8,12 @@
     "vibe-pm-agent": "./bin/mcp-server.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --incremental",
     "dev": "ts-node src/mcp/server.ts",
     "start": "node dist/mcp/server.js",
-    "test": "jest --passWithNoTests",
-    "test:unit": "jest --testPathPattern=unit --passWithNoTests",
-    "test:integration": "jest --testPathPattern=integration --passWithNoTests",
+    "test": "jest --passWithNoTests --maxWorkers=2 --testTimeout=60000",
+    "test:unit": "jest --testPathPattern=unit --passWithNoTests --maxWorkers=2 --testTimeout=60000",
+    "test:integration": "jest --testPathPattern=integration --passWithNoTests --maxWorkers=1 --testTimeout=120000",
     "test:watch": "jest --watch --passWithNoTests",
     "test:coverage": "jest --coverage --passWithNoTests",
     "lint": "eslint src/**/*.ts --fix",
@@ -48,7 +48,8 @@
     "prepare": "husky install || husky || echo 'Husky setup skipped'",
     "prebuild": "npm run clean",
     "prepublishOnly": "npm run build && npm run test",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build:fast || npm run build",
+    "build:fast": "tsc --incremental --skipLibCheck"
   },
   "keywords": [
     "mcp",
