@@ -53,6 +53,7 @@ describe('SpecGenerator', () => {
       estimatedComplexity: 7,
       optimizations: [
         {
+          id: 'opt-1',
           type: 'batching',
           description: 'Batch similar analysis operations',
           stepsAffected: ['step1'],
@@ -531,24 +532,28 @@ describe('SpecGenerator', () => {
         ...mockOptimizedWorkflow,
         optimizations: [
           {
+            id: 'opt-batch-1',
             type: 'batching',
             description: 'Batch operations',
             stepsAffected: ['step1', 'step2'],
             estimatedSavings: { vibes: 2, specs: 0, percentage: 25 },
           },
           {
+            id: 'opt-cache-1',
             type: 'caching',
             description: 'Add cache layer',
             stepsAffected: ['step1'],
             estimatedSavings: { vibes: 1, specs: 0, percentage: 15 },
           },
           {
+            id: 'opt-decomp-1',
             type: 'decomposition',
             description: 'Split into smaller specs',
             stepsAffected: ['step1', 'step2', 'step3'],
             estimatedSavings: { vibes: 0, specs: 1, percentage: 10 },
           },
           {
+            id: 'opt-vibe-1',
             type: 'vibe_to_spec',
             description: 'Convert vibes to specs',
             stepsAffected: ['step1'],

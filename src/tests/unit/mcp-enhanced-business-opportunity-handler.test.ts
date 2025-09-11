@@ -60,7 +60,7 @@ describe('MCP Enhanced Business Opportunity Handler', () => {
       const result = await server.handleAnalyzeBusinessOpportunity(args, mockContext);
 
       expect(result.isError).toBe(false);
-      const opportunityData = result.content[0].json;
+      const opportunityData = result.content[0].json.data;
       expect(opportunityData).toHaveProperty('competitiveAnalysis');
       expect(opportunityData.competitiveAnalysis).toBeDefined();
     });
@@ -79,7 +79,7 @@ describe('MCP Enhanced Business Opportunity Handler', () => {
       const result = await server.handleAnalyzeBusinessOpportunity(args, mockContext);
 
       expect(result.isError).toBe(false);
-      const opportunityData = result.content[0].json;
+      const opportunityData = result.content[0].json.data;
       expect(opportunityData).toHaveProperty('marketSizing');
       expect(opportunityData.marketSizing).toBeDefined();
     });
@@ -164,7 +164,7 @@ describe('MCP Enhanced Business Opportunity Handler', () => {
       const result = await server.handleAnalyzeBusinessOpportunity(invalidArgs, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('feature_idea is required');
+      expect(result.content[0].text || result.content[0].json?.message || '').toContain('feature_idea is required');
     });
 
     it('should include strategic fit assessment', async () => {
@@ -175,7 +175,7 @@ describe('MCP Enhanced Business Opportunity Handler', () => {
       const result = await server.handleAnalyzeBusinessOpportunity(args, mockContext);
 
       expect(result.isError).toBe(false);
-      const opportunityData = result.content[0].json;
+      const opportunityData = result.content[0].json.data;
 
       expect(opportunityData.strategicFit).toBeDefined();
       expect(opportunityData.strategicFit).toHaveProperty('alignmentScore');
@@ -193,7 +193,7 @@ describe('MCP Enhanced Business Opportunity Handler', () => {
       const result = await server.handleAnalyzeBusinessOpportunity(args, mockContext);
 
       expect(result.isError).toBe(false);
-      const opportunityData = result.content[0].json;
+      const opportunityData = result.content[0].json.data;
 
       expect(opportunityData.marketTiming).toBeDefined();
       expect(opportunityData.marketTiming).toHaveProperty('readiness');
@@ -210,7 +210,7 @@ describe('MCP Enhanced Business Opportunity Handler', () => {
       const result = await server.handleAnalyzeBusinessOpportunity(args, mockContext);
 
       expect(result.isError).toBe(false);
-      const opportunityData = result.content[0].json;
+      const opportunityData = result.content[0].json.data;
 
       expect(opportunityData.overallAssessment).toBeDefined();
       expect(opportunityData.overallAssessment).toHaveProperty('opportunityScore');

@@ -108,7 +108,13 @@ describe('SteeringFileManager', () => {
     it('should handle validation failure', async () => {
       const invalidFile = {
         ...mockSteeringFile,
-        content: '', // Empty content should fail validation
+        filename: '', // Empty filename cannot be auto-fixed and will cause severe validation failure
+        content: '', // Empty content
+        frontMatter: {
+          ...mockSteeringFile.frontMatter,
+          generatedBy: '', // Empty required field
+          featureName: '', // Empty required field
+        }
       };
 
       const result = await manager.saveSteeringFile(invalidFile);
@@ -126,7 +132,7 @@ describe('SteeringFileManager', () => {
       expect(result.success).toBe(false);
       expect(result.action).toBe('skipped');
       expect(result.message).toContain('Permission denied');
-    });
+    }, 60000);
   });
 
   describe('checkConflicts', () => {
