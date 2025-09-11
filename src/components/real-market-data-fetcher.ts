@@ -211,7 +211,7 @@ export class RealMarketDataFetcher {
         title: `Market Data from ${source.name}`,
         url: source.url,
         content: relevantContent,
-        marketMetrics: [...new Set(marketMetrics)], // Remove duplicates
+        marketMetrics: Array.from(new Set(marketMetrics)), // Remove duplicates
         source: source.name,
         fetchedAt: new Date().toISOString(),
       };

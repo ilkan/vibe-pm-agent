@@ -2,9 +2,9 @@
  * DocumentReferenceLinker Component
  *
  * This component handles the detection and generation of cross-references between
- * steering files and related documents in the .kiro/specs directory structure.
+ * documents and related files in the project directory structure.
  * It provides intelligent file discovery and path resolution for creating
- * interconnected steering file guidance.
+ * interconnected document guidance.
  */
 
 import * as fs from 'fs';
@@ -66,7 +66,7 @@ export interface CrossReferenceValidation {
 
 /**
  * DocumentReferenceLinker handles file discovery and cross-reference generation
- * for steering files and related project documents.
+ * for documents and related project files.
  */
 export class DocumentReferenceLinker {
   private config: ReferenceDetectionConfig;
@@ -85,7 +85,7 @@ export class DocumentReferenceLinker {
   }
 
   /**
-   * Add file references to a steering context by detecting related files
+   * Add file references to a context by detecting related files
    */
   addFileReferences(context: SteeringContext): SteeringContext {
     const relatedFiles = this.detectRelatedFiles(context.featureName, context.projectName);

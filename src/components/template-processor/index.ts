@@ -1,7 +1,7 @@
 /**
  * TemplateProcessor Component
  *
- * Handles template processing with placeholder replacement for steering file generation.
+ * Handles template processing with placeholder replacement for document generation.
  * Provides utilities for content extraction and formatting from PM agent documents.
  */
 
@@ -48,7 +48,7 @@ export interface ExtractedSection {
 }
 
 /**
- * Template processor for steering file generation
+ * Template processor for document generation
  */
 export class TemplateProcessor {
   private config: ContentExtractionConfig;
@@ -79,7 +79,7 @@ export class TemplateProcessor {
     }
 
     // Replace each found placeholder
-    for (const placeholder of foundPlaceholders) {
+    for (const placeholder of Array.from(foundPlaceholders)) {
       const value = placeholders[placeholder];
       const placeholderPattern = `{${placeholder}}`;
       const regex = new RegExp(placeholderPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
@@ -114,7 +114,7 @@ export class TemplateProcessor {
     }
 
     // Check for unused placeholders (placeholders in template but not in required list)
-    for (const found of foundPlaceholders) {
+    for (const found of Array.from(foundPlaceholders)) {
       if (!requiredPlaceholders.includes(found)) {
         unusedPlaceholders.push(found);
       }
@@ -454,7 +454,7 @@ export class TemplateProcessor {
   }
 
   /**
-   * Format extracted content for inclusion in steering files
+   * Format extracted content for inclusion in documents
    */
   private formatExtractedContent(content: string): string {
     if (!this.config.preserveMarkdown) {
