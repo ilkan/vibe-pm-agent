@@ -231,4 +231,4 @@ export const generateRequirementsSchema = {
  * Tool description for MCP registration
  */
 export const generateRequirementsDescription =
-  'Creates PM-grade requirements with Business Goal extraction, MoSCoW prioritization, and Go/No-Go timing decision using evidence-backed analysis and consulting frameworks.';
+  'Generates comprehensive business requirements document from feature ideas with Business Goal extraction, MoSCoW prioritization (Must/Should/Could/Won\'t Have), and Go/No-Go timing recommendations. Outputs structured JSON with functional requirements, constraints, risks, and evidence-backed analysis using consulting frameworks.';

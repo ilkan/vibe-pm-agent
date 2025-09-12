@@ -536,4 +536,4 @@ export const enhanceCitationsSchema = {
  * Tool description for MCP registration
  */
 export const enhanceCitationsDescription =
-  'Enhances document content with comprehensive citations, quality validation, and confidence scoring. Analyzes citation needs, validates sources, and provides detailed quality assessment with improvement recommendations.';
+  'Enhances content with authoritative citations and source validation. Analyzes citation needs, validates source accessibility and credibility, identifies unsupported claims, suggests additional sources, and provides comprehensive quality assessment with confidence scoring and improvement recommendations.';

@@ -574,4 +574,4 @@ export const generateBusinessCaseSchema = {
  * Tool description for MCP registration
  */
 export const generateBusinessCaseDescription =
-  'Generates comprehensive business case using Amazon Working Backwards methodology by default, with assumption ledger, confidence scoring, bear/base/bull scenarios, and hard questions. Includes fallback to standard mode for backward compatibility. Configure via amazon_mode and include_evidence_mechanisms parameters.';
+  'Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment from opportunity analysis. Uses Amazon Working Backwards methodology by default with assumption ledger, confidence scoring, bear/base/bull scenario analysis, and hard questions. Returns executive-ready document with financial projections and evidence mechanisms.';

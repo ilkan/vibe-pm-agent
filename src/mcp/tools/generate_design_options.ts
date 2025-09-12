@@ -193,4 +193,4 @@ export const generateDesignOptionsSchema = {
  * Tool description for MCP registration
  */
 export const generateDesignOptionsDescription =
-  'Translates approved requirements into Conservative/Balanced/Bold design options with Impact vs Effort analysis, problem framing, and right-time recommendations using consulting frameworks.';
+  'Creates multiple design options and architectural approaches from requirements document. Generates Conservative/Balanced/Bold alternatives with Impact vs Effort matrix analysis, problem framing, implementation complexity assessment, and right-time recommendations using consulting frameworks.';

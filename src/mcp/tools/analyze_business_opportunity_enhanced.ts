@@ -552,4 +552,4 @@ export const analyzeBusinessOpportunityEnhancedSchema = {
 } as const;
 
 export const analyzeBusinessOpportunityEnhancedDescription =
-  'Enhanced business opportunity analysis with authoritative source integration from McKinsey, BCG, Bain, Gartner, and WEF for improved confidence scoring and consulting-grade analysis quality.';
+  'Analyzes market opportunity, timing, and business justification for a feature idea using consulting frameworks (Porter\'s Five Forces, SWOT, TAM/SAM/SOM). Integrates authoritative sources from McKinsey, BCG, Bain, Gartner, and WEF. Returns comprehensive analysis with confidence scoring, competitive landscape, market sizing, and strategic recommendations.';

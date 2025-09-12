@@ -687,6 +687,12 @@ function formatValidationAndAuditResponse(
 }
 
 /**
+ * Tool description for MCP registration
+ */
+export const validateAndAuditCitationsDescription =
+  'Validates and audits citations for accuracy and credibility with comprehensive quality assessment. Checks source accessibility, assesses credibility, verifies compliance, finds alternative sources for broken links, identifies quality gaps, and generates detailed improvement recommendations with audit trail.';
+
+/**
  * Input schema for validate_and_audit_citations tool
  */
 export const validateAndAuditCitationsSchema = {

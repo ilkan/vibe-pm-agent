@@ -673,4 +673,4 @@ export const createStakeholderCommunicationSchema = {
 } as const;
 
 export const createStakeholderCommunicationDescription =
-  'Creates stakeholder communication documents (PR/FAQ or Decision One-Pager) using Amazon Working Backwards methodology by default. Routes to appropriate template based on communication_type parameter with comprehensive evidence mechanisms. Includes fallback to standard mode for backward compatibility. Configure via amazon_mode and include_evidence_mechanisms parameters.';
+  'Generates executive one-pagers, PR-FAQs, and stakeholder presentations from business case analysis. Routes to appropriate template based on communication_type (executive_onepager, pr_faq, board_presentation, team_announcement) and audience (executives, board, engineering_team, customers, investors). Uses Amazon Working Backwards methodology with evidence mechanisms.';

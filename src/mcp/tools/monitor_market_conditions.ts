@@ -267,7 +267,7 @@ function getRelatedIndustries(industry: string): string[] {
  */
 export const monitorMarketConditionsMetadata = {
   name: 'monitor_market_conditions',
-  description: 'Monitor real-time market conditions, detect changes, and provide competitive intelligence for business analysis',
+  description: 'Monitors and analyzes current market conditions and trends with real-time data, competitive intelligence, and predictive analysis. Detects market changes, tracks competitor movements, provides market sizing validation, and generates actionable recommendations for business opportunity assessment.',
   inputSchema: {
     type: 'object',
     properties: {

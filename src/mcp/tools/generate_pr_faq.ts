@@ -306,4 +306,4 @@ export const generatePRFAQSchema = {
  * Tool description for MCP registration
  */
 export const generatePRFAQDescription =
-  'Generates Amazon-style PR-FAQ document with future-dated press release, comprehensive FAQ with exactly 10 required questions, and launch checklist backed by market validation and comprehensive citations.';
+  'Generates PR-FAQ document using Amazon Working Backwards methodology with future-dated press release, comprehensive FAQ section with 10 required questions, and detailed launch checklist. Includes market validation, customer benefits, and comprehensive citations for stakeholder alignment.';
