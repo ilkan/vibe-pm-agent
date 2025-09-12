@@ -218,4 +218,4 @@ export const generateTaskPlanSchema = {
  * Tool description for MCP registration
  */
 export const generateTaskPlanDescription =
-  'Creates phased implementation plan with Guardrails Check as Task 0, followed by Immediate Wins, Short-Term, and Long-Term tasks with detailed specifications including effort, impact, and priority.';
+  'Creates detailed implementation task plan from design documents with Guardrails Check as Task 0, followed by phased Immediate Wins, Short-Term, and Long-Term tasks. Each task includes ID, name, description, acceptance criteria, effort estimation, impact assessment, and priority ranking.';

@@ -326,4 +326,4 @@ export const generateManagementOnePagerSchema = {
  * Tool description for MCP registration
  */
 export const generateManagementOnePagerDescription =
-  'Creates executive-ready management one-pager using Pyramid Principle with answer-first clarity, ROI analysis, risk assessment, and timing rationale backed by comprehensive citations and evidence.';
+  'Creates executive one-pager for management presentation using Pyramid Principle with answer-first clarity, ROI analysis, risk assessment, and timing rationale. Includes Conservative/Balanced/Bold options with cost-benefit analysis and comprehensive citations for executive decision-making.';
