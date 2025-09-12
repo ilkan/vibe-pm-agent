@@ -883,8 +883,4 @@ export const validateAndAuditCitationsSchema = {
   required: ['citations'],
 } as const;
 
-/**
- * Tool description for MCP registration
- */
-export const validateAndAuditCitationsDescription =
-  'Comprehensive citation validation and quality auditing tool that combines source validation, credibility assessment, compliance checking, and quality auditing. Provides detailed evidence reports with accessibility validation, quality metrics, improvement recommendations, and alternative source suggestions for both individual citations and full document audits.';
+
