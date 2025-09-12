@@ -698,7 +698,7 @@ describe('MarketConditionDetector', () => {
       );
 
       expect(daysDifference).toBeLessThanOrEqual(3);
-      
+
       // Clean up custom detector to prevent memory leaks
       customDetector.destroy();
     });

@@ -181,11 +181,20 @@ export class PMAgentMCPServer {
       case 'generate_business_case':
         return await this.handleGenerateBusinessCase(args as GenerateBusinessCaseArgs, context);
       case 'create_stakeholder_communication':
-        return await this.handleCreateStakeholderCommunication(args as CreateStakeholderCommunicationArgs, context);
+        return await this.handleCreateStakeholderCommunication(
+          args as CreateStakeholderCommunicationArgs,
+          context
+        );
       case 'assess_strategic_alignment':
-        return await this.handleAssessStrategicAlignment(args as AssessStrategicAlignmentArgs, context);
+        return await this.handleAssessStrategicAlignment(
+          args as AssessStrategicAlignmentArgs,
+          context
+        );
       case 'optimize_resource_allocation':
-        return await this.handleOptimizeResourceAllocation(args as OptimizeResourceAllocationArgs, context);
+        return await this.handleOptimizeResourceAllocation(
+          args as OptimizeResourceAllocationArgs,
+          context
+        );
       case 'validate_market_timing':
         return await this.handleValidateMarketTiming(args as ValidateMarketTimingArgs, context);
       default:
@@ -206,7 +215,7 @@ export class PMAgentMCPServer {
       // Get all Kiro-prefixed tools
       const kiroTools = getAllKiroToolNames().map(kiroName => {
         const internalName = getInternalToolName(kiroName);
-        
+
         // Try to get schema from MCP_TOOLS_REGISTRY first
         if (internalName && isValidToolName(internalName)) {
           const toolMeta = getToolMetadata(internalName);
@@ -216,7 +225,7 @@ export class PMAgentMCPServer {
             inputSchema: toolMeta.schema,
           };
         }
-        
+
         // Fallback to registry tools
         const registryTool = this.toolRegistry.getTool(internalName || '');
         if (registryTool) {
@@ -226,7 +235,7 @@ export class PMAgentMCPServer {
             inputSchema: registryTool.inputSchema,
           };
         }
-        
+
         // Default schema if tool not found
         return {
           name: kiroName,

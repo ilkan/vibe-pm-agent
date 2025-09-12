@@ -64,7 +64,10 @@ import {
   analyzeBusinessOpportunityEnhancedDescription,
 } from './analyze_business_opportunity_enhanced';
 
-import { monitorMarketConditions, monitorMarketConditionsMetadata } from './monitor_market_conditions';
+import {
+  monitorMarketConditions,
+  monitorMarketConditionsMetadata,
+} from './monitor_market_conditions';
 
 // Re-export for external use
 export {

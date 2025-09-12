@@ -882,5 +882,3 @@ export const validateAndAuditCitationsSchema = {
   },
   required: ['citations'],
 } as const;
-
-

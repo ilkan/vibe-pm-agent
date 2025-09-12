@@ -96,7 +96,8 @@ export class SimplePMAgentMCPServer {
       // Original 6 working tools
       {
         name: 'analyze_business_opportunity',
-        description: 'Analyzes market opportunity, timing, and business justification for a feature idea',
+        description:
+          'Analyzes market opportunity, timing, and business justification for a feature idea',
         schema: {
           type: 'object',
           properties: {
@@ -117,7 +118,8 @@ export class SimplePMAgentMCPServer {
       },
       {
         name: 'generate_business_case',
-        description: 'Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment',
+        description:
+          'Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment',
         schema: {
           type: 'object',
           properties: {
@@ -158,7 +160,8 @@ export class SimplePMAgentMCPServer {
       },
       {
         name: 'assess_strategic_alignment',
-        description: 'Evaluates how a feature aligns with company strategy, OKRs, and long-term vision',
+        description:
+          'Evaluates how a feature aligns with company strategy, OKRs, and long-term vision',
         schema: {
           type: 'object',
           properties: {
@@ -178,11 +181,15 @@ export class SimplePMAgentMCPServer {
       },
       {
         name: 'optimize_resource_allocation',
-        description: 'Analyzes resource requirements and provides optimization recommendations for development efficiency',
+        description:
+          'Analyzes resource requirements and provides optimization recommendations for development efficiency',
         schema: {
           type: 'object',
           properties: {
-            current_workflow: { type: 'object', description: 'Current development workflow or process' },
+            current_workflow: {
+              type: 'object',
+              description: 'Current development workflow or process',
+            },
             resource_constraints: {
               type: 'object',
               properties: {
@@ -196,7 +203,12 @@ export class SimplePMAgentMCPServer {
               type: 'array',
               items: {
                 type: 'string',
-                enum: ['cost_reduction', 'speed_improvement', 'quality_increase', 'risk_mitigation'],
+                enum: [
+                  'cost_reduction',
+                  'speed_improvement',
+                  'quality_increase',
+                  'risk_mitigation',
+                ],
               },
             },
           },
@@ -205,7 +217,8 @@ export class SimplePMAgentMCPServer {
       },
       {
         name: 'validate_market_timing',
-        description: 'Fast validation of whether now is the right time to build a feature based on market conditions',
+        description:
+          'Fast validation of whether now is the right time to build a feature based on market conditions',
         schema: {
           type: 'object',
           properties: {
@@ -242,7 +255,10 @@ export class SimplePMAgentMCPServer {
         schema: {
           type: 'object',
           properties: {
-            feature_idea: { type: 'string', description: 'Feature idea to generate requirements for' },
+            feature_idea: {
+              type: 'string',
+              description: 'Feature idea to generate requirements for',
+            },
             context: { type: 'object', description: 'Additional context' },
           },
           required: ['feature_idea'],
@@ -410,31 +426,31 @@ export class SimplePMAgentMCPServer {
   private getToolHandler(toolName: string) {
     const handlers: Record<string, (args: any) => Promise<any>> = {
       // Original 6 tools (map to existing handlers)
-      'analyze_business_opportunity': this.handleBusinessOpportunityAnalysis.bind(this),
-      'generate_business_case': this.handleBusinessCaseGeneration.bind(this),
-      'create_stakeholder_communication': this.handleStakeholderCommunication.bind(this),
-      'assess_strategic_alignment': this.handleStrategicAlignment.bind(this),
-      'optimize_resource_allocation': this.handleResourceOptimization.bind(this),
-      'validate_market_timing': this.handleMarketTimingValidation.bind(this),
-      
+      analyze_business_opportunity: this.handleBusinessOpportunityAnalysis.bind(this),
+      generate_business_case: this.handleBusinessCaseGeneration.bind(this),
+      create_stakeholder_communication: this.handleStakeholderCommunication.bind(this),
+      assess_strategic_alignment: this.handleStrategicAlignment.bind(this),
+      optimize_resource_allocation: this.handleResourceOptimization.bind(this),
+      validate_market_timing: this.handleMarketTimingValidation.bind(this),
+
       // Additional 16 tools (new handlers)
-      'enhance_citations': this.handleEnhanceCitations.bind(this),
-      'generate_requirements': this.handleGenerateRequirements.bind(this),
-      'generate_design_options': this.handleGenerateDesignOptions.bind(this),
-      'generate_management_onepager': this.handleGenerateManagementOnePager.bind(this),
-      'generate_pr_faq': this.handleGeneratePRFAQ.bind(this),
-      'generate_task_plan': this.handleGenerateTaskPlan.bind(this),
-      'validate_and_audit_citations': this.handleValidateAndAuditCitations.bind(this),
-      'monitor_market_conditions': this.handleMonitorMarketConditions.bind(this),
-      'optimize_intent': this.handleOptimizeIntent.bind(this),
-      'analyze_workflow': this.handleAnalyzeWorkflow.bind(this),
-      'generate_roi_analysis': this.handleGenerateROIAnalysis.bind(this),
-      'get_consulting_summary': this.handleGetConsultingSummary.bind(this),
-      'validate_idea_quick': this.handleValidateIdeaQuick.bind(this),
-      'analyze_competitor_landscape': this.handleAnalyzeCompetitorLandscape.bind(this),
-      'calculate_market_sizing': this.handleCalculateMarketSizing.bind(this),
+      enhance_citations: this.handleEnhanceCitations.bind(this),
+      generate_requirements: this.handleGenerateRequirements.bind(this),
+      generate_design_options: this.handleGenerateDesignOptions.bind(this),
+      generate_management_onepager: this.handleGenerateManagementOnePager.bind(this),
+      generate_pr_faq: this.handleGeneratePRFAQ.bind(this),
+      generate_task_plan: this.handleGenerateTaskPlan.bind(this),
+      validate_and_audit_citations: this.handleValidateAndAuditCitations.bind(this),
+      monitor_market_conditions: this.handleMonitorMarketConditions.bind(this),
+      optimize_intent: this.handleOptimizeIntent.bind(this),
+      analyze_workflow: this.handleAnalyzeWorkflow.bind(this),
+      generate_roi_analysis: this.handleGenerateROIAnalysis.bind(this),
+      get_consulting_summary: this.handleGetConsultingSummary.bind(this),
+      validate_idea_quick: this.handleValidateIdeaQuick.bind(this),
+      analyze_competitor_landscape: this.handleAnalyzeCompetitorLandscape.bind(this),
+      calculate_market_sizing: this.handleCalculateMarketSizing.bind(this),
     };
-    
+
     return handlers[toolName];
   }
 
@@ -481,31 +497,34 @@ ${realMarketData.map(source => `• ${source.source}: ${source.marketMetrics.len
 ${allMetrics.length > 0 ? allMetrics.map(metric => `• ${metric}`).join('\n') : '• No specific market metrics found in current data sources'}
 
 ### Market Size & Opportunity
-${marketSizes.length > 0
-          ? `- **Current Market Data:** ${marketSizes.slice(0, 3).join(', ')}\n- **Source Analysis:** Based on real data from ${realMarketData.map(s => s.source).join(', ')}`
-          : '- **Market Size:** Current market data unavailable - requires additional research\n- **Data Sources Checked:** ' +
-          realMarketData.map(s => s.source).join(', ')
-        }
+${
+  marketSizes.length > 0
+    ? `- **Current Market Data:** ${marketSizes.slice(0, 3).join(', ')}\n- **Source Analysis:** Based on real data from ${realMarketData.map(s => s.source).join(', ')}`
+    : '- **Market Size:** Current market data unavailable - requires additional research\n- **Data Sources Checked:** ' +
+      realMarketData.map(s => s.source).join(', ')
+}
 - **Competitive Landscape:** ${marketContext.competition || 'Competitive analysis required'}
 
 ### Growth Indicators
-${growthRates.length > 0
-          ? growthRates
-            .slice(0, 2)
-            .map(rate => `• ${rate}`)
-            .join('\n')
-          : '• Growth rate data not found in current sources - requires market research'
-        }
+${
+  growthRates.length > 0
+    ? growthRates
+        .slice(0, 2)
+        .map(rate => `• ${rate}`)
+        .join('\n')
+    : '• Growth rate data not found in current sources - requires market research'
+}
 
 ## Business Justification
 
 ### Market Evidence
-${realMarketData.length > 0
-          ? `Based on real-time data from ${realMarketData.length} financial sources:\n${realMarketData
-            .map(source => `• **${source.source}:** ${source.content.substring(0, 100)}...`)
-            .join('\n')}`
-          : 'Real-time market data unavailable - analysis based on industry knowledge'
-        }
+${
+  realMarketData.length > 0
+    ? `Based on real-time data from ${realMarketData.length} financial sources:\n${realMarketData
+        .map(source => `• **${source.source}:** ${source.content.substring(0, 100)}...`)
+        .join('\n')}`
+    : 'Real-time market data unavailable - analysis based on industry knowledge'
+}
 
 ### Strategic Value
 - **Market Position:** ${marketContext.industry || 'Technology'} sector showing activity based on current data
@@ -515,10 +534,11 @@ ${realMarketData.length > 0
 ## Recommendation
 **Decision:** ${allMetrics.length > 0 ? 'GO - Supported by real market data' : 'CONDITIONAL GO - Requires additional market research'}
 
-**Rationale:** ${allMetrics.length > 0
+**Rationale:** ${
+        allMetrics.length > 0
           ? `Analysis supported by real financial data from ${realMarketData.map(s => s.source).join(', ')}`
           : 'Limited real-time data available - recommend conducting targeted market research before proceeding'
-        }
+      }
 
 ## Real Data Sources & Citations
 
@@ -663,14 +683,14 @@ ${this.defineImplementationPhases(financialInputs)}
 4. Plan for iterative improvement based on user feedback
 
 ${await this.generateBusinessCaseCitations(financialInputs).catch(
-      error => `
+  error => `
 ## Financial Research Status
 
 Real-time financial data fetch encountered an issue: ${error.message}
 Analysis based on standard financial modeling practices.
 
 *Note: For current financial benchmarks, please verify through direct research.*`
-    )}`;
+)}`;
 
     // Create steering file if requested
     let steeringResult = null;
@@ -1927,27 +1947,27 @@ Citation quality is good with room for improvement in source diversity and curre
 ## Financial Projections
 
 ### Year 1
-- **Revenue:** $${((investment * 0.8) || 100000).toLocaleString()}
-- **Costs:** $${((investment * 0.3) || 30000).toLocaleString()}
-- **Net Benefit:** $${((investment * 0.5) || 70000).toLocaleString()}
+- **Revenue:** $${(investment * 0.8 || 100000).toLocaleString()}
+- **Costs:** $${(investment * 0.3 || 30000).toLocaleString()}
+- **Net Benefit:** $${(investment * 0.5 || 70000).toLocaleString()}
 
 ### Year 2
-- **Revenue:** $${((investment * 1.2) || 150000).toLocaleString()}
-- **Costs:** $${((investment * 0.25) || 25000).toLocaleString()}
-- **Net Benefit:** $${((investment * 0.95) || 125000).toLocaleString()}
+- **Revenue:** $${(investment * 1.2 || 150000).toLocaleString()}
+- **Costs:** $${(investment * 0.25 || 25000).toLocaleString()}
+- **Net Benefit:** $${(investment * 0.95 || 125000).toLocaleString()}
 
 ### Year 3
-- **Revenue:** $${((investment * 1.8) || 200000).toLocaleString()}
-- **Costs:** $${((investment * 0.2) || 20000).toLocaleString()}
-- **Net Benefit:** $${((investment * 1.6) || 180000).toLocaleString()}
+- **Revenue:** $${(investment * 1.8 || 200000).toLocaleString()}
+- **Costs:** $${(investment * 0.2 || 20000).toLocaleString()}
+- **Net Benefit:** $${(investment * 1.6 || 180000).toLocaleString()}
 
 ## ROI Calculations
 
 ### Key Metrics
 - **Total ROI:** ${Math.round(((investment * 2.5) / investment) * 100)}%
-- **Payback Period:** ${Math.round(investment / (investment * 0.5 / 12))} months
+- **Payback Period:** ${Math.round(investment / ((investment * 0.5) / 12))} months
 - **NPV (3 years):** $${Math.round(investment * 1.8).toLocaleString()}
-- **IRR:** ${Math.round(((investment * 2.5) / investment) * 100 / 3)}% annually
+- **IRR:** ${Math.round((((investment * 2.5) / investment) * 100) / 3)}% annually
 
 ### Sensitivity Analysis
 - **Best Case:** ROI could reach ${Math.round(((investment * 3.5) / investment) * 100)}%
@@ -2315,8 +2335,6 @@ Based on comprehensive analysis, key findings and recommendations have been iden
       content: [{ type: 'text', text: sizing }],
     };
   }
-
-
 
   async start(): Promise<void> {
     const transport = new StdioServerTransport();
