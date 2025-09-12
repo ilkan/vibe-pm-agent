@@ -978,52 +978,59 @@ export const TOOL_SCHEMAS = {
             description: 'Competitive pressure level',
           },
 
-  monitorMarketConditions: {
-    type: 'object',
-    properties: {
-      industry: {
-        type: 'string',
-        description: 'Industry to monitor (e.g., technology, healthcare, finance)',
-        minLength: 2,
-      },
-      region: {
-        type: 'string',
-        description: 'Geographic region (optional, defaults to global)',
-        enum: ['global', 'north-america', 'europe', 'asia-pacific', 'latin-america', 'middle-east-africa'],
-      },
-      marketSizingId: {
-        type: 'string',
-        description: 'Existing market sizing ID to track changes (optional)',
-      },
-      config: {
-        type: 'object',
-        properties: {
-          monitoringFrequency: {
-            type: 'number',
-            description: 'Monitoring frequency in days (default: 7)',
-            minimum: 1,
-            maximum: 30,
-          },
-          changeThreshold: {
-            type: 'number',
-            description: 'Threshold for significant changes in percentage (default: 15)',
-            minimum: 5,
-            maximum: 50,
-          },
-          enablePredictiveAnalysis: {
-            type: 'boolean',
-            description: 'Enable AI-powered predictive analysis (default: false)',
-          },
-          enableCompetitiveIntelligence: {
-            type: 'boolean',
-            description: 'Enable competitive intelligence monitoring (default: false)',
-          },
-        },
-        description: 'Optional monitoring configuration',
-      },
-    },
-    required: ['industry'],
-  } as JSONSchema,
+          monitorMarketConditions: {
+            type: 'object',
+            properties: {
+              industry: {
+                type: 'string',
+                description: 'Industry to monitor (e.g., technology, healthcare, finance)',
+                minLength: 2,
+              },
+              region: {
+                type: 'string',
+                description: 'Geographic region (optional, defaults to global)',
+                enum: [
+                  'global',
+                  'north-america',
+                  'europe',
+                  'asia-pacific',
+                  'latin-america',
+                  'middle-east-africa',
+                ],
+              },
+              marketSizingId: {
+                type: 'string',
+                description: 'Existing market sizing ID to track changes (optional)',
+              },
+              config: {
+                type: 'object',
+                properties: {
+                  monitoringFrequency: {
+                    type: 'number',
+                    description: 'Monitoring frequency in days (default: 7)',
+                    minimum: 1,
+                    maximum: 30,
+                  },
+                  changeThreshold: {
+                    type: 'number',
+                    description: 'Threshold for significant changes in percentage (default: 15)',
+                    minimum: 5,
+                    maximum: 50,
+                  },
+                  enablePredictiveAnalysis: {
+                    type: 'boolean',
+                    description: 'Enable AI-powered predictive analysis (default: false)',
+                  },
+                  enableCompetitiveIntelligence: {
+                    type: 'boolean',
+                    description: 'Enable competitive intelligence monitoring (default: false)',
+                  },
+                },
+                description: 'Optional monitoring configuration',
+              },
+            },
+            required: ['industry'],
+          } as JSONSchema,
           technical_readiness: {
             type: 'string',
             enum: ['low', 'medium', 'high'],

@@ -1,6 +1,6 @@
 /**
  * Enhanced Market Condition Monitoring MCP Tool
- * 
+ *
  * Provides real-time market monitoring, competitive intelligence, and predictive analysis
  * for business opportunity assessment and market sizing validation.
  */
@@ -129,7 +129,9 @@ export async function monitorMarketConditions(
       detectedChanges: [],
       monitoringStatus: {
         isActive: true,
-        nextCheck: new Date(Date.now() + detectorConfig.monitoringFrequency * 24 * 60 * 60 * 1000).toISOString(),
+        nextCheck: new Date(
+          Date.now() + detectorConfig.monitoringFrequency * 24 * 60 * 60 * 1000
+        ).toISOString(),
         confidence: 'high',
       },
       recommendations: {
@@ -203,7 +205,10 @@ export async function monitorMarketConditions(
         };
 
         // Add competitive recommendations
-        if (competitiveThreats.threatLevel === 'high' || competitiveThreats.threatLevel === 'critical') {
+        if (
+          competitiveThreats.threatLevel === 'high' ||
+          competitiveThreats.threatLevel === 'critical'
+        ) {
           result.recommendations.immediate.push(
             'Conduct immediate competitive response analysis',
             'Review and strengthen competitive positioning'
@@ -225,7 +230,7 @@ export async function monitorMarketConditions(
     const hasSignificantChanges = result.detectedChanges.some(
       change => change.severity === 'high' || change.severity === 'critical'
     );
-    
+
     if (hasSignificantChanges) {
       result.monitoringStatus.confidence = 'medium';
     }
@@ -236,7 +241,6 @@ export async function monitorMarketConditions(
     MCPLogger.info('Market condition monitoring completed successfully');
 
     return MCPResponseFormatter.formatSuccess(result, 'json');
-
   } catch (error) {
     return MCPErrorHandler.createErrorResponse(
       error instanceof Error ? error : new Error('Market monitoring failed')
@@ -249,14 +253,14 @@ export async function monitorMarketConditions(
  */
 function getRelatedIndustries(industry: string): string[] {
   const industryMap: Record<string, string[]> = {
-    'technology': ['software', 'hardware', 'telecommunications', 'fintech'],
-    'healthcare': ['pharmaceuticals', 'medical-devices', 'biotechnology', 'digital-health'],
-    'finance': ['banking', 'insurance', 'fintech', 'cryptocurrency'],
-    'retail': ['e-commerce', 'consumer-goods', 'fashion', 'food-beverage'],
-    'manufacturing': ['automotive', 'aerospace', 'industrial', 'chemicals'],
-    'energy': ['renewable-energy', 'oil-gas', 'utilities', 'cleantech'],
+    technology: ['software', 'hardware', 'telecommunications', 'fintech'],
+    healthcare: ['pharmaceuticals', 'medical-devices', 'biotechnology', 'digital-health'],
+    finance: ['banking', 'insurance', 'fintech', 'cryptocurrency'],
+    retail: ['e-commerce', 'consumer-goods', 'fashion', 'food-beverage'],
+    manufacturing: ['automotive', 'aerospace', 'industrial', 'chemicals'],
+    energy: ['renewable-energy', 'oil-gas', 'utilities', 'cleantech'],
     'real-estate': ['construction', 'property-management', 'architecture', 'urban-planning'],
-    'education': ['edtech', 'training', 'e-learning', 'academic-research'],
+    education: ['edtech', 'training', 'e-learning', 'academic-research'],
   };
 
   return industryMap[industry.toLowerCase()] || ['technology', 'finance', 'healthcare'];
@@ -267,7 +271,8 @@ function getRelatedIndustries(industry: string): string[] {
  */
 export const monitorMarketConditionsMetadata = {
   name: 'monitor_market_conditions',
-  description: 'Monitors and analyzes current market conditions and trends with real-time data, competitive intelligence, and predictive analysis. Detects market changes, tracks competitor movements, provides market sizing validation, and generates actionable recommendations for business opportunity assessment.',
+  description:
+    'Monitors and analyzes current market conditions and trends with real-time data, competitive intelligence, and predictive analysis. Detects market changes, tracks competitor movements, provides market sizing validation, and generates actionable recommendations for business opportunity assessment.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -278,7 +283,14 @@ export const monitorMarketConditionsMetadata = {
       region: {
         type: 'string',
         description: 'Geographic region (optional, defaults to global)',
-        enum: ['global', 'north-america', 'europe', 'asia-pacific', 'latin-america', 'middle-east-africa'],
+        enum: [
+          'global',
+          'north-america',
+          'europe',
+          'asia-pacific',
+          'latin-america',
+          'middle-east-africa',
+        ],
       },
       marketSizingId: {
         type: 'string',

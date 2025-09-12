@@ -4,7 +4,7 @@
  * This component implements intelligent market shift detection for TAM/SAM/SOM recalculation,
  * real-time notification system for significant market changes, and automated monitoring
  * of market conditions that affect market sizing analysis.
- * 
+ *
  * Key improvements:
  * - Real-time market data integration
  * - AI-powered trend analysis
@@ -32,9 +32,11 @@ import { RealMarketDataFetcher } from '../real-market-data-fetcher';
  * Detect if running in test environment
  */
 function isTestEnvironment(): boolean {
-  return process.env.NODE_ENV === 'test' || 
-         typeof jest !== 'undefined' || 
-         process.env.JEST_WORKER_ID !== undefined;
+  return (
+    process.env.NODE_ENV === 'test' ||
+    typeof jest !== 'undefined' ||
+    process.env.JEST_WORKER_ID !== undefined
+  );
 }
 
 /**
@@ -50,12 +52,12 @@ export interface MarketConditionChange {
    * Type of market change detected
    */
   type:
-  | 'growth-rate-shift'
-  | 'market-expansion'
-  | 'competitive-landscape'
-  | 'regulatory-change'
-  | 'technology-disruption'
-  | 'economic-shift';
+    | 'growth-rate-shift'
+    | 'market-expansion'
+    | 'competitive-landscape'
+    | 'regulatory-change'
+    | 'technology-disruption'
+    | 'economic-shift';
 
   /**
    * Severity of the change impact
@@ -298,7 +300,7 @@ export class MarketConditionDetector {
     this.config = { ...DEFAULT_MONITORING_CONFIG, ...config };
     this.trackers = new Map();
     this.notifications = new Map();
-    
+
     // Temporarily disable heavy components to fix test hanging
     const isTest = isTestEnvironment();
     if (isTest) {
@@ -319,7 +321,7 @@ export class MarketConditionDetector {
       this.performanceOptimizer = new PerformanceOptimizer({ testMode: true });
       this.marketDataFetcher = new RealMarketDataFetcher();
     }
-    
+
     this.aiAnalysisCache = new Map();
   }
 
@@ -924,10 +926,10 @@ export class MarketConditionDetector {
     const lastSignificantChange =
       significantChanges.length > 0
         ? Math.floor(
-          (now -
-            new Date(significantChanges[significantChanges.length - 1].detectedAt).getTime()) /
-          (1000 * 60 * 60 * 24)
-        )
+            (now -
+              new Date(significantChanges[significantChanges.length - 1].detectedAt).getTime()) /
+              (1000 * 60 * 60 * 24)
+          )
         : 0;
 
     const indicators: any[] = [];
@@ -1498,12 +1500,16 @@ export class MarketConditionDetector {
   /**
    * Enhanced real-time market data integration
    */
-  async fetchRealTimeMarketData(industry: string, region?: string): Promise<MarketConditionSnapshot> {
+  async fetchRealTimeMarketData(
+    industry: string,
+    region?: string
+  ): Promise<MarketConditionSnapshot> {
     const cacheKey = `market_data_${industry}_${region || 'global'}`;
 
     // Check cache first for performance
     const cached = this.aiAnalysisCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < 60 * 60 * 1000) { // 1 hour cache
+    if (cached && Date.now() - cached.timestamp < 60 * 60 * 1000) {
+      // 1 hour cache
       return cached.data;
     }
 
@@ -1513,7 +1519,7 @@ export class MarketConditionDetector {
         `${industry} market data`,
         industry
       );
-      
+
       // Process market data sources into structured format
       const marketData = this.processMarketDataSources(marketDataSources);
 
@@ -1602,14 +1608,16 @@ export class MarketConditionDetector {
         recommendations: [
           tamTrend > 0
             ? 'Consider expanding market strategy to capture growing TAM'
-            : 'Prepare defensive strategy for declining TAM'
+            : 'Prepare defensive strategy for declining TAM',
         ],
         requiresRecalculation: Math.abs(tamTrend) > 0.1,
       });
     }
 
     // Analyze competitive dynamics
-    const competitionTrend = this.calculateTrend(recent.map(h => h.dynamicsIndicators.competitionLevel));
+    const competitionTrend = this.calculateTrend(
+      recent.map(h => h.dynamicsIndicators.competitionLevel)
+    );
     if (Math.abs(competitionTrend) > 0.1) {
       predictedChanges.push({
         id: `predicted_competition_shift_${Date.now()}`,
@@ -1623,15 +1631,17 @@ export class MarketConditionDetector {
         recommendations: [
           competitionTrend > 0
             ? 'Strengthen competitive positioning and differentiation'
-            : 'Consider market expansion opportunities'
+            : 'Consider market expansion opportunities',
         ],
         requiresRecalculation: Math.abs(competitionTrend) > 0.15,
       });
     }
 
-    const confidenceScore = predictedChanges.length > 0
-      ? predictedChanges.reduce((sum, change) => sum + change.confidence, 0) / predictedChanges.length
-      : 0;
+    const confidenceScore =
+      predictedChanges.length > 0
+        ? predictedChanges.reduce((sum, change) => sum + change.confidence, 0) /
+          predictedChanges.length
+        : 0;
 
     return {
       predictedChanges,
@@ -1695,8 +1705,8 @@ export class MarketConditionDetector {
       }
 
       // Check for significant market share shifts
-      const significantShifts = marketShareShifts.filter(shift =>
-        Math.abs(shift.currentShare - shift.previousShare) > 0.05
+      const significantShifts = marketShareShifts.filter(
+        shift => Math.abs(shift.currentShare - shift.previousShare) > 0.05
       );
 
       if (significantShifts.length > 0) {
