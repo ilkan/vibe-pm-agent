@@ -1,14 +1,14 @@
 # Vibe PM Agent - Complete Documentation Index
 
-## 🏆 Code with Kiro Hackathon 2025 - Quick Navigation
+## 📚 Core Documentation
 
-### 🎯 For Hackathon Judges (Start Here)
+### 🎯 Essential Documentation (Start Here)
 | Document | Purpose | Time Required |
 |----------|---------|---------------|
-| **[Hackathon Overview](HACKATHON_OVERVIEW.md)** | Complete project summary and evaluation guide | 5 minutes |
-| **[../HACKATHON_DEMO.md](../HACKATHON_DEMO.md)** | 5-minute demo script for judges | 2 minutes |
-| **[../CrossFit_Coach_Benchmark_Report.md](../CrossFit_Coach_Benchmark_Report.md)** | Scientific impact analysis (+52% improvement) | 10 minutes |
+| **[../README.md](../README.md)** | Main project overview and installation guide | 5 minutes |
 | **[MCP Tools Reference](MCP_TOOLS_REFERENCE.md)** | Complete API documentation (21 tools) | 15 minutes |
+| **[Business Intelligence Guide](BUSINESS_INTELLIGENCE_GUIDE.md)** | Strategic analysis capabilities | 10 minutes |
+| **[../KIRO_INTEGRATION.md](../KIRO_INTEGRATION.md)** | Complete Kiro MCP setup guide | 5 minutes |
 
 ### 📊 Core Documentation
 | Document | Focus Area | Audience |
@@ -53,20 +53,20 @@
 
 ## 🎬 Quick Start Paths
 
-### 5-Minute Hackathon Evaluation
+### 5-Minute Quick Start
 ```bash
 # 1. Setup (30 seconds)
 npm install && npm run build && npm test
 
-# 2. Core Demo (3 minutes)
-npm run demo:ai-review
+# 2. Start MCP Server (1 minute)
+npm run mcp:server
 
-# 3. Impact Analysis (1.5 minutes)  
-open CrossFit_Coach_Benchmark_Report.md
+# 3. Test Integration (3.5 minutes)  
+# Configure Kiro MCP client and test business analysis tools
 ```
 
 ### Complete Technical Review (30 minutes)
-1. **[Hackathon Overview](HACKATHON_OVERVIEW.md)** - Project summary (5 min)
+1. **[../README.md](../README.md)** - Project overview and setup (5 min)
 2. **[Project Structure](PROJECT_STRUCTURE.md)** - Architecture review (10 min)
 3. **[MCP Tools Reference](MCP_TOOLS_REFERENCE.md)** - API documentation (15 min)
 
@@ -75,14 +75,14 @@ open CrossFit_Coach_Benchmark_Report.md
 2. **[Citation System Guide](CITATION_SYSTEM_GUIDE.md)** - Evidence standards (15 min)
 3. **[Executive Communications](EXECUTIVE_COMMUNICATIONS.md)** - Document generation (10 min)
 
-## 📊 Key Metrics & Evidence
+## 📊 Key Features & Capabilities
 
-### Scientifically Validated Impact
-- **+52% Development Readiness Improvement** (6.0→8.9/10 weighted score)
-- **+100% Market Positioning Enhancement** (4.0→8.0/10)
-- **+50% Strategic Foundation Strengthening** (6.0→9.0/10)
-- **99.8% Time Efficiency Gain** (40+ hours → 5 minutes)
-- **+33% Project Approval Rate** (67%→89%)
+### Business Intelligence Features
+- **Market Opportunity Analysis** with TAM/SAM/SOM methodology
+- **Competitive Intelligence** with positioning strategies
+- **Financial Modeling** with multi-scenario ROI projections
+- **Strategic Alignment** with company OKR scoring
+- **Executive Communications** with professional document generation
 
 ### Technical Excellence Indicators
 - **21 MCP Tools** with clean, readable names for Kiro integration
@@ -113,25 +113,25 @@ Look for these quality markers during hackathon evaluation:
 
 ### Common Questions
 - **Setup Issues**: Check [../README.md](../README.md) installation section
-- **Demo Problems**: Review [../HACKATHON_DEMO.md](../HACKATHON_DEMO.md) troubleshooting
 - **MCP Integration**: See [../KIRO_INTEGRATION.md](../KIRO_INTEGRATION.md) configuration
 - **Technical Details**: Reference [Project Structure](PROJECT_STRUCTURE.md) architecture
+- **Business Intelligence**: Review [Business Intelligence Guide](BUSINESS_INTELLIGENCE_GUIDE.md)
 
-### Evaluation Support
-- **Impact Methodology**: [../CrossFit_Coach_Benchmark_Report.md](../CrossFit_Coach_Benchmark_Report.md)
-- **Demo Scripts**: `demo/` directory with comprehensive examples
-- **API Testing**: `npm run mcp:test` for MCP server validation
+### Technical Support
+- **API Testing**: `npm run mcp:server` for MCP server startup
 - **Quality Metrics**: `npm run test` for comprehensive test suite
+- **Configuration**: Check MCP client configuration examples
+- **Troubleshooting**: Review error logs and server health checks
 
 ## 🎊 Documentation Quality Standards
 
 ### Completeness Checklist
-✅ **Hackathon Requirements**: All judging criteria addressed with evidence  
 ✅ **Technical Documentation**: Complete API reference and architecture guide  
 ✅ **Business Intelligence**: Comprehensive strategic analysis capabilities  
 ✅ **Integration Guide**: Step-by-step Kiro MCP setup and configuration  
-✅ **Quality Evidence**: Scientific benchmark analysis with 95% confidence  
-✅ **Demo Materials**: Working demonstrations with expected outcomes  
+✅ **Citation System**: Professional source validation and quality assurance
+✅ **Executive Communications**: Board-ready presentations and one-pagers
+✅ **Production Ready**: Clean, professional project structure
 
 ### Professional Standards
 - **Consulting Grade**: McKinsey/BCG quality analysis and presentations

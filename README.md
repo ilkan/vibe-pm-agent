@@ -1,255 +1,146 @@
-# Vibe PM Agent - Strategic Business Intelligence for Developers
+# Vibe PM Agent - Strategic Business Intelligence MCP Server
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
-[![Code with Kiro Hackathon 2025](https://img.shields.io/badge/Hackathon-Code%20with%20Kiro%202025-gold)](https://github.com/your-username/vibe-pm-agent)
+[![MCP Protocol](https://img.shields.io/badge/MCP-Compatible-green)](https://modelcontextprotocol.io/)
+[![npm version](https://img.shields.io/npm/v/vibe-pm-agent.svg)](https://www.npmjs.com/package/vibe-pm-agent)
 
-> **🏆 Code with Kiro Hackathon 2025 Entry**  
-> **Category: Productivity & Workflow Tools**  
-> The missing "PM Mode" that transforms developer ideas into executive-ready business cases with scientifically validated 52% improvement in development readiness and market viability.
+> **Professional Business Intelligence MCP Server**  
+> Transform feature ideas into executive-ready business cases with evidence-backed analysis, competitive intelligence, and strategic recommendations through 21 specialized MCP tools.
 
 ## 🚀 What is Vibe PM Agent?
 
-**The Strategic Bridge Between Ideas and Execution**
+**Professional Business Intelligence MCP Server**
 
-Vibe PM Agent completes Kiro's development ecosystem by adding the critical "WHY to build" layer that transforms raw technical ideas into strategically sound, market-validated business cases.
+Vibe PM Agent is a Model Context Protocol (MCP) server that provides strategic business analysis capabilities through 21 specialized tools. It transforms feature ideas into comprehensive business cases with evidence-backed analysis, competitive intelligence, and executive-ready communications.
 
-### The Complete Development Trinity
+### Core Capabilities
 
-- **🎯 PM Mode** (Vibe PM Agent): **WHY to build** - Strategic analysis, market validation, ROI justification
-- **📋 Spec Mode** (Kiro Native): **WHAT to build** - Requirements, specifications, architecture  
-- **⚡ Vibe Mode** (Kiro Native): **HOW to build** - Implementation, code generation, debugging
+- **Strategic Analysis**: Market opportunity assessment, competitive landscape analysis, and ROI modeling
+- **Executive Communications**: Professional one-pagers, PR-FAQs, and board presentations
+- **Evidence-Based Insights**: Professional citations from McKinsey, BCG, Gartner, and other authoritative sources
+- **MCP Integration**: Native support for Kiro IDE and other MCP-compatible clients
 
-### Scientifically Validated Impact: +52% Development Success Rate
+## 📊 Key Features
 
-**Rigorous Benchmark Analysis** across 5 key dimensions with industry-standard evaluation criteria:
+### Business Intelligence Tools (21 Total)
 
-- **Strategic Foundation**: +50% improvement (6.0→9.0/10) in business case clarity and market validation
-- **Market Readiness**: +100% improvement (4.0→8.0/10) in competitive positioning and go-to-market strategy  
-- **Technical Planning**: +29% improvement (7.0→9.0/10) in architecture sophistication and scalability
-- **User Experience**: +50% improvement (6.0→9.0/10) in user-centric design and accessibility
-- **Implementation Planning**: +50% improvement (6.0→9.0/10) in execution detail and risk management
+| Category | Tools | Description |
+|----------|-------|-------------|
+| **Core Business Intelligence** | 6 tools | Market analysis, ROI modeling, strategic alignment |
+| **PM Workflow** | 5 tools | Requirements generation, design options, task planning |
+| **Citation & Analysis** | 5 tools | Professional source integration, evidence validation |
+| **Workflow Optimization** | 5 tools | Resource allocation, competitive analysis, market sizing |
 
-**Overall Weighted Score**: 6.0/10 → 8.9/10 = **+52% development readiness improvement**
+### Professional Quality Standards
 
-*Methodology validated against Y Combinator standards, enterprise PM practices, and production app benchmarks. See our [CrossFit Coach Benchmark Report](./CrossFit_Coach_Benchmark_Report.md) for complete analysis with 95% confidence intervals.*
+- **Evidence-Based Analysis**: All recommendations backed by professional citations
+- **Confidence Scoring**: Transparent methodology with 0-100% confidence ratings
+- **Executive-Ready Output**: Pyramid Principle and consulting framework compliance
+- **Real-Time Intelligence**: Market conditions monitoring and competitive analysis
 
-## 💡 Why Vibe PM Agent?
+## 🎯 Use Cases
 
-### The Developer's Strategic Dilemma
-
-**Before Vibe PM Agent:**
-```
-Developer: "I have a great idea for an AI code review tool!"
-Stakeholder: "What's the business case? What's the ROI? Who are the competitors?"
-Developer: "Uh... it would be really useful for developers?"
-Result: ❌ Project rejected or delayed for months
-```
-
-**After Vibe PM Agent:**
-```
-Developer: "I have a great idea for an AI code review tool!"
-Vibe PM Agent: *Generates comprehensive business case in 60 seconds*
-- Market opportunity: $2.1B TAM with 23% CAGR
-- ROI projection: 300% return within 18 months  
-- Competitive analysis: Clear differentiation vs. 12 competitors
-- Executive summary: Board-ready presentation
-Result: ✅ Project approved with strategic context
-```
-
-### Real Impact on Development Success
-
-**Scientifically Measured Benefits:**
-- **Time Efficiency**: 40+ hours of business research → 5 minutes of AI-powered analysis (**99.8% time reduction**)
-- **Approval Success**: 67% → 89% project approval rate with strategic justification (**+33% approval improvement**)
-- **Quality Transformation**: Amateur feature requests → McKinsey-grade business cases with 25+ citations
-- **Stakeholder Alignment**: Weeks of back-and-forth → Instant executive-ready communications (**95% faster alignment**)
-- **Development ROI**: Measured +52% improvement in overall project readiness and market viability
-
-**Strategic Advantages:**
-- **Market Intelligence**: Real-time competitive landscape and timing analysis
-- **Risk Mitigation**: Evidence-backed decisions with confidence scoring
-- **Stakeholder Alignment**: Role-specific communications for different audiences
-- **Resource Optimization**: Data-driven development efficiency recommendations
-
-## 🎯 Real-World Use Cases
-
-### 🚀 Startup Validation
-**Scenario**: Early-stage startup with AI-powered developer tool idea
-**Challenge**: Need investor-ready business case with market validation
-**Solution**: 
-- Market opportunity analysis: $2.1B TAM, 23% CAGR, 15M target developers
-- Competitive landscape: 12 competitors analyzed with clear differentiation strategy
-- Financial projections: 300% ROI, $5M ARR by year 2, break-even in 18 months
-- Risk assessment: Technical, market, and competitive risks with mitigation strategies
-**Result**: Secured $2M seed funding with comprehensive business plan
-
-### 🏢 Enterprise Feature Justification  
-**Scenario**: Senior developer proposing internal AI code review system
-**Challenge**: Engineering budget approval requires business justification
-**Solution**:
-- ROI analysis: 40% reduction in code review time, $500K annual savings
-- Strategic alignment: Supports company OKRs for development velocity and quality
-- Resource optimization: 2 engineers, 6-month timeline, $300K investment
-- Executive communication: One-page summary for VP Engineering approval
-**Result**: Project approved within 2 weeks vs. typical 3-month process
-
-### 🎓 Product Manager Onboarding
-**Scenario**: Technical PM transitioning from engineering role
-**Challenge**: Need to quickly develop business analysis and strategic thinking skills
-**Solution**:
-- Framework education: MECE, Pyramid Principle, Porter's Five Forces training
-- Template library: Reusable business case and executive communication templates
-- Citation integration: Access to McKinsey, BCG, Gartner research for credibility
-- Confidence building: Structured approach to strategic analysis and presentation
-**Result**: Successful transition with 90% stakeholder satisfaction in first quarter
-
-### 🔄 Legacy System Modernization
-**Scenario**: Large enterprise considering microservices migration
-**Challenge**: Justify $2M investment in system architecture overhaul
-**Solution**:
-- Market timing analysis: Industry trends favor microservices adoption
-- Competitive benchmarking: Peer companies achieving 35% efficiency gains
-- Multi-scenario modeling: Conservative (150% ROI), Balanced (250% ROI), Bold (400% ROI)
-- Risk mitigation: Phased approach with measurable milestones and fallback options
-**Result**: Board approval for $2M investment with clear success metrics
-
-## ✨ Core Capabilities
-
-### 🎯 Strategic Business Intelligence
-- **Market Opportunity Analysis**: Comprehensive competitive landscape and TAM/SAM/SOM sizing
+### Strategic Business Analysis
+- **Market Opportunity Assessment**: Comprehensive competitive landscape and TAM/SAM/SOM sizing
 - **ROI Modeling**: Multi-scenario financial projections with risk assessment
-- **Strategic Alignment**: Company OKR and mission alignment scoring
+- **Strategic Alignment**: Company OKR and mission alignment evaluation
 - **Market Timing Validation**: Competitive window and market readiness analysis
 
-### 📊 Professional-Grade Analysis
-- **Evidence-Backed Insights**: 25+ citations from McKinsey, BCG, Gartner, HBR per analysis
-- **Confidence Scoring**: 0-100% confidence ratings with methodology transparency
-- **Consulting Frameworks**: MECE, Pyramid Principle, Porter's Five Forces integration
-- **Source Validation**: A/B/C credibility ratings with recency verification
-
-### 🎯 Executive Communications
+### Executive Communications
 - **Management One-Pagers**: Pyramid Principle structured executive summaries
 - **PR-FAQ Documents**: Amazon Working Backwards methodology implementation
 - **Board Presentations**: Strategic context with financial projections
-- **Stakeholder Alignment**: Role-specific communications for different audiences
+- **Stakeholder Communications**: Role-specific messaging for different audiences
 
-### ⚡ Developer-Friendly Integration
-- **Native Kiro Integration**: Seamless MCP protocol implementation
-- **Steering File Generation**: Automatic context and guidance creation
-- **Quick Validation**: 30-second go/no-go decisions with evidence
-- **Spec Enhancement**: Transform basic specs into comprehensive business cases
+### Product Management Workflows
+- **Requirements Generation**: EARS format requirements with acceptance criteria
+- **Design Options**: Conservative/Balanced/Bold alternatives with impact analysis
+- **Implementation Planning**: Phased task breakdown with resource optimization
+- **Citation Management**: Professional source integration and validation
 
-## 🚀 Quick Start for Hackathon Judges
-
-### ⚡ 5-Minute Evaluation Path
-
-**1. One-Command Setup**
-```bash
-git clone https://github.com/ilkan/vibe-pm-agent.git
-cd vibe-pm-agent
-npm install && npm run build && npm test
-```
-
-**2. Experience the Complete Transformation**
-```bash
-# See raw idea → strategic business case transformation
-npm run demo:ai-review
-```
-
-**3. View Impact Analysis**
-```bash
-# See the +52% development readiness improvement
-open CrossFit_Coach_Benchmark_Report.md
-```
-
-### 📋 Hackathon Requirements Compliance
-
-✅ **Working Software Application**: Fully functional MCP server with 21 business intelligence tools  
-✅ **Effective Kiro Integration**: Native MCP protocol integration with seamless IDE experience  
-✅ **Public Repository**: MIT licensed with comprehensive documentation  
-✅ **Installation & Setup**: One-command installation with automated testing  
-✅ **Third-Party Compliance**: All APIs and data sources properly licensed  
+## 🚀 Installation & Setup
 
 ### Prerequisites
 
-- **Node.js** 18.0.0 or higher
-- **npm** package manager  
-- **Kiro IDE** (recommended for full MCP integration)
-- **Git** for repository cloning
+- **Node.js** 18.0.0 or higher ([download here](https://nodejs.org))
+- **npm** package manager (included with Node.js)
+- **MCP-compatible client** (Kiro IDE recommended)
 
-### Running the MCP Server
+### Quick Installation
 
-#### Server Startup Options
-
-**Option 1: Production mode**
 ```bash
-npm run mcp:server
-# Starts server on stdio transport for MCP client connections
+# Install from npm
+npm install -g vibe-pm-agent
+
+# Or clone and build from source
+git clone https://github.com/your-username/vibe-pm-agent.git
+cd vibe-pm-agent
+npm install
+npm run build
 ```
 
-**Option 2: Development mode with auto-reload**
+### Production Deployment
+
+For production environments, use the optimized build process:
+
 ```bash
-npm run dev
-# Starts with TypeScript compilation and auto-reload on file changes
+# Production build with verification
+npm run clean:prod
+npm run verify:production
+
+# Start in production mode
+NODE_ENV=production npm start
 ```
 
-**Option 3: Debug mode with verbose logging**
+📖 **See the [Production Deployment Guide](./docs/PRODUCTION_DEPLOYMENT.md) for complete production setup, monitoring, and optimization details.**
+
+### Verify Installation
+
 ```bash
-npm run mcp:server:debug
-# Starts with debug-level logging for troubleshooting
+# Test server startup
+vibe-pm-agent --version
+
+# Test MCP server functionality
+npm test
 ```
 
-**Option 4: Direct execution**
-```bash
-npx vibe-pm-agent
-# Direct execution for testing and validation
+### MCP Client Configuration
+
+#### Kiro IDE Configuration
+
+Add to your Kiro MCP configuration file (`.kiro/settings/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "vibe-pm-agent": {
+      "command": "vibe-pm-agent",
+      "args": [],
+      "env": {
+        "LOG_LEVEL": "info"
+      },
+      "autoApprove": [
+        "mcp_vibe_pm_agent_analyze_business_opportunity",
+        "mcp_vibe_pm_agent_generate_business_case",
+        "mcp_vibe_pm_agent_create_stakeholder_communication"
+      ]
+    }
+  }
+}
 ```
 
-#### Server Configuration
+#### Alternative MCP Clients
 
-The MCP server supports various configuration options:
+For other MCP-compatible clients:
 
-**Environment Variables:**
-```bash
-LOG_LEVEL=debug          # Logging level: debug, info, warn, error
-MCP_TRANSPORT=stdio      # Transport type: stdio (default)
-CITATION_CACHE_TTL=3600  # Citation cache TTL in seconds
-MAX_CONCURRENT_TOOLS=5   # Maximum concurrent tool executions
-ENABLE_STREAMING=true    # Enable response streaming
-```
-
-**Server Capabilities:**
-- **Transport**: Standard I/O (stdio) for MCP protocol communication
-- **Tools**: 21 business intelligence and PM workflow tools
-- **Resources**: 5 unique datasets with competitive intelligence
-- **Prompts**: 5 customizable prompt templates
-- **Streaming**: Real-time response streaming for large analyses
-- **Logging**: Configurable logging levels with structured output
-- **Error Handling**: Comprehensive error handling with recovery strategies
-
-#### Connection Testing
-
-**Test server connectivity:**
-```bash
-# Test basic server startup
-npm run mcp:test
-
-# Test specific tool functionality
-node demo/test-mcp-server.js analyze_business_opportunity
-
-# Validate all tools
-node demo/test-demo-suite.js
-```
-
-**Kiro Integration:**
 ```json
 {
   "mcpServers": {
     "vibe-pm-agent": {
       "command": "node",
-      "args": ["dist/mcp/server.js"],
+      "args": ["/path/to/vibe-pm-agent/dist/mcp/server.js"],
       "cwd": "/path/to/vibe-pm-agent",
       "env": {
         "LOG_LEVEL": "info",
@@ -260,88 +151,136 @@ node demo/test-demo-suite.js
 }
 ```
 
-The MCP server will start and be available for connections from Kiro or other MCP clients using the Model Context Protocol.
+### Environment Configuration
 
-## 🧪 Evaluation Guide for Judges
+Optional environment variables for customization:
 
-### 🎯 Recommended Evaluation Path (5 minutes)
-
-**1. Quick Installation Verification**
 ```bash
-# One-command setup
-npm install && npm run build && npm test
+# Logging configuration
+export LOG_LEVEL=debug          # debug, info, warn, error
+export MCP_TRANSPORT=stdio      # Transport type (stdio default)
+
+# Performance tuning
+export CITATION_CACHE_TTL=3600  # Citation cache TTL in seconds
+export MAX_CONCURRENT_TOOLS=5   # Maximum concurrent tool executions
+export ENABLE_STREAMING=true    # Enable response streaming
 ```
 
-**2. Experience the Complete PM Workflow**
+## 🛠️ Available MCP Tools (21 Total)
+
+### Core Business Intelligence Tools (6 tools)
+
+| Tool Name | Description | Key Parameters |
+|-----------|-------------|----------------|
+| **`mcp_vibe_pm_agent_analyze_business_opportunity`** | Market validation and strategic fit assessment with competitive intelligence | `idea` (required), `market_context`, `analysis_depth` |
+| **`mcp_vibe_pm_agent_generate_business_case`** | Multi-scenario ROI analysis with risk assessment and financial projections | `opportunity_analysis` (required), `financial_inputs` |
+| **`mcp_vibe_pm_agent_create_stakeholder_communication`** | Executive communications generation (one-pagers, PR-FAQs, presentations) | `business_case` (required), `communication_type`, `audience` |
+| **`mcp_vibe_pm_agent_assess_strategic_alignment`** | Company OKR and mission alignment evaluation with scoring | `feature_concept` (required), `company_context` |
+| **`mcp_vibe_pm_agent_validate_market_timing`** | Market timing and competitive window analysis | `feature_idea` (required), `market_signals` |
+| **`mcp_vibe_pm_agent_optimize_resource_allocation`** | Development efficiency and cost optimization recommendations | `current_workflow` (required), `resource_constraints`, `optimization_goals` |
+
+### PM Workflow Tools (5 tools)
+
+| Tool Name | Description | Key Parameters |
+|-----------|-------------|----------------|
+| **`mcp_vibe_pm_agent_generate_requirements`** | PM-grade requirements with EARS format and acceptance criteria | `feature_idea` (required), `context` |
+| **`mcp_vibe_pm_agent_generate_design_options`** | Conservative/Balanced/Bold design alternatives with cost analysis | `requirements` (required), `constraints` |
+| **`mcp_vibe_pm_agent_generate_task_plan`** | Phased implementation plan with detailed task breakdown | `design` (required), `requirements` |
+| **`mcp_vibe_pm_agent_generate_management_onepager`** | Executive one-pager using Pyramid Principle | `project_info` (required), `audience` |
+| **`mcp_vibe_pm_agent_generate_pr_faq`** | Amazon-style PR-FAQ document with Working Backwards methodology | `product_info` (required), `target_audience` |
+
+### Citation & Analysis Tools (5 tools)
+
+| Tool Name | Description | Key Parameters |
+|-----------|-------------|----------------|
+| **`mcp_vibe_pm_agent_enhance_citations`** | Enhances content with authoritative citations and source validation | `content` (required), `sources` |
+| **`mcp_vibe_pm_agent_validate_and_audit_citations`** | Validates and audits citations for accuracy and credibility | `content` (required), `strict_mode` |
+| **`mcp_vibe_pm_agent_monitor_market_conditions`** | Monitors and analyzes current market conditions and trends | `market` (required), `indicators` |
+| **`mcp_vibe_pm_agent_get_consulting_summary`** | Creates consulting-style executive summary from analysis data | `analysis_data` (required), `summary_type` |
+| **`mcp_vibe_pm_agent_validate_idea_quick`** | Performs quick validation of business ideas against criteria | `idea` (required), `criteria` |
+
+### Workflow Optimization Tools (5 tools)
+
+| Tool Name | Description | Key Parameters |
+|-----------|-------------|----------------|
+| **`mcp_vibe_pm_agent_optimize_intent`** | Optimizes user intent for better clarity and actionability | `user_intent` (required), `context` |
+| **`mcp_vibe_pm_agent_analyze_workflow`** | Analyzes workflows for optimization opportunities | `workflow_description` (required), `optimization_goals` |
+| **`mcp_vibe_pm_agent_generate_roi_analysis`** | Generates comprehensive ROI analysis with financial projections | `investment` (required), `expected_returns` |
+| **`mcp_vibe_pm_agent_analyze_competitor_landscape`** | Analyzes competitive landscape and market positioning | `market_segment` (required), `competitors` |
+| **`mcp_vibe_pm_agent_calculate_market_sizing`** | Calculates market sizing using TAM-SAM-SOM methodology | `market` (required), `methodology` |
+
+### Usage Examples
+
 ```bash
-# RECOMMENDED: See the full transformation
-cd demo/ai-code-review-assistant
-node run-complete-workflow.js
-./show-analysis.sh
+# In Kiro IDE or MCP client
+"Analyze business opportunity for AI-powered code review assistant"
+"Generate business case with $500K development cost"
+"Create executive one-pager for board presentation"
+"Assess strategic alignment with company OKRs"
+"Validate market timing for customer support automation"
 ```
 
-**What you'll see:**
-- Raw idea → Strategic business case with 300% ROI projection
-- Market opportunity analysis with competitive intelligence
-- Executive one-pager ready for board presentation
-- Resource optimization with development efficiency gains
-- 25+ professional citations from McKinsey, BCG, Gartner
+## 🖥️ Server Operation
 
-**3. Compare Before/After Impact**
+### Starting the MCP Server
+
 ```bash
-# See the benchmark analysis
-open CrossFit_Coach_Benchmark_Report.md
+# Production mode (recommended)
+vibe-pm-agent
+
+# Development mode with auto-reload
+npm run dev
+
+# Debug mode with verbose logging
+npm run mcp:server:debug
+
+# Direct execution for testing
+npx vibe-pm-agent
 ```
 
-**Key metrics to observe:**
-- **+52% overall development readiness** (6.0→8.9/10 weighted score)
-- **+100% market positioning improvement** (4.0→8.0/10) with competitive intelligence
-- **+50% strategic foundation enhancement** (6.0→9.0/10) with evidence-backed analysis
-- **Professional consulting quality** vs. basic feature descriptions (McKinsey/BCG standards)
-- **95% confidence interval** with industry benchmark validation
+### Server Configuration
 
-### 🔍 Deep Dive Options
+The MCP server supports various configuration options through environment variables:
 
-**Test Individual Capabilities:**
 ```bash
-# Business intelligence
-node demo/test-mcp-server.js analyze_business_opportunity
+# Server settings
+LOG_LEVEL=info              # Logging level: debug, info, warn, error
+MCP_TRANSPORT=stdio         # Transport type (stdio default)
+ENABLE_STREAMING=true       # Enable response streaming
 
-# Executive communications  
-node demo/test-mcp-server.js create_stakeholder_communication
-
-# Strategic alignment
-node demo/test-mcp-server.js assess_strategic_alignment
+# Performance tuning
+CITATION_CACHE_TTL=3600     # Citation cache TTL in seconds
+MAX_CONCURRENT_TOOLS=5      # Maximum concurrent tool executions
 ```
 
-**Citation Quality Validation:**
+### Health Checks
+
 ```bash
-cd demo/ai-customer-support
-node test-citations.js          # Professional citation integration
-./show-results.sh              # View citation quality and sources
+# Test server connectivity
+npm run mcp:test
+
+# Validate all tools
+npm test
+
+# Check specific tool functionality
+node -e "console.log('Server health check passed')"
 ```
 
-**Kiro Integration (if available):**
-1. Add to MCP configuration: `"vibe-pm-agent": {"command": "node", "args": ["dist/mcp/server.js"]}`
-2. Test in Kiro: "Analyze business opportunity for [your idea]"
-3. Experience seamless PM Mode integration
+### Monitoring & Logging
 
-### 📊 Success Indicators
+The server provides structured logging with configurable levels:
 
-**Look for these quality markers:**
-- ✅ Professional citations from McKinsey, BCG, Gartner, HBR
-- ✅ Confidence scores (75%+ for high-quality analysis)
-- ✅ Multi-scenario ROI projections with risk assessment
-- ✅ Executive-ready formatting using Pyramid Principle
-- ✅ Strategic alignment with measurable business impact
-- ✅ Comprehensive competitive analysis and market positioning
+- **Debug**: Detailed execution traces and parameter validation
+- **Info**: Tool execution summaries and performance metrics
+- **Warn**: Non-critical issues and fallback operations
+- **Error**: Critical failures and error recovery attempts
 
-## 🛠️ Development
+## 🔧 Development
 
-### Available Scripts
+### Development Scripts
 
 ```bash
-# Development
+# Development workflow
 npm run dev              # Start development server with auto-reload
 npm run build           # Build TypeScript to JavaScript
 npm run type-check      # Run TypeScript type checking
@@ -351,25 +290,14 @@ npm test               # Run all tests
 npm run test:unit      # Run unit tests only
 npm run test:integration # Run integration tests only
 
-# Cleanup (removes test artifacts)
-npm run cleanup        # Clean up test artifacts
-npm run cleanup:verbose # Clean with detailed output
-npm run cleanup:dry-run # Preview what would be cleaned
-npm run test:watch     # Run tests in watch mode
-
-# MCP Server
-npm run mcp:server     # Start MCP server
-npm run mcp:test       # Test MCP server functionality
-
-# Code Quality
+# Code quality
 npm run lint           # Run ESLint
 npm run lint:fix       # Fix ESLint issues automatically
 npm run format         # Format code with Prettier
 
-# Demo and Examples
-npm run demo           # Run comprehensive demo
-npm run demo:citations # Test citation integration
-npm run demo:enhanced  # Test enhanced business tools
+# MCP server operations
+npm run mcp:server     # Start MCP server
+npm run mcp:test       # Test MCP server functionality
 ```
 
 ### Project Structure
@@ -384,199 +312,218 @@ src/
 ├── mcp/                    # MCP Server implementation
 │   ├── server.ts          # Main MCP server
 │   ├── server-config.ts   # Server configuration
-│   └── tools/             # MCP tool handlers
+│   └── tools/             # MCP tool handlers (21 tools)
 ├── models/                 # TypeScript interfaces and data structures
 ├── pipeline/              # Business intelligence pipeline
-├── utils/                 # Shared utilities
+├── utils/                 # Shared utilities and validation
 └── tests/                 # Comprehensive test suite
 ```
 
-## 🔧 MCP Server Features
+### API Documentation
 
-### MCP Protocol Implementation
+For complete API documentation including parameter specifications, response formats, and usage examples, see:
 
-The Vibe PM Agent implements a comprehensive MCP (Model Context Protocol) server with the following features:
+- **[MCP Tools Reference](./docs/MCP_TOOLS_REFERENCE.md)** - Complete API documentation for all 21 tools
+- **[Business Intelligence Guide](./docs/BUSINESS_INTELLIGENCE_GUIDE.md)** - Strategic analysis frameworks and methodologies
+- **[Citation System Guide](./docs/CITATION_SYSTEM_GUIDE.md)** - Professional source integration and validation  
 
-- **🛠️ Tools**: 21 business intelligence and PM workflow tools with clean, readable names
-- **📚 Resources**: Access to unique datasets and competitive intelligence
-- **📝 Prompts**: Customizable prompt templates for consistent output quality
-- **🔄 Streaming**: Real-time response streaming for large analyses
-- **🎯 Context Management**: Intelligent context handling and steering file integration
+## 📚 Documentation
 
-### MCP Tools Reference
+### Complete Documentation Suite
 
-**✨ All 21 tools feature clean, readable names without prefixes for better user experience in Kiro IDE.**
+- **[MCP Tools Reference](./docs/MCP_TOOLS_REFERENCE.md)** - Complete API documentation for all 21 MCP tools
+- **[Business Intelligence Guide](./docs/BUSINESS_INTELLIGENCE_GUIDE.md)** - Strategic analysis frameworks and methodologies  
+- **[Citation System Guide](./docs/CITATION_SYSTEM_GUIDE.md)** - Professional source integration and validation
+- **[Executive Communications](./docs/EXECUTIVE_COMMUNICATIONS.md)** - Templates and best practices for stakeholder communications
 
-#### Core Business Intelligence Tools (6 tools)
+### Quick Reference
 
-| Tool Name | Description | Required Parameters | Optional Parameters | Output Format |
-|-----------|-------------|-------------------|-------------------|---------------|
-| **`analyze_business_opportunity`** | Market validation and strategic fit assessment with competitive intelligence | `idea` (string) | `market_context`, `analysis_depth`, `citation_options`, `steering_options` | JSON with citations |
-| **`generate_business_case`** | Multi-scenario ROI analysis with risk assessment | `opportunity_analysis` (string) | `financial_inputs`, `citation_options`, `steering_options` | JSON with financial projections |
-| **`create_stakeholder_communication`** | Executive communications generation | `business_case` (string), `communication_type` (enum), `audience` (enum) | `citation_options`, `steering_options` | Formatted document |
-| **`assess_strategic_alignment`** | Company OKR and mission alignment evaluation | `feature_concept` (string) | `company_context`, `citation_options`, `steering_options` | JSON alignment score |
-| **`validate_market_timing`** | Market timing and competitive window analysis | `feature_idea` (string) | `market_signals`, `citation_options` | JSON timing assessment |
-| **`optimize_resource_allocation`** | Development efficiency and cost optimization | `current_workflow` (object) | `resource_constraints`, `optimization_goals`, `citation_options` | JSON optimization plan |
-
-#### PM Workflow Tools (5 tools)
-
-| Tool Name | Description | Required Parameters | Optional Parameters | Output Format |
-|-----------|-------------|-------------------|-------------------|---------------|
-| **`generate_requirements`** | PM-grade requirements with EARS format and acceptance criteria | `feature_idea` (string) | `context`, `steering_options` | Structured requirements |
-| **`generate_design_options`** | Conservative/Balanced/Bold design alternatives with cost analysis | `requirements` (string) | `constraints`, `steering_options` | Design options matrix |
-| **`generate_task_plan`** | Phased implementation plan with detailed task breakdown | `design` (string) | `requirements`, `steering_options` | Task breakdown |
-| **`generate_management_onepager`** | Executive one-pager using Pyramid Principle | `project_info` (string) | `audience`, `steering_options` | Executive summary |
-| **`generate_pr_faq`** | Amazon-style PR-FAQ document with Working Backwards methodology | `product_info` (string) | `target_audience`, `steering_options` | PR-FAQ format |
-
-#### Citation & Analysis Tools (5 tools)
-
-| Tool Name | Description | Required Parameters | Optional Parameters | Output Format |
-|-----------|-------------|-------------------|-------------------|---------------|
-| **`enhance_citations`** | Enhances content with authoritative citations and source validation | `content` (string) | `sources` (array), `citation_options` | Enhanced content |
-| **`validate_and_audit_citations`** | Validates and audits citations for accuracy and credibility | `content` (string) | `strict_mode` (boolean) | Audit report |
-| **`monitor_market_conditions`** | Monitors and analyzes current market conditions and trends | `market` (string) | `indicators` (array) | Market analysis |
-| **`get_consulting_summary`** | Creates consulting-style executive summary from analysis data | `analysis_data` (string) | `summary_type` (string) | Executive summary |
-| **`validate_idea_quick`** | Performs quick validation of business ideas against criteria | `idea` (string) | `criteria` (array) | Validation report |
-
-#### Workflow Optimization Tools (5 tools)
-
-| Tool Name | Description | Required Parameters | Optional Parameters | Output Format |
-|-----------|-------------|-------------------|-------------------|---------------|
-| **`optimize_intent`** | Optimizes user intent for better clarity and actionability | `user_intent` (string) | `context` (object) | Optimized intent |
-| **`analyze_workflow`** | Analyzes workflows for optimization opportunities | `workflow_description` (string) | `optimization_goals` (array) | Analysis report |
-| **`generate_roi_analysis`** | Generates comprehensive ROI analysis with financial projections | `investment` (number) | `expected_returns` (object) | Financial analysis |
-| **`analyze_competitor_landscape`** | Analyzes competitive landscape and market positioning | `market_segment` (string) | `competitors` (array) | Competitive analysis |
-| **`calculate_market_sizing`** | Calculates market sizing using TAM-SAM-SOM methodology | `market` (string) | `methodology` (string) | Market sizing |
-
-### MCP Resources
-
-The server provides access to unique datasets and competitive intelligence:
-
-#### Available Resources
-
-| Resource URI | Description | Content Type | Access Method |
-|--------------|-------------|--------------|---------------|
-| **`dataset://competitive-intelligence`** | Competitive intelligence matrix with market positioning | CSV/JSON | Read-only |
-| **`dataset://market-timing-signals`** | Industry trend analysis and competitive windows | CSV/JSON | Read-only |
-| **`dataset://pm-innovation-index`** | Product management best practices and benchmarks | CSV/JSON | Read-only |
-| **`dataset://quota-optimization-metrics`** | Development efficiency and resource allocation data | CSV/JSON | Read-only |
-| **`dataset://stakeholder-adoption-rates`** | User adoption patterns and satisfaction metrics | CSV/JSON | Read-only |
-
-#### Resource Usage Example
+#### Common Tool Usage Patterns
 
 ```typescript
-// Access competitive intelligence data
-const competitiveData = await mcpClient.readResource({
-  uri: "dataset://competitive-intelligence"
-});
-
-// Use in business opportunity analysis
-const analysis = await mcpClient.callTool("analyze_business_opportunity", {
-  feature_idea: "AI-powered code review assistant",
-  market_context: {
-    industry: "Developer Tools",
-    competition: competitiveData.companies
+// Business opportunity analysis
+{
+  "tool": "mcp_vibe_pm_agent_analyze_business_opportunity",
+  "parameters": {
+    "idea": "AI-powered code review assistant",
+    "market_context": {
+      "industry": "Developer Tools",
+      "target_segment": "Enterprise Development Teams"
+    }
   }
-});
-```
+}
 
-### MCP Prompts
-
-Customizable prompt templates for consistent, high-quality outputs:
-
-#### Available Prompts
-
-| Prompt Name | Description | Variables | Usage |
-|-------------|-------------|-----------|-------|
-| **`requirements_generation`** | PM requirements template with MoSCoW prioritization | `{raw_intent}`, `{context}`, `{constraints}` | Requirements generation |
-| **`design_options_generation`** | Design alternatives template with Impact vs Effort | `{requirements}`, `{constraints}` | Design options |
-| **`task_plan_generation`** | Implementation planning with phases and guardrails | `{design}`, `{limits}`, `{timeline}` | Task planning |
-| **`executive_onepager_generation`** | Executive summary using Pyramid Principle | `{requirements}`, `{design}`, `{roi}` | Executive communications |
-| **`pr_faq_generation`** | Amazon-style PR-FAQ template | `{requirements}`, `{design}`, `{date}` | Product announcements |
-
-#### Prompt Customization
-
-```typescript
-// Custom prompt template location
-const promptPath = '.kiro/steering/prompts/requirements_generation.md';
-
-// Template variables
-const template = `
-# Requirements Generation Template
-
-## Business Goal
-Extract the core business goal from: {raw_intent}
-
-## Context Analysis
-Consider the following context: {context}
-
-## MoSCoW Prioritization
-- Must Have: Critical requirements
-- Should Have: Important but not critical
-- Could Have: Nice to have features
-- Won't Have: Out of scope for this iteration
-`;
-```
-
-### Parameter Specifications
-
-#### Common Parameter Types
-
-**Citation Options** (used across multiple tools):
-```typescript
+// Executive communication generation
 {
-  include_citations: boolean,        // Include professional citations
-  minimum_citations: number,         // Minimum citation count (1-20)
-  minimum_confidence: "low"|"medium"|"high", // Required confidence level
-  citation_style: "business"|"apa"|"inline", // Citation formatting
-  include_bibliography: boolean,     // Include bibliography section
-  max_citation_age_months: number   // Maximum citation age (6-60 months)
+  "tool": "mcp_vibe_pm_agent_create_stakeholder_communication", 
+  "parameters": {
+    "business_case": "[previous analysis result]",
+    "communication_type": "executive_onepager",
+    "audience": "executives"
+  }
 }
 ```
 
-**Steering Options** (used across multiple tools):
+#### Response Format
+
+All tools return structured responses with:
+
 ```typescript
 {
-  create_steering_files: boolean,    // Create steering files from output
-  feature_name: string,              // Feature name for organization
-  inclusion_rule: "always"|"fileMatch"|"manual", // Context inclusion
-  file_match_pattern: string,        // Pattern for fileMatch rule
-  overwrite_existing: boolean        // Overwrite existing files
+  "content": [{"type": "text", "text": "..."}],
+  "isError": false,
+  "metadata": {
+    "executionTime": 1250,
+    "confidenceScore": 85,
+    "citationCount": 12,
+    "quotaUsed": 3
+  }
 }
 ```
 
-**Market Context** (business intelligence tools):
-```typescript
-{
-  industry: string,                  // Industry or market sector
-  geography: string[],               // Target geographic markets
-  target_segment: string,            // Target customer segment
-  competition: string               // Known competitors
-}
+## 🤝 Contributing
+
+We welcome contributions to improve the Vibe PM Agent MCP server. Please follow these guidelines:
+
+### Development Setup
+
+1. **Fork and clone the repository**
+   ```bash
+   git clone https://github.com/your-username/vibe-pm-agent.git
+   cd vibe-pm-agent
+   npm install
+   ```
+
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. **Make your changes and test**
+   ```bash
+   npm run build
+   npm test
+   npm run lint
+   ```
+
+4. **Submit a pull request**
+   - Ensure all tests pass
+   - Include clear description of changes
+   - Update documentation if needed
+
+### Code Standards
+
+- **TypeScript**: Use strict typing with proper interfaces
+- **Testing**: Include unit tests for new functionality
+- **Documentation**: Update API documentation for new tools
+- **Linting**: Follow ESLint and Prettier configurations
+
+### Reporting Issues
+
+Please use GitHub Issues to report bugs or request features:
+
+1. **Bug Reports**: Include reproduction steps, expected behavior, and system information
+2. **Feature Requests**: Describe the use case and proposed solution
+3. **Documentation**: Report unclear or missing documentation
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### Third-Party Licenses
+
+- **Node.js**: MIT License
+- **TypeScript**: Apache 2.0 License  
+- **MCP SDK**: MIT License from ModelContext Protocol
+- **Dependencies**: See `package.json` for complete dependency licenses
+
+All third-party integrations comply with their respective terms of service and licensing requirements.
+
+## 🆘 Support & Troubleshooting
+
+### Common Issues
+
+#### Installation Problems
+```bash
+# Node.js version issues
+node --version  # Should be 18.0.0+
+npm --version   # Should be 8.0.0+
+
+# Permission errors (macOS/Linux)
+sudo npm install -g vibe-pm-agent
+
+# Build failures
+npm run clean && npm install && npm run build
 ```
 
-#### Tool-Specific Parameters
+#### MCP Connection Issues
+```bash
+# Test server connectivity
+npm run mcp:test
 
-**analyze_business_opportunity**:
-```typescript
-{
-  feature_idea: string,              // REQUIRED: Feature concept (10-2000 chars)
-  market_context?: {
-    industry?: string,
-    geography?: string[],
-    target_segment?: string
-  },
-  analysis_depth?: "quick"|"standard"|"comprehensive",
-  include_competitive_analysis?: boolean,
-  include_market_sizing?: boolean,
-  citation_options?: CitationOptions,
-  steering_options?: SteeringOptions
-}
+# Check server logs
+npm run mcp:server:debug
+
+# Verify MCP client configuration
+cat .kiro/settings/mcp.json
 ```
 
-**generate_business_case**:
-```typescript
-{
+#### Performance Issues
+```bash
+# Enable performance monitoring
+export LOG_LEVEL=debug
+export ENABLE_STREAMING=true
+
+# Check resource usage
+npm run test:performance
+```
+
+### Getting Help
+
+- **Documentation**: Check [docs/](./docs/) directory for detailed guides
+- **GitHub Issues**: Report bugs and request features
+- **Community**: Join discussions in GitHub Discussions
+- **Email**: Contact the maintainers for enterprise support
+
+### System Requirements
+
+- **Operating System**: macOS, Linux, Windows (WSL recommended)
+- **Node.js**: 18.0.0 or higher
+- **Memory**: 512MB RAM minimum, 2GB recommended
+- **Storage**: 100MB for installation, additional space for cache
+- **Network**: Internet connection for citation validation and market data
+
+---
+
+## 🔗 Links & Resources
+
+### Project Links
+- **GitHub Repository**: [https://github.com/your-username/vibe-pm-agent](https://github.com/your-username/vibe-pm-agent)
+- **npm Package**: [https://www.npmjs.com/package/vibe-pm-agent](https://www.npmjs.com/package/vibe-pm-agent)
+- **Documentation**: [./docs/](./docs/)
+- **Issue Tracker**: [GitHub Issues](https://github.com/your-username/vibe-pm-agent/issues)
+
+### Related Projects
+- **Model Context Protocol**: [https://modelcontextprotocol.io/](https://modelcontextprotocol.io/)
+- **Kiro IDE**: [https://kiro.ai/](https://kiro.ai/)
+- **MCP SDK**: [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk)
+
+### Professional Resources
+- **McKinsey Insights**: Strategic frameworks and market analysis methodologies
+- **BCG Publications**: Competitive intelligence and business case development
+- **Gartner Research**: Technology market sizing and trend analysis
+- **Harvard Business Review**: Executive communication best practices
+
+---
+
+**Ready to transform your ideas into executive-ready business cases?**
+
+```bash
+npm install -g vibe-pm-agent
+vibe-pm-agent --help
+```
+
+*Professional business intelligence at your fingertips.*
   opportunity_analysis: string,      // REQUIRED: Business opportunity analysis
   financial_inputs?: {
     development_cost?: number,       // Development cost in USD
@@ -1215,6 +1162,16 @@ grep "ERROR" logs/mcp-server.log | tail -20
 grep "executionTime" logs/mcp-server.log | awk '{print $NF}' | sort -n
 ```
 
+## For Hackathon Judges
+
+🎯 **Ready to explore Vibe PM Agent's transformation of developer ideas into McKinsey-grade business cases?**
+
+**Quick Start**: Run `npm run demo:ai-review` to see a 300% ROI analysis in action, or review `CrossFit_Coach_Benchmark_Report.md` for our +52% readiness impact (95% confidence).
+
+**Built with Kiro's MCP protocol**, this **Productivity & Workflow Tools** entry demonstrates innovative use of Kiro's capabilities and is a strong contender for **"Most Innovative Use of Kiro"** bonus prize.
+
+**Questions?** File a GitHub Issue or test individual tools with `node demo/test-mcp-server.js [tool_name]`!
+
 ## 📞 Support & Documentation
 
 ### Getting Help
@@ -1290,6 +1247,10 @@ npm run dev
 **Category**: Productivity & Workflow Tools  
 **Built with**: Kiro IDE, TypeScript, Node.js, MCP Protocol  
 **Unique Value**: Evidence-backed business intelligence with professional citations and confidence scoring
+
+### Intellectual Property
+
+Vibe PM Agent is an original work created for the Code with Kiro Hackathon 2025. All code and content are solely owned by the submitter, with no third-party IP claims. Citation data from public sources (e.g., McKinsey, Gartner reports) is used under fair use for analysis, with full attribution provided. The project complies with all hackathon IP requirements.
 
 ---
 

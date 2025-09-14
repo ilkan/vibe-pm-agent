@@ -1,26 +1,26 @@
 # Vibe PM Agent Documentation
 
-## 🏆 Code with Kiro Hackathon 2025 - Complete Documentation
+## 📚 Complete Documentation Guide
 
-This documentation covers the Vibe PM Agent MCP server - the missing "PM Mode" for Kiro IDE that transforms raw developer ideas into executive-ready business cases with scientifically validated 52% improvement in development readiness.
+This documentation covers the Vibe PM Agent MCP server - a strategic business intelligence layer for developer tools that transforms raw ideas into executive-ready business cases with professional consulting-grade analysis.
 
-## 🎯 Hackathon Project Overview
+## 🎯 Project Overview
 
-**Category:** Productivity & Workflow Tools  
+**Category:** Business Intelligence & Strategic Analysis  
 **Innovation:** First-of-its-kind strategic business intelligence layer for developer tools  
-**Impact:** +52% development readiness improvement with professional consulting-grade analysis  
+**Capabilities:** Professional market analysis, competitive intelligence, and executive communications  
 **Integration:** Native Kiro MCP protocol with 21 business intelligence tools
 
 ## Documentation Structure
 
 ### 📚 Core Documentation
 
-#### [Hackathon Overview](HACKATHON_OVERVIEW.md)
-**🏆 Hackathon project summary** - Complete Code with Kiro Hackathon 2025 documentation:
-- Innovation statement and problem solution
-- Scientifically validated impact metrics (+52% development readiness)
-- Kiro integration excellence with MCP protocol
-- Judging criteria alignment and success indicators
+#### [Project Overview](../README.md)
+**📋 Complete project overview** - Main project documentation and setup guide:
+- Project description and capabilities overview
+- Installation and configuration instructions
+- Kiro integration setup with MCP protocol
+- Usage examples and best practices
 
 #### [Project Structure](PROJECT_STRUCTURE.md)
 **📁 Architecture overview** - Complete project organization and technical implementation:
@@ -63,13 +63,13 @@ All business intelligence features, competitive analysis, PM document standards,
 
 ### 🚀 Quick Start
 
-#### For Hackathon Evaluation (5 minutes)
-1. **Review [Hackathon Overview](HACKATHON_OVERVIEW.md)** for complete project summary
-2. **Run the demo**: `npm install && npm run build && npm run demo:ai-review`
-3. **Check impact analysis**: `open ../CrossFit_Coach_Benchmark_Report.md`
+#### For Quick Start (5 minutes)
+1. **Review [../README.md](../README.md)** for complete project overview
+2. **Install and build**: `npm install && npm run build && npm test`
+3. **Start MCP server**: `npm run mcp:server`
 4. **Explore MCP tools**: [MCP Tools Reference](MCP_TOOLS_REFERENCE.md)
 
-#### For Development Integration
+#### For Production Integration
 1. **Understand the architecture**: [Project Structure](PROJECT_STRUCTURE.md)
 2. **Configure Kiro MCP**: [../KIRO_INTEGRATION.md](../KIRO_INTEGRATION.md)
 3. **Try business intelligence**: [Business Intelligence Guide](BUSINESS_INTELLIGENCE_GUIDE.md)
@@ -77,8 +77,8 @@ All business intelligence features, competitive analysis, PM document standards,
 
 ### 📖 Documentation by Use Case
 
-#### For Hackathon Judges
-- [Hackathon Overview](HACKATHON_OVERVIEW.md) - Complete project summary and evaluation guide
+#### For Technical Users
+- [../README.md](../README.md) - Complete project overview and setup guide
 - [MCP Tools Reference](MCP_TOOLS_REFERENCE.md) - Technical implementation and API documentation
 - [Project Structure](PROJECT_STRUCTURE.md) - Architecture overview and quality metrics
 
@@ -100,7 +100,7 @@ All business intelligence features, competitive analysis, PM document standards,
 #### For Executives
 - [Executive Communications](EXECUTIVE_COMMUNICATIONS.md) - Board-ready presentations and one-pagers
 - [Business Intelligence Guide](BUSINESS_INTELLIGENCE_GUIDE.md) - Strategic analysis and ROI modeling
-- [Hackathon Overview](HACKATHON_OVERVIEW.md) - Innovation impact and business value
+- [../README.md](../README.md) - Project overview and business value
 
 ## Key Features
 
@@ -217,7 +217,7 @@ Core PM Mode tools for business intelligence:
 5. **Validate market timing** using validate_market_timing
 
 ### Next Steps
-1. **Start with [Hackathon Overview](HACKATHON_OVERVIEW.md)** for complete project understanding
+1. **Start with [../README.md](../README.md)** for complete project understanding
 2. **Explore [MCP Tools Reference](MCP_TOOLS_REFERENCE.md)** for technical implementation
 3. **Try business intelligence** with [Business Intelligence Guide](BUSINESS_INTELLIGENCE_GUIDE.md)
 4. **Generate professional docs** using [Executive Communications](EXECUTIVE_COMMUNICATIONS.md)

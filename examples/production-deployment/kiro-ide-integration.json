@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "vibe-pm-agent": {
+      "command": "npx",
+      "args": ["vibe-pm-agent"],
+      "env": {
+        "NODE_ENV": "production",
+        "LOG_LEVEL": "info",
+        "ENABLE_HEALTH_CHECK": "true",
+        "MCP_SERVER_PORT": "3001",
+        "MAX_CONCURRENT_REQUESTS": "15",
+        "REQUEST_TIMEOUT_MS": "30000",
+        "CACHE_ENABLED": "true",
+        "CACHE_TTL_MS": "300000",
+        "KIRO_INTEGRATION_MODE": "true",
+        "STEERING_FILES_ENABLED": "true",
+        "ENABLE_CITATIONS": "true",
+        "MIN_CITATION_CONFIDENCE": "medium",
+        "DEFAULT_CITATION_STYLE": "business",
+        "ENABLE_COMPETITIVE_ANALYSIS": "true",
+        "ENABLE_MARKET_SIZING": "true"
+      },
+      "disabled": false,
+      "description": "Optimized configuration for Kiro IDE integration with PM Mode capabilities",
+      "autoApprove": [
+        "mcp_vibe_pm_agent_validate_idea_quick",
+        "mcp_vibe_pm_agent_optimize_intent",
+        "mcp_vibe_pm_agent_analyze_workflow",
+        "mcp_vibe_pm_agent_generate_roi_analysis",
+        "mcp_vibe_pm_agent_get_consulting_summary",
+        "mcp_vibe_pm_agent_generate_requirements",
+        "mcp_vibe_pm_agent_generate_design_options",
+        "mcp_vibe_pm_agent_generate_task_plan",
+        "mcp_vibe_pm_agent_generate_management_onepager",
+        "mcp_vibe_pm_agent_generate_pr_faq",
+        "mcp_vibe_pm_agent_analyze_business_opportunity",
+        "mcp_vibe_pm_agent_generate_business_case",
+        "mcp_vibe_pm_agent_create_stakeholder_communication",
+        "mcp_vibe_pm_agent_assess_strategic_alignment",
+        "mcp_vibe_pm_agent_optimize_resource_allocation",
+        "mcp_vibe_pm_agent_validate_market_timing",
+        "mcp_vibe_pm_agent_enhance_citations",
+        "mcp_vibe_pm_agent_validate_and_audit_citations",
+        "mcp_vibe_pm_agent_monitor_market_conditions",
+        "mcp_vibe_pm_agent_analyze_competitor_landscape",
+        "mcp_vibe_pm_agent_calculate_market_sizing"
+      ]
+    }
+  }
+}

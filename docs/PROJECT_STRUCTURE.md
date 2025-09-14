@@ -104,16 +104,11 @@ vibe-pm-agent/
 │       ├── steering-file-integration-guide.md # Kiro steering integration
 │       └── competitive-analysis-examples.md # Competitive intelligence examples
 │
-├── 🎯 Demo and Examples
-│   └── demo/
-│       ├── README.md                      # Demo documentation
-│       ├── run-demo.sh                    # Comprehensive demo script
-│       ├── test-mcp-server.js             # MCP server testing script
-│       ├── unique-datasets-showcase.js    # Unique datasets demonstration
-│       └── ai-customer-support/           # Example use case
-│           ├── test-citations.js          # Citation integration demo
-│           ├── test-enhanced-tools.js     # Enhanced business tools demo
-│           └── run-citation-demo.sh       # Citation system demo
+├── 📋 Configuration Examples
+│   └── examples/
+│       ├── mcp-client-config.json         # MCP client configuration examples
+│       ├── server-config.json             # Server configuration examples
+│       └── confidence-scoring-demo.ts     # Confidence scoring examples
 │
 ├── 📈 Data and Intelligence
 │   └── data/
@@ -180,9 +175,9 @@ vibe-pm-agent/
 - **mcp-error-handling.ts**: Comprehensive error handling for MCP operations
 - **confidence-scoring.ts**: Evidence-based confidence scoring algorithms
 
-## 🎯 Hackathon Integration Points
+## 🎯 Key Integration Points
 
-### Kiro Usage Evidence
+### Kiro Integration Features
 - **Spec-Driven Development**: Built using Kiro's Spec Mode (see `.kiro/specs/`)
 - **Steering Files**: Custom PM workflow templates (see `.kiro/steering/`)
 - **MCP Integration**: Native Kiro MCP protocol support
@@ -196,14 +191,14 @@ vibe-pm-agent/
 - **Evidence-Backed Analysis**: All outputs include citations and confidence scoring
 - **Professional Citations**: Academic-grade source validation
 - **Consulting Frameworks**: MECE, Pyramid Principle, Impact vs Effort analysis
-- **Automated Executive Intelligence**: CEO query processing with professional responses
+- **Automated Executive Intelligence**: Strategic query processing with professional responses
 
 ## 🚀 Getting Started
 
 1. **Installation**: `npm install && npm run build`
 2. **Testing**: `npm test` (see TESTING.md for comprehensive guide)
 3. **MCP Server**: `npm run mcp:server`
-4. **Demo**: `npm run demo`
+4. **Configuration**: Configure MCP client (see ../KIRO_INTEGRATION.md)
 5. **Kiro Integration**: Add to MCP configuration (see README.md)
 
 ## 📊 Quality Metrics
@@ -214,15 +209,15 @@ vibe-pm-agent/
 - **Documentation**: Comprehensive guides and examples
 - **Performance**: <15s response time for complex business intelligence
 
-## 🔗 Key Files for Judges
+## 🔗 Key Files for Users
 
 1. **README.md**: Main project overview and installation
 2. **TESTING.md**: Comprehensive testing instructions
-3. **KIRO_USAGE.md**: Evidence of Kiro usage for development
+3. **KIRO_INTEGRATION.md**: Kiro MCP setup and configuration
 4. **src/mcp/server.ts**: Core MCP server implementation
 5. **src/pipeline/ai-agent-pipeline.ts**: Business intelligence pipeline
-6. **demo/**: Working demonstrations of all features
+6. **examples/**: Configuration examples and usage patterns
 
 ---
 
-*This structure demonstrates systematic development using Kiro's Spec Mode with evidence-backed business intelligence capabilities for the Code with Kiro Hackathon 2025.*
+*This structure demonstrates systematic development using Kiro's Spec Mode with evidence-backed business intelligence capabilities for professional strategic analysis.*

@@ -70,8 +70,11 @@ For more information, visit: https://github.com/your-org/vibe-pm-agent
   // Start the MCP server
   console.error('Starting vibe-pm-agent MCP Server...');
 
+  // Determine if we're in production mode
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   const server = new PMAgentMCPServer({
-    enableLogging: true,
+    enableLogging: !isProduction || process.env.MCP_ENABLE_LOGGING === 'true',
     enableMetrics: true,
   });
 
