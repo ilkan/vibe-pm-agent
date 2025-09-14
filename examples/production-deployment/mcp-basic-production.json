@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "vibe-pm-agent": {
+      "command": "npx",
+      "args": ["vibe-pm-agent"],
+      "env": {
+        "NODE_ENV": "production",
+        "LOG_LEVEL": "info",
+        "ENABLE_HEALTH_CHECK": "true",
+        "MCP_SERVER_PORT": "3001",
+        "CACHE_ENABLED": "true",
+        "ENABLE_CITATIONS": "true",
+        "MIN_CITATION_CONFIDENCE": "medium"
+      },
+      "disabled": false,
+      "description": "Basic production deployment with essential PM tools and citation system",
+      "autoApprove": [
+        "mcp_vibe_pm_agent_validate_idea_quick",
+        "mcp_vibe_pm_agent_optimize_intent",
+        "mcp_vibe_pm_agent_analyze_workflow",
+        "mcp_vibe_pm_agent_get_consulting_summary"
+      ]
+    }
+  }
+}

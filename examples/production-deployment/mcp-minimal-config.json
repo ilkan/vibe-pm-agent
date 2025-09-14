@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "vibe-pm-agent": {
+      "command": "npx",
+      "args": ["vibe-pm-agent"],
+      "env": {
+        "NODE_ENV": "production",
+        "LOG_LEVEL": "error",
+        "ENABLE_HEALTH_CHECK": "false",
+        "MAX_CONCURRENT_REQUESTS": "3",
+        "REQUEST_TIMEOUT_MS": "15000",
+        "CACHE_ENABLED": "false",
+        "ENABLE_RATE_LIMITING": "false",
+        "ENABLE_INPUT_SANITIZATION": "true",
+        "ENABLE_METRICS": "false",
+        "ENABLE_CITATIONS": "false",
+        "ENABLE_COMPETITIVE_ANALYSIS": "false",
+        "ENABLE_MARKET_SIZING": "false",
+        "KIRO_INTEGRATION_MODE": "false",
+        "STEERING_FILES_ENABLED": "false"
+      },
+      "disabled": false,
+      "description": "Minimal configuration with only core PM tools, optimized for resource-constrained environments",
+      "autoApprove": [
+        "mcp_vibe_pm_agent_validate_idea_quick",
+        "mcp_vibe_pm_agent_optimize_intent",
+        "mcp_vibe_pm_agent_analyze_workflow",
+        "mcp_vibe_pm_agent_get_consulting_summary"
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": true,
+    "declarationMap": true,
+    "noEmitOnError": false,
+    "incremental": true,
+    "tsBuildInfoFile": "./tsconfig.dev.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "demo",
+    "examples/confidence-scoring-demo.ts",
+    "examples/hooks-demo.md",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}

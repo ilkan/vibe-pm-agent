@@ -48,6 +48,7 @@ import { MCP_SERVER_CONFIG, MCPToolRegistry } from './server-config';
 // Re-export for external use
 export { MCPToolRegistry };
 import { MCPErrorHandler, MCPResponseFormatter, MCPLogger } from '../utils/mcp-error-handling';
+import { ProductionLogger, getProductionConfig } from './production-config';
 import {
   MCP_TOOLS_REGISTRY,
   getAvailableToolNames,
@@ -94,9 +95,14 @@ export class PMAgentMCPServer {
     this.toolRegistry = MCPToolRegistry.createDefault();
     this.startTime = Date.now();
 
-    // Configure logging level
+    // Configure logging level based on environment
+    ProductionLogger.initialize();
+    const prodConfig = getProductionConfig();
+    
     if (options.enableLogging !== false) {
-      MCPLogger.setLogLevel(LogLevel.INFO);
+      MCPLogger.setLogLevel(prodConfig.logging.level);
+    } else {
+      MCPLogger.setLogLevel(LogLevel.ERROR); // Only errors when logging disabled
     }
 
     this.status = {

@@ -1,18 +1,18 @@
-# Vibe PM Agent - Demo Scripts & Examples
+# Vibe PM Agent - CrossFit Coach AI Demo
 
 ## 🚀 Quick Start Demo (5 minutes)
 
-### Recommended Evaluation Path for Judges
+### Recommended Evaluation Path
 
 **1. One-Command Setup**
 ```bash
 npm install && npm run build && npm test
 ```
 
-**2. Complete PM Workflow Demo**
+**2. View Complete Transformation**
 ```bash
-# Experience the full transformation: Raw idea → Strategic business case
-npm run demo:ai-review
+# See the full transformation: Raw idea → Strategic business case
+open CrossFit\ Coach/kiro-with-vibe-pm-agent/specs/crossfit-wod-coach-ai/
 ```
 
 **3. View Impact Analysis**
@@ -23,32 +23,26 @@ open ../CrossFit_Coach_Benchmark_Report.md
 
 ## 📁 Demo Structure
 
-### Core Demos
-- **`ai-code-review-assistant/`** - Complete PM workflow transformation
-- **`realtime-collaboration/`** - Market analysis and competitive intelligence
-- **`customer-support-automation/`** - ROI analysis and business case generation
+### CrossFit Coach AI Development Comparison
+- **`CrossFit Coach/kiro-core/`** - Standard Kiro development approach
+- **`CrossFit Coach/kiro-with-vibe-pm-agent/`** - Enhanced development using Vibe PM Agent MCP tools
 
-### Specialized Demos
-- **`citation-quality/`** - Professional citation integration testing
-- **`kiro-integration/`** - MCP server integration examples
-- **`unique-datasets/`** - Proprietary market intelligence showcase
-
-## 🎯 Demo Categories
+## 🎯 What This Demo Shows
 
 ### 1. Business Intelligence Transformation
-**What it shows:** Raw developer idea → Executive-ready business case
-**Time:** 2-3 minutes
-**Key metrics:** +52% development readiness, 300% ROI projection
+**Raw idea:** "I want to have a wod coach ai for crossfit lovers"
+**Transformed into:** Complete business case with market analysis, competitive intelligence, and ROI projections
+**Time:** 2-3 minutes to review
+**Key metrics:** +52% development readiness, strategic market positioning
 
-### 2. Citation Quality & Evidence
-**What it shows:** Professional consulting-grade citations (McKinsey, BCG, Gartner)
-**Time:** 1-2 minutes  
-**Key metrics:** 25+ citations, A/B/C credibility ratings, confidence scoring
+### 2. Technical Specification Generation
+**From:** Simple feature request
+**To:** Complete technical design with architecture, data models, and implementation plan
+**Key features:** Real-time pose detection, on-device ML, cross-platform mobile app
 
-### 3. Kiro Integration
-**What it shows:** Seamless MCP protocol integration with Kiro IDE
-**Time:** 2-3 minutes
-**Key metrics:** 21 tools, real-time streaming, context management
+### 3. Kiro Integration Excellence
+**Demonstrates:** Seamless MCP protocol integration with Kiro IDE
+**Shows:** 21 business intelligence tools, real-time analysis, professional documentation
 
 ## 🏆 Success Indicators
 

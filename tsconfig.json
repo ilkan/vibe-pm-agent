@@ -12,14 +12,17 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "declarationMap": false,
+    "sourceMap": false,
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "noImplicitAny": false,
     "strictNullChecks": false,
-    "noEmitOnError": false
+    "noEmitOnError": false,
+    "removeComments": true,
+    "importHelpers": true,
+    "newLine": "lf"
   },
   "include": [
     "src/**/*"
@@ -27,7 +30,26 @@
   "exclude": [
     "node_modules",
     "dist",
+    "coverage",
+    "demo",
+    "examples/confidence-scoring-demo.ts",
+    "examples/hooks-demo.md",
+    "data",
+    "reports",
+    "scripts",
+    "tasks",
+    "tests",
+    ".evidence",
+    ".kiro",
+    "src/tests/**/*",
+    "src/models/demo.ts",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/*.demo.ts",
+    "**/*.example.ts",
+    "**/*-demo.ts",
+    "**/*-example.ts",
+    "**/*-test.ts",
+    "**/*-spec.ts"
   ]
 }

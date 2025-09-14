@@ -1,7 +1,7 @@
 ---
 title: "Business Case — New Feature"
 artifact_type: business_case
-created_at: "2025-09-13T18:16:07.030Z"
+created_at: "2025-09-14T12:04:21.968Z"
 inputs_hash: "f12acb9aea313239581799a060173456e13d5176e90a70f2d23ceb4afce6fb45"
 profile: "amazon"
 confidence:
