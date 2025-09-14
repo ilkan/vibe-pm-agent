@@ -22,10 +22,10 @@
       "disabled": false,
       "description": "Minimal configuration with only core PM tools, optimized for resource-constrained environments",
       "autoApprove": [
-        "mcp_vibe_pm_agent_validate_idea_quick",
-        "mcp_vibe_pm_agent_optimize_intent",
-        "mcp_vibe_pm_agent_analyze_workflow",
-        "mcp_vibe_pm_agent_get_consulting_summary"
+        "validate_idea_quick",
+        "optimize_intent",
+        "analyze_workflow",
+        "get_consulting_summary"
       ]
     }
   }

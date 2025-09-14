@@ -3,36 +3,53 @@
 /**
  * Vibe PM Agent - MCP Server Executable
  * 
- * This executable starts the MCP server for integration with Kiro IDE
+ * Simple and stable MCP server for integration with Kiro IDE
  * and other MCP-compatible clients.
  */
 
-const path = require('path');
-const fs = require('fs');
+const { PMAgentMCPServer } = require('../dist/mcp/server');
 
-// Check if we're in development or production
-const isDev = process.env.NODE_ENV === 'development';
-const serverPath = isDev 
-  ? path.join(__dirname, '..', 'src', 'mcp', 'server.ts')
-  : path.join(__dirname, '..', 'dist', 'mcp', 'server.js');
-
-// Check if server file exists
-if (!fs.existsSync(serverPath)) {
-  console.error('❌ MCP server file not found:', serverPath);
-  console.error('');
-  console.error('🔧 Troubleshooting:');
-  console.error('   1. Run "npm run build" to compile TypeScript');
-  console.error('   2. Ensure all dependencies are installed with "npm install"');
-  console.error('   3. Check that the project built successfully');
+// Global error handlers - no console output for MCP
+process.on('uncaughtException', (error) => {
   process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  process.exit(1);
+});
+
+// Graceful shutdown
+let server = null;
+
+async function gracefulShutdown(signal) {
+  if (server) {
+    try {
+      await server.stop();
+    } catch (error) {
+      // Silent error handling for MCP
+    }
+  }
+  
+  process.exit(0);
 }
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Start the server
-if (isDev) {
-  // Development mode with ts-node
-  require('ts-node/register');
-  require(serverPath);
-} else {
-  // Production mode
-  require(serverPath);
+async function startServer() {
+  try {
+    server = new PMAgentMCPServer();
+    await server.start();
+    
+    // Keep the process alive - no console output for MCP
+    process.stdin.resume();
+    
+  } catch (error) {
+    process.exit(1);
+  }
 }
+
+startServer().catch((error) => {
+  process.exit(1);
+});

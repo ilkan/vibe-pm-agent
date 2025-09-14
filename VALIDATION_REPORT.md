@@ -18,7 +18,7 @@
 - **Status**: PASSED
 - **Details**:
   - Server initializes with 18 core tools
-  - Successfully connects with 29 total tools available
+  - Successfully connects with 21 total tools available (corrected count)
   - Health check reports "healthy" status
   - All key PM tools registered and available
   - Server responds to MCP protocol correctly
@@ -60,12 +60,11 @@
 
 ## Core Functionality Verification
 
-### MCP Tools Available (29 total)
-- ✅ Business Intelligence Tools (6)
-- ✅ PM Workflow Tools (5) 
-- ✅ Citation & Analysis Tools (5)
-- ✅ Workflow Optimization Tools (5)
-- ✅ Additional specialized tools (8)
+### MCP Tools Available (21 total)
+- ✅ Core PM Tools (11): Requirements, Design, Tasks, Management One-Pager, PR-FAQ, Business Case, Stakeholder Communication, Business Opportunity Analysis, Citations Enhancement, Citations Validation, Market Monitoring
+- ✅ Workflow Optimization Tools (5): Intent Optimization, Workflow Analysis, ROI Analysis, Consulting Summary, Quick Validation
+- ✅ Competitive Analysis Tools (3): Competitor Landscape, Market Sizing, Strategic Alignment
+- ✅ Resource & Timing Tools (2): Resource Allocation, Market Timing
 
 ### Key Features Validated
 - ✅ Strategic business analysis capabilities
