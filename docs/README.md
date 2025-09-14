@@ -133,7 +133,7 @@ All business intelligence features, competitive analysis, PM document standards,
 ### Business Opportunity Analysis
 ```typescript
 // Analyze market opportunity and strategic fit
-const result = await mcp_vibe_pm_agent_analyze_business_opportunity({
+const result = await analyze_business_opportunity({
   idea: "AI-powered customer support chatbot",
   market_context: {
     industry: "e-commerce",
@@ -145,7 +145,7 @@ const result = await mcp_vibe_pm_agent_analyze_business_opportunity({
 ### Executive Communication Generation
 ```typescript
 // Generate executive one-pager with ROI analysis
-const onePager = await mcp_vibe_pm_agent_create_stakeholder_communication({
+const onePager = await create_stakeholder_communication({
   business_case: "...",
   communication_type: "executive_onepager",
   audience: "executives"

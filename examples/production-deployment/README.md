@@ -166,7 +166,7 @@ Expected response:
 {
   "status": "healthy",
   "uptime": 12345,
-  "toolsAvailable": ["mcp_vibe_pm_agent_analyze_business_opportunity", ...],
+  "toolsAvailable": ["analyze_business_opportunity", ...],
   "performance": {
     "averageResponseTime": 150,
     "totalRequests": 42,

@@ -122,9 +122,9 @@ Add to your Kiro MCP configuration file (`.kiro/settings/mcp.json`):
         "LOG_LEVEL": "info"
       },
       "autoApprove": [
-        "mcp_vibe_pm_agent_analyze_business_opportunity",
-        "mcp_vibe_pm_agent_generate_business_case",
-        "mcp_vibe_pm_agent_create_stakeholder_communication"
+        "analyze_business_opportunity",
+        "generate_business_case",
+        "create_stakeholder_communication"
       ]
     }
   }
@@ -172,42 +172,42 @@ export ENABLE_STREAMING=true    # Enable response streaming
 
 | Tool Name | Description | Key Parameters |
 |-----------|-------------|----------------|
-| **`mcp_vibe_pm_agent_analyze_business_opportunity`** | Market validation and strategic fit assessment with competitive intelligence | `idea` (required), `market_context`, `analysis_depth` |
-| **`mcp_vibe_pm_agent_generate_business_case`** | Multi-scenario ROI analysis with risk assessment and financial projections | `opportunity_analysis` (required), `financial_inputs` |
-| **`mcp_vibe_pm_agent_create_stakeholder_communication`** | Executive communications generation (one-pagers, PR-FAQs, presentations) | `business_case` (required), `communication_type`, `audience` |
-| **`mcp_vibe_pm_agent_assess_strategic_alignment`** | Company OKR and mission alignment evaluation with scoring | `feature_concept` (required), `company_context` |
-| **`mcp_vibe_pm_agent_validate_market_timing`** | Market timing and competitive window analysis | `feature_idea` (required), `market_signals` |
-| **`mcp_vibe_pm_agent_optimize_resource_allocation`** | Development efficiency and cost optimization recommendations | `current_workflow` (required), `resource_constraints`, `optimization_goals` |
+| **`analyze_business_opportunity`** | Market validation and strategic fit assessment with competitive intelligence | `idea` (required), `market_context`, `analysis_depth` |
+| **`generate_business_case`** | Multi-scenario ROI analysis with risk assessment and financial projections | `opportunity_analysis` (required), `financial_inputs` |
+| **`create_stakeholder_communication`** | Executive communications generation (one-pagers, PR-FAQs, presentations) | `business_case` (required), `communication_type`, `audience` |
+| **`assess_strategic_alignment`** | Company OKR and mission alignment evaluation with scoring | `feature_concept` (required), `company_context` |
+| **`validate_market_timing`** | Market timing and competitive window analysis | `feature_idea` (required), `market_signals` |
+| **`optimize_resource_allocation`** | Development efficiency and cost optimization recommendations | `current_workflow` (required), `resource_constraints`, `optimization_goals` |
 
 ### PM Workflow Tools (5 tools)
 
 | Tool Name | Description | Key Parameters |
 |-----------|-------------|----------------|
-| **`mcp_vibe_pm_agent_generate_requirements`** | PM-grade requirements with EARS format and acceptance criteria | `feature_idea` (required), `context` |
-| **`mcp_vibe_pm_agent_generate_design_options`** | Conservative/Balanced/Bold design alternatives with cost analysis | `requirements` (required), `constraints` |
-| **`mcp_vibe_pm_agent_generate_task_plan`** | Phased implementation plan with detailed task breakdown | `design` (required), `requirements` |
-| **`mcp_vibe_pm_agent_generate_management_onepager`** | Executive one-pager using Pyramid Principle | `project_info` (required), `audience` |
-| **`mcp_vibe_pm_agent_generate_pr_faq`** | Amazon-style PR-FAQ document with Working Backwards methodology | `product_info` (required), `target_audience` |
+| **`generate_requirements`** | PM-grade requirements with EARS format and acceptance criteria | `feature_idea` (required), `context` |
+| **`generate_design_options`** | Conservative/Balanced/Bold design alternatives with cost analysis | `requirements` (required), `constraints` |
+| **`generate_task_plan`** | Phased implementation plan with detailed task breakdown | `design` (required), `requirements` |
+| **`generate_management_onepager`** | Executive one-pager using Pyramid Principle | `project_info` (required), `audience` |
+| **`generate_pr_faq`** | Amazon-style PR-FAQ document with Working Backwards methodology | `product_info` (required), `target_audience` |
 
 ### Citation & Analysis Tools (5 tools)
 
 | Tool Name | Description | Key Parameters |
 |-----------|-------------|----------------|
-| **`mcp_vibe_pm_agent_enhance_citations`** | Enhances content with authoritative citations and source validation | `content` (required), `sources` |
-| **`mcp_vibe_pm_agent_validate_and_audit_citations`** | Validates and audits citations for accuracy and credibility | `content` (required), `strict_mode` |
-| **`mcp_vibe_pm_agent_monitor_market_conditions`** | Monitors and analyzes current market conditions and trends | `market` (required), `indicators` |
-| **`mcp_vibe_pm_agent_get_consulting_summary`** | Creates consulting-style executive summary from analysis data | `analysis_data` (required), `summary_type` |
-| **`mcp_vibe_pm_agent_validate_idea_quick`** | Performs quick validation of business ideas against criteria | `idea` (required), `criteria` |
+| **`enhance_citations`** | Enhances content with authoritative citations and source validation | `content` (required), `sources` |
+| **`validate_and_audit_citations`** | Validates and audits citations for accuracy and credibility | `content` (required), `strict_mode` |
+| **`monitor_market_conditions`** | Monitors and analyzes current market conditions and trends | `market` (required), `indicators` |
+| **`get_consulting_summary`** | Creates consulting-style executive summary from analysis data | `analysis_data` (required), `summary_type` |
+| **`validate_idea_quick`** | Performs quick validation of business ideas against criteria | `idea` (required), `criteria` |
 
 ### Workflow Optimization Tools (5 tools)
 
 | Tool Name | Description | Key Parameters |
 |-----------|-------------|----------------|
-| **`mcp_vibe_pm_agent_optimize_intent`** | Optimizes user intent for better clarity and actionability | `user_intent` (required), `context` |
-| **`mcp_vibe_pm_agent_analyze_workflow`** | Analyzes workflows for optimization opportunities | `workflow_description` (required), `optimization_goals` |
-| **`mcp_vibe_pm_agent_generate_roi_analysis`** | Generates comprehensive ROI analysis with financial projections | `investment` (required), `expected_returns` |
-| **`mcp_vibe_pm_agent_analyze_competitor_landscape`** | Analyzes competitive landscape and market positioning | `market_segment` (required), `competitors` |
-| **`mcp_vibe_pm_agent_calculate_market_sizing`** | Calculates market sizing using TAM-SAM-SOM methodology | `market` (required), `methodology` |
+| **`optimize_intent`** | Optimizes user intent for better clarity and actionability | `user_intent` (required), `context` |
+| **`analyze_workflow`** | Analyzes workflows for optimization opportunities | `workflow_description` (required), `optimization_goals` |
+| **`generate_roi_analysis`** | Generates comprehensive ROI analysis with financial projections | `investment` (required), `expected_returns` |
+| **`analyze_competitor_landscape`** | Analyzes competitive landscape and market positioning | `market_segment` (required), `competitors` |
+| **`calculate_market_sizing`** | Calculates market sizing using TAM-SAM-SOM methodology | `market` (required), `methodology` |
 
 ### Usage Examples
 
@@ -343,7 +343,7 @@ For complete API documentation including parameter specifications, response form
 ```typescript
 // Business opportunity analysis
 {
-  "tool": "mcp_vibe_pm_agent_analyze_business_opportunity",
+  "tool": "analyze_business_opportunity",
   "parameters": {
     "idea": "AI-powered code review assistant",
     "market_context": {
@@ -355,7 +355,7 @@ For complete API documentation including parameter specifications, response form
 
 // Executive communication generation
 {
-  "tool": "mcp_vibe_pm_agent_create_stakeholder_communication", 
+  "tool": "create_stakeholder_communication", 
   "parameters": {
     "business_case": "[previous analysis result]",
     "communication_type": "executive_onepager",

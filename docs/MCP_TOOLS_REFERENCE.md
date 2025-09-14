@@ -4,7 +4,7 @@
 
 The Vibe PM Agent provides 21 business intelligence tools through the Model Context Protocol (MCP), organized into 4 categories for comprehensive strategic analysis and executive communications.
 
-**All tools use the `mcp_vibe_pm_agent_` prefix for proper MCP protocol integration with Kiro IDE.**
+**All tools use the `` prefix for proper MCP protocol integration with Kiro IDE.**
 
 ## 📊 Tool Categories
 
@@ -22,7 +22,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ## 🔧 Core Business Intelligence Tools
 
-### `mcp_vibe_pm_agent_analyze_business_opportunity`
+### `analyze_business_opportunity`
 **Purpose:** Market validation and strategic fit assessment with competitive intelligence
 
 **Parameters:**
@@ -50,7 +50,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_generate_business_case`
+### `generate_business_case`
 **Purpose:** Multi-scenario ROI analysis with risk assessment and financial projections
 
 **Parameters:**
@@ -77,7 +77,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_create_stakeholder_communication`
+### `create_stakeholder_communication`
 **Purpose:** Executive communications generation (one-pagers, PR-FAQs, presentations)
 
 **Parameters:**
@@ -100,7 +100,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_assess_strategic_alignment`
+### `assess_strategic_alignment`
 **Purpose:** Company OKR and mission alignment evaluation with scoring
 
 **Parameters:**
@@ -127,7 +127,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_validate_market_timing`
+### `validate_market_timing`
 **Purpose:** Market timing and competitive window analysis
 
 **Parameters:**
@@ -153,7 +153,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_optimize_resource_allocation`
+### `optimize_resource_allocation`
 **Purpose:** Development efficiency and cost optimization recommendations
 
 **Parameters:**
@@ -180,7 +180,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ## 📋 PM Workflow Tools
 
-### `mcp_vibe_pm_agent_generate_requirements`
+### `generate_requirements`
 **Purpose:** PM-grade requirements with EARS format and acceptance criteria
 
 **Parameters:**
@@ -196,7 +196,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_generate_design_options`
+### `generate_design_options`
 **Purpose:** Conservative/Balanced/Bold design alternatives with cost analysis
 
 **Parameters:**
@@ -212,7 +212,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_generate_task_plan`
+### `generate_task_plan`
 **Purpose:** Phased implementation plan with detailed task breakdown
 
 **Parameters:**
@@ -228,7 +228,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_generate_management_onepager`
+### `generate_management_onepager`
 **Purpose:** Executive one-pager using Pyramid Principle
 
 **Parameters:**
@@ -244,7 +244,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_generate_pr_faq`
+### `generate_pr_faq`
 **Purpose:** Amazon-style PR-FAQ document with Working Backwards methodology
 
 **Parameters:**
@@ -260,7 +260,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ## 🔍 Citation & Analysis Tools
 
-### `mcp_vibe_pm_agent_enhance_citations`
+### `enhance_citations`
 **Purpose:** Enhances content with authoritative citations and source validation
 
 **Parameters:**
@@ -276,7 +276,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_validate_and_audit_citations`
+### `validate_and_audit_citations`
 **Purpose:** Validates and audits citations for accuracy and credibility
 
 **Parameters:**
@@ -291,7 +291,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_monitor_market_conditions`
+### `monitor_market_conditions`
 **Purpose:** Monitors and analyzes current market conditions and trends
 
 **Parameters:**
@@ -306,7 +306,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_get_consulting_summary`
+### `get_consulting_summary`
 **Purpose:** Creates consulting-style executive summary from analysis data
 
 **Parameters:**
@@ -321,7 +321,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_validate_idea_quick`
+### `validate_idea_quick`
 **Purpose:** Performs quick validation of business ideas against criteria
 
 **Parameters:**
@@ -336,7 +336,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ## ⚡ Workflow Optimization Tools
 
-### `mcp_vibe_pm_agent_optimize_intent`
+### `optimize_intent`
 **Purpose:** Optimizes user intent for better clarity and actionability
 
 **Parameters:**
@@ -351,7 +351,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_analyze_workflow`
+### `analyze_workflow`
 **Purpose:** Analyzes workflows for optimization opportunities
 
 **Parameters:**
@@ -366,7 +366,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_generate_roi_analysis`
+### `generate_roi_analysis`
 **Purpose:** Generates comprehensive ROI analysis with financial projections
 
 **Parameters:**
@@ -381,7 +381,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_analyze_competitor_landscape`
+### `analyze_competitor_landscape`
 **Purpose:** Analyzes competitive landscape and market positioning
 
 **Parameters:**
@@ -396,7 +396,7 @@ Resource allocation, competitive analysis, and market sizing
 
 ---
 
-### `mcp_vibe_pm_agent_calculate_market_sizing`
+### `calculate_market_sizing`
 **Purpose:** Calculates market sizing using TAM-SAM-SOM methodology
 
 **Parameters:**
@@ -461,31 +461,31 @@ All MCP tools return responses in this standard format:
 ## 🎯 Usage Examples in Kiro
 
 ### Business Opportunity Analysis
-Use `mcp_vibe_pm_agent_analyze_business_opportunity` with natural language:
+Use `analyze_business_opportunity` with natural language:
 ```
 "Analyze the business opportunity for an AI-powered customer support chatbot targeting e-commerce companies"
 ```
 
 ### Complete Business Case Development
-Use `mcp_vibe_pm_agent_generate_business_case` for ROI analysis:
+Use `generate_business_case` for ROI analysis:
 ```
 "Generate a comprehensive business case for our microservices migration with $2M investment and 18-month timeline"
 ```
 
 ### Executive Communication
-Use `mcp_vibe_pm_agent_create_stakeholder_communication` for presentations:
+Use `create_stakeholder_communication` for presentations:
 ```
 "Create an executive one-pager for the board presentation on our new API gateway initiative"
 ```
 
 ### Strategic Validation
-Use `mcp_vibe_pm_agent_assess_strategic_alignment` for OKR alignment:
+Use `assess_strategic_alignment` for OKR alignment:
 ```
 "Assess strategic alignment of the developer productivity tools with our company OKRs"
 ```
 
 ### Market Intelligence
-Use `mcp_vibe_pm_agent_analyze_competitor_landscape` and `mcp_vibe_pm_agent_calculate_market_sizing`:
+Use `analyze_competitor_landscape` and `calculate_market_sizing`:
 ```
 "Analyze the competitive landscape for enterprise developer tools and calculate market sizing"
 ```
@@ -515,11 +515,11 @@ Use `mcp_vibe_pm_agent_analyze_competitor_landscape` and `mcp_vibe_pm_agent_calc
 
 ### Natural Language Usage
 The tools are designed to work with natural language queries in Kiro:
-- Use `mcp_vibe_pm_agent_analyze_business_opportunity` for market analysis
-- Use `mcp_vibe_pm_agent_generate_business_case` for ROI projections
-- Use `mcp_vibe_pm_agent_create_stakeholder_communication` for executive docs
-- Use `mcp_vibe_pm_agent_validate_market_timing` for timing validation
-- Use `mcp_vibe_pm_agent_assess_strategic_alignment` for OKR alignment
+- Use `analyze_business_opportunity` for market analysis
+- Use `generate_business_case` for ROI projections
+- Use `create_stakeholder_communication` for executive docs
+- Use `validate_market_timing` for timing validation
+- Use `assess_strategic_alignment` for OKR alignment
 
 ## 🏆 Quality Standards
 
