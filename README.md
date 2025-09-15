@@ -87,7 +87,7 @@ Vibe PM Agent is a Model Context Protocol (MCP) server that provides strategic b
 ### Quick Installation
 
 ```bash
-# Install from npm
+# Install from npm(soon)
 npm install -g vibe-pm-agent
 
 # Or clone and build from source
@@ -521,7 +521,7 @@ npm run test:performance
 
 ### Related Projects
 - **Model Context Protocol**: [https://modelcontextprotocol.io/](https://modelcontextprotocol.io/)
-- **Kiro IDE**: [https://kiro.ai/](https://kiro.ai/)
+- **Kiro IDE**: [https://kiro.dev/](https://kiro.dev/)
 - **MCP SDK**: [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk)
 
 ### Professional Resources
