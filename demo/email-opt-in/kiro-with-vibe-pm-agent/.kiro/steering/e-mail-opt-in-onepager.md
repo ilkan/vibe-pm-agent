@@ -2,7 +2,7 @@
 inclusion: manual
 generatedBy: vibe-pm-agent
 generatedAt: 2025-09-15T15:28:36.535Z
-featureName: unnamed-feature
+featureName: e-mail-opt-in
 documentType: onepager
 description: Generated from PM agent onepager document
 ---
