@@ -54,6 +54,17 @@ export class PMAgentMCPServer {
     this.setupHandlers();
   }
 
+  /**
+   * Public method for testing - calls a tool handler directly
+   */
+  public async callTool(toolName: string, args: any) {
+    const handler = this.getToolHandler(toolName);
+    if (!handler) {
+      throw new Error(`Unknown tool: ${toolName}`);
+    }
+    return await handler(args);
+  }
+
   private setupHandlers(): void {
     // Dynamic tool registration with all 22 tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -423,7 +434,7 @@ export class PMAgentMCPServer {
     ];
   }
 
-  private getToolHandler(toolName: string) {
+  public getToolHandler(toolName: string) {
     const handlers: Record<string, (args: any) => Promise<any>> = {
       // Original 6 tools (map to existing handlers)
       analyze_business_opportunity: this.handleBusinessOpportunityAnalysis.bind(this),

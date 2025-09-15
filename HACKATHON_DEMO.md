@@ -58,7 +58,7 @@ The Vibe PM Agent completes Kiro's development ecosystem by adding the critical 
 
 ### Setup (30 seconds)
 ```bash
-git clone https://github.com/your-username/vibe-pm-agent.git
+git clone https://github.com/ilkan/vibe-pm-agent.git
 cd vibe-pm-agent
 npm install && npm run build && npm test
 ```

@@ -4,36 +4,36 @@ Add these badges to your README.md file to show the current status of your CI/CD
 
 ## GitHub Actions Workflow Badge
 ```markdown
-[![CI](https://github.com/your-username/vibe-pm-agent/workflows/Vibe%20PM%20Agent%20CI%2FCD/badge.svg)](https://github.com/your-username/vibe-pm-agent/actions)
+[![CI](https://github.com/ilkan/vibe-pm-agent/workflows/Vibe%20PM%20Agent%20CI%2FCD/badge.svg)](https://github.com/ilkan/vibe-pm-agent/actions)
 ```
 
 ## Test Coverage Badge
 ```markdown
-[![Coverage](https://img.shields.io/badge/coverage-85%25-green)](https://github.com/your-username/vibe-pm-agent/actions)
+[![Coverage](https://img.shields.io/badge/coverage-85%25-green)](https://github.com/ilkan/vibe-pm-agent/actions)
 ```
 
 ## Performance Badge
 ```markdown
-[![Performance](https://img.shields.io/badge/p95_latency-850ms-green)](https://github.com/your-username/vibe-pm-agent/actions)
+[![Performance](https://img.shields.io/badge/p95_latency-850ms-green)](https://github.com/ilkan/vibe-pm-agent/actions)
 ```
 
 ## Quality Gate Badge
 ```markdown
-[![Quality Gate](https://img.shields.io/badge/quality-passing-brightgreen)](https://github.com/your-username/vibe-pm-agent/actions)
+[![Quality Gate](https://img.shields.io/badge/quality-passing-brightgreen)](https://github.com/ilkan/vibe-pm-agent/actions)
 ```
 
 ## Security Badge
 ```markdown
-[![Security](https://img.shields.io/badge/security-passing-brightgreen)](https://github.com/your-username/vibe-pm-agent/actions)
+[![Security](https://img.shields.io/badge/security-passing-brightgreen)](https://github.com/ilkan/vibe-pm-agent/actions)
 ```
 
 ## All Badges Combined
 ```markdown
-[![CI](https://github.com/your-username/vibe-pm-agent/workflows/Vibe%20PM%20Agent%20CI%2FCD/badge.svg)](https://github.com/your-username/vibe-pm-agent/actions)
-[![Coverage](https://img.shields.io/badge/coverage-85%25-green)](https://github.com/your-username/vibe-pm-agent/actions)
-[![Performance](https://img.shields.io/badge/p95_latency-850ms-green)](https://github.com/your-username/vibe-pm-agent/actions)
-[![Quality Gate](https://img.shields.io/badge/quality-passing-brightgreen)](https://github.com/your-username/vibe-pm-agent/actions)
-[![Security](https://img.shields.io/badge/security-passing-brightgreen)](https://github.com/your-username/vibe-pm-agent/actions)
+[![CI](https://github.com/ilkan/vibe-pm-agent/workflows/Vibe%20PM%20Agent%20CI%2FCD/badge.svg)](https://github.com/ilkan/vibe-pm-agent/actions)
+[![Coverage](https://img.shields.io/badge/coverage-85%25-green)](https://github.com/ilkan/vibe-pm-agent/actions)
+[![Performance](https://img.shields.io/badge/p95_latency-850ms-green)](https://github.com/ilkan/vibe-pm-agent/actions)
+[![Quality Gate](https://img.shields.io/badge/quality-passing-brightgreen)](https://github.com/ilkan/vibe-pm-agent/actions)
+[![Security](https://img.shields.io/badge/security-passing-brightgreen)](https://github.com/ilkan/vibe-pm-agent/actions)
 ```
 
 ## Badge Color Scheme
@@ -59,7 +59,7 @@ Add these badges to your README.md file to show the current status of your CI/CD
 
 ## Usage Instructions
 
-1. Replace `your-username` with your actual GitHub username
+1. Replace `ilkan` with your actual GitHub username
 2. Update the repository name if different from `vibe-pm-agent`
 3. The badges will automatically update based on your CI/CD pipeline results
 4. Add these to the top of your README.md file for maximum visibility

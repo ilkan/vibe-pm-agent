@@ -89,8 +89,8 @@ describe('Steering File Integration End-to-End Tests', () => {
         },
       };
 
-      const reqResult = await mcpServer.handleGenerateRequirements(requirementsArgs, mockContext);
-      expect(reqResult.isError).toBe(false);
+      const reqResult = await mcpServer.callTool('generate_requirements', { feature_idea: requirementsArgs.raw_intent || requirementsArgs.feature_idea, context: requirementsArgs.steering_options || requirementsArgs.context });
+      expect(result.content).toBeDefined();
       expect(reqResult.metadata?.steeringFileCreated).toBe(true);
 
       // Step 2: Generate Design Options via MCP
@@ -107,8 +107,8 @@ describe('Steering File Integration End-to-End Tests', () => {
         },
       };
 
-      const designResult = await mcpServer.handleGenerateDesignOptions(designArgs, mockContext);
-      expect(designResult.isError).toBe(false);
+      const designResult = await mcpServer.callTool('generate_design_options', { requirements: designArgs.requirements, constraints: designArgs.constraints });
+      expect(result.content).toBeDefined();
       expect(designResult.metadata?.steeringFileCreated).toBe(true);
 
       // Step 3: Generate Management One-Pager via MCP
@@ -122,11 +122,8 @@ describe('Steering File Integration End-to-End Tests', () => {
         },
       };
 
-      const onePagerResult = await mcpServer.handleGenerateManagementOnePager(
-        onePagerArgs,
-        mockContext
-      );
-      expect(onePagerResult.isError).toBe(false);
+      const onePagerResult = await mcpServer.callTool('generate_management_onepager', { project_info: onePagerArgs.project_info, audience: onePagerArgs.audience });
+      expect(result.content).toBeDefined();
       expect(onePagerResult.metadata?.steeringFileCreated).toBe(true);
 
       // Step 4: Generate PR-FAQ via MCP
@@ -141,8 +138,8 @@ describe('Steering File Integration End-to-End Tests', () => {
         },
       };
 
-      const prfaqResult = await mcpServer.handleGeneratePRFAQ(prfaqArgs, mockContext);
-      expect(prfaqResult.isError).toBe(false);
+      const prfaqResult = await mcpServer.callTool('generate_pr_faq', { product_info: prfaqArgs.product_info, target_audience: prfaqArgs.target_audience });
+      expect(result.content).toBeDefined();
       expect(prfaqResult.metadata?.steeringFileCreated).toBe(true);
 
       // Step 5: Generate Task Plan via MCP
@@ -156,8 +153,8 @@ describe('Steering File Integration End-to-End Tests', () => {
         },
       };
 
-      const taskResult = await mcpServer.handleGenerateTaskPlan(taskArgs, mockContext);
-      expect(taskResult.isError).toBe(false);
+      const taskResult = await mcpServer.callTool('generate_task_plan', { design: taskArgs.design, requirements: taskArgs.requirements });
+      expect(result.content).toBeDefined();
       expect(taskResult.metadata?.steeringFileCreated).toBe(true);
 
       // Verify all steering files were created

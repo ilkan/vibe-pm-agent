@@ -490,6 +490,6 @@ jobs:
           echo "Created tag: v$VERSION-$(date +%Y%m%d-%H%M%S)"
 
 # Workflow status badges for README
-# [![CI](https://github.com/your-username/vibe-pm-agent/workflows/Vibe%20PM%20Agent%20CI%2FCD/badge.svg)](https://github.com/your-username/vibe-pm-agent/actions)
-# [![Coverage](https://img.shields.io/badge/coverage-85%25-green)](https://github.com/your-username/vibe-pm-agent/actions)
-# [![Performance](https://img.shields.io/badge/p95_latency-850ms-green)](https://github.com/your-username/vibe-pm-agent/actions)
+# [![CI](https://github.com/ilkan/vibe-pm-agent/workflows/Vibe%20PM%20Agent%20CI%2FCD/badge.svg)](https://github.com/ilkan/vibe-pm-agent/actions)
+# [![Coverage](https://img.shields.io/badge/coverage-85%25-green)](https://github.com/ilkan/vibe-pm-agent/actions)
+# [![Performance](https://img.shields.io/badge/p95_latency-850ms-green)](https://github.com/ilkan/vibe-pm-agent/actions)
