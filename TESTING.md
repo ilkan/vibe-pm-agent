@@ -8,7 +8,7 @@ This document provides comprehensive testing instructions for judges and develop
 
 ```bash
 # Clone and install
-git clone https://github.com/your-username/vibe-pm-agent.git
+git clone https://github.com/ilkan/vibe-pm-agent.git
 cd vibe-pm-agent
 npm install
 
@@ -382,7 +382,7 @@ npm run demo:citations
 
 ### Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/your-username/vibe-pm-agent/issues)
+- **Issues**: [GitHub Issues](https://github.com/ilkan/vibe-pm-agent/issues)
 - **Documentation**: See `docs/` directory for detailed guides
 - **Kiro Integration**: See `KIRO_USAGE.md` for Kiro-specific examples
 

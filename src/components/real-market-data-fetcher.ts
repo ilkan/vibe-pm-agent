@@ -50,11 +50,22 @@ export class RealMarketDataFetcher {
   ): Array<{ url: string; name: string }> {
     const sources: Array<{ url: string; name: string }> = [];
 
-    // Always try these reliable financial/business sources
+    // Core finance & markets - always include these reliable sources
     sources.push(
       { url: 'https://finance.yahoo.com/rss/', name: 'Yahoo Finance' },
       { url: 'https://feeds.reuters.com/reuters/businessNews', name: 'Reuters Business' },
-      { url: 'https://www.sec.gov/rss/investor/alerts', name: 'SEC Investor Alerts' }
+      { url: 'https://www.sec.gov/rss/investor/alerts', name: 'SEC Investor Alerts' },
+      { url: 'https://feeds.bloomberg.com/markets/news.rss', name: 'Bloomberg Markets' },
+      { url: 'https://www.ft.com/global-economy?format=rss', name: 'FT Global Economy' },
+      { url: 'https://feeds.a.dj.com/rss/RSSMarketsMain.xml', name: 'WSJ Markets' },
+      { url: 'https://www.marketwatch.com/rss/topstories', name: 'MarketWatch Top Stories' },
+      { url: 'https://nasdaqtrader.com/Trader.aspx?id=TradeHaltRSS', name: 'Nasdaq Trade Halts' },
+      { url: 'https://www.federalreserve.gov/feeds/press_all.xml', name: 'Federal Reserve Press Releases' },
+      { url: 'https://www.coindesk.com/arc/outboundfeeds/rss/', name: 'CoinDesk (Crypto)' },
+      { url: 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&output=atom', name: 'SEC EDGAR – Recent Filings (Atom)' },
+      { url: 'https://www.bls.gov/feed/news_release.rss', name: 'BLS News Releases' },
+      { url: 'https://www.bea.gov/news/rss.xml', name: 'BEA News' },
+      { url: 'https://fredblog.stlouisfed.org/feed/', name: 'FRED Blog (St. Louis Fed)' }
     );
 
     // Add fintech-specific sources
@@ -65,7 +76,17 @@ export class RealMarketDataFetcher {
     ) {
       sources.push(
         { url: 'https://www.finextra.com/rss/headlines.aspx', name: 'Finextra' },
-        { url: 'https://www.pymnts.com/feed/', name: 'PYMNTS' }
+        { url: 'https://www.pymnts.com/feed/', name: 'PYMNTS' },
+        { url: 'https://www.fintechfutures.com/feed/', name: 'FinTech Futures' },
+        { url: 'https://stripe.com/blog/feed.rss', name: 'Stripe Blog' },
+        { url: 'https://blog.plaid.com/rss/', name: 'Plaid Blog' }
+      );
+    }
+
+    // Crypto-heavy queries
+    if (/crypto|bitcoin|btc|ethereum|eth|web3|defi/i.test(topic)) {
+      sources.push(
+        { url: 'https://www.theblock.co/rss', name: 'The Block (Crypto)' }
       );
     }
 
@@ -77,7 +98,11 @@ export class RealMarketDataFetcher {
     ) {
       sources.push(
         { url: 'https://techcrunch.com/feed/', name: 'TechCrunch' },
-        { url: 'https://venturebeat.com/feed/', name: 'VentureBeat' }
+        { url: 'https://venturebeat.com/feed/', name: 'VentureBeat' },
+        { url: 'https://github.blog/feed/', name: 'GitHub Blog' },
+        { url: 'https://android-developers.googleblog.com/atom.xml', name: 'Android Developers Blog' },
+        { url: 'https://www.apple.com/newsroom/rss-feed.rss', name: 'Apple Newsroom' },
+        { url: 'https://openai.com/blog/rss', name: 'OpenAI Blog' }
       );
     }
 

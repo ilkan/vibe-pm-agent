@@ -51,7 +51,7 @@ npx vibe-pm-agent
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/vibe-pm-agent.git
+git clone https://github.com/ilkan/vibe-pm-agent.git
 cd vibe-pm-agent
 
 # Install dependencies

@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "demo",
+    "examples/confidence-scoring-demo.ts",
+    "examples/hooks-demo.md",
+    "data",
+    "reports",
+    "scripts",
+    "tasks",
+    ".evidence",
+    ".kiro",
+    "src/models/demo.ts"
+  ]
+}

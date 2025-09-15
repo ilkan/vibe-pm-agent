@@ -24,23 +24,39 @@ Vibe PM Agent is a Model Context Protocol (MCP) server that provides strategic b
 
 ## 📊 Key Features
 
+### Real-Time Market Intelligence Engine
+
+**14+ Premium Financial Data Sources** providing live market intelligence:
+- **Core Financial**: Bloomberg Markets, Reuters Business, Yahoo Finance, WSJ Markets, Financial Times
+- **Government/Regulatory**: SEC EDGAR filings, Federal Reserve press releases, BLS economic data, BEA reports
+- **Industry-Specific**: FinTech Futures, Stripe Blog, Plaid Blog, The Block (crypto), TechCrunch, GitHub Blog
+- **Market Metrics Extraction**: Automatic detection of market cap, revenue, funding, growth rates, and valuations
+
 ### Business Intelligence Tools (21 Total)
 
 | Category | Tools | Description |
 |----------|-------|-------------|
-| **Core Business Intelligence** | 6 tools | Market analysis, ROI modeling, strategic alignment |
+| **Core Business Intelligence** | 6 tools | Market analysis, ROI modeling, strategic alignment with real-time data |
 | **PM Workflow** | 5 tools | Requirements generation, design options, task planning |
-| **Citation & Analysis** | 5 tools | Professional source integration, evidence validation |
-| **Workflow Optimization** | 5 tools | Resource allocation, competitive analysis, market sizing |
+| **Citation & Analysis** | 5 tools | Professional source integration, evidence validation with live market data |
+| **Workflow Optimization** | 5 tools | Resource allocation, competitive analysis, market sizing with current metrics |
 
 ### Professional Quality Standards
 
-- **Evidence-Based Analysis**: All recommendations backed by professional citations
-- **Confidence Scoring**: Transparent methodology with 0-100% confidence ratings
-- **Executive-Ready Output**: Pyramid Principle and consulting framework compliance
-- **Real-Time Intelligence**: Market conditions monitoring and competitive analysis
+- **Evidence-Based Analysis**: All recommendations backed by professional citations from 14+ authoritative financial sources
+- **Real-Time Market Intelligence**: Live data from Bloomberg, Reuters, WSJ, Federal Reserve, SEC, and industry leaders
+- **Confidence Scoring**: Enhanced methodology with 0-100% confidence ratings backed by real market data
+- **Executive-Ready Output**: Pyramid Principle and consulting framework compliance with verified market metrics
 
 ## 🎯 Use Cases
+
+### Real-Time Market Intelligence
+
+**Live Financial Data Integration:**
+- **Market Metrics Extraction**: Automatic detection and validation of market cap, revenue, funding rounds, growth rates, and company valuations from Bloomberg, Reuters, and WSJ
+- **Regulatory Intelligence**: Real-time SEC EDGAR filings, Federal Reserve policy updates, and economic indicators from BLS/BEA
+- **Industry-Specific Insights**: Live data from FinTech Futures, TechCrunch, GitHub trends, and crypto market intelligence from CoinDesk and The Block
+- **Competitive Intelligence**: Current market positioning, funding announcements, and strategic moves from premium financial sources
 
 ### Strategic Business Analysis
 - **Market Opportunity Assessment**: Comprehensive competitive landscape and TAM/SAM/SOM sizing
@@ -75,7 +91,7 @@ Vibe PM Agent is a Model Context Protocol (MCP) server that provides strategic b
 npm install -g vibe-pm-agent
 
 # Or clone and build from source
-git clone https://github.com/your-username/vibe-pm-agent.git
+git clone https://github.com/ilkan/vibe-pm-agent.git
 cd vibe-pm-agent
 npm install
 npm run build
@@ -389,7 +405,7 @@ We welcome contributions to improve the Vibe PM Agent MCP server. Please follow 
 
 1. **Fork and clone the repository**
    ```bash
-   git clone https://github.com/your-username/vibe-pm-agent.git
+   git clone https://github.com/ilkan/vibe-pm-agent.git
    cd vibe-pm-agent
    npm install
    ```
@@ -498,10 +514,10 @@ npm run test:performance
 ## 🔗 Links & Resources
 
 ### Project Links
-- **GitHub Repository**: [https://github.com/your-username/vibe-pm-agent](https://github.com/your-username/vibe-pm-agent)
+- **GitHub Repository**: [https://github.com/ilkan/vibe-pm-agent](https://github.com/ilkan/vibe-pm-agent)
 - **npm Package**: [https://www.npmjs.com/package/vibe-pm-agent](https://www.npmjs.com/package/vibe-pm-agent)
 - **Documentation**: [./docs/](./docs/)
-- **Issue Tracker**: [GitHub Issues](https://github.com/your-username/vibe-pm-agent/issues)
+- **Issue Tracker**: [GitHub Issues](https://github.com/ilkan/vibe-pm-agent/issues)
 
 ### Related Projects
 - **Model Context Protocol**: [https://modelcontextprotocol.io/](https://modelcontextprotocol.io/)
@@ -675,6 +691,9 @@ The Vibe PM Agent implements a comprehensive citation and evidence system that e
 - **Academic Sources**: Harvard Business Review, MIT Sloan, Stanford research
 - **Industry Data**: Stack Overflow surveys, GitHub reports, company filings
 - **Government Data**: Bureau of Labor Statistics, SEC filings, trade data
+- **Real-Time Financial Data**: Bloomberg Markets, Reuters Business, Yahoo Finance, WSJ Markets
+- **Regulatory Intelligence**: SEC EDGAR filings, Federal Reserve press releases, BLS economic data
+- **Industry-Specific Sources**: FinTech Futures, TechCrunch, VentureBeat, CoinDesk, GitHub Blog
 
 **Citation Quality Standards:**
 - **Credibility Ratings**: A (top-tier), B (credible), C (supplementary) source classification
@@ -685,22 +704,23 @@ The Vibe PM Agent implements a comprehensive citation and evidence system that e
 
 #### Confidence Scoring Algorithm
 
-**Confidence Calculation (0-100%):**
+**Enhanced Confidence Calculation (0-100%):**
 ```
-Confidence Score = (Source Quality × 0.4) + (Evidence Quantity × 0.3) + (Methodology Rigor × 0.3)
+Confidence Score = (Source Quality × 0.3) + (Evidence Quantity × 0.2) + (Methodology Rigor × 0.2) + (Real-Time Data × 0.3)
 
 Where:
 - Source Quality: Average credibility rating of citations (A=100, B=75, C=50)
 - Evidence Quantity: Citation count normalized to 0-100 scale
 - Methodology Rigor: Analysis approach scoring (MECE=100, Benchmarking=90, etc.)
+- Real-Time Data: Live market data freshness and accuracy (Current=100, <24hrs=90, <7days=75)
 ```
 
-**Confidence Levels:**
-- **90-100%**: High confidence with multiple A-rated sources and rigorous methodology
-- **75-89%**: Medium-high confidence with good sources and solid analysis
-- **60-74%**: Medium confidence with adequate evidence and standard methodology
-- **45-59%**: Medium-low confidence with limited sources or methodology gaps
-- **0-44%**: Low confidence requiring additional research and validation
+**Enhanced Confidence Levels:**
+- **90-100%**: High confidence with multiple A-rated sources, rigorous methodology, and current market data
+- **75-89%**: Medium-high confidence with good sources, solid analysis, and recent market intelligence
+- **60-74%**: Medium confidence with adequate evidence, standard methodology, and available market data
+- **45-59%**: Medium-low confidence with limited sources, methodology gaps, or stale market data
+- **0-44%**: Low confidence requiring additional research, validation, and current market intelligence
 
 #### Citation Integration Examples
 
@@ -792,11 +812,12 @@ annually to the global economy, with significant implications for productivity g
 - **Geographic Coverage**: Balanced representation of target markets
 - **Industry Relevance**: 90%+ relevance score for industry-specific analysis
 
-**Quality Assurance Thresholds:**
-- **Minimum Citations**: 5+ citations for standard analysis, 10+ for comprehensive
-- **Confidence Floor**: 75% minimum confidence for executive communications
-- **Source Diversity**: No single source >40% of total citations
-- **Methodology Transparency**: Clear explanation of analysis approach and limitations
+**Enhanced Quality Assurance Thresholds:**
+- **Minimum Citations**: 5+ citations for standard analysis, 10+ for comprehensive (now includes real-time market data)
+- **Confidence Floor**: 75% minimum confidence for executive communications (enhanced with live market intelligence)
+- **Source Diversity**: No single source >40% of total citations, balanced mix of static and real-time sources
+- **Market Data Freshness**: 80%+ of market metrics from sources updated within 24 hours
+- **Methodology Transparency**: Clear explanation of analysis approach, limitations, and market data validation
 
 ### Integration with MCP Tools
 
@@ -945,7 +966,7 @@ We welcome contributions that enhance the strategic business intelligence capabi
 ### Development Setup
 ```bash
 # Fork and clone the repository
-git clone https://github.com/your-username/vibe-pm-agent.git
+git clone https://github.com/ilkan/vibe-pm-agent.git
 cd vibe-pm-agent
 
 # Install dependencies and build
@@ -1177,7 +1198,7 @@ grep "executionTime" logs/mcp-server.log | awk '{print $NF}' | sort -n
 ### Getting Help
 
 **Primary Support Channels:**
-- **GitHub Issues**: [Report bugs and request features](https://github.com/your-username/vibe-pm-agent/issues)
+- **GitHub Issues**: [Report bugs and request features](https://github.com/ilkan/vibe-pm-agent/issues)
 - **Documentation**: Comprehensive guides in `docs/` directory
 - **Demo Examples**: Working examples in `demo/` directory
 - **Kiro Integration**: Detailed integration guide in `KIRO_USAGE.md`
@@ -1215,7 +1236,7 @@ docs/
 **Development Setup:**
 ```bash
 # Fork and clone repository
-git clone https://github.com/your-username/vibe-pm-agent.git
+git clone https://github.com/ilkan/vibe-pm-agent.git
 cd vibe-pm-agent
 
 # Install dependencies

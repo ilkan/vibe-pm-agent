@@ -58,12 +58,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/vibe-pm-agent.git"
+    "url": "https://github.com/ilkan/vibe-pm-agent.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/vibe-pm-agent/issues"
+    "url": "https://github.com/ilkan/vibe-pm-agent/issues"
   },
-  "homepage": "https://github.com/your-username/vibe-pm-agent#readme",
+  "homepage": "https://github.com/ilkan/vibe-pm-agent#readme",
   "devDependencies": {
     "@types/glob": "^8.1.0",
     "@types/jest": "^29.5.12",

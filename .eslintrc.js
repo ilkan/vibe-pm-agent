@@ -3,7 +3,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
-    project: './tsconfig.json',
+    project: './tsconfig.eslint.json',
   },
   plugins: ['@typescript-eslint', 'prettier'],
   extends: [
@@ -46,5 +46,6 @@ module.exports = {
     '*.js',
     '!.eslintrc.js',
     '!jest.config.js',
+    'src/models/demo.ts',
   ],
 };
