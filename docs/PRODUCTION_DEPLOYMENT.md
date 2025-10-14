@@ -4,6 +4,8 @@
 
 This guide covers deploying the Vibe PM Agent MCP server in production environments with optimal performance, security, and reliability.
 
+> **Deployment shortcut:** Use `deployment/aws/deploy.sh` for the official infrastructure automation pipeline. The legacy shell scripts have been retired.
+
 ## Quick Start
 
 ```bash

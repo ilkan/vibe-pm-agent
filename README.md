@@ -1,13 +1,12 @@
-# Vibe PM Agent - Strategic Business Intelligence MCP Server
+# Hacking PM Interview - Vibe PM Agent
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-Compatible-green)](https://modelcontextprotocol.io/)
-[![npm version](https://img.shields.io/npm/v/vibe-pm-agent.svg)](https://www.npmjs.com/package/vibe-pm-agent)
 
-> **Professional Business Intelligence MCP Server**  
-> Transform feature ideas into executive-ready business cases with evidence-backed analysis, competitive intelligence, and strategic recommendations through 21 specialized MCP tools.
+> **AI-Powered PM Interview Preparation MCP Server**  
+> Master product management interviews with realistic practice questions, case studies, company-specific insights, and framework-based coaching through specialized MCP tools.
 
 ## 🚀 What is Vibe PM Agent?
 
@@ -108,6 +107,13 @@ npm run verify:production
 
 # Start in production mode
 NODE_ENV=production npm start
+```
+
+To deploy the interview preparation stack to AWS, use the refreshed automation in `deployment/aws`:
+
+```bash
+# Bundles lambdas, packages the template, deploys, and syncs the knowledge base
+bash deployment/aws/deploy.sh dev us-east-1 amazon.nova-pro-v1:0 my-artifact-bucket
 ```
 
 📖 **See the [Production Deployment Guide](./docs/PRODUCTION_DEPLOYMENT.md) for complete production setup, monitoring, and optimization details.**

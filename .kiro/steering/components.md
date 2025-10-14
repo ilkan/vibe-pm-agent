@@ -6,7 +6,9 @@ inclusion: always
 
 ## Architecture Pattern
 
-**Modular Pipeline**: `Input → Intent Analysis → Business Analysis → Market Validation → Optimization → Output Generation`
+**AI-Powered Modular Pipeline**: `Input → AWS AI Agent (Bedrock) → Intent Analysis → Business Analysis → Market Validation → Optimization → Output Generation`
+
+**Interview Preparation Pipeline**: `User Query → Bedrock Agent → Interview Coach/Case Study Agent → Framework Analysis → Personalized Feedback → Progress Tracking`
 
 ## Component Structure
 
@@ -29,12 +31,26 @@ export class ComponentName {
 
 ## Key Components
 
+### AWS AI Agent Layer (NEW)
+- **Bedrock Agent Orchestrator**: Multi-agent coordination using Amazon Bedrock Agent
+- **Interview Coach Agent**: AI-powered interview question generation and evaluation
+- **Case Study Agent**: Structured case study creation and guidance
+- **Company Research Agent**: Company-specific interview preparation and insights
+- **Progress Analysis Agent**: Performance tracking and personalized learning recommendations
+
 ### Core Pipeline
 - **Intent Interpreter**: Natural language → structured requirements
 - **Business Analyzer**: Consulting frameworks (SWOT, Porter's Five Forces, BCG Matrix)
 - **Workflow Optimizer**: Efficiency analysis and optimization strategies
 - **Kiro Resource Optimizer**: 🚀 **FLAGSHIP** - Vibe/Spec mode optimization, 3.2x velocity improvements
 - **Spec Generator**: Analysis → Kiro specifications
+
+### Interview Preparation Components (NEW)
+- **Interview Question Bank**: Categorized PM questions with difficulty levels and company-specific variants
+- **Response Evaluator**: Framework-based analysis using STAR method, product sense, and analytical thinking
+- **Case Study Generator**: Dynamic case creation using real market data and industry trends
+- **Feedback Engine**: Personalized coaching feedback with improvement recommendations
+- **Progress Tracker**: Performance analytics and adaptive learning path management
 
 ### Document Generation
 - **PM Document Generator**: Executive documents using Pyramid Principle
@@ -51,8 +67,16 @@ export class ComponentName {
 ### MCP Tool Implementation
 - Follow `{action}_{subject}.ts` naming convention
 - Export handler functions with TypeScript interfaces
-- Orchestrate existing components, don't duplicate logic
+- Orchestrate AWS AI agents and existing components, don't duplicate logic
 - Include confidence scores (0-1 scale) in all outputs
+- Integrate with Bedrock Agent action groups for AI-powered functionality
+
+### AWS AI Agent Integration
+- Use Amazon Bedrock Agent for complex reasoning and multi-step workflows
+- Implement action groups for structured agent interactions
+- Leverage Amazon Nova foundation models for natural language processing
+- Integrate Amazon Q Developer for technical interview scenarios
+- Maintain agent state and context across interview sessions
 
 ### Business Analysis Standards
 - Structure outputs: Executive Summary → Analysis → Recommendations → Appendix

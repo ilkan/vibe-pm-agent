@@ -10,6 +10,7 @@ export * from './steering';
 export * from './competitive';
 export * from './market-data';
 export * from './audit';
+export * from './interview';
 
 // Selective exports from proprietary-frameworks to avoid conflicts
 export {

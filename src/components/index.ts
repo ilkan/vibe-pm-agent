@@ -28,3 +28,15 @@ export * from './secure-credential-manager';
 
 // Enhanced Citation System - Unified Integration
 export * from './enhanced-citation-system';
+
+// Interview Preparation Components
+export * from './interview-preparation-core';
+export * from './interview-question-bank';
+export * from './interview-question-generator';
+export * from './interview-response-evaluator';
+
+// Case Study Components
+export * from './case-study-templates';
+export * from './framework-guidance';
+export * from './case-study-execution-engine';
+export * from './case-study-helper';

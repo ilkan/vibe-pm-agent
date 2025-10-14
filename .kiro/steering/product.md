@@ -5,7 +5,7 @@ inclusion: always
 # Vibe PM Agent - Product & Development Guidelines
 
 ## Product Identity
-The **Vibe PM Agent** is an MCP server providing strategic business analysis for Kiro's PM Mode. It transforms feature ideas into executive-ready business cases through consulting-grade analysis, answering "WHY to build" questions with data-driven insights.
+The **Vibe PM Agent** is an AWS AI-powered MCP server providing strategic business analysis and PM interview preparation. It transforms feature ideas into executive-ready business cases through consulting-grade analysis, answering "WHY to build" questions with data-driven insights, while also serving as a comprehensive PM interview coaching platform using Amazon Bedrock Agent and Nova foundation models.
 
 ## Architecture Patterns
 
@@ -23,8 +23,14 @@ The **Vibe PM Agent** is an MCP server providing strategic business analysis for
 
 ### Data Flow Pattern
 ```
-User Input → MCP Tool → Pipeline Component → Business Logic → Formatted Output
+User Input → MCP Tool → AWS AI Agent (Bedrock) → Pipeline Component → Business Logic → Formatted Output
 ```
+
+### AWS AI Agent Architecture
+- **Amazon Bedrock Agent**: Core AI orchestration for interview coaching and business analysis
+- **Action Groups**: Structured agent actions for question generation, evaluation, and case studies
+- **Foundation Models**: Amazon Nova for natural language understanding and generation
+- **Knowledge Base**: PM frameworks, interview best practices, and market intelligence
 
 ## Code Style & Standards
 
@@ -53,6 +59,13 @@ User Input → MCP Tool → Pipeline Component → Business Logic → Formatted 
 - ROI calculations with sensitivity analysis and scenario modeling
 - Strategic alignment scoring against company OKRs and mission
 - Resource optimization with cost-benefit analysis
+
+### PM Interview Preparation (NEW)
+- **Interactive Interview Chat**: AI-powered practice sessions with personalized feedback using Amazon Bedrock Agent
+- **Case Study Helper**: Structured case study practice with framework guidance and real-time market data
+- **Company-Specific Preparation**: Tailored interview prep for target companies using AI agent knowledge base
+- **Progress Tracking**: Performance analytics and personalized learning paths powered by Amazon Nova
+- **Technical Interview Support**: Amazon Q Developer integration for code review and technical PM questions
 
 ### Document Generation
 - Executive one-pagers: 1-page summary with key metrics and decision framework
@@ -103,8 +116,23 @@ User Input → MCP Tool → Pipeline Component → Business Logic → Formatted 
 - Provide clear decision criteria and success metrics
 
 ## Primary Use Cases
+
+### Business Intelligence (Existing)
 1. **Feature Justification**: Market opportunity + competitive analysis + ROI projection
 2. **Investment Analysis**: Financial modeling + strategic alignment + risk assessment
 3. **Market Validation**: Timing signals + competitive landscape + demand analysis
 4. **Resource Planning**: Cost optimization + team allocation + timeline analysis
 5. **Stakeholder Communication**: Executive summaries + board materials + team alignment
+
+### PM Interview Preparation (NEW)
+6. **Interview Practice**: AI-powered chat sessions with behavioral, product sense, and analytical questions
+7. **Case Study Coaching**: Structured practice with product design, strategy, and market entry cases
+8. **Company-Specific Prep**: Tailored preparation for Google, Amazon, Meta, Microsoft, and other tech companies
+9. **Technical PM Training**: Code review scenarios and technical product decision frameworks
+10. **Performance Analytics**: Progress tracking, skill assessment, and personalized improvement recommendations
+
+### AWS AI Agent Features
+- **Multi-Agent Orchestration**: Specialized agents for different interview types and business analysis
+- **Real-Time Adaptation**: AI agents adapt difficulty and focus based on user performance
+- **Knowledge Integration**: Seamless integration of market intelligence with interview scenarios
+- **Scalable Deployment**: AWS cloud infrastructure supporting concurrent users globally

@@ -69,6 +69,75 @@ import {
   monitorMarketConditionsMetadata,
 } from './monitor_market_conditions';
 
+// Interview Preparation Tools
+import {
+  startInterviewPreparation,
+  startInterviewPreparationSchema,
+  startInterviewPreparationDescription,
+} from './start_interview_preparation';
+
+import {
+  generateInterviewQuestion,
+  generateInterviewQuestionSchema,
+  generateInterviewQuestionDescription,
+} from './generate_interview_question';
+
+import {
+  evaluateInterviewResponse,
+  evaluateInterviewResponseSchema,
+  evaluateInterviewResponseDescription,
+} from './evaluate_interview_response';
+
+import {
+  getInterviewFeedback,
+  getInterviewFeedbackSchema,
+  getInterviewFeedbackDescription,
+} from './get_interview_feedback';
+
+// Case Study Tools
+import {
+  startCaseStudy,
+  startCaseStudySchema,
+  startCaseStudyDescription,
+} from './start_case_study';
+
+import {
+  getCaseGuidance,
+  getCaseGuidanceSchema,
+  getCaseGuidanceDescription,
+} from './get_case_guidance';
+
+import {
+  evaluateCaseApproach,
+  evaluateCaseApproachSchema,
+  evaluateCaseApproachDescription,
+} from './evaluate_case_approach';
+
+import {
+  completeCaseStudy,
+  completeCaseStudySchema,
+  completeCaseStudyDescription,
+} from './complete_case_study';
+
+// Company-Specific Preparation Tools
+import {
+  getCompanyInterviewInsights,
+  getCompanyInterviewInsightsSchema,
+  getCompanyInterviewInsightsDescription,
+} from './get_company_interview_insights';
+
+import {
+  customizePreparationForCompany,
+  customizePreparationForCompanySchema,
+  customizePreparationForCompanyDescription,
+} from './customize_preparation_for_company';
+
+import {
+  getCompanyCaseScenarios,
+  getCompanyCaseScenariosSchema,
+  getCompanyCaseScenariosDescription,
+} from './get_company_case_scenarios';
+
 // Re-export for external use
 export {
   generateRequirements,
@@ -101,6 +170,42 @@ export {
   analyzeBusinessOpportunityEnhanced,
   analyzeBusinessOpportunityEnhancedSchema,
   analyzeBusinessOpportunityEnhancedDescription,
+  // Interview Preparation Tools
+  startInterviewPreparation,
+  startInterviewPreparationSchema,
+  startInterviewPreparationDescription,
+  generateInterviewQuestion,
+  generateInterviewQuestionSchema,
+  generateInterviewQuestionDescription,
+  evaluateInterviewResponse,
+  evaluateInterviewResponseSchema,
+  evaluateInterviewResponseDescription,
+  getInterviewFeedback,
+  getInterviewFeedbackSchema,
+  getInterviewFeedbackDescription,
+  // Case Study Tools
+  startCaseStudy,
+  startCaseStudySchema,
+  startCaseStudyDescription,
+  getCaseGuidance,
+  getCaseGuidanceSchema,
+  getCaseGuidanceDescription,
+  evaluateCaseApproach,
+  evaluateCaseApproachSchema,
+  evaluateCaseApproachDescription,
+  completeCaseStudy,
+  completeCaseStudySchema,
+  completeCaseStudyDescription,
+  // Company-Specific Preparation Tools
+  getCompanyInterviewInsights,
+  getCompanyInterviewInsightsSchema,
+  getCompanyInterviewInsightsDescription,
+  customizePreparationForCompany,
+  customizePreparationForCompanySchema,
+  customizePreparationForCompanyDescription,
+  getCompanyCaseScenarios,
+  getCompanyCaseScenariosSchema,
+  getCompanyCaseScenariosDescription,
 };
 
 /**
@@ -161,6 +266,64 @@ export const MCP_TOOLS_REGISTRY = {
     handler: monitorMarketConditions,
     schema: monitorMarketConditionsMetadata.inputSchema,
     description: monitorMarketConditionsMetadata.description,
+  },
+  // Interview Preparation Tools
+  start_interview_preparation: {
+    handler: startInterviewPreparation,
+    schema: startInterviewPreparationSchema,
+    description: startInterviewPreparationDescription,
+  },
+  generate_interview_question: {
+    handler: generateInterviewQuestion,
+    schema: generateInterviewQuestionSchema,
+    description: generateInterviewQuestionDescription,
+  },
+  evaluate_interview_response: {
+    handler: evaluateInterviewResponse,
+    schema: evaluateInterviewResponseSchema,
+    description: evaluateInterviewResponseDescription,
+  },
+  get_interview_feedback: {
+    handler: getInterviewFeedback,
+    schema: getInterviewFeedbackSchema,
+    description: getInterviewFeedbackDescription,
+  },
+  // Case Study Tools
+  start_case_study: {
+    handler: startCaseStudy,
+    schema: startCaseStudySchema,
+    description: startCaseStudyDescription,
+  },
+  get_case_guidance: {
+    handler: getCaseGuidance,
+    schema: getCaseGuidanceSchema,
+    description: getCaseGuidanceDescription,
+  },
+  evaluate_case_approach: {
+    handler: evaluateCaseApproach,
+    schema: evaluateCaseApproachSchema,
+    description: evaluateCaseApproachDescription,
+  },
+  complete_case_study: {
+    handler: completeCaseStudy,
+    schema: completeCaseStudySchema,
+    description: completeCaseStudyDescription,
+  },
+  // Company-Specific Preparation Tools
+  get_company_interview_insights: {
+    handler: getCompanyInterviewInsights,
+    schema: getCompanyInterviewInsightsSchema,
+    description: getCompanyInterviewInsightsDescription,
+  },
+  customize_preparation_for_company: {
+    handler: customizePreparationForCompany,
+    schema: customizePreparationForCompanySchema,
+    description: customizePreparationForCompanyDescription,
+  },
+  get_company_case_scenarios: {
+    handler: getCompanyCaseScenarios,
+    schema: getCompanyCaseScenariosSchema,
+    description: getCompanyCaseScenariosDescription,
   },
 } as const;
 

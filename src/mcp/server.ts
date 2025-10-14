@@ -9,6 +9,19 @@ import { CitationService } from '../components/citation-service';
 import { RealMarketDataFetcher } from '../components/real-market-data-fetcher';
 import { DocumentType } from '../models/steering';
 
+// Import PM Interview Preparation Tools
+import { startInterviewPreparation } from './tools/start_interview_preparation';
+import { generateInterviewQuestion } from './tools/generate_interview_question';
+import { evaluateInterviewResponse } from './tools/evaluate_interview_response';
+import { getInterviewFeedback } from './tools/get_interview_feedback';
+import { startCaseStudy } from './tools/start_case_study';
+import { getCaseGuidance } from './tools/get_case_guidance';
+import { evaluateCaseApproach } from './tools/evaluate_case_approach';
+import { completeCaseStudy } from './tools/complete_case_study';
+import { getCompanyInterviewInsights } from './tools/get_company_interview_insights';
+import { customizePreparationForCompany } from './tools/customize_preparation_for_company';
+import { getCompanyCaseScenarios } from './tools/get_company_case_scenarios';
+
 /**
  * PM-Focused MCP Server that answers "WHY to build" questions
  * Designed to complement Kiro's native Spec Mode (WHAT) and Vibe Mode (HOW)
@@ -101,7 +114,7 @@ export class PMAgentMCPServer {
     });
   }
 
-  // Dynamic tool registry with all 22 tools
+  // Dynamic tool registry with all 32 tools (21 original + 11 PM interview preparation)
   private getAllTools() {
     return [
       // Original 6 working tools
@@ -431,6 +444,171 @@ export class PMAgentMCPServer {
           required: ['market'],
         },
       },
+      // PM Interview Preparation Tools (11 new tools)
+      {
+        name: 'start_interview_preparation',
+        description: 'Initiates a comprehensive PM interview preparation session with personalized coaching',
+        schema: {
+          type: 'object',
+          properties: {
+            role_level: { type: 'string', enum: ['APM', 'PM', 'Senior PM', 'Principal PM'], description: 'Target PM role level' },
+            target_company: { type: 'string', description: 'Company you are interviewing with (optional)' },
+            preparation_timeline: { type: 'string', description: 'Available preparation time (e.g., "2 weeks", "1 month")' },
+            focus_areas: { type: 'array', items: { type: 'string' }, description: 'Specific areas to focus on (optional)' },
+            experience_level: { type: 'string', description: 'Years of PM experience' },
+            weak_areas: { type: 'array', items: { type: 'string' }, description: 'Areas needing improvement (optional)' }
+          },
+          required: ['role_level']
+        }
+      },
+      {
+        name: 'generate_interview_question',
+        description: 'Generates realistic PM interview questions based on role level, company, and question type',
+        schema: {
+          type: 'object',
+          properties: {
+            role_level: { type: 'string', enum: ['APM', 'PM', 'Senior PM', 'Principal PM'], description: 'Target PM role level' },
+            question_category: { type: 'string', enum: ['behavioral', 'product_sense', 'analytical', 'technical', 'leadership'], description: 'Type of question to generate' },
+            company_context: { type: 'string', description: 'Target company for customization (optional)' },
+            difficulty_level: { type: 'integer', minimum: 1, maximum: 5, description: 'Question difficulty (1=easy, 5=hard)' },
+            session_id: { type: 'string', description: 'Interview preparation session ID (optional)' }
+          },
+          required: ['role_level', 'question_category']
+        }
+      },
+      {
+        name: 'evaluate_interview_response',
+        description: 'Evaluates PM interview responses using framework-based analysis and provides detailed feedback',
+        schema: {
+          type: 'object',
+          properties: {
+            question_id: { type: 'string', description: 'ID of the question being answered' },
+            user_response: { type: 'string', description: 'The candidate\'s response to evaluate' },
+            session_id: { type: 'string', description: 'Interview preparation session ID (optional)' },
+            evaluation_focus: { type: 'array', items: { type: 'string', enum: ['frameworks', 'specificity', 'structure', 'metrics'] }, description: 'Specific evaluation criteria to focus on' },
+            company_context: { type: 'string', description: 'Company context for evaluation (optional)' }
+          },
+          required: ['question_id', 'user_response']
+        }
+      },
+      {
+        name: 'get_interview_feedback',
+        description: 'Provides comprehensive feedback and improvement recommendations based on interview performance',
+        schema: {
+          type: 'object',
+          properties: {
+            session_id: { type: 'string', description: 'Interview preparation session ID' },
+            include_detailed_analysis: { type: 'boolean', description: 'Include detailed performance breakdown (default: true)' },
+            include_study_plan: { type: 'boolean', description: 'Include personalized study recommendations (default: true)' },
+            focus_on_improvements: { type: 'boolean', description: 'Focus feedback on areas needing improvement (default: false)' }
+          },
+          required: ['session_id']
+        }
+      },
+      {
+        name: 'start_case_study',
+        description: 'Initiates a PM case study practice session with realistic business scenarios',
+        schema: {
+          type: 'object',
+          properties: {
+            case_type: { type: 'string', enum: ['product_design', 'strategy', 'prioritization', 'market_entry', 'growth', 'monetization'], description: 'Type of case study' },
+            industry: { type: 'string', description: 'Industry context for the case (optional)' },
+            difficulty_level: { type: 'integer', minimum: 1, maximum: 5, description: 'Case difficulty (1=easy, 5=hard)' },
+            time_limit: { type: 'integer', description: 'Time limit in minutes (optional)' },
+            company_style: { type: 'string', description: 'Company interview style to emulate (optional)' },
+            role_level: { type: 'string', enum: ['APM', 'PM', 'Senior PM', 'Principal PM'], description: 'Target role level' }
+          },
+          required: ['case_type', 'role_level']
+        }
+      },
+      {
+        name: 'get_case_guidance',
+        description: 'Provides framework-based guidance and hints during case study execution',
+        schema: {
+          type: 'object',
+          properties: {
+            session_id: { type: 'string', description: 'Case study session ID' },
+            current_step: { type: 'string', description: 'Current step or challenge in the case' },
+            request_type: { type: 'string', enum: ['hint', 'framework', 'clarification', 'next_step'], description: 'Type of guidance needed' },
+            user_progress: { type: 'string', description: 'Summary of progress so far (optional)' }
+          },
+          required: ['session_id', 'current_step', 'request_type']
+        }
+      },
+      {
+        name: 'evaluate_case_approach',
+        description: 'Evaluates case study approach and provides real-time feedback on methodology and thinking',
+        schema: {
+          type: 'object',
+          properties: {
+            session_id: { type: 'string', description: 'Case study session ID' },
+            step_number: { type: 'integer', description: 'Current step number in the case' },
+            user_approach: { type: 'string', description: 'User\'s approach or solution for this step' },
+            frameworks_used: { type: 'array', items: { type: 'string' }, description: 'PM frameworks applied (optional)' },
+            request_detailed_feedback: { type: 'boolean', description: 'Request comprehensive feedback (default: false)' }
+          },
+          required: ['session_id', 'step_number', 'user_approach']
+        }
+      },
+      {
+        name: 'complete_case_study',
+        description: 'Completes case study session and provides comprehensive evaluation with performance analytics',
+        schema: {
+          type: 'object',
+          properties: {
+            session_id: { type: 'string', description: 'Case study session ID to complete' },
+            include_detailed_breakdown: { type: 'boolean', description: 'Include step-by-step performance breakdown (default: true)' },
+            include_recommendations: { type: 'boolean', description: 'Include personalized study and practice recommendations (default: true)' },
+            include_performance_analytics: { type: 'boolean', description: 'Include detailed performance analytics and benchmarking (default: false)' }
+          },
+          required: ['session_id']
+        }
+      },
+      {
+        name: 'get_company_interview_insights',
+        description: 'Provides comprehensive company-specific interview insights and preparation guidance',
+        schema: {
+          type: 'object',
+          properties: {
+            company_name: { type: 'string', description: 'Name of the target company' },
+            role_level: { type: 'string', enum: ['APM', 'PM', 'Senior PM', 'Principal PM'], description: 'Target role level' },
+            include_recent_changes: { type: 'boolean', description: 'Include recent company developments and changes (default: true)' },
+            focus_areas: { type: 'array', items: { type: 'string' }, description: 'Specific areas to focus insights on (optional)' }
+          },
+          required: ['company_name', 'role_level']
+        }
+      },
+      {
+        name: 'customize_preparation_for_company',
+        description: 'Creates personalized interview preparation plan tailored to specific company and role',
+        schema: {
+          type: 'object',
+          properties: {
+            company_name: { type: 'string', description: 'Target company name' },
+            role_level: { type: 'string', enum: ['APM', 'PM', 'Senior PM', 'Principal PM'], description: 'Target role level' },
+            preparation_timeline: { type: 'string', description: 'Available preparation time (e.g., "2 weeks", "1 month")' },
+            experience_background: { type: 'string', description: 'Candidate\'s relevant experience and background' },
+            weak_areas: { type: 'array', items: { type: 'string' }, description: 'Areas needing focused improvement (optional)' },
+            preferred_study_style: { type: 'string', enum: ['intensive', 'gradual', 'mixed'], description: 'Preferred preparation approach (optional)' }
+          },
+          required: ['company_name', 'role_level', 'preparation_timeline']
+        }
+      },
+      {
+        name: 'get_company_case_scenarios',
+        description: 'Generates company-specific case study scenarios based on real business challenges and company context',
+        schema: {
+          type: 'object',
+          properties: {
+            company_name: { type: 'string', description: 'Target company name' },
+            case_type: { type: 'string', enum: ['product_design', 'strategy', 'prioritization', 'market_entry', 'growth', 'monetization'], description: 'Type of case study' },
+            role_level: { type: 'string', enum: ['APM', 'PM', 'Senior PM', 'Principal PM'], description: 'Target role level' },
+            use_real_products: { type: 'boolean', description: 'Base scenarios on actual company products (default: true)' },
+            difficulty_level: { type: 'integer', minimum: 1, maximum: 5, description: 'Scenario difficulty (1=easy, 5=hard)' }
+          },
+          required: ['company_name', 'case_type', 'role_level']
+        }
+      }
     ];
   }
 
@@ -460,6 +638,19 @@ export class PMAgentMCPServer {
       validate_idea_quick: this.handleValidateIdeaQuick.bind(this),
       analyze_competitor_landscape: this.handleAnalyzeCompetitorLandscape.bind(this),
       calculate_market_sizing: this.handleCalculateMarketSizing.bind(this),
+
+      // PM Interview Preparation Tools (11 new handlers)
+      start_interview_preparation: this.handleStartInterviewPreparation.bind(this),
+      generate_interview_question: this.handleGenerateInterviewQuestion.bind(this),
+      evaluate_interview_response: this.handleEvaluateInterviewResponse.bind(this),
+      get_interview_feedback: this.handleGetInterviewFeedback.bind(this),
+      start_case_study: this.handleStartCaseStudy.bind(this),
+      get_case_guidance: this.handleGetCaseGuidance.bind(this),
+      evaluate_case_approach: this.handleEvaluateCaseApproach.bind(this),
+      complete_case_study: this.handleCompleteCaseStudy.bind(this),
+      get_company_interview_insights: this.handleGetCompanyInterviewInsights.bind(this),
+      customize_preparation_for_company: this.handleCustomizePreparationForCompany.bind(this),
+      get_company_case_scenarios: this.handleGetCompanyCaseScenarios.bind(this),
     };
 
     return handlers[toolName];
@@ -2345,6 +2536,170 @@ Based on comprehensive analysis, key findings and recommendations have been iden
     return {
       content: [{ type: 'text', text: sizing }],
     };
+  }
+
+  // PM INTERVIEW PREPARATION HANDLERS
+
+  private createToolContext(toolName: string, args: any) {
+    return {
+      toolName,
+      sessionId: args.session_id || `session_${Date.now()}`,
+      timestamp: Date.now()
+    };
+  }
+
+  private async handleStartInterviewPreparation(args: any) {
+    try {
+      const result = await startInterviewPreparation(args, this.createToolContext('start_interview_preparation', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleGenerateInterviewQuestion(args: any) {
+    try {
+      const result = await generateInterviewQuestion(args, this.createToolContext('generate_interview_question', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleEvaluateInterviewResponse(args: any) {
+    try {
+      const result = await evaluateInterviewResponse(args, this.createToolContext('evaluate_interview_response', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleGetInterviewFeedback(args: any) {
+    try {
+      const result = await getInterviewFeedback(args, this.createToolContext('get_interview_feedback', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleStartCaseStudy(args: any) {
+    try {
+      const result = await startCaseStudy(args, this.createToolContext('start_case_study', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleGetCaseGuidance(args: any) {
+    try {
+      const result = await getCaseGuidance(args, this.createToolContext('get_case_guidance', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleEvaluateCaseApproach(args: any) {
+    try {
+      const result = await evaluateCaseApproach(args, this.createToolContext('evaluate_case_approach', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleCompleteCaseStudy(args: any) {
+    try {
+      const result = await completeCaseStudy(args, this.createToolContext('complete_case_study', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleGetCompanyInterviewInsights(args: any) {
+    try {
+      const result = await getCompanyInterviewInsights(args, this.createToolContext('get_company_interview_insights', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleCustomizePreparationForCompany(args: any) {
+    try {
+      const result = await customizePreparationForCompany(args, this.createToolContext('customize_preparation_for_company', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
+  }
+
+  private async handleGetCompanyCaseScenarios(args: any) {
+    try {
+      const result = await getCompanyCaseScenarios(args, this.createToolContext('get_company_case_scenarios', args));
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+        isError: true,
+      };
+    }
   }
 
   async start(): Promise<void> {
