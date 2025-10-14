@@ -1,0 +1,96 @@
+{
+  "agentName": "vibe-pm-agent",
+  "version": "2.0.0",
+  "description": "PM-Focused AI Agent with 32 business intelligence and interview preparation tools",
+  "runtime": {
+    "type": "bedrock-agentcore",
+    "pythonVersion": "3.9",
+    "architecture": "x86_64"
+  },
+  "deployment": {
+    "region": "us-east-1",
+    "environment": "production",
+    "autoScaling": {
+      "enabled": true,
+      "minInstances": 1,
+      "maxInstances": 10,
+      "targetCpuUtilization": 70
+    },
+    "monitoring": {
+      "enabled": true,
+      "logLevel": "INFO",
+      "metrics": ["CPUUtilization", "MemoryUtilization", "RequestCount", "ErrorRate"]
+    }
+  },
+  "tools": {
+    "count": 32,
+    "categories": [
+      "business_analysis",
+      "strategic_planning",
+      "stakeholder_communication",
+      "resource_optimization",
+      "market_timing",
+      "interview_preparation",
+      "case_studies"
+    ],
+    "autoApprove": [
+      "validate_idea_quick",
+      "optimize_intent",
+      "analyze_workflow",
+      "get_consulting_summary"
+    ]
+  },
+  "security": {
+    "iamRole": "VibePMAgentCoreRole",
+    "permissions": [
+      "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream",
+      "bedrock:ListFoundationModels",
+      "bedrock:GetFoundationModel",
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "cloudwatch:PutMetricData"
+    ]
+  },
+  "networking": {
+    "vpcConfig": {
+      "enabled": false
+    },
+    "publicAccess": true
+  },
+  "environmentVariables": {
+    "NODE_ENV": "production",
+    "LOG_LEVEL": "INFO",
+    "MCP_SERVER_PORT": "3001",
+    "CACHE_ENABLED": "true",
+    "ENABLE_CITATIONS": "true",
+    "MIN_CITATION_CONFIDENCE": "medium",
+    "BEDROCK_REGION": "us-east-1",
+    "AGENTCORE_ENVIRONMENT": "production"
+  },
+  "build": {
+    "sourceDirectory": ".",
+    "buildCommand": "pip install -r requirements.txt",
+    "entryPoint": "pm_agent.py",
+    "dependencies": [
+      "bedrock-agentcore",
+      "bedrock-agentcore-starter-toolkit"
+    ]
+  },
+  "healthCheck": {
+    "enabled": true,
+    "path": "/health",
+    "timeout": 30,
+    "interval": 60,
+    "unhealthyThreshold": 3,
+    "healthyThreshold": 2
+  },
+  "tags": {
+    "Project": "VibePMAgent",
+    "Environment": "Production",
+    "Deployment": "AgentCore",
+    "Owner": "PM-Team",
+    "CostCenter": "Product-Development"
+  }
+}

@@ -1,0 +1,11 @@
+bedrock-agentcore>=0.1.0
+bedrock-agentcore-starter-toolkit>=0.1.0
+asyncio-mqtt>=0.16.1
+pydantic>=2.0.0
+fastapi>=0.100.0
+uvicorn>=0.20.0
+python-multipart>=0.0.6
+aiofiles>=23.0.0
+python-dotenv>=1.0.0
+boto3>=1.28.0
+botocore>=1.31.0

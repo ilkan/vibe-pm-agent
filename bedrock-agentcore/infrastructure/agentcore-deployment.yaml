@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for Vibe PM Agent Bedrock AgentCore deployment'
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: production
+    Description: Environment name for resource naming
+
+  AgentName:
+    Type: String
+    Default: vibe-pm-agent
+    Description: Name of the AgentCore agent
+
+Resources:
+  # IAM Role for AgentCore Agent
+  VibePMAgentCoreRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AgentName}-${EnvironmentName}-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: VibePMAgentCorePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                  - bedrock:ListFoundationModels
+                  - bedrock:GetFoundationModel
+                  - bedrock:CreateAgent
+                  - bedrock:UpdateAgent
+                  - bedrock:GetAgent
+                  - bedrock:DeleteAgent
+                  - bedrock:ListAgents
+                  - bedrock:CreateAgentAlias
+                  - bedrock:UpdateAgentAlias
+                  - bedrock:GetAgentAlias
+                  - bedrock:DeleteAgentAlias
+                  - bedrock:ListAgentAliases
+                  - bedrock:CreateAgentActionGroup
+                  - bedrock:UpdateAgentActionGroup
+                  - bedrock:GetAgentActionGroup
+                  - bedrock:DeleteAgentActionGroup
+                  - bedrock:ListAgentActionGroups
+                  - bedrock:InvokeAgent
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - bedrock:GetInferenceProfile
+                  - bedrock:ListInferenceProfiles
+                  - bedrock:TagResource
+                Resource: 'arn:aws:bedrock:*::inference-profile/*'
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/bedrock/agentcore/${AgentName}*'
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                  - cloudwatch:GetMetricStatistics
+                  - cloudwatch:ListMetrics
+                Resource: '*'
+
+  # CloudWatch Log Group for AgentCore Agent
+  AgentCoreLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/bedrock/agentcore/${AgentName}'
+      RetentionInDays: 30
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Agent
+          Value: !Ref AgentName
+
+  # CloudWatch Alarms for monitoring
+  AgentCoreErrorRateAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${AgentName}-${EnvironmentName}-error-rate'
+      MetricName: ErrorRate
+      Namespace: AWS/Bedrock/AgentCore
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Agent
+          Value: !Ref AgentName
+
+  AgentCoreLatencyAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${AgentName}-${EnvironmentName}-latency'
+      MetricName: Latency
+      Namespace: AWS/Bedrock/AgentCore
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 3000
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Agent
+          Value: !Ref AgentName
+
+Outputs:
+  AgentCoreRoleArn:
+    Description: ARN of the IAM role for AgentCore agent
+    Value: !GetAtt VibePMAgentCoreRole.Arn
+    Export:
+      Name: !Sub '${AgentName}-${EnvironmentName}-role-arn'
+
+  AgentCoreLogGroupName:
+    Description: Name of the CloudWatch log group
+    Value: !Ref AgentCoreLogGroup
+    Export:
+      Name: !Sub '${AgentName}-${EnvironmentName}-log-group'
+
+  AgentCoreErrorAlarmName:
+    Description: Name of the error rate alarm
+    Value: !Ref AgentCoreErrorRateAlarm
+
+  AgentCoreLatencyAlarmName:
+    Description: Name of the latency alarm
+    Value: !Ref AgentCoreLatencyAlarm

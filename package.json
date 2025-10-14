@@ -31,8 +31,7 @@
     "build:analyze": "npm run build:prod && npm run analyze:bundle",
     "analyze:bundle": "find dist -name '*.js' -exec wc -c {} + | sort -n",
     "verify:production": "node scripts/verify-production-build.mjs",
-    "start:verify": "timeout 10s node dist/mcp/server.js --health || true",
-
+    "start:verify": "timeout 10s node dist/mcp/server.js --health || true"
   },
   "keywords": [
     "mcp",
