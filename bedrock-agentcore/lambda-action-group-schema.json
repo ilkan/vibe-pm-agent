@@ -1,0 +1,1423 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Vibe PM Agent Lambda Functions",
+    "version": "1.0.0",
+    "description": "APIs for 32 PM-focused Lambda functions including business analysis, communications, requirements, market intelligence, interview prep, and case studies"
+  },
+  "paths": {
+    "/business-analysis/analyze-opportunity": {
+      "post": {
+        "summary": "Analyze business opportunity, market potential, and strategic fit for a feature idea",
+        "description": "Analyze business opportunity, market potential, and strategic fit for a feature idea",
+        "operationId": "analyze_business_opportunity",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idea": {
+                    "type": "string",
+                    "description": "The business or feature idea to analyze"
+                  },
+                  "market_context": {
+                    "type": "object",
+                    "properties": {
+                      "industry": { "type": "string" },
+                      "competition": { "type": "string" },
+                      "budget_range": { "type": "string", "enum": ["small", "medium", "large"] },
+                      "timeline": { "type": "string" }
+                    }
+                  }
+                },
+                "required": ["idea"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business opportunity analysis completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "analysis": { "type": "string" },
+                    "recommendations": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/business-analysis/generate-case": {
+      "post": {
+        "summary": "Create comprehensive business case with ROI analysis, risk assessment, and strategic alignment",
+        "description": "Create comprehensive business case with ROI analysis, risk assessment, and strategic alignment",
+        "operationId": "generate_business_case",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "opportunity_analysis": {
+                    "type": "string",
+                    "description": "Business opportunity analysis"
+                  },
+                  "financial_inputs": {
+                    "type": "object",
+                    "properties": {
+                      "development_cost": { "type": "number" },
+                      "operational_cost": { "type": "number" },
+                      "expected_revenue": { "type": "number" },
+                      "time_to_market": { "type": "number" }
+                    }
+                  }
+                },
+                "required": ["opportunity_analysis"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business case generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "business_case": { "type": "string" },
+                    "roi_analysis": { "type": "object" },
+                    "risk_assessment": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/business-analysis/assess-alignment": {
+      "post": {
+        "summary": "Evaluate how a feature aligns with company strategy, OKRs, and long-term vision",
+        "description": "Evaluate how a feature aligns with company strategy, OKRs, and long-term vision",
+        "operationId": "assess_strategic_alignment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feature_concept": {
+                    "type": "string",
+                    "description": "Feature concept or business case"
+                  },
+                  "company_context": {
+                    "type": "object",
+                    "properties": {
+                      "mission": { "type": "string" },
+                      "current_okrs": { "type": "array", "items": { "type": "string" } },
+                      "strategic_priorities": { "type": "array", "items": { "type": "string" } },
+                      "competitive_position": { "type": "string" }
+                    }
+                  }
+                },
+                "required": ["feature_concept"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Strategic alignment assessment completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "alignment_score": { "type": "number" },
+                    "recommendations": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/business-analysis/optimize-resources": {
+      "post": {
+        "summary": "Analyze resource requirements and provide optimization recommendations for development efficiency",
+        "description": "Analyze resource requirements and provide optimization recommendations for development efficiency",
+        "operationId": "optimize_resource_allocation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "current_workflow": {
+                    "type": "object",
+                    "description": "Current development workflow or process"
+                  },
+                  "resource_constraints": {
+                    "type": "object",
+                    "properties": {
+                      "team_size": { "type": "number" },
+                      "budget": { "type": "number" },
+                      "timeline": { "type": "string" },
+                      "technical_debt": { "type": "string" }
+                    }
+                  },
+                  "optimization_goals": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["current_workflow"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resource optimization analysis completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "optimization_plan": { "type": "object" },
+                    "efficiency_gains": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/business-analysis/validate-timing": {
+      "post": {
+        "summary": "Fast validation of whether now is the right time to build a feature based on market conditions",
+        "description": "Fast validation of whether now is the right time to build a feature based on market conditions",
+        "operationId": "validate_market_timing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feature_idea": {
+                    "type": "string",
+                    "description": "Feature idea to validate timing for"
+                  },
+                  "market_signals": {
+                    "type": "object",
+                    "properties": {
+                      "customer_demand": { "type": "string", "enum": ["low", "medium", "high"] },
+                      "competitive_pressure": { "type": "string", "enum": ["low", "medium", "high"] },
+                      "technical_readiness": { "type": "string", "enum": ["low", "medium", "high"] },
+                      "resource_availability": { "type": "string", "enum": ["low", "medium", "high"] }
+                    }
+                  }
+                },
+                "required": ["feature_idea"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Market timing validation completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "timing_score": { "type": "number" },
+                    "recommendation": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/business-analysis/validate-idea": {
+      "post": {
+        "summary": "Perform quick validation of business ideas against criteria",
+        "description": "Perform quick validation of business ideas against criteria",
+        "operationId": "validate_idea_quick",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idea": {
+                    "type": "string",
+                    "description": "Idea to validate quickly"
+                  },
+                  "criteria": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["idea"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Idea validation completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "validation_result": { "type": "object" },
+                    "score": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/business-analysis/analyze-competitors": {
+      "post": {
+        "summary": "Analyze competitive landscape and market positioning",
+        "description": "Analyze competitive landscape and market positioning",
+        "operationId": "analyze_competitor_landscape",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "market_segment": {
+                    "type": "string",
+                    "description": "Market segment to analyze"
+                  },
+                  "competitors": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["market_segment"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Competitor analysis completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "competitive_analysis": { "type": "object" },
+                    "market_positioning": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/business-analysis/calculate-market-size": {
+      "post": {
+        "summary": "Calculate market sizing using TAM-SAM-SOM methodology",
+        "description": "Calculate market sizing using TAM-SAM-SOM methodology",
+        "operationId": "calculate_market_sizing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "market": {
+                    "type": "string",
+                    "description": "Market to size"
+                  },
+                  "methodology": { "type": "string" }
+                },
+                "required": ["market"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Market sizing calculation completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tam": { "type": "number" },
+                    "sam": { "type": "number" },
+                    "som": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/communications/create-stakeholder": {
+      "post": {
+        "summary": "Generate executive one-pagers, PR-FAQs, and stakeholder presentations",
+        "description": "Generate executive one-pagers, PR-FAQs, and stakeholder presentations",
+        "operationId": "create_stakeholder_communication",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "business_case": {
+                    "type": "string",
+                    "description": "Business case analysis"
+                  },
+                  "communication_type": {
+                    "type": "string",
+                    "enum": ["executive_onepager", "pr_faq", "board_presentation", "team_announcement"]
+                  },
+                  "audience": {
+                    "type": "string",
+                    "enum": ["executives", "board", "engineering_team", "customers", "investors"]
+                  }
+                },
+                "required": ["business_case", "communication_type", "audience"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stakeholder communication created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "document": { "type": "string" },
+                    "format": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/communications/generate-onepager": {
+      "post": {
+        "summary": "Create executive one-pager for management presentation",
+        "description": "Create executive one-pager for management presentation",
+        "operationId": "generate_management_onepager",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_info": {
+                    "type": "string",
+                    "description": "Project information"
+                  },
+                  "audience": {
+                    "type": "string",
+                    "enum": ["executives", "board", "engineering_team", "customers", "investors"]
+                  }
+                },
+                "required": ["project_info"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Management one-pager generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "one_pager": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/communications/generate-pr-faq": {
+      "post": {
+        "summary": "Generate PR-FAQ document using Amazon Working Backwards methodology",
+        "description": "Generate PR-FAQ document using Amazon Working Backwards methodology",
+        "operationId": "generate_pr_faq",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "product_info": {
+                    "type": "string",
+                    "description": "Product information"
+                  },
+                  "target_audience": { "type": "string" }
+                },
+                "required": ["product_info"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PR-FAQ document generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pr_faq": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/communications/get-consulting-summary": {
+      "post": {
+        "summary": "Create consulting-style executive summary from analysis data",
+        "description": "Create consulting-style executive summary from analysis data",
+        "operationId": "get_consulting_summary",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "analysis_data": {
+                    "type": "string",
+                    "description": "Analysis data to summarize"
+                  },
+                  "summary_type": { "type": "string" }
+                },
+                "required": ["analysis_data"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Consulting summary created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "executive_summary": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/requirements/generate": {
+      "post": {
+        "summary": "Generate comprehensive requirements document from feature ideas",
+        "description": "Generate comprehensive requirements document from feature ideas",
+        "operationId": "generate_requirements",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feature_idea": {
+                    "type": "string",
+                    "description": "Feature idea to generate requirements for"
+                  },
+                  "context": { "type": "object" }
+                },
+                "required": ["feature_idea"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Requirements document generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requirements_doc": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/requirements/generate-design-options": {
+      "post": {
+        "summary": "Create multiple design options and architectural approaches",
+        "description": "Create multiple design options and architectural approaches",
+        "operationId": "generate_design_options",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "requirements": {
+                    "type": "string",
+                    "description": "Requirements document"
+                  },
+                  "constraints": { "type": "object" }
+                },
+                "required": ["requirements"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Design options generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "design_options": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/requirements/generate-task-plan": {
+      "post": {
+        "summary": "Create detailed implementation task plan from design documents",
+        "description": "Create detailed implementation task plan from design documents",
+        "operationId": "generate_task_plan",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "design": {
+                    "type": "string",
+                    "description": "Design document"
+                  },
+                  "requirements": { "type": "string" }
+                },
+                "required": ["design"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task plan generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "task_plan": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/requirements/optimize-intent": {
+      "post": {
+        "summary": "Optimize user intent for better clarity and actionability",
+        "description": "Optimize user intent for better clarity and actionability",
+        "operationId": "optimize_intent",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_intent": {
+                    "type": "string",
+                    "description": "User intent to optimize"
+                  },
+                  "context": { "type": "object" }
+                },
+                "required": ["user_intent"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Intent optimization completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "optimized_intent": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market-intelligence/enhance-citations": {
+      "post": {
+        "summary": "Enhance content with authoritative citations and source validation",
+        "description": "Enhance content with authoritative citations and source validation",
+        "operationId": "enhance_citations",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "description": "Content to enhance with citations"
+                  },
+                  "sources": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Citations enhanced successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enhanced_content": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market-intelligence/validate-citations": {
+      "post": {
+        "summary": "Validate and audit citations for accuracy and credibility",
+        "description": "Validate and audit citations for accuracy and credibility",
+        "operationId": "validate_and_audit_citations",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "description": "Content with citations to validate"
+                  },
+                  "strict_mode": { "type": "boolean" }
+                },
+                "required": ["content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Citations validated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "validation_report": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market-intelligence/monitor-conditions": {
+      "post": {
+        "summary": "Monitor and analyze current market conditions and trends",
+        "description": "Monitor and analyze current market conditions and trends",
+        "operationId": "monitor_market_conditions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "market": {
+                    "type": "string",
+                    "description": "Market to monitor"
+                  },
+                  "indicators": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["market"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Market conditions monitored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "market_analysis": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market-intelligence/analyze-workflow": {
+      "post": {
+        "summary": "Analyze workflows for optimization opportunities",
+        "description": "Analyze workflows for optimization opportunities",
+        "operationId": "analyze_workflow",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "workflow_description": {
+                    "type": "string",
+                    "description": "Workflow to analyze"
+                  },
+                  "optimization_goals": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["workflow_description"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Workflow analysis completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "optimization_opportunities": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview-prep/start-session": {
+      "post": {
+        "summary": "Initiate a comprehensive PM interview preparation session with personalized coaching",
+        "description": "Initiate a comprehensive PM interview preparation session with personalized coaching",
+        "operationId": "start_interview_preparation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"]
+                  },
+                  "target_company": { "type": "string" },
+                  "preparation_timeline": { "type": "string" },
+                  "focus_areas": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "experience_level": { "type": "string" },
+                  "weak_areas": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["role_level"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Interview preparation session started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session_id": { "type": "string" },
+                    "preparation_plan": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview-prep/generate-question": {
+      "post": {
+        "summary": "Generate realistic PM interview questions based on role level, company, and question type",
+        "description": "Generate realistic PM interview questions based on role level, company, and question type",
+        "operationId": "generate_interview_question",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"]
+                  },
+                  "question_category": {
+                    "type": "string",
+                    "enum": ["behavioral", "product_sense", "analytical", "technical", "leadership"]
+                  },
+                  "company_context": { "type": "string" },
+                  "difficulty_level": { "type": "integer" },
+                  "session_id": { "type": "string" }
+                },
+                "required": ["role_level", "question_category"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Interview question generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "question": { "type": "string" },
+                    "question_id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview-prep/evaluate-response": {
+      "post": {
+        "summary": "Evaluate PM interview responses using framework-based analysis and provide detailed feedback",
+        "description": "Evaluate PM interview responses using framework-based analysis and provide detailed feedback",
+        "operationId": "evaluate_interview_response",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "question_id": {
+                    "type": "string",
+                    "description": "ID of the question being answered"
+                  },
+                  "user_response": {
+                    "type": "string",
+                    "description": "The candidate's response to evaluate"
+                  },
+                  "session_id": { "type": "string" },
+                  "evaluation_focus": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "company_context": { "type": "string" }
+                },
+                "required": ["question_id", "user_response"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response evaluation completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "feedback": { "type": "object" },
+                    "score": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview-prep/get-feedback": {
+      "post": {
+        "summary": "Provide comprehensive feedback and improvement recommendations based on interview performance",
+        "description": "Provide comprehensive feedback and improvement recommendations based on interview performance",
+        "operationId": "get_interview_feedback",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "description": "Interview preparation session ID"
+                  },
+                  "include_detailed_analysis": { "type": "boolean" },
+                  "include_study_plan": { "type": "boolean" },
+                  "focus_on_improvements": { "type": "boolean" }
+                },
+                "required": ["session_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Interview feedback generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "feedback_report": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview-prep/company-insights": {
+      "post": {
+        "summary": "Provide comprehensive company-specific interview insights and preparation guidance",
+        "description": "Provide comprehensive company-specific interview insights and preparation guidance",
+        "operationId": "get_company_interview_insights",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_name": {
+                    "type": "string",
+                    "description": "Name of the target company"
+                  },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"]
+                  },
+                  "include_recent_changes": { "type": "boolean" },
+                  "focus_areas": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["company_name", "role_level"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company interview insights generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "company_insights": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview-prep/customize-plan": {
+      "post": {
+        "summary": "Create personalized interview preparation plan tailored to specific company and role",
+        "description": "Create personalized interview preparation plan tailored to specific company and role",
+        "operationId": "customize_preparation_for_company",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_name": {
+                    "type": "string",
+                    "description": "Target company name"
+                  },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"]
+                  },
+                  "preparation_timeline": {
+                    "type": "string",
+                    "description": "Available preparation time (e.g., \"2 weeks\", \"1 month\")"
+                  },
+                  "experience_background": {
+                    "type": "string",
+                    "description": "Candidate's relevant experience and background"
+                  },
+                  "weak_areas": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "preferred_study_style": { "type": "string" }
+                },
+                "required": ["company_name", "role_level", "preparation_timeline"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customized preparation plan created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "preparation_plan": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-studies/start-session": {
+      "post": {
+        "summary": "Initiate a PM case study practice session with realistic business scenarios",
+        "description": "Initiate a PM case study practice session with realistic business scenarios",
+        "operationId": "start_case_study",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "case_type": {
+                    "type": "string",
+                    "enum": ["product_design", "strategy", "prioritization", "market_entry", "growth", "monetization"]
+                  },
+                  "industry": { "type": "string" },
+                  "difficulty_level": { "type": "integer" },
+                  "time_limit": { "type": "integer" },
+                  "company_style": { "type": "string" },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"]
+                  }
+                },
+                "required": ["case_type", "role_level"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case study session started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session_id": { "type": "string" },
+                    "case_scenario": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-studies/get-guidance": {
+      "post": {
+        "summary": "Provide framework-based guidance and hints during case study execution",
+        "description": "Provide framework-based guidance and hints during case study execution",
+        "operationId": "get_case_guidance",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "description": "Case study session ID"
+                  },
+                  "current_step": {
+                    "type": "string",
+                    "description": "Current step or challenge in the case"
+                  },
+                  "request_type": {
+                    "type": "string",
+                    "enum": ["hint", "framework", "clarification", "next_step"]
+                  },
+                  "user_progress": { "type": "string" }
+                },
+                "required": ["session_id", "current_step", "request_type"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case guidance provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "guidance": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-studies/evaluate-approach": {
+      "post": {
+        "summary": "Evaluate case study approach and provide real-time feedback on methodology and thinking",
+        "description": "Evaluate case study approach and provide real-time feedback on methodology and thinking",
+        "operationId": "evaluate_case_approach",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "description": "Case study session ID"
+                  },
+                  "step_number": {
+                    "type": "integer",
+                    "description": "Current step number in the case"
+                  },
+                  "user_approach": {
+                    "type": "string",
+                    "description": "User's approach or solution for this step"
+                  },
+                  "frameworks_used": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "request_detailed_feedback": { "type": "boolean" }
+                },
+                "required": ["session_id", "step_number", "user_approach"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case approach evaluated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "feedback": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-studies/complete-session": {
+      "post": {
+        "summary": "Complete case study session and provide comprehensive evaluation with performance analytics",
+        "description": "Complete case study session and provide comprehensive evaluation with performance analytics",
+        "operationId": "complete_case_study",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "description": "Case study session ID to complete"
+                  },
+                  "include_detailed_breakdown": { "type": "boolean" },
+                  "include_recommendations": { "type": "boolean" },
+                  "include_performance_analytics": { "type": "boolean" }
+                },
+                "required": ["session_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case study completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "final_evaluation": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-studies/company-scenarios": {
+      "post": {
+        "summary": "Generate company-specific case study scenarios based on real business challenges and company context",
+        "description": "Generate company-specific case study scenarios based on real business challenges and company context",
+        "operationId": "get_company_case_scenarios",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_name": {
+                    "type": "string",
+                    "description": "Target company name"
+                  },
+                  "case_type": {
+                    "type": "string",
+                    "enum": ["product_design", "strategy", "prioritization", "market_entry", "growth", "monetization"]
+                  },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"]
+                  },
+                  "use_real_products": { "type": "boolean" },
+                  "difficulty_level": { "type": "integer" }
+                },
+                "required": ["company_name", "case_type", "role_level"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company case scenarios generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "case_scenarios": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

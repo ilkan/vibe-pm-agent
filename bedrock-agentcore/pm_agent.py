@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Vibe PM Agent for AWS Bedrock AgentCore
+Vibe PM Agent for AWS Bedrock AgentCore with Lambda Integration
 Transforms the existing MCP server into a Bedrock AgentCore-compatible agent
+Supports both local MCP server and AWS Lambda deployment modes
 Maintains all 32 PM-focused tools and business intelligence capabilities
 """
 
@@ -10,6 +11,8 @@ import json
 import os
 import subprocess
 import sys
+import boto3
+import base64
 from typing import Any, Dict, List, Optional
 
 from bedrock_agentcore.runtime import BedrockAgentCoreApp

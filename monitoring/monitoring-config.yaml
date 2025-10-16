@@ -1,0 +1,159 @@
+# Monitoring and Alerting Configuration for Vibe PM Agent Lambda
+
+global:
+  environment: dev
+  region: us-west-2
+
+lambda_function:
+  name: "${ENVIRONMENT}-vibe-pm-agent-lambda"
+  log_group: "/aws/lambda/${ENVIRONMENT}-vibe-pm-agent-lambda"
+
+cloudwatch:
+  dashboards:
+    main_dashboard:
+      name: "vibe-pm-agent-${ENVIRONMENT}-dashboard"
+      widgets:
+        - type: "log_insights"
+          title: "Lambda Function Logs"
+          query: "fields @timestamp, @message
+                  | filter @message like /ERROR/
+                  | sort @timestamp desc
+                  | limit 100"
+
+        - type: "metric"
+          title: "Lambda Errors"
+          metrics:
+            - namespace: "AWS/Lambda"
+              metric: "Errors"
+              dimensions:
+                - name: "FunctionName"
+                  value: "${LAMBDA_FUNCTION_NAME}"
+              stat: "Sum"
+
+        - type: "metric"
+          title: "Lambda Duration"
+          metrics:
+            - namespace: "AWS/Lambda"
+              metric: "Duration"
+              dimensions:
+                - name: "FunctionName"
+                  value: "${LAMBDA_FUNCTION_NAME}"
+              stat: "Average"
+
+        - type: "metric"
+          title: "Lambda Invocations"
+          metrics:
+            - namespace: "AWS/Lambda"
+              metric: "Invocations"
+              dimensions:
+                - name: "FunctionName"
+                  value: "${LAMBDA_FUNCTION_NAME}"
+              stat: "Sum"
+
+  alarms:
+    error_alarm:
+      name: "${ENVIRONMENT}-vibe-pm-agent-lambda-errors"
+      description: "Alert when Lambda function has errors"
+      metric_name: "Errors"
+      namespace: "AWS/Lambda"
+      statistic: "Sum"
+      period: 300
+      evaluation_periods: 2
+      threshold: 1
+      comparison_operator: "GreaterThanOrEqualToThreshold"
+      dimensions:
+        - name: "FunctionName"
+          value: "${LAMBDA_FUNCTION_NAME}"
+      actions:
+        - type: "sns"
+          topic_arn: "${ALARM_TOPIC_ARN}"
+
+    duration_alarm:
+      name: "${ENVIRONMENT}-vibe-pm-agent-lambda-duration"
+      description: "Alert when Lambda function duration is too high"
+      metric_name: "Duration"
+      namespace: "AWS/Lambda"
+      statistic: "Average"
+      period: 300
+      evaluation_periods: 2
+      threshold: 250000  # 250 seconds in milliseconds
+      comparison_operator: "GreaterThanThreshold"
+      dimensions:
+        - name: "FunctionName"
+          value: "${LAMBDA_FUNCTION_NAME}"
+      actions:
+        - type: "sns"
+          topic_arn: "${ALARM_TOPIC_ARN}"
+
+    throttle_alarm:
+      name: "${ENVIRONMENT}-vibe-pm-agent-lambda-throttles"
+      description: "Alert when Lambda function is being throttled"
+      metric_name: "Throttles"
+      namespace: "AWS/Lambda"
+      statistic: "Sum"
+      period: 300
+      evaluation_periods: 2
+      threshold: 1
+      comparison_operator: "GreaterThanOrEqualToThreshold"
+      dimensions:
+        - name: "FunctionName"
+          value: "${LAMBDA_FUNCTION_NAME}"
+      actions:
+        - type: "sns"
+          topic_arn: "${ALARM_TOPIC_ARN}"
+
+sns_topics:
+  alarm_topic:
+    name: "${ENVIRONMENT}-vibe-pm-agent-alarms"
+    display_name: "Vibe PM Agent Lambda Alarms"
+    subscriptions:
+      - protocol: "email"
+        endpoint: "${ALARM_EMAIL}"
+
+log_groups:
+  lambda_logs:
+    name: "/aws/lambda/${ENVIRONMENT}-vibe-pm-agent-lambda"
+    retention_days: 30
+    kms_key_id: "${LOG_KMS_KEY_ID}"
+
+  api_gateway_logs:
+    name: "API_GATEWAY_EXECUTION_LOGS"
+    retention_days: 30
+
+xray:
+  tracing_enabled: true
+  sampling_rules:
+    - service_name: "${LAMBDA_FUNCTION_NAME}"
+      sampling_rate: 0.1
+      reservoir_size: 1
+
+health_checks:
+  lambda_health_check:
+    name: "${ENVIRONMENT}-lambda-health-check"
+    type: "lambda"
+    function_name: "${LAMBDA_FUNCTION_NAME}"
+    payload: |
+      {
+        "toolName": "health_check",
+        "toolArgs": {}
+      }
+    schedule: "rate(5 minutes)"
+
+  api_gateway_health_check:
+    name: "${ENVIRONMENT}-api-gateway-health-check"
+    type: "http"
+    url: "${API_GATEWAY_URL}/health"
+    schedule: "rate(5 minutes)"
+
+monitoring_scripts:
+  check_lambda_health:
+    path: "./scripts/check-lambda-health.sh"
+    description: "Check Lambda function health and metrics"
+
+  check_api_gateway:
+    path: "./scripts/check-api-gateway.sh"
+    description: "Check API Gateway health and endpoints"
+
+  generate_report:
+    path: "./scripts/generate-monitoring-report.sh"
+    description: "Generate comprehensive monitoring report"

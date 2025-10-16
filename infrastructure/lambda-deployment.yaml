@@ -1,0 +1,236 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CloudFormation template for Vibe PM Agent Lambda Functions
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+    Description: Environment name
+
+  S3BucketName:
+    Type: String
+    Description: S3 bucket for Lambda deployment package
+
+  S3Key:
+    Type: String
+    Description: S3 key for Lambda deployment package
+
+Globals:
+  Function:
+    Timeout: 300
+    MemorySize: 1024
+    Runtime: nodejs20.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        NODE_ENV: !Ref Environment
+        ENVIRONMENT: !Ref Environment
+
+Resources:
+  # Main Lambda Function for all PM tools
+  VibePMAgentLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Environment}-vibe-pm-agent-lambda"
+      Description: Unified Lambda function for 32 PM-focused tools including business analysis, communications, requirements, market intelligence, interview prep, and case studies
+      CodeUri:
+        Bucket: !Ref S3BucketName
+        Key: !Ref S3Key
+      Handler: index.handler
+      Layers: []
+      VpcConfig:
+        SecurityGroupIds: []
+        SubnetIds: []
+
+
+      # Enhanced monitoring and logging
+      LoggingConfig:
+        LogFormat: JSON
+        ApplicationLogLevel: INFO
+        SystemLogLevel: INFO
+
+      # Environment variables for all tools
+      Environment:
+        Variables:
+          NODE_ENV: !Ref Environment
+          ENVIRONMENT: !Ref Environment
+          # Add any additional environment variables here
+
+      # IAM role will be created automatically by SAM
+      Role: !GetAtt VibePMAgentLambdaRole.Arn
+
+      Events:
+        # CloudWatch Events for scheduled tasks (if needed)
+        ScheduledTask:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 hour)
+            Name: !Sub "${Environment}-scheduled-task"
+            Description: Scheduled task for PM agent
+            Enabled: false
+
+  # IAM Role for Lambda execution
+  VibePMAgentLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Environment}-vibe-pm-agent-lambda-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+      Policies:
+        - PolicyName: VibePMAgentLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # CloudWatch Logs permissions
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:CreateLogGroup
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${Environment}-vibe-pm-agent-lambda:*"
+
+              # S3 permissions for data access (if needed)
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource: "*"
+
+              # SNS permissions for dead letter queue
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Sub "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-vibe-pm-agent-dlq"
+
+              # Additional permissions for PM tools (add as needed)
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                Resource: "*"
+
+  # CloudWatch Log Group for Lambda
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${Environment}-vibe-pm-agent-lambda"
+      RetentionInDays: 30
+      KmsKeyId: !If
+        - IsProduction
+        - !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/alias/aws/lambda"
+        - !Ref AWS::NoValue
+
+  # CloudWatch Alarms for monitoring
+  LambdaErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${Environment}-vibe-pm-agent-lambda-errors"
+      AlarmDescription: Alarm for Lambda function errors
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref VibePMAgentLambda
+      TreatMissingData: notBreaching
+
+  LambdaDurationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${Environment}-vibe-pm-agent-lambda-duration"
+      AlarmDescription: Alarm for Lambda function duration
+      MetricName: Duration
+      Namespace: AWS/Lambda
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 250000  # 250 seconds in milliseconds
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref VibePMAgentLambda
+      TreatMissingData: notBreaching
+
+  LambdaThrottlesAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${Environment}-vibe-pm-agent-lambda-throttles"
+      AlarmDescription: Alarm for Lambda function throttles
+      MetricName: Throttles
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref VibePMAgentLambda
+      TreatMissingData: notBreaching
+
+  # SNS Topic for notifications
+  LambdaAlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${Environment}-vibe-pm-agent-alarms"
+      DisplayName: Vibe PM Agent Lambda Alarms
+
+  # Subscribe email to alarm notifications (if needed)
+  # LambdaAlarmSubscription:
+  #   Type: AWS::SNS::Subscription
+  #   Properties:
+  #     TopicArn: !Ref LambdaAlarmTopic
+  #     Protocol: email
+  #     Endpoint: !Sub "{{resolve:ssm:/${Environment}/vibe-pm-agent/alarm-email}}"
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, "prod"]
+
+Outputs:
+  LambdaFunctionArn:
+    Description: ARN of the Lambda function
+    Value: !GetAtt VibePMAgentLambda.Arn
+    Export:
+      Name: !Sub "${Environment}-vibe-pm-agent-lambda-arn"
+
+  LambdaFunctionName:
+    Description: Name of the Lambda function
+    Value: !Ref VibePMAgentLambda
+    Export:
+      Name: !Sub "${Environment}-vibe-pm-agent-lambda-name"
+
+  LambdaRoleArn:
+    Description: ARN of the Lambda IAM role
+    Value: !GetAtt VibePMAgentLambdaRole.Arn
+    Export:
+      Name: !Sub "${Environment}-vibe-pm-agent-lambda-role-arn"
+
+  CloudWatchLogGroup:
+    Description: CloudWatch log group for Lambda
+    Value: !Ref LambdaLogGroup
+    Export:
+      Name: !Sub "${Environment}-vibe-pm-agent-lambda-log-group"
+
+  AlarmTopicArn:
+    Description: SNS topic for Lambda alarms
+    Value: !Ref LambdaAlarmTopic
+    Export:
+      Name: !Sub "${Environment}-vibe-pm-agent-alarms-topic-arn"

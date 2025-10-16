@@ -1,0 +1,760 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Vibe PM Agent - Interview Focus",
+    "version": "1.0.0",
+    "description": "Specialized API for PM interview preparation with 10 focused tools including question generation, response evaluation, company insights, and case study practice"
+  },
+  "paths": {
+    "/interview/start-session": {
+      "post": {
+        "summary": "Start a comprehensive PM interview preparation session with personalized coaching",
+        "description": "Initiate a comprehensive PM interview preparation session with personalized coaching",
+        "operationId": "start_interview_preparation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"],
+                    "description": "Target PM role level"
+                  },
+                  "target_company": {
+                    "type": "string",
+                    "description": "Company you are interviewing with (optional)"
+                  },
+                  "preparation_timeline": {
+                    "type": "string",
+                    "description": "Available preparation time (e.g., \"2 weeks\", \"1 month\")"
+                  },
+                  "focus_areas": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["Product Strategy", "Leadership", "Analytical Thinking", "Technical Knowledge", "Behavioral"]
+                    },
+                    "description": "Specific areas to focus on (optional)"
+                  },
+                  "experience_level": {
+                    "type": "string",
+                    "description": "Years of PM experience"
+                  },
+                  "weak_areas": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["Product Strategy", "Leadership", "Analytical Thinking", "Technical Knowledge", "Behavioral"]
+                    },
+                    "description": "Areas needing improvement (optional)"
+                  }
+                },
+                "required": ["role_level"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Interview preparation session started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "session_id": { "type": "string" },
+                        "preparation_plan": { "type": "object" },
+                        "next_steps": { "type": "array", "items": { "type": "string" } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview/generate-question": {
+      "post": {
+        "summary": "Generate realistic PM interview questions based on role level, company, and question type",
+        "description": "Generate realistic PM interview questions based on role level, company, and question type",
+        "operationId": "generate_interview_question",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"],
+                    "description": "Target PM role level"
+                  },
+                  "question_category": {
+                    "type": "string",
+                    "enum": ["behavioral", "product_sense", "analytical", "technical", "leadership"],
+                    "description": "Type of question to generate"
+                  },
+                  "company_context": {
+                    "type": "string",
+                    "description": "Target company for customization (optional)"
+                  },
+                  "difficulty_level": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "description": "Question difficulty (1=easy, 5=hard)"
+                  },
+                  "session_id": {
+                    "type": "string",
+                    "description": "Interview preparation session ID (optional)"
+                  }
+                },
+                "required": ["role_level", "question_category"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Interview question generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "question": { "type": "string" },
+                        "question_id": { "type": "string" },
+                        "category": { "type": "string" },
+                        "difficulty": { "type": "integer" },
+                        "frameworks": { "type": "array", "items": { "type": "string" } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview/evaluate-response": {
+      "post": {
+        "summary": "Evaluate PM interview responses using framework-based analysis and provide detailed feedback",
+        "description": "Evaluate PM interview responses using framework-based analysis and provide detailed feedback",
+        "operationId": "evaluate_interview_response",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "question_id": {
+                    "type": "string",
+                    "description": "ID of the question being answered"
+                  },
+                  "user_response": {
+                    "type": "string",
+                    "description": "The candidate's response to evaluate"
+                  },
+                  "session_id": {
+                    "type": "string",
+                    "description": "Interview preparation session ID (optional)"
+                  },
+                  "evaluation_focus": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["frameworks", "specificity", "structure", "metrics"]
+                    },
+                    "description": "Specific evaluation criteria to focus on"
+                  },
+                  "company_context": {
+                    "type": "string",
+                    "description": "Company context for evaluation (optional)"
+                  }
+                },
+                "required": ["question_id", "user_response"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response evaluation completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "feedback": {
+                          "type": "object",
+                          "properties": {
+                            "overall_score": { "type": "number" },
+                            "strengths": { "type": "array", "items": { "type": "string" } },
+                            "improvements": { "type": "array", "items": { "type": "string" } },
+                            "framework_usage": { "type": "array", "items": { "type": "string" } }
+                          }
+                        },
+                        "score": { "type": "number" },
+                        "detailed_feedback": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview/get-feedback": {
+      "post": {
+        "summary": "Provide comprehensive feedback and improvement recommendations based on interview performance",
+        "description": "Provide comprehensive feedback and improvement recommendations based on interview performance",
+        "operationId": "get_interview_feedback",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "description": "Interview preparation session ID"
+                  },
+                  "include_detailed_analysis": {
+                    "type": "boolean",
+                    "description": "Include detailed performance breakdown (default: true)"
+                  },
+                  "include_study_plan": {
+                    "type": "boolean",
+                    "description": "Include personalized study recommendations (default: true)"
+                  },
+                  "focus_on_improvements": {
+                    "type": "boolean",
+                    "description": "Focus feedback on areas needing improvement (default: false)"
+                  }
+                },
+                "required": ["session_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Interview feedback generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "feedback_report": {
+                          "type": "object",
+                          "properties": {
+                            "overall_performance": { "type": "string" },
+                            "strengths": { "type": "array", "items": { "type": "string" } },
+                            "weaknesses": { "type": "array", "items": { "type": "string" } },
+                            "improvement_priorities": { "type": "array", "items": { "type": "string" } }
+                          }
+                        },
+                        "study_plan": {
+                          "type": "object",
+                          "properties": {
+                            "daily_practice": { "type": "array", "items": { "type": "string" } },
+                            "weekly_goals": { "type": "array", "items": { "type": "string" } },
+                            "resources": { "type": "array", "items": { "type": "string" } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview/company-insights": {
+      "post": {
+        "summary": "Provide comprehensive company-specific interview insights and preparation guidance",
+        "description": "Provide comprehensive company-specific interview insights and preparation guidance",
+        "operationId": "get_company_interview_insights",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_name": {
+                    "type": "string",
+                    "description": "Name of the target company",
+                    "enum": ["Google", "Meta", "Amazon", "Microsoft", "Apple", "Netflix", "Uber", "Airbnb", "Stripe", "Square"]
+                  },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"],
+                    "description": "Target role level"
+                  },
+                  "include_recent_changes": {
+                    "type": "boolean",
+                    "description": "Include recent company developments and changes (default: true)"
+                  },
+                  "focus_areas": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["Product Strategy", "Leadership", "Analytical Thinking", "Technical Knowledge", "Behavioral"]
+                    },
+                    "description": "Specific areas to focus insights on (optional)"
+                  }
+                },
+                "required": ["company_name", "role_level"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company interview insights generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "company_insights": {
+                          "type": "object",
+                          "properties": {
+                            "company_overview": { "type": "string" },
+                            "interview_process": { "type": "string" },
+                            "common_questions": { "type": "array", "items": { "type": "string" } },
+                            "evaluation_criteria": { "type": "array", "items": { "type": "string" } },
+                            "preparation_tips": { "type": "array", "items": { "type": "string" } }
+                          }
+                        },
+                        "role_specific_guidance": {
+                          "type": "object",
+                          "properties": {
+                            "key_competencies": { "type": "array", "items": { "type": "string" } },
+                            "expected_experience": { "type": "string" },
+                            "success_factors": { "type": "array", "items": { "type": "string" } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview/customize-plan": {
+      "post": {
+        "summary": "Create personalized interview preparation plan tailored to specific company and role",
+        "description": "Create personalized interview preparation plan tailored to specific company and role",
+        "operationId": "customize_preparation_for_company",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_name": {
+                    "type": "string",
+                    "description": "Target company name",
+                    "enum": ["Google", "Meta", "Amazon", "Microsoft", "Apple", "Netflix", "Uber", "Airbnb", "Stripe", "Square"]
+                  },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"],
+                    "description": "Target role level"
+                  },
+                  "preparation_timeline": {
+                    "type": "string",
+                    "description": "Available preparation time (e.g., \"2 weeks\", \"1 month\")",
+                    "enum": ["1 week", "2 weeks", "1 month", "2 months", "3 months"]
+                  },
+                  "experience_background": {
+                    "type": "string",
+                    "description": "Candidate's relevant experience and background"
+                  },
+                  "weak_areas": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["Product Strategy", "Leadership", "Analytical Thinking", "Technical Knowledge", "Behavioral"]
+                    },
+                    "description": "Areas needing focused improvement (optional)"
+                  },
+                  "preferred_study_style": {
+                    "type": "string",
+                    "enum": ["intensive", "gradual", "mixed"],
+                    "description": "Preferred preparation approach (optional)"
+                  }
+                },
+                "required": ["company_name", "role_level", "preparation_timeline"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customized preparation plan created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "preparation_plan": {
+                          "type": "object",
+                          "properties": {
+                            "timeline": { "type": "string" },
+                            "daily_schedule": { "type": "array", "items": { "type": "string" } },
+                            "weekly_milestones": { "type": "array", "items": { "type": "string" } },
+                            "practice_questions": { "type": "array", "items": { "type": "string" } },
+                            "mock_interview_plan": { "type": "object" }
+                          }
+                        },
+                        "company_specific_tips": { "type": "array", "items": { "type": "string" } },
+                        "success_probability": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-studies/start-session": {
+      "post": {
+        "summary": "Initiate a PM case study practice session with realistic business scenarios",
+        "description": "Initiate a PM case study practice session with realistic business scenarios",
+        "operationId": "start_case_study",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "case_type": {
+                    "type": "string",
+                    "enum": ["product_design", "strategy", "prioritization", "market_entry", "growth", "monetization"],
+                    "description": "Type of case study"
+                  },
+                  "industry": {
+                    "type": "string",
+                    "description": "Industry context for the case (optional)",
+                    "enum": ["Technology", "E-commerce", "Fintech", "Healthcare", "Social Media", "Gaming"]
+                  },
+                  "difficulty_level": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "description": "Case difficulty (1=easy, 5=hard)"
+                  },
+                  "time_limit": {
+                    "type": "integer",
+                    "description": "Time limit in minutes (optional)"
+                  },
+                  "company_style": {
+                    "type": "string",
+                    "description": "Company interview style to emulate (optional)",
+                    "enum": ["Google", "Meta", "Amazon", "Microsoft", "Apple", "Netflix"]
+                  },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"],
+                    "description": "Target role level"
+                  }
+                },
+                "required": ["case_type", "role_level"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case study session started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "session_id": { "type": "string" },
+                        "case_scenario": {
+                          "type": "object",
+                          "properties": {
+                            "title": { "type": "string" },
+                            "description": { "type": "string" },
+                            "context": { "type": "string" },
+                            "challenge": { "type": "string" },
+                            "data_provided": { "type": "object" }
+                          }
+                        },
+                        "time_limit": { "type": "integer" },
+                        "next_steps": { "type": "array", "items": { "type": "string" } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-studies/get-guidance": {
+      "post": {
+        "summary": "Provide framework-based guidance and hints during case study execution",
+        "description": "Provide framework-based guidance and hints during case study execution",
+        "operationId": "get_case_guidance",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "description": "Case study session ID"
+                  },
+                  "current_step": {
+                    "type": "string",
+                    "description": "Current step or challenge in the case",
+                    "enum": ["Understand the problem", "Analyze the data", "Generate options", "Evaluate trade-offs", "Make recommendation", "Plan implementation"]
+                  },
+                  "request_type": {
+                    "type": "string",
+                    "enum": ["hint", "framework", "clarification", "next_step"],
+                    "description": "Type of guidance needed"
+                  },
+                  "user_progress": {
+                    "type": "string",
+                    "description": "Summary of progress so far (optional)"
+                  }
+                },
+                "required": ["session_id", "current_step", "request_type"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case guidance provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "guidance": { "type": "string" },
+                        "frameworks": { "type": "array", "items": { "type": "string" } },
+                        "next_questions": { "type": "array", "items": { "type": "string" } },
+                        "common_pitfalls": { "type": "array", "items": { "type": "string" } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-studies/evaluate-approach": {
+      "post": {
+        "summary": "Evaluate case study approach and provide real-time feedback on methodology and thinking",
+        "description": "Evaluate case study approach and provide real-time feedback on methodology and thinking",
+        "operationId": "evaluate_case_approach",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "description": "Case study session ID"
+                  },
+                  "step_number": {
+                    "type": "integer",
+                    "description": "Current step number in the case"
+                  },
+                  "user_approach": {
+                    "type": "string",
+                    "description": "User's approach or solution for this step"
+                  },
+                  "frameworks_used": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["CIRCLES", "AARRR", "RICE", "Kano Model", "MoSCoW", "SWOT", "Porter's Five Forces"]
+                    },
+                    "description": "PM frameworks applied (optional)"
+                  },
+                  "request_detailed_feedback": {
+                    "type": "boolean",
+                    "description": "Request comprehensive feedback (default: false)"
+                  }
+                },
+                "required": ["session_id", "step_number", "user_approach"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case approach evaluated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "feedback": {
+                          "type": "object",
+                          "properties": {
+                            "step_score": { "type": "number" },
+                            "methodology_assessment": { "type": "string" },
+                            "strengths": { "type": "array", "items": { "type": "string" } },
+                            "suggestions": { "type": "array", "items": { "type": "string" } }
+                          }
+                        },
+                        "overall_progress": { "type": "string" },
+                        "next_steps": { "type": "array", "items": { "type": "string" } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-studies/complete-session": {
+      "post": {
+        "summary": "Complete case study session and provide comprehensive evaluation with performance analytics",
+        "description": "Complete case study session and provide comprehensive evaluation with performance analytics",
+        "operationId": "complete_case_study",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "description": "Case study session ID to complete"
+                  },
+                  "include_detailed_breakdown": {
+                    "type": "boolean",
+                    "description": "Include step-by-step performance breakdown (default: true)"
+                  },
+                  "include_recommendations": {
+                    "type": "boolean",
+                    "description": "Include personalized study and practice recommendations (default: true)"
+                  },
+                  "include_performance_analytics": {
+                    "type": "boolean",
+                    "description": "Include detailed performance analytics and benchmarking (default: false)"
+                  }
+                },
+                "required": ["session_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Case study completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "final_evaluation": {
+                          "type": "object",
+                          "properties": {
+                            "overall_score": { "type": "number" },
+                            "performance_summary": { "type": "string" },
+                            "key_strengths": { "type": "array", "items": { "type": "string" } },
+                            "development_areas": { "type": "array", "items": { "type": "string" } },
+                            "readiness_assessment": { "type": "string" }
+                          }
+                        },
+                        "detailed_breakdown": {
+                          "type": "object",
+                          "properties": {
+                            "structure_score": { "type": "number" },
+                            "analytical_score": { "type": "number" },
+                            "communication_score": { "type": "number" },
+                            "framework_usage": { "type": "number" }
+                          }
+                        },
+                        "recommendations": {
+                          "type": "object",
+                          "properties": {
+                            "practice_areas": { "type": "array", "items": { "type": "string" } },
+                            "study_resources": { "type": "array", "items": { "type": "string" } },
+                            "next_steps": { "type": "array", "items": { "type": "string" } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

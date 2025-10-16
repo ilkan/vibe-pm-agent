@@ -1,0 +1,40 @@
+{
+  "name": "vibe-pm-agent-tests",
+  "version": "2.0.0",
+  "description": "Integration and performance tests for Vibe PM Agent Lambda functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha 'integration/**/*.test.ts' --require ts-node/register --timeout 60000",
+    "test:integration": "mocha 'integration/**/*.test.ts' --require ts-node/register --timeout 60000",
+    "test:performance": "mocha 'performance/**/*.test.ts' --require ts-node/register --timeout 120000",
+    "test:security": "mocha 'security/**/*.test.ts' --require ts-node/register --timeout 60000",
+    "test:watch": "mocha 'integration/**/*.test.ts' --require ts-node/register --watch --timeout 60000",
+    "test:coverage": "nyc npm run test",
+    "lint": "eslint 'integration/**/*.ts' 'performance/**/*.ts' 'security/**/*.ts'",
+    "lint:fix": "eslint 'integration/**/*.ts' 'performance/**/*.ts' 'security/**/*.ts' --fix"
+  },
+  "dependencies": {
+    "@aws-sdk/client-lambda": "^3.490.0",
+    "@aws-sdk/client-cloudwatch": "^3.490.0",
+    "@aws-sdk/client-cloudwatch-logs": "^3.490.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "chai": "^4.3.0",
+    "eslint": "^8.0.0",
+    "mocha": "^10.0.0",
+    "nyc": "^15.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "engineStrict": true
+}
