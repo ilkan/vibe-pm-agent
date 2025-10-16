@@ -1,0 +1,17 @@
+{
+  "apiKeys": [
+    {
+      "keyId": "example-client-1",
+      "hashedKey": "your-hashed-api-key-here",
+      "clientName": "Example External Client",
+      "permissions": ["all"],
+      "enabled": true,
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "requestsPerHour": 1000,
+        "burstLimit": 10
+      },
+      "expiresAt": null
+    }
+  ]
+}

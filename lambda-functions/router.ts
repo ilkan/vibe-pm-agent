@@ -1,12 +1,11 @@
 // Main Lambda Router for Vibe PM Agent
 // Routes requests to appropriate tool handlers across all categories
+// Supports dual access patterns: external (API Gateway) and internal (direct invocation)
 
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
 import {
-  LambdaRequest,
   LambdaResponse,
-  ToolNotFoundError,
-  ToolExecutionError
+  ToolNotFoundError
 } from './shared/types';
 import {
   validateLambdaRequest,
@@ -28,72 +27,57 @@ import * as marketIntelligenceHandlers from './market-intelligence';
 import * as interviewPrepHandlers from './interview-prep';
 import * as caseStudiesHandlers from './case-studies';
 
+// Import authentication service
+import { AuthService } from './auth/auth-service';
+
+// Invocation context types
+export enum InvocationContext {
+  EXTERNAL_API_GATEWAY = 'external',
+  INTERNAL_DIRECT = 'internal',
+  INTERNAL_BEDROCK = 'bedrock'
+}
+
+// Direct invocation event type (for internal AWS requests)
+export interface DirectInvocationEvent {
+  toolName: string;
+  toolArgs: Record<string, any>;
+  source?: string;
+  requestId?: string;
+}
+
 export const handler = async (
-  event: APIGatewayEvent,
+  event: APIGatewayEvent | DirectInvocationEvent,
   context: Context
-): Promise<APIGatewayProxyResult> => {
+): Promise<APIGatewayProxyResult | LambdaResponse> => {
   const config = loadEnvironmentConfig();
   const logger = new Logger(config);
   const timer = new PerformanceTimer();
 
   try {
+    // Detect invocation context
+    const invocationContext = detectInvocationContext(event);
+    
     logger.info('Vibe PM Agent Lambda Router invoked', {
       requestId: context.awsRequestId,
       functionName: context.functionName,
-      path: event.path,
-      httpMethod: event.httpMethod
+      invocationContext,
+      externalAccessEnabled: config.externalAccessEnabled,
+      ...(invocationContext === InvocationContext.EXTERNAL_API_GATEWAY && {
+        path: (event as APIGatewayEvent).path,
+        httpMethod: (event as APIGatewayEvent).httpMethod
+      })
     });
 
-    // Handle health check
-    if (event.path === '/health' && event.httpMethod === 'GET') {
-      return formatApiGatewayResponse(200, {
-        status: 'healthy',
-        timestamp: new Date().toISOString(),
-        version: '2.0.0',
-        environment: config.environment,
-        tools: 32
-      });
+    // Route based on invocation context
+    if (invocationContext === InvocationContext.EXTERNAL_API_GATEWAY) {
+      return await handleExternalRequest(event as APIGatewayEvent, context, config, logger, timer);
+    } else {
+      return await handleInternalRequest(event as DirectInvocationEvent, context, config, logger, timer);
     }
 
-    // Parse and validate request
-    let requestBody: any;
-    try {
-      requestBody = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
-    } catch (error) {
-      return formatApiGatewayResponse(400, {
-        success: false,
-        error: 'Invalid JSON in request body'
-      });
-    }
 
-    const request = validateLambdaRequest(requestBody);
 
-    // Route to appropriate tool handler
-    const result = await routeToTool(request.toolName, request.toolArgs, logger);
 
-    const executionTime = timer.measure();
-    logger.info('Vibe PM Agent Lambda Router completed', {
-      requestId: context.awsRequestId,
-      toolName: request.toolName,
-      executionTime,
-      success: result.success
-    });
-
-    const response = formatSuccessResponse(
-      result,
-      context.awsRequestId,
-      request.toolName,
-      executionTime
-    );
-
-    // Convert to OpenAI-compatible format for Bedrock Agent
-    const openAIResponse = convertToOpenAIFormat(
-      response,
-      request.toolName,
-      request.toolArgs
-    );
-
-    return formatApiGatewayResponse(200, openAIResponse);
 
   } catch (error) {
     const executionTime = timer.measure();
@@ -102,12 +86,306 @@ export const handler = async (
       executionTime
     });
 
-    const response = formatErrorResponse(error as Error, context.awsRequestId);
-    const statusCode = (error as any)?.statusCode || 500;
-
-    return formatApiGatewayResponse(statusCode, response);
+    // Detect invocation context for proper error response format
+    const invocationContext = detectInvocationContext(event);
+    
+    if (invocationContext === InvocationContext.EXTERNAL_API_GATEWAY) {
+      const response = formatErrorResponse(error as Error, context.awsRequestId);
+      const statusCode = (error as any)?.statusCode || 500;
+      return formatApiGatewayResponse(statusCode, response);
+    } else {
+      // For internal requests, return Lambda response format
+      return formatErrorResponse(error as Error, context.awsRequestId);
+    }
   }
 };
+
+/**
+ * Detect invocation context based on event structure
+ */
+function detectInvocationContext(event: any): InvocationContext {
+  // Check for API Gateway event structure
+  if (event.requestContext && event.headers && event.httpMethod && event.path) {
+    return InvocationContext.EXTERNAL_API_GATEWAY;
+  }
+  
+  // Check for Bedrock agent source
+  if (event.source === 'bedrock-agent' || event.source === 'aws.bedrock') {
+    return InvocationContext.INTERNAL_BEDROCK;
+  }
+  
+  // Direct Lambda invocation (default for internal requests)
+  return InvocationContext.INTERNAL_DIRECT;
+}
+
+/**
+ * Handle external requests from API Gateway
+ */
+async function handleExternalRequest(
+  event: APIGatewayEvent,
+  context: Context,
+  config: any,
+  logger: Logger,
+  timer: PerformanceTimer
+): Promise<APIGatewayProxyResult> {
+  // Handle health check (no authentication required, works even when external access disabled)
+  if (event.path === '/health' && event.httpMethod === 'GET') {
+    return formatApiGatewayResponse(200, {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: '2.0.0',
+      environment: config.environment,
+      tools: 32,
+      accessMode: 'external'
+    });
+  }
+
+  // Handle OPTIONS requests for CORS (no authentication required)
+  if (event.httpMethod === 'OPTIONS') {
+    return formatApiGatewayResponse(200, {}, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Content-Type, X-API-Key, Authorization',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
+    });
+  }
+
+  // Check if external access is enabled (after health check and OPTIONS)
+  if (!config.externalAccessEnabled) {
+    logger.warn('External access attempt when disabled', {
+      requestId: context.awsRequestId,
+      path: event.path,
+      httpMethod: event.httpMethod
+    });
+    
+    return formatApiGatewayResponse(403, {
+      success: false,
+      error: 'External access is not enabled'
+    });
+  }
+
+  // Authenticate external requests
+  const authService = new AuthService();
+  const requestContext = {
+    requestId: context.awsRequestId,
+    endpoint: `${event.httpMethod} ${event.path}`
+  } as any;
+
+  // Add optional fields only if they exist
+  const userAgent = event.headers?.['User-Agent'] || event.headers?.['user-agent'];
+  if (userAgent) requestContext.userAgent = userAgent;
+  
+  const ipAddress = event.requestContext?.identity?.sourceIp;
+  if (ipAddress) requestContext.ipAddress = ipAddress;
+
+  const authResult = await authService.authenticateRequest(
+    event.headers || {},
+    requestContext
+  );
+
+  if (!authResult.isAuthenticated) {
+    logger.warn('Authentication failed for external request', {
+      requestId: context.awsRequestId,
+      path: event.path,
+      httpMethod: event.httpMethod,
+      error: authResult.error,
+      ipAddress: event.requestContext?.identity?.sourceIp
+    });
+
+    return authService.createAuthErrorResponse(authResult, 401);
+  }
+
+  logger.info('External request authenticated successfully', {
+    requestId: context.awsRequestId,
+    clientId: authResult.clientId,
+    clientName: authResult.clientName,
+    path: event.path,
+    httpMethod: event.httpMethod
+  });
+
+  // Parse and validate request
+  let requestBody: any;
+  try {
+    requestBody = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
+  } catch (error) {
+    return formatApiGatewayResponse(400, {
+      success: false,
+      error: 'Invalid JSON in request body'
+    });
+  }
+
+  const request = validateLambdaRequest(requestBody);
+
+  // Route to appropriate tool handler
+  const result = await routeToTool(request.toolName, request.toolArgs, logger);
+
+  const executionTime = timer.measure();
+  logger.info('External request completed', {
+    requestId: context.awsRequestId,
+    toolName: request.toolName,
+    executionTime,
+    success: result.success,
+    accessPattern: 'external',
+    clientId: authResult.clientId,
+    clientName: authResult.clientName,
+    path: event.path,
+    httpMethod: event.httpMethod,
+    ipAddress: event.requestContext?.identity?.sourceIp,
+    userAgent: event.headers?.['User-Agent'] || event.headers?.['user-agent']
+  });
+
+  const response = formatSuccessResponse(
+    result,
+    context.awsRequestId,
+    request.toolName,
+    executionTime
+  );
+
+  // Log access metrics for monitoring
+  const metricsData = {
+    requestId: context.awsRequestId,
+    toolName: request.toolName,
+    executionTime,
+    success: result.success,
+    httpMethod: event.httpMethod,
+    path: event.path
+  } as any;
+
+  if (authResult.clientId) {
+    metricsData.clientId = authResult.clientId;
+  }
+
+  logAccessMetrics('external', metricsData);
+
+  // Convert to OpenAI-compatible format for external clients
+  const openAIResponse = convertToOpenAIFormat(
+    response,
+    request.toolName,
+    request.toolArgs
+  );
+
+  return formatApiGatewayResponse(200, openAIResponse);
+}
+
+/**
+ * Handle internal requests (direct Lambda invocation)
+ */
+async function handleInternalRequest(
+  event: DirectInvocationEvent,
+  context: Context,
+  config: any,
+  logger: Logger,
+  timer: PerformanceTimer
+): Promise<LambdaResponse> {
+  // Validate direct invocation request
+  if (!event.toolName || !event.toolArgs) {
+    throw new Error('Direct invocation requires toolName and toolArgs');
+  }
+
+  logger.info('Internal request processing', {
+    requestId: context.awsRequestId,
+    toolName: event.toolName,
+    source: event.source || 'direct-invocation',
+    accessPattern: 'internal',
+    invocationArn: context.invokedFunctionArn,
+    functionName: context.functionName
+  });
+
+  // Route to appropriate tool handler
+  const result = await routeToTool(event.toolName, event.toolArgs, logger);
+
+  const executionTime = timer.measure();
+  logger.info('Internal request completed', {
+    requestId: context.awsRequestId,
+    toolName: event.toolName,
+    executionTime,
+    success: result.success,
+    accessPattern: 'internal',
+    source: event.source || 'direct-invocation',
+    invocationArn: context.invokedFunctionArn,
+    functionName: context.functionName
+  });
+
+  // Log access metrics for monitoring
+  logAccessMetrics('internal', {
+    requestId: context.awsRequestId,
+    toolName: event.toolName,
+    executionTime,
+    success: result.success,
+    source: event.source || 'direct-invocation'
+  });
+
+  return formatSuccessResponse(
+    result,
+    context.awsRequestId,
+    event.toolName,
+    executionTime
+  );
+}
+
+/**
+ * Log access metrics for CloudWatch monitoring
+ */
+function logAccessMetrics(accessPattern: 'external' | 'internal', metrics: {
+  requestId: string;
+  toolName: string;
+  executionTime: number;
+  success: boolean;
+  clientId?: string;
+  source?: string;
+  httpMethod?: string;
+  path?: string;
+}): void {
+  // Log request count metric
+  console.log(JSON.stringify({
+    MetricName: 'RequestCount',
+    Value: 1,
+    Unit: 'Count',
+    Dimensions: [
+      { Name: 'AccessPattern', Value: accessPattern },
+      { Name: 'ToolName', Value: metrics.toolName },
+      { Name: 'Success', Value: metrics.success.toString() }
+    ],
+    Timestamp: new Date().toISOString()
+  }));
+
+  // Log execution time metric
+  console.log(JSON.stringify({
+    MetricName: 'ExecutionTime',
+    Value: metrics.executionTime,
+    Unit: 'Milliseconds',
+    Dimensions: [
+      { Name: 'AccessPattern', Value: accessPattern },
+      { Name: 'ToolName', Value: metrics.toolName }
+    ],
+    Timestamp: new Date().toISOString()
+  }));
+
+  // Log access pattern specific metrics
+  if (accessPattern === 'external' && metrics.clientId) {
+    console.log(JSON.stringify({
+      MetricName: 'ExternalClientRequest',
+      Value: 1,
+      Unit: 'Count',
+      Dimensions: [
+        { Name: 'ClientId', Value: metrics.clientId },
+        { Name: 'ToolName', Value: metrics.toolName },
+        { Name: 'HttpMethod', Value: metrics.httpMethod || 'unknown' }
+      ],
+      Timestamp: new Date().toISOString()
+    }));
+  } else if (accessPattern === 'internal') {
+    console.log(JSON.stringify({
+      MetricName: 'InternalRequest',
+      Value: 1,
+      Unit: 'Count',
+      Dimensions: [
+        { Name: 'Source', Value: metrics.source || 'direct-invocation' },
+        { Name: 'ToolName', Value: metrics.toolName }
+      ],
+      Timestamp: new Date().toISOString()
+    }));
+  }
+}
 
 // Tool routing and execution
 async function routeToTool(toolName: string, toolArgs: Record<string, any>, logger: Logger): Promise<any> {

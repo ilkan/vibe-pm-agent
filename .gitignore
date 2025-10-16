@@ -131,3 +131,7 @@ demo/run-all-demos.js
 demo/test-mcp-server.js
 demo/ai-code-review-assistant/
 demo/citation-quality/
+
+# AWS credential files (keep .gitkeep for directory structure)
+.aws/*
+!.aws/.gitkeep

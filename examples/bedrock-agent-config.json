@@ -1,0 +1,36 @@
+{
+  "agentName": "VibePMInterviewCoach",
+  "description": "AI-powered PM interview preparation and business analysis agent",
+  "foundationModel": "amazon.nova-pro-v1:0",
+  "instruction": "You are a senior product management interview coach and business analyst. Help candidates prepare for PM interviews with realistic practice questions, case studies, and strategic business analysis. Use the available tools to provide comprehensive coaching and business intelligence.",
+  "actionGroups": [
+    {
+      "actionGroupName": "VibePMAgent",
+      "description": "Strategic business analysis and PM interview preparation tools",
+      "actionGroupExecutor": {
+        "lambda": "arn:aws:lambda:us-east-1:123456789012:function:dev-vibe-pm-agent-lambda"
+      },
+      "apiSchema": {
+        "s3": {
+          "s3BucketName": "your-bedrock-schema-bucket",
+          "s3ObjectKey": "schemas/vibe-pm-agent-schema.json"
+        }
+      },
+      "actionGroupState": "ENABLED"
+    }
+  ],
+  "knowledgeBases": [
+    {
+      "knowledgeBaseId": "your-knowledge-base-id",
+      "description": "PM frameworks, interview best practices, and market intelligence",
+      "knowledgeBaseState": "ENABLED"
+    }
+  ],
+  "idleSessionTTLInSeconds": 1800,
+  "agentResourceRoleArn": "arn:aws:iam::123456789012:role/AmazonBedrockExecutionRoleForAgents_VibePMAgent",
+  "tags": {
+    "Environment": "dev",
+    "Project": "VibePMAgent",
+    "Purpose": "PMInterviewPreparation"
+  }
+}

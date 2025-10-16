@@ -186,6 +186,210 @@ export MCP_TRANSPORT=stdio      # Transport type (stdio default)
 export CITATION_CACHE_TTL=3600  # Citation cache TTL in seconds
 export MAX_CONCURRENT_TOOLS=5   # Maximum concurrent tool executions
 export ENABLE_STREAMING=true    # Enable response streaming
+
+# External access configuration
+export EXTERNAL_ACCESS_ENABLED=true  # Enable external API access with authentication
+```
+
+## 🌐 External Access Configuration
+
+Vibe PM Agent supports dual access patterns for maximum flexibility:
+
+### Access Patterns
+
+#### 1. Internal Access (Default)
+- **Direct Lambda ARN invocation** for AWS Bedrock agents
+- **No authentication required** for internal requests
+- **Optimal performance** with zero authentication overhead
+- **Automatic context detection** based on invocation source
+
+#### 2. External Access (Optional)
+- **Public API Gateway URL** with API key authentication
+- **Secure external client access** for web applications and third-party integrations
+- **Rate limiting and monitoring** built-in
+- **CORS support** for browser-based clients
+
+### Quick Setup
+
+1. **Enable external access:**
+   ```bash
+   export EXTERNAL_ACCESS_ENABLED=true
+   ```
+
+2. **Setup credential files:**
+   ```bash
+   ./deployment-scripts/setup-credentials.sh dev
+   ```
+
+3. **Deploy with external access:**
+   ```bash
+   ./deployment-scripts/deploy-api-gateway.sh dev
+   ```
+
+### API Key Configuration
+
+#### Setup API Keys
+
+Create and configure API keys in `.aws/api-keys.json`:
+
+```json
+{
+  "apiKeys": [
+    {
+      "keyId": "client-web-app",
+      "hashedKey": "sha256-hash-of-your-api-key",
+      "clientName": "Web Application",
+      "permissions": ["all"],
+      "enabled": true,
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "requestsPerHour": 1000,
+        "burstLimit": 10
+      },
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
+#### Generate API Keys
+
+Use the credential setup script to generate secure API keys:
+
+```bash
+# Generate sample API keys for testing
+./deployment-scripts/setup-credentials.sh dev
+
+# The script will create:
+# - .aws/api-keys.json (configuration file)
+# - .aws/sample-api-key.txt (temporary reference)
+# - .aws/credentials-dev (AWS credentials)
+```
+
+### External API Usage
+
+#### Authentication
+
+Include the API key in the `X-API-Key` header:
+
+```bash
+curl -X POST "https://your-api-gateway-url/business-analysis/analyze-opportunity" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key-here" \
+  -d '{
+    "idea": "AI-powered code review assistant",
+    "market_context": {
+      "industry": "developer_tools",
+      "budget_range": "medium"
+    }
+  }'
+```
+
+#### JavaScript/TypeScript Example
+
+```typescript
+const response = await fetch('https://your-api-gateway-url/business-analysis/analyze-opportunity', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-API-Key': 'your-api-key-here'
+  },
+  body: JSON.stringify({
+    idea: 'AI-powered code review assistant',
+    market_context: {
+      industry: 'developer_tools',
+      budget_range: 'medium'
+    }
+  })
+});
+
+const result = await response.json();
+```
+
+### Bedrock Agent Configuration
+
+For internal AWS access, configure your Bedrock agent with the Lambda ARN:
+
+```json
+{
+  "actionGroups": [
+    {
+      "actionGroupName": "VibePMAgent",
+      "description": "Strategic business analysis and PM tools",
+      "actionGroupExecutor": {
+        "lambda": "arn:aws:lambda:us-east-1:123456789012:function:dev-vibe-pm-agent-lambda"
+      },
+      "apiSchema": {
+        "s3": {
+          "s3BucketName": "your-schema-bucket",
+          "s3ObjectKey": "vibe-pm-agent-schema.json"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Security Best Practices
+
+#### API Key Management
+- **Hash API keys** before storing in configuration files
+- **Rotate keys regularly** (recommended: every 90 days)
+- **Use different keys** for different environments (dev/prod)
+- **Monitor API usage** through CloudWatch logs
+
+#### Credential File Security
+- **Never commit** `.aws/*` files to version control
+- **Use environment-specific** credential files
+- **Set proper file permissions** (600 for credential files)
+- **Use AWS IAM roles** for production deployments
+
+#### Network Security
+- **Enable CORS** only for trusted domains
+- **Use HTTPS** for all external API calls
+- **Implement rate limiting** to prevent abuse
+- **Monitor failed authentication** attempts
+
+### Deployment Scripts
+
+The deployment process automatically handles both access patterns:
+
+```bash
+# Deploy with external access enabled (default)
+EXTERNAL_ACCESS_ENABLED=true ./deployment-scripts/deploy-api-gateway.sh prod
+
+# Deploy with only internal access
+EXTERNAL_ACCESS_ENABLED=false ./deployment-scripts/deploy-api-gateway.sh prod
+
+# Setup credentials for external access
+./deployment-scripts/setup-credentials.sh prod
+```
+
+### Monitoring and Troubleshooting
+
+#### CloudWatch Logs
+- **Authentication attempts** are logged with client identification
+- **Failed requests** include error details and retry guidance
+- **Performance metrics** track response times for both access patterns
+
+#### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| `401 Unauthorized` | Check API key format and ensure it's included in `X-API-Key` header |
+| `403 Forbidden` | Verify API key permissions and rate limits |
+| `CORS errors` | Ensure your domain is configured in API Gateway CORS settings |
+| `Internal access fails` | Verify Lambda ARN and IAM role permissions for Bedrock agent |
+
+#### Testing External Access
+
+```bash
+# Test health endpoint (no auth required)
+curl https://your-api-gateway-url/health
+
+# Test authenticated endpoint
+curl -H "X-API-Key: your-key" https://your-api-gateway-url/business-analysis/validate-idea \
+  -d '{"idea": "test", "criteria": ["feasibility"]}'
 ```
 
 ## 🛠️ Available MCP Tools (21 Total)

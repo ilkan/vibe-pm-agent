@@ -23,7 +23,8 @@ The **Vibe PM Agent** is an AWS AI-powered MCP server providing strategic busine
 
 ### Data Flow Pattern
 ```
-User Input → MCP Tool → AWS AI Agent (Bedrock) → Pipeline Component → Business Logic → Formatted Output
+External Client (API Key) → API Gateway → Lambda → MCP Tool → Business Logic → Response
+Internal Bedrock Agent → Direct Lambda (ARN) → MCP Tool → Business Logic → Response
 ```
 
 ### AWS AI Agent Architecture
@@ -136,3 +137,23 @@ User Input → MCP Tool → AWS AI Agent (Bedrock) → Pipeline Component → Bu
 - **Real-Time Adaptation**: AI agents adapt difficulty and focus based on user performance
 - **Knowledge Integration**: Seamless integration of market intelligence with interview scenarios
 - **Scalable Deployment**: AWS cloud infrastructure supporting concurrent users globally
+
+## Access Patterns (NEW)
+
+### External Access
+- **Authentication**: API key-based authentication for external clients
+- **Endpoint**: Public API Gateway URL with authentication required
+- **Credentials**: Stored securely in `.aws/api-keys.json` (gitignored)
+- **Use Cases**: External applications, web clients, third-party integrations
+
+### Internal Access
+- **Authentication**: IAM roles and direct Lambda ARN invocation
+- **Endpoint**: Direct Lambda function invocation via ARN
+- **Credentials**: AWS IAM roles for Bedrock agents
+- **Use Cases**: Bedrock agents, internal AWS services, high-performance scenarios
+
+### Configuration
+- **Environment Variable**: `EXTERNAL_ACCESS_ENABLED=true/false`
+- **Credential Files**: `.aws/` directory with gitignore protection
+- **Context Detection**: Automatic routing based on invocation source
+- **Performance**: Zero overhead for internal requests, minimal overhead for external

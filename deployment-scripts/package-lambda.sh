@@ -138,14 +138,31 @@ create_package() {
     mkdir -p "${PACKAGE_DIR}"
 
     # Copy Lambda function files to package directory
+    log_info "Copying compiled Lambda functions..."
     cp -r "${LAMBDA_DIR}/dist/"* "${PACKAGE_DIR}/"
 
-    # Create package
-    cd "${DIST_DIR}"
-    log_info "Creating ZIP package: ${PACKAGE_NAME}"
-    zip -r "${PACKAGE_NAME}" lambda-package/
+    # Install production dependencies in package directory
+    log_info "Installing production dependencies..."
+    cd "${PACKAGE_DIR}"
+    npm install --production --no-optional
 
-    log_success "Deployment package created: ${DIST_DIR}/${PACKAGE_NAME}"
+    # Remove unnecessary files to reduce package size
+    log_info "Removing unnecessary files..."
+    find . -name "*.ts" -type f -delete
+    find . -name "*.d.ts" -type f -delete
+    find . -name "*.map" -type f -delete
+    find . -name "*.md" -type f -delete
+    rm -rf .git .github .vscode tests __tests__
+
+    # Create package
+    cd "${PACKAGE_DIR}"
+    log_info "Creating ZIP package: ${PACKAGE_NAME}"
+    PACKAGE_PATH="${DIST_DIR}/${PACKAGE_NAME}"
+    zip -r "${PACKAGE_PATH}" . -x "*.DS_Store" "*.git/*"
+
+    # Get package size
+    PACKAGE_SIZE=$(du -h "${PACKAGE_PATH}" | cut -f1)
+    log_success "Deployment package created: ${PACKAGE_PATH} (${PACKAGE_SIZE})"
 }
 
 # Upload to S3

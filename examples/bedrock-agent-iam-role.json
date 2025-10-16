@@ -1,0 +1,61 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "BedrockAgentBedrockFoundationModelPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0",
+        "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0",
+        "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0"
+      ]
+    },
+    {
+      "Sid": "BedrockAgentLambdaInvokePolicy",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+        "arn:aws:lambda:us-east-1:123456789012:function:dev-vibe-pm-agent-lambda",
+        "arn:aws:lambda:us-east-1:123456789012:function:prod-vibe-pm-agent-lambda"
+      ]
+    },
+    {
+      "Sid": "BedrockAgentKnowledgeBasePolicy",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:Retrieve",
+        "bedrock:RetrieveAndGenerate"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:us-east-1:123456789012:knowledge-base/your-knowledge-base-id"
+      ]
+    },
+    {
+      "Sid": "BedrockAgentS3SchemaPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::your-bedrock-schema-bucket/schemas/*"
+      ]
+    },
+    {
+      "Sid": "BedrockAgentLogsPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": [
+        "arn:aws:logs:us-east-1:123456789012:log-group:/aws/bedrock/agents/*"
+      ]
+    }
+  ]
+}

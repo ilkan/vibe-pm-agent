@@ -12,6 +12,7 @@ DIST_DIR="${PROJECT_ROOT}/dist"
 ENVIRONMENT=${1:-dev}
 STACK_NAME="${ENVIRONMENT}-vibe-pm-agent-lambda"
 TEMPLATE_FILE="${PROJECT_ROOT}/infrastructure/lambda-deployment.yaml"
+EXTERNAL_ACCESS_ENABLED=${EXTERNAL_ACCESS_ENABLED:-true}
 
 # Colors for output
 RED='\033[0;31m'
@@ -105,6 +106,7 @@ get_stack_status() {
 # Deploy Lambda function
 deploy_lambda() {
     log_info "Deploying Lambda function to environment: $ENVIRONMENT"
+    log_info "External access enabled: $EXTERNAL_ACCESS_ENABLED"
 
     # Check if stack exists
     if stack_exists; then
@@ -123,6 +125,7 @@ deploy_lambda() {
             ParameterKey=Environment,ParameterValue="$ENVIRONMENT" \
             ParameterKey=S3BucketName,ParameterValue="$S3_BUCKET" \
             ParameterKey=S3Key,ParameterValue="$S3_KEY" \
+            ParameterKey=ExternalAccessEnabled,ParameterValue="$EXTERNAL_ACCESS_ENABLED" \
         --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM \
         --region "us-east-1" \
         --output text; then

@@ -1,1 +1,7 @@
-{"toolName": "validate_idea_quick", "toolArgs": {"idea": "Test deployment validation", "criteria": ["market_viability", "technical_feasibility"]}}
+{
+  "toolName": "validate_idea_quick",
+  "toolArgs": {
+    "idea": "AI-powered PM interview coach",
+    "criteria": ["market_viability", "technical_feasibility"]
+  }
+}

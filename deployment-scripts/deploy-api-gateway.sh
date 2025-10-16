@@ -10,6 +10,7 @@ ENVIRONMENT=${1:-dev}
 REGION=${AWS_REGION:-us-east-1}
 STACK_NAME="vibe-pm-agent-${ENVIRONMENT}"
 LAMBDA_FUNCTION_NAME="vibe-pm-agent-${ENVIRONMENT}"
+EXTERNAL_ACCESS_ENABLED=${EXTERNAL_ACCESS_ENABLED:-true}
 
 # Colors for output
 RED='\033[0;31m'
@@ -21,6 +22,7 @@ echo -e "${GREEN}🚀 Starting API Gateway deployment for Vibe PM Agent${NC}"
 echo "Environment: $ENVIRONMENT"
 echo "Region: $REGION"
 echo "Stack Name: $STACK_NAME"
+echo "External Access: $EXTERNAL_ACCESS_ENABLED"
 
 # Check if AWS CLI is installed
 if ! command -v aws &> /dev/null; then
@@ -91,6 +93,43 @@ deploy_lambda() {
     echo -e "${GREEN}✅ Lambda function deployed${NC}"
 }
 
+# Function to setup API keys for external access
+setup_api_keys() {
+    if [ "$EXTERNAL_ACCESS_ENABLED" = "true" ]; then
+        echo -e "${YELLOW}🔑 Setting up API keys for external access...${NC}"
+        
+        # Check if .aws/api-keys.json exists
+        if [ ! -f ".aws/api-keys.json" ]; then
+            echo -e "${YELLOW}⚠️  API keys file not found. Creating from template...${NC}"
+            
+            # Create .aws directory if it doesn't exist
+            mkdir -p .aws
+            
+            # Copy template if it exists
+            if [ -f ".aws-templates/api-keys.template.json" ]; then
+                cp .aws-templates/api-keys.template.json .aws/api-keys.json
+                echo -e "${GREEN}✅ API keys template copied to .aws/api-keys.json${NC}"
+                echo -e "${YELLOW}⚠️  Please update .aws/api-keys.json with actual API keys before deployment${NC}"
+            else
+                echo -e "${RED}❌ API keys template not found. Please create .aws/api-keys.json manually${NC}"
+                return 1
+            fi
+        else
+            echo -e "${GREEN}✅ API keys file found${NC}"
+        fi
+        
+        # Validate API keys file format
+        if ! python3 -m json.tool .aws/api-keys.json > /dev/null 2>&1; then
+            echo -e "${RED}❌ Invalid JSON format in .aws/api-keys.json${NC}"
+            return 1
+        fi
+        
+        echo -e "${GREEN}✅ API keys configuration validated${NC}"
+    else
+        echo -e "${YELLOW}⚠️  External access disabled, skipping API key setup${NC}"
+    fi
+}
+
 # Function to deploy API Gateway
 deploy_api_gateway() {
     echo -e "${YELLOW}🌐 Deploying API Gateway...${NC}"
@@ -110,6 +149,7 @@ deploy_api_gateway() {
             --template-body file://api-gateway-packaged.yaml \
             --parameters ParameterKey=Environment,ParameterValue="$ENVIRONMENT" \
                          ParameterKey=LambdaFunctionArn,ParameterValue="$LAMBDA_ARN" \
+                         ParameterKey=ExternalAccessEnabled,ParameterValue="$EXTERNAL_ACCESS_ENABLED" \
             --capabilities CAPABILITY_IAM \
             --region "$REGION"
     else
@@ -119,6 +159,7 @@ deploy_api_gateway() {
             --template-body file://api-gateway-packaged.yaml \
             --parameters ParameterKey=Environment,ParameterValue="$ENVIRONMENT" \
                          ParameterKey=LambdaFunctionArn,ParameterValue="$LAMBDA_ARN" \
+                         ParameterKey=ExternalAccessEnabled,ParameterValue="$EXTERNAL_ACCESS_ENABLED" \
             --capabilities CAPABILITY_IAM \
             --region "$REGION"
     fi
@@ -157,24 +198,47 @@ test_api_gateway() {
         echo -e "${YELLOW}⚠️  Health check response: $RESPONSE${NC}"
     fi
 
-    # Test a sample tool endpoint
-    echo "Testing sample tool endpoint..."
-    SAMPLE_PAYLOAD='{
-        "toolName": "validate_idea_quick",
-        "toolArgs": {
-            "idea": "Test idea for API validation",
-            "criteria": ["market_viability", "technical_feasibility"]
-        }
-    }'
+    # Test external access if enabled
+    if [ "$EXTERNAL_ACCESS_ENABLED" = "true" ]; then
+        echo "Testing external access with API key..."
+        
+        # Extract first API key from config for testing
+        if [ -f ".aws/api-keys.json" ]; then
+            TEST_API_KEY=$(python3 -c "
+import json
+with open('.aws/api-keys.json', 'r') as f:
+    data = json.load(f)
+    if 'apiKeys' in data and len(data['apiKeys']) > 0:
+        print(data['apiKeys'][0].get('keyId', 'test-key'))
+    else:
+        print('test-key')
+" 2>/dev/null || echo "test-key")
+        else
+            TEST_API_KEY="test-key"
+        fi
+        
+        # Test a sample tool endpoint with API key
+        SAMPLE_PAYLOAD='{
+            "toolName": "validate_idea_quick",
+            "toolArgs": {
+                "idea": "Test idea for API validation",
+                "criteria": ["market_viability", "technical_feasibility"]
+            }
+        }'
 
-    RESPONSE=$(curl -s -X POST "$API_URL/business-analysis/validate-idea" \
-        -H "Content-Type: application/json" \
-        -d "$SAMPLE_PAYLOAD" || echo "Curl failed")
+        RESPONSE=$(curl -s -X POST "$API_URL/business-analysis/validate-idea" \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: $TEST_API_KEY" \
+            -d "$SAMPLE_PAYLOAD" || echo "Curl failed")
 
-    if [[ $RESPONSE == *"success"* ]]; then
-        echo -e "${GREEN}✅ Tool endpoint test passed${NC}"
+        if [[ $RESPONSE == *"success"* ]]; then
+            echo -e "${GREEN}✅ External API access test passed${NC}"
+        else
+            echo -e "${YELLOW}⚠️  External API response: $RESPONSE${NC}"
+            echo -e "${YELLOW}⚠️  Note: This may fail if API keys are not properly configured${NC}"
+        fi
     else
-        echo -e "${YELLOW}⚠️  Tool endpoint response: $RESPONSE${NC}"
+        echo -e "${YELLOW}⚠️  External access disabled, skipping API key tests${NC}"
     fi
 }
 
@@ -194,6 +258,9 @@ main() {
 
     # Get Lambda ARN
     LAMBDA_ARN=$(get_lambda_arn)
+
+    # Setup API keys for external access
+    setup_api_keys
 
     # Package Lambda function
     package_lambda
@@ -226,6 +293,24 @@ main() {
     echo "Case Studies: $API_URL/case-studies/"
     echo ""
     echo -e "${YELLOW}🔧 Total tools available: 32${NC}"
+    echo ""
+    if [ "$EXTERNAL_ACCESS_ENABLED" = "true" ]; then
+        echo -e "${YELLOW}🔑 External Access Configuration:${NC}"
+        echo "- External access is ENABLED"
+        echo "- API keys are required for external requests"
+        echo "- Configure API keys in .aws/api-keys.json"
+        echo "- Use X-API-Key header for authentication"
+        echo ""
+        echo -e "${YELLOW}🔒 Internal Access:${NC}"
+        echo "- Bedrock agents can access directly via Lambda ARN"
+        echo "- No authentication required for internal requests"
+        echo "- Lambda ARN: $LAMBDA_ARN"
+    else
+        echo -e "${YELLOW}🔒 Access Configuration:${NC}"
+        echo "- External access is DISABLED"
+        echo "- Only internal AWS access via Lambda ARN"
+        echo "- Set EXTERNAL_ACCESS_ENABLED=true to enable external access"
+    fi
 }
 
 # Run main function

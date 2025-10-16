@@ -19,6 +19,14 @@ Parameters:
     Type: String
     Description: S3 key for Lambda deployment package
 
+  ExternalAccessEnabled:
+    Type: String
+    Default: 'true'
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Description: Enable external access with API key authentication
+
 Globals:
   Function:
     Timeout: 300
@@ -59,6 +67,7 @@ Resources:
         Variables:
           NODE_ENV: !Ref Environment
           ENVIRONMENT: !Ref Environment
+          EXTERNAL_ACCESS_ENABLED: !Ref ExternalAccessEnabled
           # Add any additional environment variables here
 
       # IAM role will be created automatically by SAM
@@ -129,10 +138,6 @@ Resources:
     Properties:
       LogGroupName: !Sub "/aws/lambda/${Environment}-vibe-pm-agent-lambda"
       RetentionInDays: 30
-      KmsKeyId: !If
-        - IsProduction
-        - !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/alias/aws/lambda"
-        - !Ref AWS::NoValue
 
   # CloudWatch Alarms for monitoring
   LambdaErrorsAlarm:

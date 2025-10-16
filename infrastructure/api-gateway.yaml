@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: API Gateway for Vibe PM Agent Lambda Functions
 
+Conditions:
+  ExternalAccessEnabled: !Equals [!Ref ExternalAccessEnabled, 'true']
+
 Parameters:
   Environment:
     Type: String
@@ -15,12 +18,22 @@ Parameters:
     Type: String
     Description: ARN of the main Lambda function
 
+  ExternalAccessEnabled:
+    Type: String
+    Default: 'true'
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Description: Enable external access with API key authentication
+
 Globals:
   Api:
     Cors:
       AllowMethods: "'GET,POST,OPTIONS'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With'"
       AllowOrigin: "'*'"
+      AllowCredentials: false
+      MaxAge: "'600'"
 
 Resources:
   # Main API Gateway REST API
@@ -30,18 +43,99 @@ Resources:
       Name: !Sub "${Environment}-vibe-pm-agent-api"
       StageName: !Ref Environment
       Description: API Gateway for Vibe PM Agent with 32 PM-focused tools
+      GatewayResponses:
+        UNAUTHORIZED:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+          ResponseTemplates:
+            application/json: |
+              {
+                "error": {
+                  "code": "UNAUTHORIZED",
+                  "message": "Invalid or missing API key",
+                  "timestamp": "$context.requestTime",
+                  "requestId": "$context.requestId"
+                }
+              }
+        FORBIDDEN:
+          StatusCode: 403
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+          ResponseTemplates:
+            application/json: |
+              {
+                "error": {
+                  "code": "FORBIDDEN",
+                  "message": "API key lacks required permissions",
+                  "timestamp": "$context.requestTime",
+                  "requestId": "$context.requestId"
+                }
+              }
+        THROTTLED:
+          StatusCode: 429
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              Retry-After: "'60'"
+          ResponseTemplates:
+            application/json: |
+              {
+                "error": {
+                  "code": "RATE_LIMIT_EXCEEDED",
+                  "message": "Rate limit exceeded. Please try again later.",
+                  "timestamp": "$context.requestTime",
+                  "requestId": "$context.requestId",
+                  "retryAfter": 60
+                }
+              }
+        QUOTA_EXCEEDED:
+          StatusCode: 429
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+          ResponseTemplates:
+            application/json: |
+              {
+                "error": {
+                  "code": "QUOTA_EXCEEDED",
+                  "message": "Monthly quota exceeded. Please upgrade your plan or wait for quota reset.",
+                  "timestamp": "$context.requestTime",
+                  "requestId": "$context.requestId"
+                }
+              }
       DefinitionBody:
         openapi: 3.0.1
         info:
           title: Vibe PM Agent API
           description: API for Product Management tools and business intelligence
           version: "2.0.0"
+        components:
+          securitySchemes:
+            ApiKeyAuth:
+              type: apiKey
+              in: header
+              name: X-API-Key
+              description: API key for external access authentication
+          schemas:
         paths:
           # Business Analysis Tools (8 tools)
           /business-analysis/analyze-opportunity:
             post:
               summary: Analyze business opportunity
               operationId: analyzeBusinessOpportunity
+              security:
+                - ApiKeyAuth: []
               requestBody:
                 required: true
                 content:
@@ -55,6 +149,18 @@ Resources:
                     application/json:
                       schema:
                         $ref: "#/components/schemas/BusinessAnalysisResponse"
+                "401":
+                  description: Unauthorized - Invalid or missing API key
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/ErrorResponse"
+                "403":
+                  description: Forbidden - API key lacks required permissions
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/ErrorResponse"
               x-amazon-apigateway-integration:
                 type: aws_proxy
                 httpMethod: POST
@@ -730,6 +836,8 @@ Resources:
             get:
               summary: Health check
               operationId: healthCheck
+              security:
+                - ApiKeyAuth: []
               responses:
                 "200":
                   description: Health check response
@@ -750,13 +858,24 @@ Resources:
                           environment:
                             type: string
                             example: "dev"
+                "401":
+                  description: Unauthorized - Invalid or missing API key
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/ErrorResponse"
+                "403":
+                  description: Forbidden - API key lacks required permissions
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/ErrorResponse"
               x-amazon-apigateway-integration:
                 type: aws_proxy
                 httpMethod: POST
                 uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
 
-        components:
-          schemas:
+
             BusinessAnalysisRequest:
               type: object
               required:
@@ -945,6 +1064,69 @@ Resources:
                 executionTime:
                   type: number
 
+            ErrorResponse:
+              type: object
+              properties:
+                error:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      example: "INVALID_API_KEY"
+                    message:
+                      type: string
+                      example: "Invalid or missing API key"
+                    details:
+                      type: object
+                    timestamp:
+                      type: string
+                      format: date-time
+                    requestId:
+                      type: string
+                    retryAfter:
+                      type: number
+                      description: "Seconds to wait before retrying (for rate limit errors)"
+        security:
+          - ApiKeyAuth: []
+
+  # API Key for external access
+  VibePMAgentAPIKey:
+    Type: AWS::ApiGateway::ApiKey
+    Condition: ExternalAccessEnabled
+    Properties:
+      Name: !Sub "${Environment}-vibe-pm-agent-api-key"
+      Description: API Key for external access to Vibe PM Agent
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref VibePMAgentAPI
+          StageName: !Ref Environment
+
+  # Usage Plan for API key management
+  VibePMAgentUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Condition: ExternalAccessEnabled
+    Properties:
+      UsagePlanName: !Sub "${Environment}-vibe-pm-agent-usage-plan"
+      Description: Usage plan for Vibe PM Agent external access
+      ApiStages:
+        - ApiId: !Ref VibePMAgentAPI
+          Stage: !Ref Environment
+      Throttle:
+        RateLimit: 100
+        BurstLimit: 200
+      Quota:
+        Limit: 10000
+        Period: MONTH
+
+  # Link API Key to Usage Plan
+  VibePMAgentUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Condition: ExternalAccessEnabled
+    Properties:
+      KeyId: !Ref VibePMAgentAPIKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref VibePMAgentUsagePlan
+
   # Lambda permission for API Gateway
   LambdaInvokePermission:
     Type: AWS::Lambda::Permission
@@ -965,3 +1147,17 @@ Outputs:
     Value: !Ref VibePMAgentAPI
     Export:
       Name: !Sub "${Environment}-vibe-pm-agent-api-id"
+
+  ApiKeyId:
+    Condition: ExternalAccessEnabled
+    Description: API Key ID for external access
+    Value: !Ref VibePMAgentAPIKey
+    Export:
+      Name: !Sub "${Environment}-vibe-pm-agent-api-key-id"
+
+  ApiKeyValue:
+    Condition: ExternalAccessEnabled
+    Description: API Key value for external access (store securely)
+    Value: !GetAtt VibePMAgentAPIKey.Value
+    Export:
+      Name: !Sub "${Environment}-vibe-pm-agent-api-key-value"
