@@ -33,6 +33,7 @@
     "verify:production": "node scripts/verify-production-build.mjs",
     "start:verify": "timeout 10s node dist/mcp/server.js --health || true",
     "demo:hackathon": "node demo/hackathon-showcase.js",
+    "demo:ui": "node demo/serve-demo.js",
     "demo:aws-agents": "node demo/aws-agent-orchestration.js",
     "demo:multi-agent-orchestration": "node demo/multi-agent-demo.js",
     "demo:nova-pro-capabilities": "node demo/nova-pro-demo.js",
