@@ -2,7 +2,7 @@
 
 ## ✅ **Testing Complete - All Systems Ready!**
 
-### 🚀 **Branch: hacking-pm-interview**
+### 🚀 **Branch: ai-agent-global-hackathon**
 - **Clean MCP server** focused purely on PM interview preparation
 - **No AWS dependencies** - runs locally with full functionality
 - **10 specialized MCP tools** for comprehensive interview coaching
@@ -213,7 +213,7 @@
 
 ## 🎉 **Conclusion**
 
-The **Hacking PM Interview** MCP tools are **fully functional and ready for production use**. The system provides:
+The **AI Agent Global Hackathon** PM interview preparation MCP tools are **fully functional and ready for production use**. The system provides:
 
 - **Comprehensive interview preparation** with personalized coaching
 - **Realistic practice environment** with framework-based learning
