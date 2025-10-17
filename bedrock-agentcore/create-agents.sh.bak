@@ -49,7 +49,7 @@ create_agent() {
         --agent-version "DRAFT" \
         --action-group-name "$action_group_name" \
         --description "Action group for $agent_name with specialized MCP tools" \
-        --action-group-executor lambda="$LAMBDA_ARN" \
+        --action-group-executor lambda-function-arn="$LAMBDA_ARN" \
         --function-schema "$tools_json" \
         --output json)
     
@@ -88,32 +88,40 @@ create_agent \
                 "name": "analyze_business_opportunity",
                 "description": "Analyzes market opportunity, timing, and business justification for a feature idea",
                 "parameters": {
-                    "idea": {
-                        "description": "Raw feature idea or business need",
-                        "type": "string",
-                        "required": true
+                    "type": "object",
+                    "properties": {
+                        "idea": {"type": "string", "description": "Raw feature idea or business need"},
+                        "market_context": {
+                            "type": "object",
+                            "properties": {
+                                "industry": {"type": "string"},
+                                "competition": {"type": "string"},
+                                "timeline": {"type": "string"},
+                                "budget_range": {"type": "string", "enum": ["small", "medium", "large"]}
+                            }
+                        }
                     },
-                    "market_context": {
-                        "description": "Market and business context information",
-                        "type": "string",
-                        "required": false
-                    }
+                    "required": ["idea"]
                 }
             },
             {
                 "name": "generate_business_case",
                 "description": "Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment",
                 "parameters": {
-                    "opportunity_analysis": {
-                        "description": "Business opportunity analysis",
-                        "type": "string",
-                        "required": true
+                    "type": "object",
+                    "properties": {
+                        "opportunity_analysis": {"type": "string", "description": "Business opportunity analysis"},
+                        "financial_inputs": {
+                            "type": "object",
+                            "properties": {
+                                "development_cost": {"type": "number"},
+                                "expected_revenue": {"type": "number"},
+                                "operational_cost": {"type": "number"},
+                                "time_to_market": {"type": "number"}
+                            }
+                        }
                     },
-                    "financial_inputs": {
-                        "description": "Financial inputs as JSON string",
-                        "type": "string",
-                        "required": false
-                    }
+                    "required": ["opportunity_analysis"]
                 }
             },
             {

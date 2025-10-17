@@ -10,13 +10,6 @@ import {
   ToolExecutionError
 } from './types';
 
-// Helper function to parse environment variables as boolean
-function isEnvironmentVariableTrue(value: string | undefined): boolean {
-  if (!value) return false;
-  const normalizedValue = value.toLowerCase().trim();
-  return ['true', '1', 'yes', 'on', 'enabled'].includes(normalizedValue);
-}
-
 // Environment configuration loader
 export function loadEnvironmentConfig(): EnvironmentConfig {
   return {
@@ -26,8 +19,7 @@ export function loadEnvironmentConfig(): EnvironmentConfig {
     bedrockRegion: process.env.BEDROCK_REGION || 'us-east-1',
     apiGatewayUrl: process.env.API_GATEWAY_URL,
     enableCaching: process.env.ENABLE_CACHING === 'true',
-    cacheTimeout: parseInt(process.env.CACHE_TIMEOUT || '300'),
-    externalAccessEnabled: isEnvironmentVariableTrue(process.env.EXTERNAL_ACCESS_ENABLED)
+    cacheTimeout: parseInt(process.env.CACHE_TIMEOUT || '300')
   };
 }
 

@@ -1,0 +1,408 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Executive Communications Agent API",
+    "description": "Stakeholder communication, executive documents, and strategic presentations",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/create_stakeholder_communication": {
+      "post": {
+        "summary": "Generates executive one-pagers, PR-FAQs, and stakeholder presentations",
+        "operationId": "create_stakeholder_communication",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "business_case": {
+                    "type": "string",
+                    "description": "Business case analysis"
+                  },
+                  "communication_type": {
+                    "type": "string",
+                    "enum": ["executive_onepager", "pr_faq", "board_presentation", "team_announcement"],
+                    "description": "Type of communication to generate"
+                  },
+                  "audience": {
+                    "type": "string",
+                    "enum": ["executives", "board", "engineering_team", "customers", "investors"],
+                    "description": "Target audience for the communication"
+                  }
+                },
+                "required": ["business_case", "communication_type", "audience"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Generated stakeholder communication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "communication": {"type": "string"},
+                    "format": {"type": "string"},
+                    "key_messages": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate_management_onepager": {
+      "post": {
+        "summary": "Creates executive one-pager for management presentation",
+        "operationId": "generate_management_onepager",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_info": {
+                    "type": "string",
+                    "description": "Project information to include in the one-pager"
+                  },
+                  "audience": {
+                    "type": "string",
+                    "description": "Target audience for the presentation"
+                  }
+                },
+                "required": ["project_info"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Executive one-pager document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "onepager": {"type": "string"},
+                    "executive_summary": {"type": "string"},
+                    "key_metrics": {"type": "array", "items": {"type": "object"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate_pr_faq": {
+      "post": {
+        "summary": "Generates PR-FAQ document using Amazon Working Backwards methodology",
+        "operationId": "generate_pr_faq",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "product_info": {
+                    "type": "string",
+                    "description": "Product information"
+                  },
+                  "target_audience": {
+                    "type": "string",
+                    "description": "Target audience"
+                  }
+                },
+                "required": ["product_info"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PR-FAQ document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pr_faq": {"type": "string"},
+                    "press_release": {"type": "string"},
+                    "faq_section": {"type": "array", "items": {"type": "object"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get_consulting_summary": {
+      "post": {
+        "summary": "Creates consulting-style executive summary from analysis data",
+        "operationId": "get_consulting_summary",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "analysis_data": {
+                    "type": "string",
+                    "description": "Analysis data to summarize"
+                  },
+                  "summary_type": {
+                    "type": "string",
+                    "description": "Type of summary needed"
+                  }
+                },
+                "required": ["analysis_data"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Consulting-style executive summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "executive_summary": {"type": "string"},
+                    "key_insights": {"type": "array", "items": {"type": "string"}},
+                    "recommendations": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate_roi_analysis": {
+      "post": {
+        "summary": "Generates comprehensive ROI analysis with financial projections",
+        "operationId": "generate_roi_analysis",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "investment": {
+                    "type": "number",
+                    "description": "Investment amount"
+                  },
+                  "expected_returns": {
+                    "type": "object",
+                    "description": "Expected returns data"
+                  }
+                },
+                "required": ["investment"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ROI analysis with projections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "roi_analysis": {"type": "string"},
+                    "financial_projections": {"type": "object"},
+                    "break_even_analysis": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get_company_interview_insights": {
+      "post": {
+        "summary": "Provides comprehensive company-specific interview insights and preparation guidance",
+        "operationId": "get_company_interview_insights",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_name": {
+                    "type": "string",
+                    "description": "Name of the target company"
+                  },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"],
+                    "description": "Target role level"
+                  },
+                  "focus_areas": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Specific areas to focus insights on"
+                  },
+                  "include_recent_changes": {
+                    "type": "boolean",
+                    "description": "Include recent company developments and changes"
+                  }
+                },
+                "required": ["company_name", "role_level"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company-specific interview insights",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "company_insights": {"type": "string"},
+                    "interview_process": {"type": "string"},
+                    "key_focus_areas": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customize_preparation_for_company": {
+      "post": {
+        "summary": "Creates personalized interview preparation plan tailored to specific company and role",
+        "operationId": "customize_preparation_for_company",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_name": {
+                    "type": "string",
+                    "description": "Target company name"
+                  },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"],
+                    "description": "Target role level"
+                  },
+                  "preparation_timeline": {
+                    "type": "string",
+                    "description": "Available preparation time (e.g., 2 weeks, 1 month)"
+                  },
+                  "experience_background": {
+                    "type": "string",
+                    "description": "Candidate's relevant experience and background"
+                  },
+                  "weak_areas": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Areas needing focused improvement"
+                  }
+                },
+                "required": ["company_name", "role_level", "preparation_timeline"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Personalized preparation plan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "preparation_plan": {"type": "string"},
+                    "study_schedule": {"type": "array", "items": {"type": "object"}},
+                    "focus_areas": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get_company_case_scenarios": {
+      "post": {
+        "summary": "Generates company-specific case study scenarios based on real business challenges",
+        "operationId": "get_company_case_scenarios",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_name": {
+                    "type": "string",
+                    "description": "Target company name"
+                  },
+                  "case_type": {
+                    "type": "string",
+                    "enum": ["product_design", "strategy", "prioritization", "market_entry", "growth", "monetization"],
+                    "description": "Type of case study"
+                  },
+                  "role_level": {
+                    "type": "string",
+                    "enum": ["APM", "PM", "Senior PM", "Principal PM"],
+                    "description": "Target role level"
+                  },
+                  "difficulty_level": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "description": "Scenario difficulty from 1 (easy) to 5 (hard)"
+                  },
+                  "use_real_products": {
+                    "type": "boolean",
+                    "description": "Base scenarios on actual company products"
+                  }
+                },
+                "required": ["company_name", "case_type", "role_level"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company-specific case study scenarios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "case_scenarios": {"type": "array", "items": {"type": "object"}},
+                    "company_context": {"type": "string"},
+                    "evaluation_criteria": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

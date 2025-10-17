@@ -73,7 +73,6 @@ export interface EnvironmentConfig {
   apiGatewayUrl?: string | undefined;
   enableCaching?: boolean;
   cacheTimeout?: number;
-  externalAccessEnabled?: boolean;
 }
 
 // Tool execution result

@@ -1,0 +1,375 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Product Development Agent API",
+    "description": "Requirements generation, design options, and resource optimization tools",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/generate_requirements": {
+      "post": {
+        "summary": "Generates comprehensive requirements document from feature ideas",
+        "operationId": "generate_requirements",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feature_idea": {
+                    "type": "string",
+                    "description": "Feature idea to generate requirements for"
+                  },
+                  "context": {
+                    "type": "object",
+                    "description": "Additional context information"
+                  }
+                },
+                "required": ["feature_idea"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comprehensive requirements document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requirements": {"type": "string"},
+                    "user_stories": {"type": "array", "items": {"type": "string"}},
+                    "acceptance_criteria": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate_design_options": {
+      "post": {
+        "summary": "Creates multiple design options and architectural approaches",
+        "operationId": "generate_design_options",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "requirements": {
+                    "type": "string",
+                    "description": "Requirements document"
+                  },
+                  "constraints": {
+                    "type": "object",
+                    "description": "Design constraints"
+                  }
+                },
+                "required": ["requirements"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Multiple design options",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "design_options": {"type": "array", "items": {"type": "object"}},
+                    "recommended_approach": {"type": "string"},
+                    "trade_offs": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate_task_plan": {
+      "post": {
+        "summary": "Creates detailed implementation task plan from design documents",
+        "operationId": "generate_task_plan",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "design": {
+                    "type": "string",
+                    "description": "Design document"
+                  },
+                  "requirements": {
+                    "type": "string",
+                    "description": "Requirements document"
+                  }
+                },
+                "required": ["design"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Implementation task plan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "task_plan": {"type": "array", "items": {"type": "object"}},
+                    "timeline": {"type": "string"},
+                    "dependencies": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/optimize_resource_allocation": {
+      "post": {
+        "summary": "Analyzes resource requirements and provides optimization recommendations",
+        "operationId": "optimize_resource_allocation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "current_workflow": {
+                    "type": "object",
+                    "description": "Current development workflow"
+                  },
+                  "resource_constraints": {
+                    "type": "object",
+                    "description": "Resource constraints",
+                    "properties": {
+                      "team_size": {"type": "number"},
+                      "budget": {"type": "number"},
+                      "timeline": {"type": "string"},
+                      "technical_debt": {"type": "string"}
+                    }
+                  },
+                  "optimization_goals": {
+                    "type": "array",
+                    "items": {"type": "string", "enum": ["cost_reduction", "speed_improvement", "quality_increase", "risk_mitigation"]},
+                    "description": "Optimization goals"
+                  }
+                },
+                "required": ["current_workflow"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resource optimization recommendations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "optimization_plan": {"type": "string"},
+                    "resource_allocation": {"type": "object"},
+                    "efficiency_gains": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/optimize_intent": {
+      "post": {
+        "summary": "Optimizes user intent for better clarity and actionability",
+        "operationId": "optimize_intent",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_intent": {
+                    "type": "string",
+                    "description": "User intent to optimize"
+                  },
+                  "context": {
+                    "type": "object",
+                    "description": "Context information"
+                  }
+                },
+                "required": ["user_intent"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Optimized user intent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "optimized_intent": {"type": "string"},
+                    "clarity_score": {"type": "number"},
+                    "actionable_steps": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analyze_workflow": {
+      "post": {
+        "summary": "Analyzes workflows for optimization opportunities",
+        "operationId": "analyze_workflow",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "workflow_description": {
+                    "type": "string",
+                    "description": "Workflow to analyze"
+                  },
+                  "optimization_goals": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Optimization goals"
+                  }
+                },
+                "required": ["workflow_description"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Workflow analysis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "workflow_analysis": {"type": "string"},
+                    "bottlenecks": {"type": "array", "items": {"type": "string"}},
+                    "optimization_opportunities": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/enhance_citations": {
+      "post": {
+        "summary": "Enhances content with authoritative citations and source validation",
+        "operationId": "enhance_citations",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "description": "Content to enhance with citations"
+                  },
+                  "sources": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Source materials"
+                  }
+                },
+                "required": ["content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enhanced content with citations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enhanced_content": {"type": "string"},
+                    "citations": {"type": "array", "items": {"type": "object"}},
+                    "credibility_score": {"type": "number"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validate_and_audit_citations": {
+      "post": {
+        "summary": "Validates and audits citations for accuracy and credibility",
+        "operationId": "validate_and_audit_citations",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "description": "Content with citations to validate"
+                  },
+                  "strict_mode": {
+                    "type": "boolean",
+                    "description": "Enable strict validation"
+                  }
+                },
+                "required": ["content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Citation validation results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "validation_results": {"type": "array", "items": {"type": "object"}},
+                    "overall_credibility": {"type": "number"},
+                    "recommendations": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

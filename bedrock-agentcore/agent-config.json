@@ -1,0 +1,110 @@
+{
+  "agents": {
+    "business-strategy": {
+      "name": "vibe-pm-business-strategy-agent",
+      "agentId": "IBQRX8MZJJ",
+      "aliasId": "TSTALIASID",
+      "specialization": "business_analysis",
+      "description": "Strategic business analysis, market validation, and competitive intelligence",
+      "tools": [
+        "analyze_business_opportunity",
+        "generate_business_case",
+        "assess_strategic_alignment",
+        "validate_market_timing",
+        "validate_idea_quick",
+        "analyze_competitor_landscape",
+        "calculate_market_sizing",
+        "monitor_market_conditions"
+      ],
+      "maxConcurrentSessions": 10,
+      "timeoutSeconds": 300
+    },
+    "product-development": {
+      "name": "vibe-pm-product-development-agent",
+      "agentId": "CEW45LTT2P",
+      "aliasId": "TSTALIASID",
+      "specialization": "product_development",
+      "description": "Requirements generation, design options, and resource optimization",
+      "tools": [
+        "generate_requirements",
+        "generate_design_options",
+        "generate_task_plan",
+        "optimize_resource_allocation",
+        "optimize_intent",
+        "analyze_workflow",
+        "enhance_citations",
+        "validate_and_audit_citations"
+      ],
+      "maxConcurrentSessions": 10,
+      "timeoutSeconds": 300
+    },
+    "executive-communications": {
+      "name": "vibe-pm-executive-communications-agent",
+      "agentId": "ULX1RJGKCR",
+      "aliasId": "TSTALIASID",
+      "specialization": "executive_communications",
+      "description": "Stakeholder communication, executive documents, and strategic presentations",
+      "tools": [
+        "create_stakeholder_communication",
+        "generate_management_onepager",
+        "generate_pr_faq",
+        "get_consulting_summary",
+        "generate_roi_analysis",
+        "get_company_interview_insights",
+        "customize_preparation_for_company",
+        "get_company_case_scenarios"
+      ],
+      "maxConcurrentSessions": 10,
+      "timeoutSeconds": 300
+    },
+    "interview-coaching": {
+      "name": "vibe-pm-interview-coaching-agent",
+      "agentId": "PDZPQTNLYH",
+      "aliasId": "TSTALIASID",
+      "specialization": "interview_coaching",
+      "description": "PM interview preparation, case studies, and personalized coaching",
+      "tools": [
+        "start_interview_preparation",
+        "generate_interview_question",
+        "evaluate_interview_response",
+        "get_interview_feedback",
+        "start_case_study",
+        "get_case_guidance",
+        "evaluate_case_approach",
+        "complete_case_study"
+      ],
+      "maxConcurrentSessions": 15,
+      "timeoutSeconds": 600
+    }
+  },
+  "orchestration": {
+    "defaultRegion": "us-east-1",
+    "maxRetries": 3,
+    "retryDelayMs": 1000,
+    "enableCrossAgentCollaboration": true,
+    "enablePerformanceMetrics": true,
+    "logLevel": "info"
+  },
+  "routing": {
+    "intentAnalysis": {
+      "businessKeywords": ["market", "opportunity", "business case", "roi", "competition", "strategy", "timing", "validation", "revenue", "cost"],
+      "productKeywords": ["requirements", "design", "development", "technical", "implementation", "workflow", "optimization", "architecture", "feature"],
+      "communicationKeywords": ["executive", "presentation", "stakeholder", "communication", "one-pager", "pr-faq", "summary", "report", "document"],
+      "interviewKeywords": ["interview", "preparation", "coaching", "case study", "feedback", "practice", "question", "behavioral", "product sense"]
+    },
+    "multiAgentTriggers": [
+      "comprehensive analysis",
+      "end-to-end",
+      "full workflow",
+      "complete solution",
+      "business case with presentation",
+      "requirements with strategy"
+    ]
+  },
+  "performance": {
+    "cacheEnabled": true,
+    "cacheTtlSeconds": 3600,
+    "metricsEnabled": true,
+    "tracingEnabled": true
+  }
+}

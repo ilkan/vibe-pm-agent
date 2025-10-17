@@ -1,0 +1,381 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Business Strategy Agent API",
+    "version": "1.0.0",
+    "description": "Strategic business analysis, market validation, and competitive intelligence tools"
+  },
+  "paths": {
+    "/analyze_business_opportunity": {
+      "post": {
+        "summary": "Analyzes market opportunity, timing, and business justification for a feature idea",
+        "description": "Analyzes market opportunity, timing, and business justification for a feature idea using consulting frameworks",
+        "operationId": "analyze_business_opportunity",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idea": {
+                    "type": "string",
+                    "description": "Raw feature idea or business need"
+                  },
+                  "market_context": {
+                    "type": "object",
+                    "description": "Market and business context information"
+                  }
+                },
+                "required": ["idea"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business opportunity analysis results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "analysis": {
+                      "type": "string",
+                      "description": "Comprehensive market opportunity analysis"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate_business_case": {
+      "post": {
+        "summary": "Creates comprehensive business case with ROI analysis",
+        "description": "Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment",
+        "operationId": "generate_business_case",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "opportunity_analysis": {
+                    "type": "string",
+                    "description": "Business opportunity analysis"
+                  },
+                  "financial_inputs": {
+                    "type": "object",
+                    "description": "Financial inputs for ROI calculation"
+                  }
+                },
+                "required": ["opportunity_analysis"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comprehensive business case",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "business_case": {
+                      "type": "string",
+                      "description": "Complete business case document"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assess_strategic_alignment": {
+      "post": {
+        "summary": "Evaluates feature alignment with company strategy",
+        "description": "Evaluates how a feature aligns with company strategy, OKRs, and long-term vision",
+        "operationId": "assess_strategic_alignment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feature_concept": {
+                    "type": "string",
+                    "description": "Feature concept or business case"
+                  },
+                  "company_context": {
+                    "type": "object",
+                    "description": "Company strategic context"
+                  }
+                },
+                "required": ["feature_concept"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Strategic alignment assessment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "alignment_assessment": {
+                      "type": "string",
+                      "description": "Strategic alignment analysis"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validate_market_timing": {
+      "post": {
+        "summary": "Validates market timing for feature development",
+        "description": "Fast validation of whether now is the right time to build a feature based on market conditions",
+        "operationId": "validate_market_timing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feature_idea": {
+                    "type": "string",
+                    "description": "Feature idea to validate timing for"
+                  },
+                  "market_signals": {
+                    "type": "object",
+                    "description": "Market timing signals"
+                  }
+                },
+                "required": ["feature_idea"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Market timing validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "timing_validation": {
+                      "type": "string",
+                      "description": "Market timing analysis"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validate_idea_quick": {
+      "post": {
+        "summary": "Quick validation of business ideas",
+        "description": "Performs quick validation of business ideas against criteria",
+        "operationId": "validate_idea_quick",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idea": {
+                    "type": "string",
+                    "description": "Idea to validate quickly"
+                  },
+                  "criteria": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Validation criteria"
+                  }
+                },
+                "required": ["idea"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quick validation results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "validation_results": {
+                      "type": "string",
+                      "description": "Quick validation analysis"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analyze_competitor_landscape": {
+      "post": {
+        "summary": "Analyzes competitive landscape",
+        "description": "Analyzes competitive landscape and market positioning",
+        "operationId": "analyze_competitor_landscape",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "market_segment": {
+                    "type": "string",
+                    "description": "Market segment to analyze"
+                  },
+                  "competitors": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of competitors"
+                  }
+                },
+                "required": ["market_segment"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Competitive landscape analysis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "competitive_analysis": {
+                      "type": "string",
+                      "description": "Competitive landscape analysis"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calculate_market_sizing": {
+      "post": {
+        "summary": "Calculates market sizing using TAM-SAM-SOM",
+        "description": "Calculates market sizing using TAM-SAM-SOM methodology",
+        "operationId": "calculate_market_sizing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "market": {
+                    "type": "string",
+                    "description": "Market to size"
+                  },
+                  "methodology": {
+                    "type": "string",
+                    "description": "Sizing methodology"
+                  }
+                },
+                "required": ["market"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Market sizing analysis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "market_sizing": {
+                      "type": "string",
+                      "description": "TAM-SAM-SOM analysis"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monitor_market_conditions": {
+      "post": {
+        "summary": "Monitors market conditions and trends",
+        "description": "Monitors and analyzes current market conditions and trends",
+        "operationId": "monitor_market_conditions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "market": {
+                    "type": "string",
+                    "description": "Market to monitor"
+                  },
+                  "indicators": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Key indicators to track"
+                  }
+                },
+                "required": ["market"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Market conditions analysis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "market_conditions": {
+                      "type": "string",
+                      "description": "Market conditions analysis"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

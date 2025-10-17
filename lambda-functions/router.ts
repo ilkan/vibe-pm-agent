@@ -30,6 +30,14 @@ import * as caseStudiesHandlers from './case-studies';
 // Import authentication service
 import { AuthService } from './auth/auth-service';
 
+// Import Bedrock agent handler
+import { 
+  isBedrockAgentEvent, 
+  handleBedrockAgentRequest,
+  BedrockAgentEvent,
+  BedrockAgentResponse 
+} from './bedrock-agent-handler';
+
 // Invocation context types
 export enum InvocationContext {
   EXTERNAL_API_GATEWAY = 'external',
@@ -45,16 +53,89 @@ export interface DirectInvocationEvent {
   requestId?: string;
 }
 
+// Tool routing and execution (moved up to be accessible by Bedrock handler)
+async function routeToTool(toolName: string, toolArgs: Record<string, any>, logger: Logger): Promise<any> {
+  // Create a comprehensive tool registry
+  const toolRegistry = {
+    // Business Analysis Tools (8 tools)
+    'analyze_business_opportunity': businessAnalysisHandlers.analyzeBusinessOpportunity,
+    'generate_business_case': businessAnalysisHandlers.generateBusinessCase,
+    'assess_strategic_alignment': businessAnalysisHandlers.assessStrategicAlignment,
+    'optimize_resource_allocation': businessAnalysisHandlers.optimizeResourceAllocation,
+    'validate_market_timing': businessAnalysisHandlers.validateMarketTiming,
+    'validate_idea_quick': businessAnalysisHandlers.validateIdeaQuick,
+    'analyze_competitor_landscape': businessAnalysisHandlers.analyzeCompetitorLandscape,
+    'calculate_market_sizing': businessAnalysisHandlers.calculateMarketSizing,
+
+    // Communications Tools (4 tools)
+    'create_stakeholder_communication': communicationsHandlers.handleStakeholderCommunication,
+    'generate_management_onepager': communicationsHandlers.handleGenerateManagementOnePager,
+    'generate_pr_faq': communicationsHandlers.handleGeneratePRFAQ,
+    'get_consulting_summary': communicationsHandlers.handleGetConsultingSummary,
+
+    // Requirements Tools (4 tools)
+    'generate_requirements': requirementsHandlers.handleGenerateRequirements,
+    'generate_design_options': requirementsHandlers.handleGenerateDesignOptions,
+    'generate_task_plan': requirementsHandlers.handleGenerateTaskPlan,
+    'optimize_intent': requirementsHandlers.handleOptimizeIntent,
+
+    // Market Intelligence Tools (4 tools)
+    'enhance_citations': marketIntelligenceHandlers.handleEnhanceCitations,
+    'validate_and_audit_citations': marketIntelligenceHandlers.handleValidateAndAuditCitations,
+    'monitor_market_conditions': marketIntelligenceHandlers.handleMonitorMarketConditions,
+    'analyze_workflow': marketIntelligenceHandlers.handleAnalyzeWorkflow,
+
+    // Interview Prep Tools (6 tools)
+    'start_interview_preparation': interviewPrepHandlers.handleStartInterviewPreparation,
+    'generate_interview_question': interviewPrepHandlers.handleGenerateInterviewQuestion,
+    'evaluate_interview_response': interviewPrepHandlers.handleEvaluateInterviewResponse,
+    'get_interview_feedback': interviewPrepHandlers.handleGetInterviewFeedback,
+    'get_company_interview_insights': interviewPrepHandlers.handleGetCompanyInterviewInsights,
+    'customize_preparation_for_company': interviewPrepHandlers.handleCustomizePreparationForCompany,
+
+    // Case Studies Tools (5 tools)
+    'start_case_study': caseStudiesHandlers.handleStartCaseStudy,
+    'get_case_guidance': caseStudiesHandlers.handleGetCaseGuidance,
+    'evaluate_case_approach': caseStudiesHandlers.handleEvaluateCaseApproach,
+    'complete_case_study': caseStudiesHandlers.handleCompleteCaseStudy,
+    'get_company_case_scenarios': caseStudiesHandlers.handleGetCompanyCaseScenarios
+  };
+
+  const handler = toolRegistry[toolName as keyof typeof toolRegistry];
+  if (!handler) {
+    throw new ToolNotFoundError(toolName);
+  }
+
+  return await executeTool(toolName, toolArgs, handler);
+}
+
 export const handler = async (
-  event: APIGatewayEvent | DirectInvocationEvent,
+  event: APIGatewayEvent | DirectInvocationEvent | BedrockAgentEvent,
   context: Context
-): Promise<APIGatewayProxyResult | LambdaResponse> => {
+): Promise<APIGatewayProxyResult | LambdaResponse | BedrockAgentResponse> => {
   const config = loadEnvironmentConfig();
   const logger = new Logger(config);
   const timer = new PerformanceTimer();
 
   try {
-    // Detect invocation context
+    // Check for Bedrock Agent request first
+    if (isBedrockAgentEvent(event)) {
+      logger.info('Bedrock Agent request detected', {
+        requestId: context.awsRequestId,
+        agentId: (event as BedrockAgentEvent).agent.id,
+        actionGroup: (event as BedrockAgentEvent).actionGroup,
+        function: (event as BedrockAgentEvent).function
+      });
+      
+      return await handleBedrockAgentRequest(
+        event as BedrockAgentEvent, 
+        context, 
+        routeToTool, 
+        logger
+      );
+    }
+    
+    // Detect invocation context for non-Bedrock requests
     const invocationContext = detectInvocationContext(event);
     
     logger.info('Vibe PM Agent Lambda Router invoked', {
@@ -387,58 +468,3 @@ function logAccessMetrics(accessPattern: 'external' | 'internal', metrics: {
   }
 }
 
-// Tool routing and execution
-async function routeToTool(toolName: string, toolArgs: Record<string, any>, logger: Logger): Promise<any> {
-  // Create a comprehensive tool registry
-  const toolRegistry = {
-    // Business Analysis Tools (8 tools)
-    'analyze_business_opportunity': businessAnalysisHandlers.analyzeBusinessOpportunity,
-    'generate_business_case': businessAnalysisHandlers.generateBusinessCase,
-    'assess_strategic_alignment': businessAnalysisHandlers.assessStrategicAlignment,
-    'optimize_resource_allocation': businessAnalysisHandlers.optimizeResourceAllocation,
-    'validate_market_timing': businessAnalysisHandlers.validateMarketTiming,
-    'validate_idea_quick': businessAnalysisHandlers.validateIdeaQuick,
-    'analyze_competitor_landscape': businessAnalysisHandlers.analyzeCompetitorLandscape,
-    'calculate_market_sizing': businessAnalysisHandlers.calculateMarketSizing,
-
-    // Communications Tools (4 tools)
-    'create_stakeholder_communication': communicationsHandlers.handleStakeholderCommunication,
-    'generate_management_onepager': communicationsHandlers.handleGenerateManagementOnePager,
-    'generate_pr_faq': communicationsHandlers.handleGeneratePRFAQ,
-    'get_consulting_summary': communicationsHandlers.handleGetConsultingSummary,
-
-    // Requirements Tools (4 tools)
-    'generate_requirements': requirementsHandlers.handleGenerateRequirements,
-    'generate_design_options': requirementsHandlers.handleGenerateDesignOptions,
-    'generate_task_plan': requirementsHandlers.handleGenerateTaskPlan,
-    'optimize_intent': requirementsHandlers.handleOptimizeIntent,
-
-    // Market Intelligence Tools (4 tools)
-    'enhance_citations': marketIntelligenceHandlers.handleEnhanceCitations,
-    'validate_and_audit_citations': marketIntelligenceHandlers.handleValidateAndAuditCitations,
-    'monitor_market_conditions': marketIntelligenceHandlers.handleMonitorMarketConditions,
-    'analyze_workflow': marketIntelligenceHandlers.handleAnalyzeWorkflow,
-
-    // Interview Prep Tools (6 tools)
-    'start_interview_preparation': interviewPrepHandlers.handleStartInterviewPreparation,
-    'generate_interview_question': interviewPrepHandlers.handleGenerateInterviewQuestion,
-    'evaluate_interview_response': interviewPrepHandlers.handleEvaluateInterviewResponse,
-    'get_interview_feedback': interviewPrepHandlers.handleGetInterviewFeedback,
-    'get_company_interview_insights': interviewPrepHandlers.handleGetCompanyInterviewInsights,
-    'customize_preparation_for_company': interviewPrepHandlers.handleCustomizePreparationForCompany,
-
-    // Case Studies Tools (5 tools)
-    'start_case_study': caseStudiesHandlers.handleStartCaseStudy,
-    'get_case_guidance': caseStudiesHandlers.handleGetCaseGuidance,
-    'evaluate_case_approach': caseStudiesHandlers.handleEvaluateCaseApproach,
-    'complete_case_study': caseStudiesHandlers.handleCompleteCaseStudy,
-    'get_company_case_scenarios': caseStudiesHandlers.handleGetCompanyCaseScenarios
-  };
-
-  const handler = toolRegistry[toolName as keyof typeof toolRegistry];
-  if (!handler) {
-    throw new ToolNotFoundError(toolName);
-  }
-
-  return await executeTool(toolName, toolArgs, handler);
-}

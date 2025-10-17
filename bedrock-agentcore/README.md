@@ -1,335 +1,270 @@
-# Vibe PM Agent - AWS Bedrock AgentCore Deployment
-
-This directory contains everything needed to deploy the Vibe PM Agent to AWS Bedrock AgentCore, transforming your existing MCP server into a scalable, production-ready AI agent.
+# Vibe PM Agent - Multi-Agent Architecture
 
 ## Overview
 
-The deployment transforms your Node.js/TypeScript MCP server (with 32 PM-focused tools) into a Bedrock AgentCore-compatible agent that can be invoked through AWS Bedrock services while maintaining all existing functionality.
-
-### Key Features
-
-- **32 PM Tools**: All existing business intelligence and interview preparation tools
-- **Bedrock Integration**: Native integration with Bedrock models and services
-- **Production Ready**: Auto-scaling, monitoring, logging, and enterprise features
-- **MCP Compatibility**: Maintains compatibility with existing MCP clients
-- **Cost Effective**: Pay-per-use model with Bedrock
+This directory contains the complete multi-agent architecture for the Vibe PM Agent system using Amazon Bedrock. The system distributes 32 MCP tools across 4 specialized agents, each handling 8 tools maximum for optimal performance and maintainability.
 
 ## Architecture
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   MCP Clients   │───▶│  Bedrock         │───▶│   Vibe PM       │
-│   (Kiro, etc.)  │    │  AgentCore       │    │   Agent         │
-└─────────────────┘    │                  │    │                 │
-                       │  - Auto-scaling  │    │  - 32 PM Tools  │
-┌─────────────────┐    │  - Load balancer │    │  - Node.js MCP  │
-│  Direct API     │───▶│  - Monitoring    │───▶│  - Bedrock AI   │
-│  Integration    │    │  - Logging       │    │  - Business     │
-└─────────────────┘    └──────────────────┘    │    Intelligence │
-                                              └─────────────────┘
-```
+### 🎯 Agent Distribution
+
+| Agent | Specialization | Tools | Purpose |
+|-------|---------------|-------|---------|
+| **Business Strategy Agent** | Market Analysis & Strategy | 8 | Market opportunity, competitive analysis, business cases |
+| **Product Development Agent** | Requirements & Development | 8 | Requirements, design options, resource optimization |
+| **Executive Communications Agent** | Stakeholder Communications | 8 | Executive documents, presentations, company insights |
+| **Interview Coaching Agent** | PM Interview Preparation | 8 | Interview practice, case studies, personalized coaching |
+
+### 🔧 Tool Distribution
+
+**Business Strategy Agent (8 tools):**
+- `analyze_business_opportunity` - Market opportunity assessment
+- `generate_business_case` - ROI analysis and business justification
+- `assess_strategic_alignment` - Company strategy alignment scoring
+- `validate_market_timing` - Market timing signals analysis
+- `validate_idea_quick` - Rapid go/no-go validation
+- `analyze_competitor_landscape` - Competitive positioning analysis
+- `calculate_market_sizing` - TAM/SAM/SOM calculations
+- `monitor_market_conditions` - Real-time market intelligence
+
+**Product Development Agent (8 tools):**
+- `generate_requirements` - Comprehensive requirements documentation
+- `generate_design_options` - Multiple architectural approaches
+- `generate_task_plan` - Implementation task breakdown
+- `optimize_resource_allocation` - Resource planning and optimization
+- `optimize_intent` - User intent clarification and optimization
+- `analyze_workflow` - Workflow analysis and optimization
+- `enhance_citations` - Content enhancement with authoritative sources
+- `validate_and_audit_citations` - Citation accuracy validation
+
+**Executive Communications Agent (8 tools):**
+- `create_stakeholder_communication` - Role-specific communications
+- `generate_management_onepager` - Executive one-pagers
+- `generate_pr_faq` - Amazon Working Backwards PR-FAQ
+- `get_consulting_summary` - Consulting-style executive summaries
+- `generate_roi_analysis` - Financial projections and ROI modeling
+- `get_company_interview_insights` - Company-specific insights
+- `customize_preparation_for_company` - Tailored preparation plans
+- `get_company_case_scenarios` - Company-specific case studies
+
+**Interview Coaching Agent (8 tools):**
+- `start_interview_preparation` - Personalized interview coaching sessions
+- `generate_interview_question` - Dynamic question generation
+- `evaluate_interview_response` - Framework-based response evaluation
+- `get_interview_feedback` - Comprehensive performance feedback
+- `start_case_study` - Interactive case study practice
+- `get_case_guidance` - Real-time case study guidance
+- `evaluate_case_approach` - Case study methodology evaluation
+- `complete_case_study` - Performance analytics and recommendations
 
 ## Quick Start
 
-### Prerequisites
-
-1. **AWS Account** with Bedrock access
-2. **AWS CLI** configured with appropriate credentials
-3. **Python 3.9+** for AgentCore runtime
-4. **Node.js 18+** for MCP server
-5. **Vibe PM Agent** source code
-
-### One-Command Deployment
+### 1. Prerequisites
 
 ```bash
-# From the bedrock-agentcore directory
-./deployment-scripts/deploy.sh all
+# Install required tools
+brew install awscli jq node
+
+# Configure AWS credentials
+aws configure
+
+# Verify Node.js version (18+ required)
+node --version
 ```
 
-This will:
-1. ✅ Check all prerequisites
-2. ✅ Build the agent components
-3. ✅ Deploy AWS infrastructure (IAM, CloudWatch, etc.)
-4. ✅ Deploy agent to Bedrock AgentCore
-5. ✅ Validate the deployment
+### 2. Configuration
 
-## Manual Deployment Steps
-
-### Step 1: Prerequisites Check
+Update the configuration in `deploy-multi-agent.sh`:
 
 ```bash
-./deployment-scripts/deploy.sh prerequisites
+# Edit these values in deploy-multi-agent.sh
+AWS_ACCOUNT_ID="123456789012"  # Your AWS account ID
+AWS_REGION="us-east-1"         # Your preferred region
+LAMBDA_FUNCTION_NAME="vibe-pm-agent-lambda"
+BEDROCK_ROLE_NAME="AmazonBedrockExecutionRoleForAgents_vibe-pm"
 ```
 
-### Step 2: Build Agent
+### 3. Deploy Everything
 
 ```bash
-./deployment-scripts/deploy.sh build
+# Full deployment (recommended)
+./deploy-multi-agent.sh
+
+# Or deploy components separately
+./deploy-multi-agent.sh lambda-only    # Deploy Lambda function only
+./deploy-multi-agent.sh agents-only    # Create Bedrock agents only
+./deploy-multi-agent.sh test-only      # Run tests only
 ```
 
-### Step 3: Deploy Infrastructure
+### 4. Test the System
 
 ```bash
-./deployment-scripts/deploy.sh infrastructure
+# Test all agents
+./test-agents.sh
+
+# Comprehensive testing
+node comprehensive-test.js
+
+# Check results
+cat test-results.json
 ```
 
-### Step 4: Deploy Agent
+## Files Overview
+
+### Core Files
+- `agent-architecture.md` - Detailed architecture documentation
+- `agent-config.json` - Agent configuration and settings
+- `agent-orchestrator.ts` - Multi-agent orchestration logic
+- `agent-registry.csv` - Generated agent IDs (after deployment)
+
+### Deployment Scripts
+- `deploy-multi-agent.sh` - Complete deployment automation
+- `create-agents.sh` - Bedrock agent creation script
+- `test-agents.sh` - Basic agent testing script
+- `comprehensive-test.js` - Full test suite with scenarios
+
+### Generated Files (after deployment)
+- `agent-registry.csv` - Agent IDs and metadata
+- `test-results.json` - Comprehensive test results
+- `*.bak` - Backup files from configuration updates
+
+## Usage Examples
+
+### Direct Agent Invocation
 
 ```bash
-./deployment-scripts/deploy.sh deploy
+# Test Business Strategy Agent
+aws bedrock-agent-runtime invoke-agent \
+  --agent-id "YOUR_BUSINESS_AGENT_ID" \
+  --agent-alias-id "TSTALIASID" \
+  --session-id "test-session-123" \
+  --input-text "Analyze the market opportunity for AI-powered project management tools"
 ```
 
-### Step 5: Validate Deployment
+### Using the Orchestrator
 
-```bash
-./deployment-scripts/deploy.sh validate
+```typescript
+import { createAgentOrchestrator } from './agent-orchestrator';
+
+const orchestrator = createAgentOrchestrator('us-east-1');
+
+const response = await orchestrator.orchestrate({
+  userIntent: "Create a comprehensive business case with executive presentation",
+  requiresMultiAgent: true
+});
 ```
 
-## Configuration
+### Lambda Integration
 
-### Environment Variables
-
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `ENVIRONMENT` | Environment name | `production` | No |
-| `AWS_REGION` | AWS region | `us-east-1` | No |
-| `BEDROCK_REGION` | Bedrock region | `us-east-1` | No |
-| `LOG_LEVEL` | Logging level | `INFO` | No |
-
-### Deployment Configuration
-
-Edit `deployment-config.json` to customize:
-
-```json
-{
-  "agentName": "vibe-pm-agent",
-  "deployment": {
-    "region": "us-east-1",
-    "autoScaling": {
-      "enabled": true,
-      "minInstances": 1,
-      "maxInstances": 10
+```javascript
+// Direct Lambda invocation for internal use
+const payload = {
+  toolName: "analyze_business_opportunity",
+  toolArgs: {
+    idea: "AI-powered customer service chatbot",
+    market_context: {
+      industry: "SaaS",
+      competition: "High",
+      timeline: "6 months",
+      budget_range: "medium"
     }
-  },
-  "tools": {
-    "autoApprove": ["validate_idea_quick", "optimize_intent"]
   }
-}
+};
+
+const result = await lambda.invoke({
+  FunctionName: "vibe-pm-agent-lambda",
+  Payload: JSON.stringify(payload)
+}).promise();
 ```
 
-## Testing Your Deployment
+## Monitoring & Troubleshooting
 
-### Test Individual Tools
+### CloudWatch Logs
 
 ```bash
-# Test business opportunity analysis
-aws bedrock-agent invoke \
-  --agent-id your-agent-id \
-  --input '{"tool_name": "analyze_business_opportunity", "tool_args": {"idea": "AI-powered project management"}}'
+# Monitor agent execution
+aws logs tail /aws/lambda/vibe-pm-agent-lambda --follow
 
-# Test market timing validation
-aws bedrock-agent invoke \
-  --agent-id your-agent-id \
-  --input '{"tool_name": "validate_market_timing", "tool_args": {"feature_idea": "new feature"}}'
+# Check Bedrock agent logs
+aws logs describe-log-groups --log-group-name-prefix "/aws/bedrock"
 ```
 
-### Test with MCP Clients
+### Performance Metrics
 
-Your deployed agent remains compatible with existing MCP clients:
-
-```bash
-# Update your MCP client configuration to point to the Bedrock agent
-# The agent will handle MCP protocol requests through Bedrock
-```
-
-## Monitoring & Operations
-
-### CloudWatch Dashboards
-
-The deployment automatically creates CloudWatch monitoring:
-
-- **Error Rate**: Monitor tool call failures
-- **Latency**: Track response times
-- **Request Count**: Monitor usage patterns
-- **Custom Metrics**: Tool-specific performance metrics
-
-### Logs
-
-View agent logs in CloudWatch:
-
-```bash
-aws logs tail /aws/bedrock/agentcore/vibe-pm-agent --follow
-```
-
-### Alarms
-
-Pre-configured alarms for:
-- Error rate > 5%
-- Latency > 3 seconds
-- Custom thresholds based on your requirements
-
-## Troubleshooting
+The system automatically logs performance metrics:
+- Request count by agent and tool
+- Execution time distribution
+- Success/failure rates
+- Cross-agent collaboration patterns
 
 ### Common Issues
 
-1. **Agent Not Responding**
-   ```bash
-   # Check CloudWatch logs
-   aws logs describe-log-groups --log-group-name-prefix vibe-pm-agent
+1. **Agent ID not configured**: Update `agent-config.json` with actual agent IDs
+2. **Permission denied**: Verify Bedrock execution role has Lambda invoke permissions
+3. **Timeout errors**: Increase timeout in agent configuration
+4. **Tool not found**: Check tool distribution in agent action groups
 
-   # Verify agent status
-   aws bedrock-agent get-agent --agent-id your-agent-id
-   ```
+## Development
 
-2. **Tool Call Failures**
-   ```bash
-   # Check IAM permissions
-   aws iam get-role --role-name VibePMAgentCoreRole-production
+### Adding New Tools
 
-   # Verify Bedrock model access
-   aws bedrock list-foundation-models
-   ```
+1. Add tool to appropriate agent's action group schema
+2. Update `agent-config.json` with new tool name
+3. Implement tool handler in Lambda function
+4. Update orchestrator routing logic
+5. Add test cases to `comprehensive-test.js`
 
-3. **Performance Issues**
-   ```bash
-   # Check auto-scaling configuration
-   aws application-autoscaling describe-scalable-targets --service-namespace bedrock
+### Modifying Agent Behavior
 
-   # Monitor CloudWatch metrics
-   aws cloudwatch get-metric-statistics --namespace AWS/Bedrock/AgentCore
-   ```
+1. Update agent instructions in `create-agents.sh`
+2. Modify action group schemas as needed
+3. Redeploy agents: `./deploy-multi-agent.sh agents-only`
+4. Test changes: `./deploy-multi-agent.sh test-only`
 
-### Debug Mode
+### Cross-Agent Workflows
 
-Enable debug logging:
+The orchestrator supports complex workflows spanning multiple agents:
 
-```bash
-export LOG_LEVEL=DEBUG
-./deployment-scripts/deploy.sh deploy
+```typescript
+// Example: End-to-end product launch workflow
+const workflow = await orchestrator.orchestrate({
+  userIntent: "Complete product launch analysis from market research to executive presentation",
+  requiresMultiAgent: true,
+  context: {
+    product: "AI Analytics Dashboard",
+    timeline: "Q2 2024",
+    budget: "$2M"
+  }
+});
 ```
-
-## Cost Optimization
-
-### Monitoring Costs
-
-- **CloudWatch**: ~$0.30/GB logs ingested
-- **Bedrock**: Pay-per-use model for tool calls
-- **Auto-scaling**: Minimal cost when idle
-
-### Optimization Tips
-
-1. **Right-size instances** based on usage patterns
-2. **Use auto-scaling** to handle traffic spikes
-3. **Monitor and alert** on cost thresholds
-4. **Archive old logs** to reduce storage costs
 
 ## Security Considerations
 
-### IAM Permissions
+- All agents use IAM roles with least-privilege access
+- API keys for external access are hashed and stored securely
+- Cross-agent communication is logged for audit trails
+- Sensitive data is not logged in CloudWatch
 
-The deployment creates least-privilege IAM roles:
+## Cost Optimization
 
-- **Bedrock Access**: Model invocation and agent management
-- **CloudWatch**: Logging and monitoring
-- **VPC Access**: Optional network isolation
+- Agents are configured with appropriate timeout limits
+- Caching is enabled for repeated requests
+- Session management prevents unnecessary agent invocations
+- Performance metrics help identify optimization opportunities
 
-### Network Security
+## Support
 
-- **VPC Deployment**: Optional VPC isolation
-- **Private Endpoints**: Secure AWS service communication
-- **Encryption**: All data encrypted in transit and at rest
-
-## Advanced Configuration
-
-### Custom Tool Registration
-
-Add new tools by extending `pm_agent.py`:
-
-```python
-def register_custom_tool(self, tool_name: str, schema: Dict, handler: Callable):
-    """Register additional custom tools"""
-    self.app.register_tool(Tool(
-        name=tool_name,
-        description=f"Custom tool: {tool_name}",
-        input_schema=schema,
-        handler=handler
-    ))
-```
-
-### Environment-Specific Settings
-
-Create environment-specific configurations:
-
-```bash
-# Development
-ENVIRONMENT=dev ./deployment-scripts/deploy.sh all
-
-# Staging
-ENVIRONMENT=staging ./deployment-scripts/deploy.sh all
-
-# Production
-ENVIRONMENT=prod ./deployment-scripts/deploy.sh all
-```
-
-## Support & Maintenance
-
-### Regular Tasks
-
-1. **Monitor Performance**: Review CloudWatch metrics weekly
-2. **Update Dependencies**: Keep Bedrock AgentCore libraries current
-3. **Security Updates**: Apply AWS security patches
-4. **Cost Review**: Monitor and optimize costs monthly
-
-### Getting Help
-
-1. **AWS Documentation**: [Bedrock AgentCore Guide](https://docs.aws.amazon.com/bedrock-agentcore/)
-2. **CloudWatch Logs**: Check `/aws/bedrock/agentcore/vibe-pm-agent`
-3. **AWS Support**: Use your AWS support plan for issues
+For issues or questions:
+1. Check CloudWatch logs for detailed error messages
+2. Review test results in `test-results.json`
+3. Verify configuration in `agent-config.json`
+4. Run diagnostic tests: `node comprehensive-test.js`
 
 ## Next Steps
 
 After successful deployment:
-
-1. **Test all 32 PM tools** through Bedrock interface
-2. **Integrate with applications** using Bedrock API
-3. **Set up monitoring dashboards** for key metrics
-4. **Configure alerts** for critical issues
-5. **Plan for scaling** based on usage patterns
-
-## API Reference
-
-### Bedrock Agent Invocation
-
-```python
-import boto3
-
-bedrock_agent = boto3.client('bedrock-agent')
-
-response = bedrock_agent.invoke_agent(
-    agentId='your-agent-id',
-    agentAliasId='your-alias-id',
-    inputText='Call analyze_business_opportunity tool',
-    sessionId='unique-session-id'
-)
-```
-
-### MCP Client Integration
-
-```json
-{
-  "mcpServers": {
-    "vibe-pm-agent": {
-      "type": "bedrock-agent",
-      "agentId": "your-agent-id",
-      "region": "us-east-1"
-    }
-  }
-}
-```
-
----
-
-**Deployment Status**: Ready for production use
-**Tools Available**: 32 PM-focused tools
-**Scalability**: Auto-scaling enabled
-**Monitoring**: CloudWatch integration active
+1. Integrate with your application using the Lambda ARN
+2. Set up monitoring dashboards in CloudWatch
+3. Configure alerts for agent failures or performance issues
+4. Implement custom workflows using the orchestrator
+5. Scale agent resources based on usage patterns
