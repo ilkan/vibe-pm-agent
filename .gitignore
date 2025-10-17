@@ -135,3 +135,11 @@ demo/citation-quality/
 # AWS credential files (keep .gitkeep for directory structure)
 .aws/*
 !.aws/.gitkeep
+
+# AWS credentials in various locations
+bedrock-agentcore/.aws
+lambda-functions/.env.lambda
+*.env.lambda
+.env.*
+**/credentials
+**/config
