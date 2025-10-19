@@ -1,0 +1,33 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "BedrockFoundationModelAccess",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:InvokeModel",
+                "bedrock:InvokeModelWithResponseStream"
+            ],
+            "Resource": "arn:aws:bedrock:us-east-1::foundation-model/*"
+        },
+        {
+            "Sid": "BedrockAgentAccess",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:InvokeAgent",
+                "bedrock-agent:InvokeAgent",
+                "bedrock-agent-runtime:InvokeAgent"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "BedrockGeneralAccess",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:ListFoundationModels",
+                "bedrock:GetFoundationModel"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Bedrock Agent Invocation Lambda with API Gateway and Cognito Auth'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, prod]
+  BedrockAgentId:
+    Type: String
+    Default: ULX1RJGKCR
+    Description: Bedrock Agent ID
+  BedrockAgentAliasId:
+    Type: String
+    Default: TSTALIASID
+    Description: Bedrock Agent Alias ID
+  CognitoUserPoolId:
+    Type: String
+    Default: us-east-1_gFn54IyZ5
+    Description: Cognito User Pool ID for authorization
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs18.x
+    Environment:
+      Variables:
+        AWS_REGION: !Ref AWS::Region
+        BEDROCK_AGENT_ID: !Ref BedrockAgentId
+        BEDROCK_AGENT_ALIAS_ID: !Ref BedrockAgentAliasId
+
+Resources:
+  # Lambda Function
+  InvokeBedrockAgentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'invoke-bedrock-agent-${Environment}'
+      CodeUri: .
+      Handler: index.handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BedrockAgentApi
+            Path: /invoke
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+        OptionsEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BedrockAgentApi
+            Path: /invoke
+            Method: options
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeAgent
+                - bedrock-agent:InvokeAgent
+                - bedrock-agent-runtime:InvokeAgent
+                - bedrock-runtime:InvokeModel
+              Resource: '*'
+
+  # API Gateway
+  BedrockAgentApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub 'bedrock-agent-api-${Environment}'
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}'
+            Header: Authorization
+
+Outputs:
+  ApiGatewayUrl:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${BedrockAgentApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiUrl'
+  
+  LambdaFunctionArn:
+    Description: 'Lambda Function ARN'
+    Value: !GetAtt InvokeBedrockAgentFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaArn'

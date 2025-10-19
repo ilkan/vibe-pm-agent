@@ -1,0 +1,15 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeAgent",
+        "bedrock-agent:InvokeAgent",
+        "bedrock-agent-runtime:InvokeAgent",
+        "bedrock-runtime:InvokeModel"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

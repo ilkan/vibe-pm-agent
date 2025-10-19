@@ -1,0 +1,12 @@
+{
+  "name": "invoke-bedrock-agent",
+  "version": "1.0.0",
+  "description": "Lambda function to invoke Bedrock Agent for web UI",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.490.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

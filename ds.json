@@ -1,0 +1,24 @@
+{
+    "name": "knowledge-base-quick-start-nsrcx-data-source",
+    "cfg": {
+        "type": "WEB",
+        "webConfiguration": {
+            "sourceConfiguration": {
+                "urlConfiguration": {
+                    "seedUrls": [
+                        {
+                            "url": "https://www.parasut.com/blog"
+                        }
+                    ]
+                }
+            },
+            "crawlerConfiguration": {
+                "crawlerLimits": {
+                    "rateLimit": 300
+                },
+                "userAgentHeader": "bedrockbot"
+            }
+        }
+    },
+    "vec": {}
+}

@@ -1,0 +1,269 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS Cognito User Pool and App Client for Vibe PM Agent Web UI - Enhanced with AWS Q Developer best practices'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+    Description: Environment name
+  
+  CallbackURL:
+    Type: String
+    Default: http://localhost:3000
+    Description: Callback URL for the web application
+  
+  LogoutURL:
+    Type: String
+    Default: http://localhost:3000/logout
+    Description: Logout URL for the web application
+  
+  EnableMFA:
+    Type: String
+    Default: 'OPTIONAL'
+    AllowedValues: ['OFF', 'OPTIONAL', 'ON']
+    Description: Multi-factor authentication setting
+  
+  PasswordMinLength:
+    Type: Number
+    Default: 8
+    MinValue: 6
+    MaxValue: 99
+    Description: Minimum password length
+  
+  EnableAdvancedSecurity:
+    Type: String
+    Default: 'ENFORCED'
+    AllowedValues: ['OFF', 'AUDIT', 'ENFORCED']
+    Description: Advanced security features (risk-based authentication)
+
+Resources:
+  # Cognito User Pool with Enhanced Security
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub 'vibe-pm-agent-${Environment}'
+      # Authentication Configuration
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      
+      # Email Configuration
+      EmailConfiguration:
+        EmailSendingAccount: COGNITO_DEFAULT
+        ReplyToEmailAddress: !Sub 'noreply@vibe-pm-agent-${Environment}.com'
+      
+      # Password Policy (AWS Q Developer recommended)
+      Policies:
+        PasswordPolicy:
+          MinimumLength: !Ref PasswordMinLength
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          TemporaryPasswordValidityDays: 7
+      
+      # MFA Configuration
+      MfaConfiguration: !Ref EnableMFA
+      EnabledMfas:
+        - SOFTWARE_TOKEN_MFA
+      
+      # Advanced Security Features
+      UserPoolAddOns:
+        AdvancedSecurityMode: !Ref EnableAdvancedSecurity
+      
+      # Account Recovery
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      
+      # User Attributes Schema
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Required: true
+          Mutable: true
+        - Name: given_name
+          AttributeDataType: String
+          Required: false
+          Mutable: true
+        - Name: family_name
+          AttributeDataType: String
+          Required: false
+          Mutable: true
+        - Name: preferred_username
+          AttributeDataType: String
+          Required: false
+          Mutable: true
+        - Name: picture
+          AttributeDataType: String
+          Required: false
+          Mutable: true
+      
+      # Device Configuration
+      DeviceConfiguration:
+        ChallengeRequiredOnNewDevice: true
+        DeviceOnlyRememberedOnUserPrompt: false
+      
+      # Admin Create User Configuration
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      
+      # Verification Message Templates
+      VerificationMessageTemplate:
+        DefaultEmailOption: CONFIRM_WITH_LINK
+      
+      UserPoolTags:
+        Environment: !Ref Environment
+        Project: vibe-pm-agent
+        SecurityLevel: enhanced
+        ManagedBy: cloudformation
+
+  # Cognito User Pool Client (Public Client - Web Application)
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub 'vibe-pm-agent-web-client-${Environment}'
+      UserPoolId: !Ref UserPool
+      
+      # Client Type Configuration (Public Client)
+      GenerateSecret: false
+      
+      # Identity Providers
+      SupportedIdentityProviders:
+        - COGNITO
+      
+      # OAuth 2.0 Configuration (AWS Q Developer recommended)
+      AllowedOAuthFlows:
+        - code  # Authorization Code Grant (most secure)
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+        - aws.cognito.signin.user.admin
+      AllowedOAuthFlowsUserPoolClient: true
+      
+      # Callback and Logout URLs
+      CallbackURLs:
+        - !Ref CallbackURL
+        - !Sub '${CallbackURL}/auth/callback'
+      LogoutURLs:
+        - !Ref LogoutURL
+        - !Sub '${CallbackURL}/auth/logout'
+      
+      # Authentication Flows
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH          # Secure Remote Password
+        - ALLOW_REFRESH_TOKEN_AUTH     # Refresh tokens
+        - ALLOW_USER_PASSWORD_AUTH     # Username/password (if needed)
+      
+      # Security Settings
+      PreventUserExistenceErrors: ENABLED
+      EnableTokenRevocation: true
+      
+      # Token Validity (AWS Q Developer recommended)
+      AccessTokenValidity: 60        # 1 hour
+      IdTokenValidity: 60           # 1 hour  
+      RefreshTokenValidity: 30      # 30 days
+      TokenValidityUnits:
+        AccessToken: minutes
+        IdToken: minutes
+        RefreshToken: days
+      
+      # Read/Write Attributes
+      ReadAttributes:
+        - email
+        - email_verified
+        - given_name
+        - family_name
+        - preferred_username
+        - picture
+      WriteAttributes:
+        - given_name
+        - family_name
+        - preferred_username
+        - picture
+
+  # Cognito User Pool Domain for Managed Login
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub 'vibe-pm-agent-${Environment}-${AWS::AccountId}'
+      UserPoolId: !Ref UserPool
+  
+  # CloudWatch Log Group for Cognito Events
+  CognitoLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/cognito/userpool/${UserPool}'
+      RetentionInDays: 30
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: vibe-pm-agent
+  
+
+
+Outputs:
+  UserPoolId:
+    Description: 'Cognito User Pool ID'
+    Value: !Ref UserPool
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolId'
+
+  UserPoolClientId:
+    Description: 'Cognito User Pool Client ID'
+    Value: !Ref UserPoolClient
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolClientId'
+
+  UserPoolDomain:
+    Description: 'Cognito User Pool Domain URL'
+    Value: !Sub 'https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com'
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolDomain'
+
+  UserPoolArn:
+    Description: 'Cognito User Pool ARN'
+    Value: !GetAtt UserPool.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolArn'
+
+  HostedUIURL:
+    Description: 'Cognito Managed Login URL'
+    Value: !Sub 'https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=email+openid+profile+aws.cognito.signin.user.admin&redirect_uri=${CallbackURL}'
+    Export:
+      Name: !Sub '${AWS::StackName}-HostedUIURL'
+
+  AuthorizeURL:
+    Description: 'OAuth 2.0 Authorization Endpoint'
+    Value: !Sub 'https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/oauth2/authorize'
+    Export:
+      Name: !Sub '${AWS::StackName}-AuthorizeURL'
+
+  TokenURL:
+    Description: 'OAuth 2.0 Token Endpoint'
+    Value: !Sub 'https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/oauth2/token'
+    Export:
+      Name: !Sub '${AWS::StackName}-TokenURL'
+
+  UserInfoURL:
+    Description: 'OIDC UserInfo Endpoint'
+    Value: !Sub 'https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/oauth2/userInfo'
+    Export:
+      Name: !Sub '${AWS::StackName}-UserInfoURL'
+
+  JWKSUrl:
+    Description: 'JSON Web Key Set URL'
+    Value: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json'
+    Export:
+      Name: !Sub '${AWS::StackName}-JWKSUrl'
+
+  Region:
+    Description: 'AWS Region'
+    Value: !Ref AWS::Region
+    Export:
+      Name: !Sub '${AWS::StackName}-Region'

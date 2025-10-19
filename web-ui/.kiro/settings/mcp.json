@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "aws-docs": {
+      "command": "uvx",
+      "args": ["awslabs.aws-documentation-mcp-server@latest"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    "aws-bedrock": {
+      "command": "uvx",
+      "args": ["aws-bedrock-mcp-server@latest"],
+      "env": {
+        "AWS_REGION": "us-east-1",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "bedrock_invoke_model",
+        "bedrock_list_models",
+        "bedrock_get_model_info"
+      ]
+    }
+  }
+}
