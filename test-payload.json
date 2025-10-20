@@ -1,7 +1,0 @@
-{
-  "toolName": "validate_idea_quick",
-  "toolArgs": {
-    "idea": "AI-powered PM interview coach",
-    "criteria": ["market_viability", "technical_feasibility"]
-  }
-}
