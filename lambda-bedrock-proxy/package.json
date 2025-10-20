@@ -1,0 +1,25 @@
+{
+  "name": "bedrock-agent-proxy",
+  "version": "2.0.0",
+  "description": "AWS Lambda proxy for Bedrock Agent with rate limiting and Claude 3.5 Haiku support",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "zip -r ../bedrock-proxy-with-rate-limiting.zip . -x '*.git*' 'node_modules/.cache/*'",
+    "install-deps": "npm install @aws-sdk/client-bedrock-runtime @aws-sdk/client-bedrock-agent-runtime"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.913.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.913.0"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "bedrock",
+    "claude",
+    "rate-limiting",
+    "ai"
+  ],
+  "author": "Vibe PM Agent",
+  "license": "MIT"
+}
