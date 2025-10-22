@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Copy, Pin, Edit2, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn } from './ui/utils';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface ChatMessageProps {
   role: 'user' | 'agent';
@@ -60,8 +61,14 @@ export function ChatMessage({
           )}
         </div>
 
-        <div className="prose prose-sm dark:prose-invert max-w-none">
-          <p className="whitespace-pre-wrap">{content}</p>
+        <div className="relative">
+          {role === 'agent' ? (
+            <MarkdownRenderer content={content} />
+          ) : (
+            <div className="prose prose-sm dark:prose-invert max-w-none">
+              <p className="whitespace-pre-wrap text-foreground">{content}</p>
+            </div>
+          )}
           {isStreaming && (
             <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1" />
           )}

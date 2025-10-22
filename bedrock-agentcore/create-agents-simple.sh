@@ -32,7 +32,7 @@ create_agent() {
         --agent-name "$agent_name" \
         --description "$agent_description" \
         --agent-resource-role-arn "$ROLE_ARN" \
-        --foundation-model "anthropic.claude-3-5-sonnet-20241022-v2:0" \
+        --foundation-model "anthropic.claude-3-5-haiku-20241022-v1:0" \
         --instruction "$instruction" \
         --idle-session-ttl-in-seconds 1800 \
         --output json)

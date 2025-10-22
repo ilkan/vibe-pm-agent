@@ -1,0 +1,1128 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API Gateway for Vibe PM Agent Lambda Functions
+Conditions:
+  ExternalAccessEnabled:
+    Fn::Equals:
+    - Ref: ExternalAccessEnabled
+    - 'true'
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+    - dev
+    - prod
+    Description: Environment name
+  LambdaFunctionArn:
+    Type: String
+    Description: ARN of the main Lambda function
+  ExternalAccessEnabled:
+    Type: String
+    Default: 'true'
+    AllowedValues:
+    - 'true'
+    - 'false'
+    Description: Enable external access with API key authentication
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With'"
+      AllowOrigin: "'*'"
+      AllowCredentials: false
+      MaxAge: "'600'"
+Resources:
+  VibePMAgentAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name:
+        Fn::Sub: ${Environment}-vibe-pm-agent-api
+      StageName:
+        Ref: Environment
+      Description: API Gateway for Vibe PM Agent with 32 PM-focused tools
+      GatewayResponses:
+        UNAUTHORIZED:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+          ResponseTemplates:
+            application/json: "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n\
+              \    \"message\": \"Invalid or missing API key\",\n    \"timestamp\"\
+              : \"$context.requestTime\",\n    \"requestId\": \"$context.requestId\"\
+              \n  }\n}\n"
+        FORBIDDEN:
+          StatusCode: 403
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+          ResponseTemplates:
+            application/json: "{\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n \
+              \   \"message\": \"API key lacks required permissions\",\n    \"timestamp\"\
+              : \"$context.requestTime\",\n    \"requestId\": \"$context.requestId\"\
+              \n  }\n}\n"
+        THROTTLED:
+          StatusCode: 429
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              Retry-After: "'60'"
+          ResponseTemplates:
+            application/json: "{\n  \"error\": {\n    \"code\": \"RATE_LIMIT_EXCEEDED\"\
+              ,\n    \"message\": \"Rate limit exceeded. Please try again later.\"\
+              ,\n    \"timestamp\": \"$context.requestTime\",\n    \"requestId\":\
+              \ \"$context.requestId\",\n    \"retryAfter\": 60\n  }\n}\n"
+        QUOTA_EXCEEDED:
+          StatusCode: 429
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+          ResponseTemplates:
+            application/json: "{\n  \"error\": {\n    \"code\": \"QUOTA_EXCEEDED\"\
+              ,\n    \"message\": \"Monthly quota exceeded. Please upgrade your plan\
+              \ or wait for quota reset.\",\n    \"timestamp\": \"$context.requestTime\"\
+              ,\n    \"requestId\": \"$context.requestId\"\n  }\n}\n"
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title: Vibe PM Agent API
+          description: API for Product Management tools and business intelligence
+          version: 2.0.0
+        components:
+          securitySchemes:
+            ApiKeyAuth:
+              type: apiKey
+              in: header
+              name: X-API-Key
+              description: API key for external access authentication
+          schemas: null
+        paths:
+          /business-analysis/analyze-opportunity:
+            post:
+              summary: Analyze business opportunity
+              operationId: analyzeBusinessOpportunity
+              security:
+              - ApiKeyAuth: []
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/BusinessAnalysisRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/BusinessAnalysisResponse'
+                '401':
+                  description: Unauthorized - Invalid or missing API key
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ErrorResponse'
+                '403':
+                  description: Forbidden - API key lacks required permissions
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ErrorResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /business-analysis/generate-case:
+            post:
+              summary: Generate business case
+              operationId: generateBusinessCase
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/BusinessAnalysisRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/BusinessAnalysisResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /business-analysis/strategic-alignment:
+            post:
+              summary: Assess strategic alignment
+              operationId: assessStrategicAlignment
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/BusinessAnalysisRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/BusinessAnalysisResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /business-analysis/optimize-resources:
+            post:
+              summary: Optimize resource allocation
+              operationId: optimizeResourceAllocation
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/BusinessAnalysisRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/BusinessAnalysisResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /business-analysis/validate-timing:
+            post:
+              summary: Validate market timing
+              operationId: validateMarketTiming
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/BusinessAnalysisRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/BusinessAnalysisResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /business-analysis/validate-idea:
+            post:
+              summary: Quick idea validation
+              operationId: validateIdeaQuick
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/BusinessAnalysisRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/BusinessAnalysisResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /business-analysis/competitor-analysis:
+            post:
+              summary: Analyze competitor landscape
+              operationId: analyzeCompetitorLandscape
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/BusinessAnalysisRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/BusinessAnalysisResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /business-analysis/market-sizing:
+            post:
+              summary: Calculate market sizing
+              operationId: calculateMarketSizing
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/BusinessAnalysisRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/BusinessAnalysisResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /communications/stakeholder-communication:
+            post:
+              summary: Generate stakeholder communication
+              operationId: createStakeholderCommunication
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CommunicationsRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/CommunicationsResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /communications/executive-onepager:
+            post:
+              summary: Generate executive one-pager
+              operationId: generateManagementOnepager
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CommunicationsRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/CommunicationsResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /communications/pr-faq:
+            post:
+              summary: Generate PR-FAQ document
+              operationId: generatePrFaq
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CommunicationsRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/CommunicationsResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /communications/board-presentation:
+            post:
+              summary: Generate board presentation
+              operationId: generateBoardPresentation
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CommunicationsRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/CommunicationsResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /requirements/generate-requirements:
+            post:
+              summary: Generate requirements document
+              operationId: generateRequirements
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/RequirementsRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/RequirementsResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /requirements/design-options:
+            post:
+              summary: Generate design options
+              operationId: generateDesignOptions
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/RequirementsRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/RequirementsResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /requirements/task-plan:
+            post:
+              summary: Generate task plan
+              operationId: generateTaskPlan
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/RequirementsRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/RequirementsResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /requirements/roi-analysis:
+            post:
+              summary: Generate ROI analysis
+              operationId: generateRoiAnalysis
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/RequirementsRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/RequirementsResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /market-intelligence/enhance-citations:
+            post:
+              summary: Enhance content with citations
+              operationId: enhanceCitations
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/MarketIntelligenceRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/MarketIntelligenceResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /market-intelligence/validate-citations:
+            post:
+              summary: Validate and audit citations
+              operationId: validateAndAuditCitations
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/MarketIntelligenceRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/MarketIntelligenceResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /market-intelligence/monitor-market:
+            post:
+              summary: Monitor market conditions
+              operationId: monitorMarketConditions
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/MarketIntelligenceRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/MarketIntelligenceResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /market-intelligence/optimize-intent:
+            post:
+              summary: Optimize user intent
+              operationId: optimizeIntent
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/MarketIntelligenceRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/MarketIntelligenceResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /interview-prep/start-session:
+            post:
+              summary: Start interview preparation session
+              operationId: startInterviewPreparation
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/InterviewPrepRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/InterviewPrepResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /interview-prep/generate-question:
+            post:
+              summary: Generate interview question
+              operationId: generateInterviewQuestion
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/InterviewPrepRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/InterviewPrepResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /interview-prep/evaluate-response:
+            post:
+              summary: Evaluate interview response
+              operationId: evaluateInterviewResponse
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/InterviewPrepRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/InterviewPrepResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /interview-prep/get-feedback:
+            post:
+              summary: Get interview feedback
+              operationId: getInterviewFeedback
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/InterviewPrepRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/InterviewPrepResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /interview-prep/company-insights:
+            post:
+              summary: Get company interview insights
+              operationId: getCompanyInterviewInsights
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/InterviewPrepRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/InterviewPrepResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /interview-prep/customize-preparation:
+            post:
+              summary: Customize preparation for company
+              operationId: customizePreparationForCompany
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/InterviewPrepRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/InterviewPrepResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /case-studies/start-case:
+            post:
+              summary: Start case study session
+              operationId: startCaseStudy
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CaseStudiesRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/CaseStudiesResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /case-studies/get-guidance:
+            post:
+              summary: Get case study guidance
+              operationId: getCaseGuidance
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CaseStudiesRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/CaseStudiesResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /case-studies/evaluate-approach:
+            post:
+              summary: Evaluate case approach
+              operationId: evaluateCaseApproach
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CaseStudiesRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/CaseStudiesResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /case-studies/complete-case:
+            post:
+              summary: Complete case study
+              operationId: completeCaseStudy
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CaseStudiesRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/CaseStudiesResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /case-studies/company-scenarios:
+            post:
+              summary: Get company case scenarios
+              operationId: getCompanyCaseScenarios
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CaseStudiesRequest'
+              responses:
+                '200':
+                  description: Success response
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/CaseStudiesResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+          /health:
+            get:
+              summary: Health check
+              operationId: healthCheck
+              security:
+              - ApiKeyAuth: []
+              responses:
+                '200':
+                  description: Health check response
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            example: healthy
+                          timestamp:
+                            type: string
+                            format: date-time
+                          version:
+                            type: string
+                            example: 2.0.0
+                          environment:
+                            type: string
+                            example: dev
+                '401':
+                  description: Unauthorized - Invalid or missing API key
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ErrorResponse'
+                '403':
+                  description: Forbidden - API key lacks required permissions
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ErrorResponse'
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations
+            BusinessAnalysisRequest:
+              type: object
+              required:
+              - toolName
+              - toolArgs
+              properties:
+                toolName:
+                  type: string
+                  enum:
+                  - analyze_business_opportunity
+                  - generate_business_case
+                  - assess_strategic_alignment
+                  - optimize_resource_allocation
+                  - validate_market_timing
+                  - validate_idea_quick
+                  - analyze_competitor_landscape
+                  - calculate_market_sizing
+                toolArgs:
+                  type: object
+                  description: Arguments specific to the tool
+            BusinessAnalysisResponse:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                data:
+                  type: object
+                requestId:
+                  type: string
+                toolName:
+                  type: string
+                executionTime:
+                  type: number
+            CommunicationsRequest:
+              type: object
+              required:
+              - toolName
+              - toolArgs
+              properties:
+                toolName:
+                  type: string
+                  enum:
+                  - create_stakeholder_communication
+                  - generate_management_onepager
+                  - generate_pr_faq
+                  - generate_board_presentation
+                toolArgs:
+                  type: object
+            CommunicationsResponse:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                data:
+                  type: object
+                requestId:
+                  type: string
+                toolName:
+                  type: string
+                executionTime:
+                  type: number
+            RequirementsRequest:
+              type: object
+              required:
+              - toolName
+              - toolArgs
+              properties:
+                toolName:
+                  type: string
+                  enum:
+                  - generate_requirements
+                  - generate_design_options
+                  - generate_task_plan
+                  - generate_roi_analysis
+                toolArgs:
+                  type: object
+            RequirementsResponse:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                data:
+                  type: object
+                requestId:
+                  type: string
+                toolName:
+                  type: string
+                executionTime:
+                  type: number
+            MarketIntelligenceRequest:
+              type: object
+              required:
+              - toolName
+              - toolArgs
+              properties:
+                toolName:
+                  type: string
+                  enum:
+                  - enhance_citations
+                  - validate_and_audit_citations
+                  - monitor_market_conditions
+                  - optimize_intent
+                toolArgs:
+                  type: object
+            MarketIntelligenceResponse:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                data:
+                  type: object
+                requestId:
+                  type: string
+                toolName:
+                  type: string
+                executionTime:
+                  type: number
+            InterviewPrepRequest:
+              type: object
+              required:
+              - toolName
+              - toolArgs
+              properties:
+                toolName:
+                  type: string
+                  enum:
+                  - start_interview_preparation
+                  - generate_interview_question
+                  - evaluate_interview_response
+                  - get_interview_feedback
+                  - get_company_interview_insights
+                  - customize_preparation_for_company
+                toolArgs:
+                  type: object
+            InterviewPrepResponse:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                data:
+                  type: object
+                requestId:
+                  type: string
+                toolName:
+                  type: string
+                executionTime:
+                  type: number
+            CaseStudiesRequest:
+              type: object
+              required:
+              - toolName
+              - toolArgs
+              properties:
+                toolName:
+                  type: string
+                  enum:
+                  - start_case_study
+                  - get_case_guidance
+                  - evaluate_case_approach
+                  - complete_case_study
+                  - get_company_case_scenarios
+                toolArgs:
+                  type: object
+            CaseStudiesResponse:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                data:
+                  type: object
+                requestId:
+                  type: string
+                toolName:
+                  type: string
+                executionTime:
+                  type: number
+            ErrorResponse:
+              type: object
+              properties:
+                error:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      example: INVALID_API_KEY
+                    message:
+                      type: string
+                      example: Invalid or missing API key
+                    details:
+                      type: object
+                    timestamp:
+                      type: string
+                      format: date-time
+                    requestId:
+                      type: string
+                    retryAfter:
+                      type: number
+                      description: Seconds to wait before retrying (for rate limit
+                        errors)
+        security:
+        - ApiKeyAuth: []
+  VibePMAgentAPIKey:
+    Type: AWS::ApiGateway::ApiKey
+    Condition: ExternalAccessEnabled
+    Properties:
+      Name:
+        Fn::Sub: ${Environment}-vibe-pm-agent-api-key
+      Description: API Key for external access to Vibe PM Agent
+      Enabled: true
+      StageKeys:
+      - RestApiId:
+          Ref: VibePMAgentAPI
+        StageName:
+          Ref: Environment
+  VibePMAgentUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Condition: ExternalAccessEnabled
+    Properties:
+      UsagePlanName:
+        Fn::Sub: ${Environment}-vibe-pm-agent-usage-plan
+      Description: Usage plan for Vibe PM Agent external access
+      ApiStages:
+      - ApiId:
+          Ref: VibePMAgentAPI
+        Stage:
+          Ref: Environment
+      Throttle:
+        RateLimit: 100
+        BurstLimit: 200
+      Quota:
+        Limit: 10000
+        Period: MONTH
+  VibePMAgentUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Condition: ExternalAccessEnabled
+    Properties:
+      KeyId:
+        Ref: VibePMAgentAPIKey
+      KeyType: API_KEY
+      UsagePlanId:
+        Ref: VibePMAgentUsagePlan
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: LambdaFunctionArn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+Outputs:
+  ApiGatewayUrl:
+    Description: URL of the API Gateway
+    Value:
+      Fn::Sub: https://${VibePMAgentAPI}.execute-api.${AWS::Region}.amazonaws.com/${Environment}
+    Export:
+      Name:
+        Fn::Sub: ${Environment}-vibe-pm-agent-api-url
+  ApiGatewayId:
+    Description: API Gateway ID
+    Value:
+      Ref: VibePMAgentAPI
+    Export:
+      Name:
+        Fn::Sub: ${Environment}-vibe-pm-agent-api-id
+  ApiKeyId:
+    Condition: ExternalAccessEnabled
+    Description: API Key ID for external access
+    Value:
+      Ref: VibePMAgentAPIKey
+    Export:
+      Name:
+        Fn::Sub: ${Environment}-vibe-pm-agent-api-key-id
+  ApiKeyValue:
+    Condition: ExternalAccessEnabled
+    Description: API Key value for external access (store securely)
+    Value:
+      Fn::GetAtt:
+      - VibePMAgentAPIKey
+      - Value
+    Export:
+      Name:
+        Fn::Sub: ${Environment}-vibe-pm-agent-api-key-value

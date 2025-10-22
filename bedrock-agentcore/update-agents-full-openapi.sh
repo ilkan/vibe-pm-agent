@@ -77,7 +77,7 @@ enable_agent_orchestration() {
         --agent-id "$agent_id" \
         --agent-name "$agent_name" \
         --description "AI-powered PM agent with orchestration enabled for multi-agent collaboration" \
-        --foundation-model "anthropic.claude-3-5-sonnet-20241022-v2:0" \
+        --foundation-model "anthropic.claude-3-5-haiku-20241022-v1:0" \
         --instruction "You are a specialized PM agent with orchestration capabilities. You can collaborate with other agents to provide comprehensive solutions. Always provide structured, actionable insights with proper citations and confidence scores." \
         --output json > /dev/null
     

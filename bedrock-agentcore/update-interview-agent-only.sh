@@ -239,7 +239,7 @@ aws bedrock-agent update-agent \
     --agent-name "vibe-pm-interview-coaching-agent" \
     --agent-resource-role-arn "$AGENT_ROLE_ARN" \
     --description "AI-powered PM agent with multi-agent orchestration capabilities for comprehensive business analysis and interview preparation" \
-    --foundation-model "anthropic.claude-3-5-sonnet-20241022-v2:0" \
+    --foundation-model "anthropic.claude-3-5-haiku-20241022-v1:0" \
     --instruction "You are a specialized PM agent with orchestration capabilities. You can collaborate with other agents to provide comprehensive solutions. When users request complex analysis that spans multiple domains, coordinate with other agents. Always provide structured, actionable insights with proper citations and confidence scores. Use your specialized tools effectively and suggest when multi-agent collaboration would be beneficial." \
     --output json > /dev/null
 

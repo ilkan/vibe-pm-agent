@@ -3,7 +3,7 @@
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema, CreateMessageRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { SteeringService } from '../components/steering-service';
 import { CitationService } from '../components/citation-service';
 import { RealMarketDataFetcher } from '../components/real-market-data-fetcher';
@@ -41,6 +41,7 @@ export class PMAgentMCPServer {
       {
         capabilities: {
           tools: {},
+          sampling: {},
         },
       }
     );
@@ -78,6 +79,142 @@ export class PMAgentMCPServer {
     return await handler(args);
   }
 
+  /**
+   * Handle basic conversational messages
+   */
+  private async handleBasicMessage(message: string): Promise<string> {
+    const lowerMessage = message.toLowerCase().trim();
+
+    // Handle greetings
+    if (lowerMessage.match(/^(hi|hello|hey|greetings)$/)) {
+      return `Hello! I'm the Vibe PM Agent, your AI-powered product management assistant. I help answer "WHY to build" questions through:
+
+🎯 **Business Analysis**: Market opportunity assessment, competitive analysis, ROI calculations
+📊 **Strategic Planning**: Business cases, stakeholder communications, resource optimization  
+🎤 **PM Interview Prep**: Practice questions, case studies, company-specific preparation
+📈 **Market Intelligence**: Real-time market data, timing validation, competitor insights
+
+**Quick Start:**
+- Ask me to analyze a feature idea: "Analyze the business opportunity for [your idea]"
+- Get interview help: "Start PM interview preparation for Senior PM role"
+- Generate documents: "Create an executive one-pager for [your project]"
+- Or just ask: "What can you help me with?"
+
+What would you like to work on today?`;
+    }
+
+    // Handle help requests
+    if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
+      return `I'm your PM-focused AI assistant with 32 specialized tools. Here's what I can help with:
+
+## 🎯 Business Analysis & Strategy
+- **analyze_business_opportunity**: Market opportunity assessment with real data
+- **generate_business_case**: ROI analysis, risk assessment, strategic alignment
+- **assess_strategic_alignment**: Evaluate feature fit with company OKRs
+- **validate_market_timing**: Determine optimal timing for feature launch
+
+## 📊 Document Generation  
+- **create_stakeholder_communication**: Executive one-pagers, PR-FAQs, presentations
+- **generate_management_onepager**: Executive summaries for leadership
+- **generate_pr_faq**: Amazon Working Backwards methodology
+
+## 🎤 PM Interview Preparation (NEW!)
+- **start_interview_preparation**: Personalized coaching sessions
+- **generate_interview_question**: Practice questions by category and difficulty
+- **start_case_study**: Product design, strategy, and market entry cases
+- **get_company_interview_insights**: Company-specific preparation
+
+## 📈 Market Intelligence
+- **analyze_competitor_landscape**: Competitive positioning analysis
+- **calculate_market_sizing**: TAM-SAM-SOM methodology
+- **monitor_market_conditions**: Real-time market trends
+
+## ⚡ Resource Optimization
+- **optimize_resource_allocation**: Development efficiency recommendations
+- **analyze_workflow**: Process optimization opportunities
+
+Just ask me to use any of these tools, or describe what you need help with!`;
+    }
+
+    // Handle capability questions
+    if (lowerMessage.includes('tools') || lowerMessage.includes('functions')) {
+      const toolCount = this.getAllTools().length;
+      return `I have ${toolCount} specialized tools available:
+
+**Core Categories:**
+- Business Analysis (6 tools)
+- Document Generation (5 tools) 
+- PM Interview Preparation (11 tools)
+- Market Intelligence (4 tools)
+- Resource Optimization (3 tools)
+- Citation & Validation (3 tools)
+
+To see all tools with descriptions, you can ask your MCP client to list my tools, or ask me about a specific category like "Tell me about interview preparation tools" or "What business analysis can you do?"`;
+    }
+
+    // Handle interview preparation questions
+    if (lowerMessage.includes('interview') || lowerMessage.includes('pm interview')) {
+      return `🎤 **PM Interview Preparation** - I offer comprehensive interview coaching:
+
+**Available Tools:**
+- **start_interview_preparation**: Begin personalized coaching for your target role
+- **generate_interview_question**: Practice behavioral, product sense, analytical questions
+- **evaluate_interview_response**: Get detailed feedback on your answers
+- **start_case_study**: Practice product design, strategy, market entry cases
+- **get_company_interview_insights**: Company-specific preparation (Google, Amazon, Meta, etc.)
+
+**Quick Start:**
+1. "Start PM interview preparation for Senior PM role"
+2. "Generate a product sense question for Google PM interview"
+3. "Start a product design case study"
+
+**Supported Companies:** Google, Amazon, Meta, Microsoft, Apple, Netflix, Uber, Airbnb, and more!
+
+Ready to start practicing? Just tell me your target role and company!`;
+    }
+
+    // Handle business analysis questions
+    if (lowerMessage.includes('business') || lowerMessage.includes('analysis') || lowerMessage.includes('opportunity')) {
+      return `🎯 **Business Analysis** - I help answer "WHY to build" questions:
+
+**Core Capabilities:**
+- **Market Opportunity Assessment**: Real market data, competitive landscape, timing signals
+- **Business Case Generation**: ROI analysis, risk assessment, financial projections
+- **Strategic Alignment**: Evaluate fit with company OKRs and long-term vision
+- **Resource Optimization**: Development efficiency, cost-benefit analysis
+
+**Quick Examples:**
+- "Analyze the business opportunity for a mobile payment feature"
+- "Generate a business case for AI-powered customer support"
+- "Assess strategic alignment of social features for our app"
+
+**Output Formats:**
+- Executive one-pagers for leadership
+- PR-FAQ documents (Amazon methodology)
+- Board presentations with financial projections
+- Technical requirements and implementation plans
+
+What feature or business opportunity would you like me to analyze?`;
+    }
+
+    // Default response for other messages
+    return `I understand you said: "${message}"
+
+I'm the Vibe PM Agent, specialized in product management analysis and interview preparation. I work best when you:
+
+1. **Ask me to use a specific tool**: "Analyze business opportunity for [idea]"
+2. **Request help with PM interviews**: "Start interview preparation" 
+3. **Need business documents**: "Create executive one-pager for [project]"
+4. **Want market analysis**: "Calculate market sizing for [market]"
+
+**Popular requests:**
+- "What can you help me with?" (see all capabilities)
+- "Help me prepare for PM interviews" (interview coaching)
+- "Analyze the opportunity for [your feature idea]" (business analysis)
+
+What would you like to work on?`;
+  }
+
   private setupHandlers(): void {
     // Dynamic tool registration with all 22 tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -108,6 +245,43 @@ export class PMAgentMCPServer {
               text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
             },
           ],
+          isError: true,
+        };
+      }
+    });
+
+    // Handle basic message/chat requests
+    this.server.setRequestHandler(CreateMessageRequestSchema, async request => {
+      const { messages } = request.params;
+
+      try {
+        // Get the last user message
+        const lastMessage = messages[messages.length - 1];
+        const userMessage = (lastMessage?.content as any)?.text || lastMessage?.content || '';
+
+        // Handle basic conversational requests
+        const response = await this.handleBasicMessage(String(userMessage));
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: response,
+            },
+          ],
+          model: 'vibe-pm-agent',
+          role: 'assistant',
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            },
+          ],
+          model: 'vibe-pm-agent',
+          role: 'assistant',
           isError: true,
         };
       }
@@ -699,34 +873,31 @@ ${realMarketData.map(source => `• ${source.source}: ${source.marketMetrics.len
 ${allMetrics.length > 0 ? allMetrics.map(metric => `• ${metric}`).join('\n') : '• No specific market metrics found in current data sources'}
 
 ### Market Size & Opportunity
-${
-  marketSizes.length > 0
-    ? `- **Current Market Data:** ${marketSizes.slice(0, 3).join(', ')}\n- **Source Analysis:** Based on real data from ${realMarketData.map(s => s.source).join(', ')}`
-    : '- **Market Size:** Current market data unavailable - requires additional research\n- **Data Sources Checked:** ' +
-      realMarketData.map(s => s.source).join(', ')
-}
+${marketSizes.length > 0
+          ? `- **Current Market Data:** ${marketSizes.slice(0, 3).join(', ')}\n- **Source Analysis:** Based on real data from ${realMarketData.map(s => s.source).join(', ')}`
+          : '- **Market Size:** Current market data unavailable - requires additional research\n- **Data Sources Checked:** ' +
+          realMarketData.map(s => s.source).join(', ')
+        }
 - **Competitive Landscape:** ${marketContext.competition || 'Competitive analysis required'}
 
 ### Growth Indicators
-${
-  growthRates.length > 0
-    ? growthRates
-        .slice(0, 2)
-        .map(rate => `• ${rate}`)
-        .join('\n')
-    : '• Growth rate data not found in current sources - requires market research'
-}
+${growthRates.length > 0
+          ? growthRates
+            .slice(0, 2)
+            .map(rate => `• ${rate}`)
+            .join('\n')
+          : '• Growth rate data not found in current sources - requires market research'
+        }
 
 ## Business Justification
 
 ### Market Evidence
-${
-  realMarketData.length > 0
-    ? `Based on real-time data from ${realMarketData.length} financial sources:\n${realMarketData
-        .map(source => `• **${source.source}:** ${source.content.substring(0, 100)}...`)
-        .join('\n')}`
-    : 'Real-time market data unavailable - analysis based on industry knowledge'
-}
+${realMarketData.length > 0
+          ? `Based on real-time data from ${realMarketData.length} financial sources:\n${realMarketData
+            .map(source => `• **${source.source}:** ${source.content.substring(0, 100)}...`)
+            .join('\n')}`
+          : 'Real-time market data unavailable - analysis based on industry knowledge'
+        }
 
 ### Strategic Value
 - **Market Position:** ${marketContext.industry || 'Technology'} sector showing activity based on current data
@@ -736,11 +907,10 @@ ${
 ## Recommendation
 **Decision:** ${allMetrics.length > 0 ? 'GO - Supported by real market data' : 'CONDITIONAL GO - Requires additional market research'}
 
-**Rationale:** ${
-        allMetrics.length > 0
+**Rationale:** ${allMetrics.length > 0
           ? `Analysis supported by real financial data from ${realMarketData.map(s => s.source).join(', ')}`
           : 'Limited real-time data available - recommend conducting targeted market research before proceeding'
-      }
+        }
 
 ## Real Data Sources & Citations
 
@@ -885,14 +1055,14 @@ ${this.defineImplementationPhases(financialInputs)}
 4. Plan for iterative improvement based on user feedback
 
 ${await this.generateBusinessCaseCitations(financialInputs).catch(
-  error => `
+      error => `
 ## Financial Research Status
 
 Real-time financial data fetch encountered an issue: ${error.message}
 Analysis based on standard financial modeling practices.
 
 *Note: For current financial benchmarks, please verify through direct research.*`
-)}`;
+    )}`;
 
     // Create steering file if requested
     let steeringResult = null;

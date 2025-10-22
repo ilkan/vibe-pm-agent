@@ -39,10 +39,10 @@
     "@aws-sdk/client-dynamodb": "^3.490.0",
     "@aws-sdk/client-lambda": "^3.490.0",
     "@aws-sdk/util-dynamodb": "^3.490.0",
+    "@types/aws-lambda": "^8.10.156",
     "axios": "^1.6.0"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.130",
     "@types/node": "^20.11.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
