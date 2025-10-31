@@ -20,9 +20,7 @@ export const KIRO_TOOL_MAPPINGS: Record<string, string> = {
   'generate_management_onepager': 'generate_management_onepager',
   'generate_pr_faq': 'generate_pr_faq',
   'generate_task_plan': 'generate_task_plan',
-  'enhance_citations': 'enhance_citations',
-  'trusted_citation_scraper': 'trusted_citation_scraper',
-  'validate_and_audit_citations': 'validate_and_audit_citations',
+  'unified_citation_system': 'unified_citation_system',
   'monitor_market_conditions': 'monitor_market_conditions',
   'optimize_intent': 'optimize_intent',
   'analyze_workflow': 'analyze_workflow',
@@ -59,12 +57,8 @@ export const KIRO_TOOL_DESCRIPTIONS: Record<string, string> = {
     'Generates PR-FAQ document using Amazon Working Backwards methodology with future-dated press release, comprehensive FAQ section with 10 required questions, and detailed launch checklist. Includes market validation, customer benefits, and comprehensive citations for stakeholder alignment.',
   'generate_task_plan':
     'Creates detailed implementation task plan from design documents with Guardrails Check as Task 0, followed by phased Immediate Wins, Short-Term, and Long-Term tasks. Each task includes ID, name, description, acceptance criteria, effort estimation, impact assessment, and priority ranking.',
-  'enhance_citations':
-    'Enhances content with authoritative citations and source validation. Analyzes citation needs, validates source accessibility and credibility, identifies unsupported claims, suggests additional sources, and provides comprehensive quality assessment with confidence scoring and improvement recommendations.',
-  'trusted_citation_scraper':
-    'Scrapes trusted domains (.gov, .edu, McKinsey, HBR, Gartner, Statista, etc.) to deliver high-confidence citations with evidence highlights, robots.txt compliance checks, and citation quality metrics. Increases document confidence by grounding claims in verifiable authoritative sources.',
-  'validate_and_audit_citations':
-    'Validates and audits citations for accuracy and credibility with comprehensive quality assessment. Checks source accessibility, assesses credibility, verifies compliance, finds alternative sources for broken links, identifies quality gaps, and generates detailed improvement recommendations with audit trail.',
+  'unified_citation_system':
+    'Unified citation management system with multiple operation modes: enhance_content (add citations to content), validate_citations (audit existing citations), discover_sources (find new trusted sources), and comprehensive (full workflow). Provides source validation, quality assessment, compliance checking, and evidence reporting in a single integrated tool.',
   'monitor_market_conditions':
     'Monitors and analyzes current market conditions and trends with real-time data, competitive intelligence, and predictive analysis. Detects market changes, tracks competitor movements, provides market sizing validation, and generates actionable recommendations for business opportunity assessment.',
   'optimize_intent': 'Optimizes user intent for better clarity and actionability',

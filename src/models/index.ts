@@ -10,6 +10,9 @@ export * from './steering';
 export * from './competitive';
 export * from './market-data';
 export * from './audit';
+export * from './nvidia-nim';
+export * from './security-compliance';
+export * from './bedrock';
 
 // Selective exports from proprietary-frameworks to avoid conflicts
 export {

@@ -35,22 +35,10 @@ import {
 import { generatePRFAQ, generatePRFAQSchema, generatePRFAQDescription } from './generate_pr_faq';
 
 import {
-  enhanceCitations,
-  enhanceCitationsSchema,
-  enhanceCitationsDescription,
-} from './enhance_citations';
-
-import {
-  validateAndAuditCitations,
-  validateAndAuditCitationsSchema,
-  validateAndAuditCitationsDescription,
-} from './validate_and_audit_citations';
-
-import {
-  trustedCitationScraper,
-  trustedCitationScraperSchema,
-  trustedCitationScraperDescription,
-} from './trusted_citation_scraper';
+  unifiedCitationSystem,
+  unifiedCitationSystemSchema,
+  unifiedCitationSystemDescription,
+} from './unified_citation_system';
 
 import {
   generateBusinessCase,
@@ -75,6 +63,58 @@ import {
   monitorMarketConditionsMetadata,
 } from './monitor_market_conditions';
 
+import {
+  awsDocsSearch,
+  awsDocsSearchSchema,
+  awsDocsSearchDescription,
+} from './aws_docs_search';
+
+import {
+  awsDocsRead,
+  awsDocsReadSchema,
+  awsDocsReadDescription,
+} from './aws_docs_read';
+
+import {
+  awsDocsRecommend,
+  awsDocsRecommendSchema,
+  awsDocsRecommendDescription,
+} from './aws_docs_recommend';
+
+import {
+  awsContextualInfo,
+  awsContextualInfoSchema,
+  awsContextualInfoDescription,
+} from './aws_contextual_info';
+
+import {
+  awsCodeGenerator,
+  awsCodeGeneratorSchema,
+  awsCodeGeneratorDescription,
+} from './aws_code_generator';
+
+import {
+  awsBestPractices,
+  awsBestPracticesSchema,
+  awsBestPracticesDescription,
+} from './aws_best_practices';
+
+import {
+  assessStrategicAlignment,
+} from './assess_strategic_alignment';
+
+import {
+  validateMarketTiming,
+} from './validate_market_timing';
+
+import {
+  optimizeResourceAllocation,
+} from './optimize_resource_allocation';
+
+import {
+  analyzeBusinessOpportunity,
+} from './analyze_business_opportunity';
+
 // Re-export for external use
 export {
   generateRequirements,
@@ -92,15 +132,9 @@ export {
   generatePRFAQ,
   generatePRFAQSchema,
   generatePRFAQDescription,
-  enhanceCitations,
-  enhanceCitationsSchema,
-  enhanceCitationsDescription,
-  validateAndAuditCitations,
-  validateAndAuditCitationsSchema,
-  validateAndAuditCitationsDescription,
-  trustedCitationScraper,
-  trustedCitationScraperSchema,
-  trustedCitationScraperDescription,
+  unifiedCitationSystem,
+  unifiedCitationSystemSchema,
+  unifiedCitationSystemDescription,
   generateBusinessCase,
   generateBusinessCaseSchema,
   generateBusinessCaseDescription,
@@ -110,6 +144,28 @@ export {
   analyzeBusinessOpportunityEnhanced,
   analyzeBusinessOpportunityEnhancedSchema,
   analyzeBusinessOpportunityEnhancedDescription,
+  awsDocsSearch,
+  awsDocsSearchSchema,
+  awsDocsSearchDescription,
+  awsDocsRead,
+  awsDocsReadSchema,
+  awsDocsReadDescription,
+  awsDocsRecommend,
+  awsDocsRecommendSchema,
+  awsDocsRecommendDescription,
+  awsContextualInfo,
+  awsContextualInfoSchema,
+  awsContextualInfoDescription,
+  awsCodeGenerator,
+  awsCodeGeneratorSchema,
+  awsCodeGeneratorDescription,
+  awsBestPractices,
+  awsBestPracticesSchema,
+  awsBestPracticesDescription,
+  assessStrategicAlignment,
+  validateMarketTiming,
+  optimizeResourceAllocation,
+  analyzeBusinessOpportunity,
 };
 
 /**
@@ -141,20 +197,10 @@ export const MCP_TOOLS_REGISTRY = {
     schema: generatePRFAQSchema,
     description: generatePRFAQDescription,
   },
-  enhance_citations: {
-    handler: enhanceCitations,
-    schema: enhanceCitationsSchema,
-    description: enhanceCitationsDescription,
-  },
-  trusted_citation_scraper: {
-    handler: trustedCitationScraper,
-    schema: trustedCitationScraperSchema,
-    description: trustedCitationScraperDescription,
-  },
-  validate_and_audit_citations: {
-    handler: validateAndAuditCitations,
-    schema: validateAndAuditCitationsSchema,
-    description: validateAndAuditCitationsDescription,
+  unified_citation_system: {
+    handler: unifiedCitationSystem,
+    schema: unifiedCitationSystemSchema,
+    description: unifiedCitationSystemDescription,
   },
   generate_business_case: {
     handler: generateBusinessCase,
@@ -175,6 +221,115 @@ export const MCP_TOOLS_REGISTRY = {
     handler: monitorMarketConditions,
     schema: monitorMarketConditionsMetadata.inputSchema,
     description: monitorMarketConditionsMetadata.description,
+  },
+  aws_docs_search: {
+    handler: awsDocsSearch,
+    schema: awsDocsSearchSchema,
+    description: awsDocsSearchDescription,
+  },
+  aws_docs_read: {
+    handler: awsDocsRead,
+    schema: awsDocsReadSchema,
+    description: awsDocsReadDescription,
+  },
+  aws_docs_recommend: {
+    handler: awsDocsRecommend,
+    schema: awsDocsRecommendSchema,
+    description: awsDocsRecommendDescription,
+  },
+  aws_contextual_info: {
+    handler: awsContextualInfo,
+    schema: awsContextualInfoSchema,
+    description: awsContextualInfoDescription,
+  },
+  aws_code_generator: {
+    handler: awsCodeGenerator,
+    schema: awsCodeGeneratorSchema,
+    description: awsCodeGeneratorDescription,
+  },
+  aws_best_practices: {
+    handler: awsBestPractices,
+    schema: awsBestPracticesSchema,
+    description: awsBestPracticesDescription,
+  },
+  assess_strategic_alignment: {
+    handler: assessStrategicAlignment,
+    schema: {
+      type: 'object',
+      properties: {
+        feature_concept: { type: 'string', description: 'Feature concept to assess' },
+        company_context: {
+          type: 'object',
+          properties: {
+            mission: { type: 'string' },
+            current_okrs: { type: 'array', items: { type: 'string' } },
+            strategic_priorities: { type: 'array', items: { type: 'string' } },
+            competitive_position: { type: 'string' }
+          }
+        }
+      },
+      required: ['feature_concept']
+    },
+    description: 'Evaluates how a feature aligns with company strategy, OKRs, and long-term vision',
+  },
+  validate_market_timing: {
+    handler: validateMarketTiming,
+    schema: {
+      type: 'object',
+      properties: {
+        feature_idea: { type: 'string', description: 'Feature idea to validate timing for' },
+        market_signals: {
+          type: 'object',
+          properties: {
+            trends: { type: 'array', items: { type: 'string' } },
+            competitive_moves: { type: 'array', items: { type: 'string' } },
+            customer_feedback: { type: 'array', items: { type: 'string' } }
+          }
+        }
+      },
+      required: ['feature_idea']
+    },
+    description: 'Fast validation of whether now is the right time to build a feature based on market conditions',
+  },
+  optimize_resource_allocation: {
+    handler: optimizeResourceAllocation,
+    schema: {
+      type: 'object',
+      properties: {
+        current_workflow: {
+          type: 'object',
+          properties: {
+            tasks: { type: 'array', items: { type: 'object' } },
+            resources: { type: 'array', items: { type: 'object' } },
+            timeline: { type: 'string' }
+          }
+        },
+        resource_constraints: {
+          type: 'object',
+          properties: {
+            budget: { type: 'number' },
+            team_size: { type: 'number' },
+            timeline: { type: 'string' }
+          }
+        },
+        optimization_goals: { type: 'array', items: { type: 'string' } }
+      },
+      required: ['current_workflow']
+    },
+    description: 'Analyzes resource requirements and provides optimization recommendations for development efficiency',
+  },
+  analyze_business_opportunity: {
+    handler: analyzeBusinessOpportunity,
+    schema: {
+      type: 'object',
+      properties: {
+        idea: { type: 'string', description: 'Business idea or feature to analyze' },
+        market_context: { type: 'object', description: 'Market context and background information' },
+        analysis_depth: { type: 'string', enum: ['quick', 'standard', 'comprehensive'], default: 'standard' }
+      },
+      required: ['idea']
+    },
+    description: 'Analyzes market opportunity, timing, and business justification for a feature idea',
   },
 } as const;
 

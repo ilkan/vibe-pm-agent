@@ -1,5 +1,6 @@
 # Serverless Framework Configuration for Vibe PM Agent
 # Deploys the MCP server as AWS Lambda functions with API Gateway
+# Enhanced with Bedrock Agent integration and Llama 3.1 Nemotron Nano 8B V1
 
 service: vibe-pm-agent
 
@@ -10,17 +11,24 @@ provider:
   runtime: nodejs18.x
   region: ${opt:region, 'us-east-1'}
   stage: ${opt:stage, 'prod'}
-  memorySize: 1024
+  memorySize: 2048
   timeout: 300
   
-  # Environment variables
+  # Environment variables - Enhanced for Bedrock integration
   environment:
     NODE_ENV: production
     LOG_LEVEL: ${opt:log-level, 'info'}
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
+    # Bedrock Agent configuration
+    BEDROCK_REGION: ${self:provider.region}
+    BUSINESS_STRATEGY_AGENT_ID: IBQRX8MZJJ
+    PRODUCT_DEVELOPMENT_AGENT_ID: CEW45LTT2P
+    EXECUTIVE_COMMUNICATIONS_AGENT_ID: ULX1RJGKCR
+    CASE_STUDY_COACHING_AGENT_ID: PDZPQTNLYH
+    NEMOTRON_MODEL_ID: meta.llama3-1-nemotron-nano-8b-v1:0
     
-  # IAM Role permissions
+  # IAM Role permissions - Enhanced for Bedrock Agent integration
   iam:
     role:
       statements:
@@ -53,6 +61,26 @@ provider:
           Resource:
             - '${self:custom.dynamoDbArn}'
             - '${self:custom.dynamoDbArn}/index/*'
+        # Bedrock Agent permissions
+        - Effect: Allow
+          Action:
+            - bedrock:InvokeModel
+            - bedrock:InvokeModelWithResponseStream
+            - bedrock:GetFoundationModel
+            - bedrock:ListFoundationModels
+          Resource: 
+            - 'arn:aws:bedrock:${self:provider.region}::foundation-model/meta.llama3-1-nemotron-nano-8b-v1:0'
+            - 'arn:aws:bedrock:${self:provider.region}:*:model/*'
+        - Effect: Allow
+          Action:
+            - bedrock:InvokeAgent
+            - bedrock:GetAgent
+            - bedrock:ListAgents
+          Resource:
+            - 'arn:aws:bedrock:${self:provider.region}:*:agent/IBQRX8MZJJ'
+            - 'arn:aws:bedrock:${self:provider.region}:*:agent/CEW45LTT2P'
+            - 'arn:aws:bedrock:${self:provider.region}:*:agent/ULX1RJGKCR'
+            - 'arn:aws:bedrock:${self:provider.region}:*:agent/PDZPQTNLYH'
 
   # API Gateway configuration
   apiGateway:

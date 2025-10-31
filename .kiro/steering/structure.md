@@ -19,15 +19,39 @@ inclusion: always
 - Use PascalCase for interfaces and classes: `BusinessOpportunity`, `MarketAnalysis`
 - Use camelCase for functions and variables: `analyzeMarketOpportunity()`
 
-### MCP Server Structure
+### ✅ MCP Server Structure (OPERATIONAL)
 ```
 src/mcp/
-├── server.ts              # Main MCP server implementation
-├── tools/                 # Individual MCP tool handlers
-│   ├── analyze_business_opportunity.ts
-│   ├── generate_business_case.ts
-│   └── validate_market_timing.ts
-└── index.ts              # MCP exports and tool registration
+├── server.ts              # Main MCP server implementation ✅
+├── tools/                 # Individual MCP tool handlers (27 tools) ✅
+│   ├── analyze_business_opportunity.ts ✅
+│   ├── assess_strategic_alignment.ts ✅
+│   ├── validate_market_timing.ts ✅
+│   ├── optimize_resource_allocation.ts ✅
+│   ├── generate_business_case.ts ✅
+│   ├── create_stakeholder_communication.ts ✅
+│   ├── generate_management_onepager.ts ✅
+│   ├── generate_pr_faq.ts ✅
+│   ├── generate_requirements.ts ✅
+│   ├── generate_design_options.ts ✅
+│   ├── generate_task_plan.ts ✅
+│   ├── unified_citation_system.ts ✅
+│   ├── monitor_market_conditions.ts ✅
+│   ├── aws_docs_search.ts ✅
+│   ├── aws_docs_read.ts ✅
+│   ├── aws_contextual_info.ts ✅
+│   ├── aws_code_generator.ts ✅
+│   ├── aws_best_practices.ts ✅
+│   └── index.ts           # Tool registry and exports ✅
+├── tool-mappings.ts       # Kiro tool name mappings ✅
+├── production-config.ts   # Production configuration ✅
+└── index.ts              # MCP exports ✅
+
+# Compiled Output (Ready for Use)
+dist/mcp/
+├── server.js             # Compiled MCP server ✅
+├── tools/                # Compiled tool handlers ✅
+└── *.js                  # All compiled components ✅
 ```
 
 ### Component Architecture
@@ -36,9 +60,19 @@ src/mcp/
 - Use dependency injection pattern for external services
 - Implement proper error handling with custom error types
 
-### Data Flow Pattern
+### ✅ Data Flow Pattern (VALIDATED)
 ```
-MCP Tool → Pipeline Component → Business Logic → Formatted Output
+Kiro IDE → MCP Protocol → Tool Handler → Pipeline Component → Business Logic → Formatted Output
+
+Example Flow:
+1. User requests business analysis in Kiro
+2. Kiro sends MCP request to vibe-pm-agent server
+3. Server routes to analyze_business_opportunity tool
+4. Tool orchestrates BusinessAnalyzer component
+5. Component applies consulting frameworks
+6. Formatted response returned to Kiro
+
+Performance: 5.75ms average response time ✅
 ```
 
 ## Code Organization Rules

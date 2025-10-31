@@ -137,6 +137,83 @@ deploy_to_aws() {
     log_success "Deployment completed"
 }
 
+# Update Bedrock agents with enhanced configurations
+update_bedrock_agents() {
+    log_info "Updating Bedrock agents with enhanced Nemotron configurations..."
+    
+    cd ../../
+    
+    # Bedrock Agent IDs
+    BUSINESS_STRATEGY_AGENT_ID="IBQRX8MZJJ"
+    PRODUCT_DEVELOPMENT_AGENT_ID="CEW45LTT2P"
+    EXECUTIVE_COMMUNICATIONS_AGENT_ID="ULX1RJGKCR"
+    CASE_STUDY_COACHING_AGENT_ID="PDZPQTNLYH"
+    NEMOTRON_MODEL_ID="meta.llama3-1-nemotron-nano-8b-v1:0"
+    
+    log_info "Validating Bedrock agents..."
+    log_info "  Business Strategy Agent: $BUSINESS_STRATEGY_AGENT_ID"
+    log_info "  Product Development Agent: $PRODUCT_DEVELOPMENT_AGENT_ID"
+    log_info "  Executive Communications Agent: $EXECUTIVE_COMMUNICATIONS_AGENT_ID"
+    log_info "  Case Study Coaching Agent: $CASE_STUDY_COACHING_AGENT_ID"
+    log_info "  Enhanced Model: $NEMOTRON_MODEL_ID"
+    
+    # Check Bedrock access
+    if ! aws bedrock list-foundation-models --region ${REGION} &> /dev/null; then
+        log_warning "Bedrock access not available in region ${REGION}. Skipping agent updates."
+        cd deployment/aws
+        return 0
+    fi
+    
+    # Check if Nemotron model is available
+    if aws bedrock get-foundation-model --model-identifier $NEMOTRON_MODEL_ID --region ${REGION} &> /dev/null; then
+        log_success "Nemotron model $NEMOTRON_MODEL_ID is available"
+    else
+        log_warning "Nemotron model $NEMOTRON_MODEL_ID may not be available in region ${REGION}"
+    fi
+    
+    # Validate each agent
+    local agents=($BUSINESS_STRATEGY_AGENT_ID $PRODUCT_DEVELOPMENT_AGENT_ID $EXECUTIVE_COMMUNICATIONS_AGENT_ID $CASE_STUDY_COACHING_AGENT_ID)
+    local agent_names=("Business Strategy" "Product Development" "Executive Communications" "Case Study Coaching")
+    
+    for i in "${!agents[@]}"; do
+        local agent_id="${agents[$i]}"
+        local agent_name="${agent_names[$i]}"
+        
+        if aws bedrock-agent get-agent --agent-id $agent_id --region ${REGION} &> /dev/null; then
+            log_success "✅ $agent_name Agent ($agent_id) is available"
+        else
+            log_warning "⚠️  $agent_name Agent ($agent_id) not found"
+        fi
+    done
+    
+    # Run the Bedrock agent update script
+    if [ -f "scripts/update-bedrock-agents.js" ]; then
+        log_info "Running Bedrock agent configuration updates..."
+        node scripts/update-bedrock-agents.js
+        if [ $? -eq 0 ]; then
+            log_success "Bedrock agents updated successfully with Nemotron enhancements"
+        else
+            log_error "Failed to update Bedrock agents"
+            return 1
+        fi
+    else
+        log_warning "Bedrock agent update script not found, skipping agent updates"
+    fi
+    
+    # Test enhanced agents if script exists
+    if [ -f "scripts/test-enhanced-agents.js" ]; then
+        log_info "Testing enhanced Bedrock agents..."
+        node scripts/test-enhanced-agents.js
+        if [ $? -eq 0 ]; then
+            log_success "Enhanced agent tests passed"
+        else
+            log_warning "Some enhanced agent tests failed"
+        fi
+    fi
+    
+    cd deployment/aws
+}
+
 # Get deployment info
 get_deployment_info() {
     log_info "Getting deployment information..."
@@ -216,6 +293,7 @@ main() {
     install_dependencies
     build_project
     deploy_to_aws
+    update_bedrock_agents
     get_deployment_info
     test_deployment
     

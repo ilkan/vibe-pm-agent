@@ -20,6 +20,30 @@ export interface ToolResult {
   metadata?: any;
 }
 
+export const createStakeholderCommunicationSchema = {
+  type: 'object',
+  properties: {
+    business_case: { 
+      type: 'string', 
+      description: 'Business case document to create communication from' 
+    },
+    communication_type: {
+      type: 'string',
+      enum: ['executive_onepager', 'pr_faq', 'board_presentation', 'team_announcement'],
+      description: 'Type of stakeholder communication to generate'
+    },
+    audience: {
+      type: 'string',
+      enum: ['executives', 'board', 'engineering_team', 'customers', 'investors'],
+      description: 'Target audience for the communication'
+    },
+    amazon_mode: { type: 'boolean', description: 'Use Amazon Working Backwards methodology' }
+  },
+  required: ['business_case', 'communication_type', 'audience']
+};
+
+export const createStakeholderCommunicationDescription = 'Generates executive one-pagers, PR-FAQs, and stakeholder presentations from business case analysis. Routes to appropriate template based on communication_type (executive_onepager, pr_faq, board_presentation, team_announcement) and audience (executives, board, engineering_team, customers, investors). Uses Amazon Working Backwards methodology with evidence mechanisms.';
+
 export async function createStakeholderCommunication(args: StakeholderCommunicationArgs): Promise<ToolResult> {
   try {
     let document = '';

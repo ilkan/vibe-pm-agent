@@ -26,5 +26,22 @@ export * from './access-control-manager';
 export * from './data-anonymization-service';
 export * from './secure-credential-manager';
 
+// NVIDIA NIM Security and Compliance Components
+export * from './nvidia-nim-credential-manager';
+export * from './nvidia-nim-security-compliance';
+
 // Enhanced Citation System - Unified Integration
 export * from './enhanced-citation-system';
+
+// AWS Bedrock Integration Components (Local NIM)
+export * from './bedrock-runtime-client';
+export * from './nemotron-model-service';
+export * from './bedrock-error-handler';
+export * from './mcp-tool-enhancer';
+
+// Monitoring and Observability Components
+export * from './cloudwatch-monitor';
+export * from './xray-tracer';
+export * from './health-monitor';
+export * from './error-recovery-manager';
+export * from './monitoring-orchestrator';

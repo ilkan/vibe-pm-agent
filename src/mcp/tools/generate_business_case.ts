@@ -24,6 +24,29 @@ export interface ToolResult {
   metadata?: any;
 }
 
+export const generateBusinessCaseSchema = {
+  type: 'object',
+  properties: {
+    opportunity_analysis: { 
+      type: 'string', 
+      description: 'Comprehensive opportunity analysis to base the business case on' 
+    },
+    financial_inputs: {
+      type: 'object',
+      properties: {
+        development_cost: { type: 'number', description: 'Estimated development cost' },
+        operational_cost: { type: 'number', description: 'Annual operational cost' },
+        expected_revenue: { type: 'number', description: 'Expected annual revenue' },
+        time_to_market: { type: 'number', description: 'Time to market in months' }
+      }
+    },
+    amazon_mode: { type: 'boolean', description: 'Use Amazon Working Backwards methodology' }
+  },
+  required: ['opportunity_analysis']
+};
+
+export const generateBusinessCaseDescription = 'Creates comprehensive business case with ROI analysis, risk assessment, and strategic alignment from opportunity analysis. Uses Amazon Working Backwards methodology by default with assumption ledger, confidence scoring, bear/base/bull scenario analysis, and hard questions. Returns executive-ready document with financial projections and evidence mechanisms.';
+
 export async function generateBusinessCase(args: BusinessCaseArgs): Promise<ToolResult> {
   try {
     const financials = args.financial_inputs || {};

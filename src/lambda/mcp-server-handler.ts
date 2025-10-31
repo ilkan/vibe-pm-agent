@@ -30,14 +30,31 @@ interface MCPResponse {
   id?: string | number;
 }
 
-// Tool registry
+// Enhanced tool registry with Bedrock agent integration
 const TOOLS = {
+  // Business Strategy Agent tools
   'analyze_business_opportunity': analyzeBusinessOpportunity,
-  'generate_business_case': generateBusinessCase,
-  'create_stakeholder_communication': createStakeholderCommunication,
   'assess_strategic_alignment': assessStrategicAlignment,
   'validate_market_timing': validateMarketTiming,
+  
+  // Executive Communications Agent tools
+  'generate_business_case': generateBusinessCase,
+  'create_stakeholder_communication': createStakeholderCommunication,
+  
+  // Product Development Agent tools
   'optimize_resource_allocation': optimizeResourceAllocation,
+  
+  // Supervisor Agent tools (placeholders - would route to actual agent invocations)
+  'invoke_business_strategy_agent': analyzeBusinessOpportunity, // Placeholder
+  'invoke_product_development_agent': optimizeResourceAllocation, // Placeholder
+  'invoke_executive_communications_agent': generateBusinessCase, // Placeholder
+  'invoke_case_study_coaching_agent': assessStrategicAlignment, // Placeholder
+  'invoke_citation_agent': analyzeBusinessOpportunity, // Placeholder
+  
+  // Citation Agent tools (placeholders)
+  'validate_citations': analyzeBusinessOpportunity, // Placeholder
+  'source_citations': analyzeBusinessOpportunity, // Placeholder
+  'assess_credibility': analyzeBusinessOpportunity, // Placeholder
 };
 
 /**

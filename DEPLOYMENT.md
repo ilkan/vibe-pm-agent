@@ -1,286 +1,371 @@
-# 🚀 Vibe PM Agent - AWS Deployment Guide
+# Vibe PM Agent - Deployment Guide
 
-Deploy your Vibe PM Agent MCP server to AWS in minutes with professional-grade infrastructure.
+Complete deployment guide for the Vibe PM Agent MCP server with AWS Bedrock Agent integration and Llama 3.1 Nemotron Nano 8B V1 enhancement.
 
-## Quick Deploy
+## 🚀 Quick Deployment
 
-```bash
-# 1. Install dependencies
-npm install
+### Prerequisites
 
-# 2. Configure AWS credentials
-aws configure
+1. **Node.js 18+** and npm
+2. **AWS CLI** configured with appropriate permissions
+3. **Serverless Framework** (installed automatically if needed)
+4. **AWS Bedrock access** in your target region
 
-# 3. Deploy to production
-npm run deploy:aws
-
-# 4. Verify deployment
-npm run deploy:verify
-```
-
-## 📋 Prerequisites
-
-- **Node.js** 18.0.0+ ([download](https://nodejs.org))
-- **AWS CLI** configured ([setup guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html))
-- **AWS Account** with appropriate permissions
-- **npm** package manager (included with Node.js)
-
-## 🎯 Deployment Options
-
-### Option 1: Serverless Framework (Recommended)
-
-**Best for:** Quick deployment, automatic scaling, minimal configuration
+### One-Command Deployment
 
 ```bash
-# Production deployment
+# Deploy to production
 npm run deploy:aws
 
-# Development environment
-npm run deploy:aws:dev
-
-# Staging environment  
+# Deploy to staging
 npm run deploy:aws:staging
 
-# View deployment info
-npm run deploy:aws:info
-
-# View logs
-npm run deploy:aws:logs
-
-# Remove deployment
-npm run deploy:aws:remove
-```
-
-### Option 2: AWS CDK
-
-**Best for:** Advanced configuration, enterprise deployments, infrastructure as code
-
-```bash
-# Navigate to CDK directory
-cd deployment/aws/cdk
-
-# Install CDK dependencies
-npm install
-
-# Bootstrap CDK (first time only)
-npm run bootstrap
-
-# Deploy to production
-npm run deploy:prod
-
 # Deploy to development
-npm run deploy:dev
+npm run deploy:aws:dev
 ```
 
-## 🏗️ What Gets Deployed
+## 📋 Detailed Setup
 
-### AWS Infrastructure
+### 1. Environment Setup
 
-| Resource | Purpose | Configuration |
-|----------|---------|---------------|
-| **5 Lambda Functions** | MCP server and business intelligence tools | 1GB memory, 5min timeout |
-| **API Gateway** | RESTful API with CORS | Rate limiting, logging enabled |
-| **DynamoDB Table** | Caching layer for analysis results | Pay-per-request, TTL enabled |
-| **S3 Bucket** | Document and artifact storage | Versioned, encrypted |
-| **CloudWatch** | Logging and monitoring | 30-day retention, X-Ray tracing |
-
-### API Endpoints
-
-After deployment, you'll have these endpoints:
-
-```
-https://your-api-id.execute-api.region.amazonaws.com/prod/
-├── /mcp/health          # Health check
-├── /mcp                 # Main MCP protocol endpoint
-└── /api/
-    ├── /business/analyze    # Business analysis
-    ├── /documents/generate  # Document generation
-    ├── /market/analyze     # Market intelligence
-    └── /citations/validate # Citation service
-```
-
-## ⚙️ Configuration
-
-### Environment Variables
-
+#### AWS Credentials Configuration
 ```bash
-# Deployment stage
-export STAGE=prod              # prod, staging, dev
+# Configure AWS CLI
+aws configure
 
-# AWS region
-export REGION=us-east-1        # Your preferred region
+# Verify access
+aws sts get-caller-identity
 
-# Logging level
-export LOG_LEVEL=info          # debug, info, warn, error
-
-# Performance tuning
-export LAMBDA_MEMORY=1024      # Lambda memory in MB
-export LAMBDA_TIMEOUT=300      # Lambda timeout in seconds
+# Check Bedrock access
+aws bedrock list-foundation-models --region us-east-1
 ```
 
-### Custom Configuration
-
-Edit `deployment/aws/serverless.yml` for advanced configuration:
-
-```yaml
-# Custom memory per function
-functions:
-  mcpServer:
-    memorySize: 2048
-    timeout: 600
-    
-# VPC configuration (optional)
-provider:
-  vpc:
-    securityGroupIds:
-      - sg-12345678
-    subnetIds:
-      - subnet-12345678
-```
-
-## 🔧 Post-Deployment Setup
-
-### 1. Configure MCP Client
-
-Add to your Kiro MCP configuration (`.kiro/settings/mcp.json`):
+#### Required AWS Permissions
+Your AWS user/role needs the following permissions:
 
 ```json
 {
-  "mcpServers": {
-    "vibe-pm-agent": {
-      "command": "curl",
-      "args": [
-        "-X", "POST",
-        "-H", "Content-Type: application/json",
-        "-d", "@-",
-        "https://your-api-id.execute-api.region.amazonaws.com/prod/mcp"
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:*",
+        "lambda:*",
+        "apigateway:*",
+        "iam:*",
+        "s3:*",
+        "dynamodb:*",
+        "logs:*",
+        "bedrock:*",
+        "bedrock-agent:*"
       ],
-      "env": {
-        "LOG_LEVEL": "info"
-      }
+      "Resource": "*"
     }
-  }
+  ]
 }
 ```
 
-### 2. Test Deployment
+### 2. Project Setup
 
 ```bash
-# Automated verification
-npm run deploy:verify
+# Clone and setup
+git clone <repository-url>
+cd vibe-pm-agent
 
-# Manual health check
-curl https://your-api-id.execute-api.region.amazonaws.com/prod/mcp/health
+# Install dependencies
+npm install
 
-# Test MCP tools
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"method":"tools/list","id":1}' \
-  https://your-api-id.execute-api.region.amazonaws.com/prod/mcp
+# Build the project
+npm run build:prod
+
+# Verify build
+ls -la dist/mcp/server.js
 ```
 
-### 3. Monitor Performance
+### 3. Bedrock Agent Configuration
 
-- **CloudWatch Dashboard**: View metrics and logs
-- **X-Ray Tracing**: Analyze performance bottlenecks
-- **Cost Explorer**: Monitor AWS costs
+#### Current Agent Configuration
+The system includes 4 enhanced Bedrock agents:
 
-## 💰 Cost Estimation
+| Agent | ID | Purpose | Model |
+|-------|----|---------| ------|
+| Business Strategy | IBQRX8MZJJ | Market analysis with enhanced reasoning | Nemotron Nano 8B V1 |
+| Product Development | CEW45LTT2P | Requirements and design with intelligent planning | Nemotron Nano 8B V1 |
+| Executive Communications | ULX1RJGKCR | Business cases with advanced ROI analysis | Nemotron Nano 8B V1 |
+| Case Study Coaching | PDZPQTNLYH | Strategic coaching with Nemotron insights | Nemotron Nano 8B V1 |
 
-**Typical monthly costs:**
-
-| Usage Level | Lambda | API Gateway | DynamoDB | S3 | Total |
-|-------------|--------|-------------|----------|----|----|
-| **Light** (10K requests) | $2 | $0.35 | $0.25 | $0.50 | **~$3** |
-| **Medium** (100K requests) | $20 | $3.50 | $1.25 | $2.50 | **~$27** |
-| **Heavy** (1M requests) | $200 | $35 | $12.50 | $25 | **~$273** |
-
-*Costs may vary by region and usage patterns*
-
-## 🔒 Security Features
-
-- **IAM Roles**: Least-privilege access for Lambda functions
-- **Encryption**: Data encrypted at rest and in transit
-- **VPC Support**: Optional private network deployment
-- **API Security**: Rate limiting and request validation
-- **Audit Logging**: Complete request/response logging
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-**Deployment Fails:**
-```bash
-# Check AWS credentials
-aws sts get-caller-identity
-
-# Verify permissions
-aws iam get-user
-
-# Check region
-aws configure get region
+#### Agent Configuration Files
+```
+src/config/bedrock-agents/
+├── business-strategy-agent.ts      # IBQRX8MZJJ
+├── product-development-agent.ts    # CEW45LTT2P
+├── executive-communications-agent.ts # ULX1RJGKCR
+├── case-study-coaching-agent.ts    # PDZPQTNLYH
+└── index.ts                        # Agent registry
 ```
 
-**Lambda Errors:**
+### 4. Deployment Process
+
+#### Standard Deployment
 ```bash
+# Navigate to deployment directory
+cd deployment/aws
+
+# Deploy with enhanced logging
+STAGE=prod REGION=us-east-1 ./deploy.sh deploy
+```
+
+#### Custom Deployment Options
+```bash
+# Deploy to specific stage and region
+STAGE=staging REGION=eu-west-1 ./deploy.sh deploy
+
+# Deploy with debug logging
+LOG_LEVEL=debug ./deploy.sh deploy
+
+# Deploy without Bedrock agent updates
+SKIP_BEDROCK_AGENTS=true ./deploy.sh deploy
+```
+
+### 5. Post-Deployment Verification
+
+#### Test MCP Server
+```bash
+# Test all 27 tools
+node test-mcp-server.js
+
+# Expected output:
+# ✅ MCP Server initialized successfully
+# ✅ Tool invocation successful
+# ✅ All tests completed successfully!
+```
+
+#### Test Bedrock Agents
+```bash
+# Test enhanced agents
+npm run agents:test
+
+# Expected output:
+# ✅ Business Strategy Agent (IBQRX8MZJJ) - Working
+# ✅ Product Development Agent (CEW45LTT2P) - Working
+# ✅ Executive Communications Agent (ULX1RJGKCR) - Working
+# ✅ Case Study Coaching Agent (PDZPQTNLYH) - Working
+```
+
+#### Verify Deployment
+```bash
+# Get deployment information
+./deploy.sh info
+
+# Test API endpoints
+./deploy.sh test
+
 # View logs
-npm run deploy:aws:logs
-
-# Test function directly
-aws lambda invoke \
-  --function-name prod-vibe-pm-agent-mcp-server \
-  --payload '{}' \
-  response.json
+./deploy.sh logs
 ```
 
-**API Gateway Issues:**
+## 🏗️ Architecture Overview
+
+### AWS Resources Created
+
+#### Lambda Functions
+- **mcpServer** - Main MCP server handler
+- **businessAnalysis** - Business opportunity analysis
+- **documentGeneration** - Executive communications
+- **marketIntelligence** - Real-time market analysis
+- **citationService** - Professional citation management
+
+#### Supporting Resources
+- **API Gateway** - REST API for MCP protocol
+- **DynamoDB Table** - Caching and session storage
+- **S3 Bucket** - Data storage and artifacts
+- **CloudWatch Logs** - Centralized logging
+- **IAM Roles** - Secure access management
+
+#### Bedrock Integration
+- **4 Enhanced Agents** - With Nemotron model integration
+- **Model Access** - Llama 3.1 Nemotron Nano 8B V1
+- **Agent Runtime** - For enhanced reasoning capabilities
+
+### Network Architecture
+```
+Internet → API Gateway → Lambda Functions → Bedrock Agents → Nemotron Model
+                    ↓
+                DynamoDB (Cache)
+                    ↓
+                S3 (Storage)
+```
+
+## 🔧 Configuration Options
+
+### Environment Variables
+
+#### MCP Server Configuration
 ```bash
-# Test health endpoint
-curl https://api-id.execute-api.region.amazonaws.com/prod/mcp/health
+# Core settings
+NODE_ENV=production
+LOG_LEVEL=info
+STAGE=prod
+REGION=us-east-1
 
-# Check API Gateway logs
-aws logs tail /aws/apigateway/api-id --follow
+# Bedrock configuration
+BEDROCK_REGION=us-east-1
+NEMOTRON_MODEL_ID=meta.llama3-1-nemotron-nano-8b-v1:0
+
+# Agent IDs
+BUSINESS_STRATEGY_AGENT_ID=IBQRX8MZJJ
+PRODUCT_DEVELOPMENT_AGENT_ID=CEW45LTT2P
+EXECUTIVE_COMMUNICATIONS_AGENT_ID=ULX1RJGKCR
+CASE_STUDY_COACHING_AGENT_ID=PDZPQTNLYH
 ```
+
+#### Serverless Configuration
+Located in `deployment/aws/serverless.yml`:
+
+```yaml
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'prod'}
+  memorySize: 2048  # Enhanced for Bedrock integration
+  timeout: 300
+```
+
+### Custom Domain Setup (Optional)
+
+```bash
+# Install serverless domain manager
+npm install serverless-domain-manager --save-dev
+
+# Configure custom domain in serverless.yml
+customDomain:
+  domainName: api.yourdomain.com
+  basePath: vibe-pm-agent
+  stage: ${self:provider.stage}
+  createRoute53Record: true
+
+# Create domain
+serverless create_domain --stage prod
+
+# Deploy with custom domain
+serverless deploy --stage prod
+```
+
+## 🔍 Monitoring & Troubleshooting
+
+### CloudWatch Monitoring
+
+#### Key Metrics to Monitor
+- **Lambda Duration** - Function execution time
+- **Lambda Errors** - Error rate and types
+- **API Gateway 4XX/5XX** - Client and server errors
+- **DynamoDB Throttles** - Database performance
+- **Bedrock Invocations** - Model usage and costs
+
+#### Setting Up Alarms
+```bash
+# Create CloudWatch alarms
+aws cloudwatch put-metric-alarm \
+  --alarm-name "VibePMAgent-HighErrorRate" \
+  --alarm-description "High error rate in Vibe PM Agent" \
+  --metric-name Errors \
+  --namespace AWS/Lambda \
+  --statistic Sum \
+  --period 300 \
+  --threshold 10 \
+  --comparison-operator GreaterThanThreshold
+```
+
+### Log Analysis
+
+#### Viewing Logs
+```bash
+# Real-time logs
+./deploy.sh logs
+
+# Specific function logs
+aws logs tail /aws/lambda/prod-vibe-pm-agent-mcp-server --follow
+
+# Filter logs by error level
+aws logs filter-log-events \
+  --log-group-name /aws/lambda/prod-vibe-pm-agent-mcp-server \
+  --filter-pattern "ERROR"
+```
+
+#### Common Issues and Solutions
+
+| Issue | Symptoms | Solution |
+|-------|----------|----------|
+| Cold Start Timeout | Intermittent timeouts | Increase memory allocation |
+| Bedrock Access Denied | 403 errors from agents | Check IAM permissions |
+| High Latency | Slow response times | Enable caching, optimize queries |
+| Memory Issues | Out of memory errors | Increase Lambda memory |
+| Rate Limiting | 429 errors | Implement exponential backoff |
 
 ### Performance Optimization
 
-1. **Increase Lambda Memory**: Higher memory = faster CPU
-2. **Enable Provisioned Concurrency**: Reduce cold starts
-3. **Optimize DynamoDB**: Use appropriate read/write capacity
-4. **Cache Responses**: Implement application-level caching
-
-## 📊 Monitoring
-
-### CloudWatch Metrics
-
-Monitor these key metrics:
-
-- **Lambda Duration**: Function execution time
-- **API Gateway Latency**: Request response time
-- **Error Rate**: Failed requests percentage
-- **DynamoDB Throttling**: Capacity exceeded events
-
-### Alarms
-
-Automatic alarms for:
-
-- High error rates (>5%)
-- High latency (>5 seconds)
-- Lambda function failures
-- DynamoDB throttling
-
-### Cost Monitoring
-
-- **AWS Cost Explorer**: Track spending trends
-- **Budget Alerts**: Get notified of cost overruns
-- **Resource Tagging**: Organize costs by project
-
-## 🔄 CI/CD Integration
-
-### GitHub Actions
-
+#### Lambda Optimization
 ```yaml
-name: Deploy to AWS
+# Optimized Lambda configuration
+functions:
+  mcpServer:
+    memorySize: 2048  # Higher memory for better performance
+    timeout: 300      # Adequate timeout for complex analysis
+    reservedConcurrency: 10  # Prevent runaway costs
+    environment:
+      NODE_OPTIONS: '--max-old-space-size=1792'
+```
+
+#### Caching Strategy
+```typescript
+// DynamoDB caching configuration
+const cacheConfig = {
+  tableName: 'vibe-pm-agent-prod-cache',
+  ttl: 300, // 5 minutes for business analysis
+  keyPrefix: 'mcp-tool-',
+  enableCompression: true
+};
+```
+
+## 🚀 Advanced Deployment Scenarios
+
+### Multi-Region Deployment
+
+```bash
+# Deploy to multiple regions
+REGION=us-east-1 ./deploy.sh deploy
+REGION=eu-west-1 ./deploy.sh deploy
+REGION=ap-southeast-1 ./deploy.sh deploy
+
+# Configure Route 53 for global load balancing
+aws route53 create-health-check \
+  --caller-reference vibe-pm-agent-us-east-1 \
+  --health-check-config Type=HTTPS,ResourcePath=/mcp/health
+```
+
+### Blue-Green Deployment
+
+```bash
+# Deploy to staging
+STAGE=staging ./deploy.sh deploy
+
+# Test staging environment
+STAGE=staging ./deploy.sh test
+
+# Promote to production
+STAGE=prod ./deploy.sh deploy
+
+# Rollback if needed
+STAGE=prod-backup ./deploy.sh deploy
+```
+
+### CI/CD Integration
+
+#### GitHub Actions Example
+```yaml
+name: Deploy Vibe PM Agent
 on:
   push:
     branches: [main]
@@ -294,48 +379,93 @@ jobs:
         with:
           node-version: '18'
       - run: npm install
+      - run: npm run build:prod
       - run: npm run deploy:aws
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 ```
 
-### GitLab CI
+## 🔒 Security Considerations
 
-```yaml
-deploy:
-  stage: deploy
-  image: node:18
-  script:
-    - npm install
-    - npm run deploy:aws
-  only:
-    - main
+### IAM Best Practices
+
+#### Least Privilege Access
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:*:*:foundation-model/meta.llama3-1-nemotron-nano-8b-v1:0"
+      ]
+    }
+  ]
+}
 ```
 
-## 📚 Next Steps
+#### API Security
+- Enable API Gateway authentication
+- Use AWS WAF for DDoS protection
+- Implement rate limiting
+- Enable CloudTrail logging
 
-1. **Custom Domain**: Set up a custom domain for your API
-2. **Monitoring**: Configure advanced monitoring and alerting
-3. **Scaling**: Implement auto-scaling for high traffic
-4. **Security**: Add API authentication and authorization
-5. **Backup**: Set up automated backups for DynamoDB
+### Data Protection
+- Enable encryption at rest for DynamoDB and S3
+- Use HTTPS/TLS for all communications
+- Implement data retention policies
+- Regular security audits
 
-## 🆘 Support
+## 💰 Cost Optimization
 
-Need help with deployment?
+### Bedrock Costs
+- **Nemotron Model**: ~$0.0002 per 1K input tokens
+- **Agent Invocations**: ~$0.00001 per invocation
+- **Estimated Monthly Cost**: $50-200 for moderate usage
 
-- **Documentation**: Check [deployment/aws/README.md](deployment/aws/README.md)
-- **Issues**: Open a GitHub issue
-- **Community**: Join our discussions
-- **Enterprise**: Contact for enterprise support
+### Lambda Costs
+- **Compute**: ~$0.0000166667 per GB-second
+- **Requests**: ~$0.20 per 1M requests
+- **Estimated Monthly Cost**: $20-100 for moderate usage
+
+### Cost Monitoring
+```bash
+# Set up billing alerts
+aws budgets create-budget \
+  --account-id 123456789012 \
+  --budget file://budget.json
+```
+
+## 📞 Support & Troubleshooting
+
+### Getting Help
+- **Documentation**: [docs/](docs/) directory
+- **Issues**: [GitHub Issues](https://github.com/ilkan/vibe-pm-agent/issues)
+- **Examples**: [examples/](examples/) directory
+
+### Emergency Procedures
+
+#### Rollback Deployment
+```bash
+# Quick rollback
+./deploy.sh remove
+STAGE=prod-backup ./deploy.sh deploy
+```
+
+#### Scale Down for Cost Control
+```bash
+# Reduce Lambda concurrency
+aws lambda put-provisioned-concurrency-config \
+  --function-name vibe-pm-agent-prod-mcpServer \
+  --provisioned-concurrency-config ProvisionedConcurrencyConfig=0
+```
 
 ---
 
-**Ready to deploy?**
+**Ready to deploy your enhanced Vibe PM Agent with Bedrock integration?** 🚀
 
-```bash
-npm run deploy:aws
-```
-
-*Your business intelligence platform awaits in the cloud.*
+Follow this guide for a smooth deployment experience with all 27 MCP tools and 4 enhanced Bedrock agents!

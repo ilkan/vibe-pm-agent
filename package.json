@@ -24,6 +24,9 @@
     "type-check:prod": "tsc --project tsconfig.prod.json --noEmit",
     "mcp:server": "node dist/mcp/server.js",
     "mcp:server:debug": "node dist/mcp/server.js --log-level debug",
+    "agents:update": "node scripts/update-bedrock-agents.js",
+    "agents:test": "node scripts/test-enhanced-agents.js",
+    "agents:deploy": "npm run agents:update && npm run agents:test",
     "clean": "rm -rf dist",
     "clean:prod": "rm -rf dist && npm run build:prod",
     "prebuild": "npm run clean",
@@ -93,6 +96,9 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock": "^3.922.0",
+    "@aws-sdk/client-bedrock-agent": "^3.922.0",
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.922.0",
     "@aws-sdk/client-cloudwatch": "^3.0.0",
     "@aws-sdk/client-cloudwatch-logs": "^3.0.0",
     "@aws-sdk/client-sns": "^3.0.0",

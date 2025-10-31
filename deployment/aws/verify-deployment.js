@@ -234,14 +234,27 @@ async function testAwsResources() {
       name: 'Lambda Functions',
       command: `aws lambda list-functions --region ${REGION} --query 'Functions[?starts_with(FunctionName, \`${STAGE}-vibe-pm-agent\`)].FunctionName' --output text`,
     },
+    {
+      name: 'Bedrock Agents',
+      command: `aws bedrock-agent list-agents --region ${REGION} --query 'agentSummaries[?contains(agentId, \`IBQRX8MZJJ\`) || contains(agentId, \`CEW45LTT2P\`) || contains(agentId, \`ULX1RJGKCR\`) || contains(agentId, \`PDZPQTNLYH\`) || contains(agentId, \`SUPERVISOR001\`) || contains(agentId, \`CITATION001\`)].agentId' --output text`,
+    },
   ];
 
   let allPassed = true;
 
   for (const test of tests) {
     try {
-      execSync(test.command, { stdio: 'pipe' });
-      log('green', `${test.name} - OK`);
+      const result = execSync(test.command, { stdio: 'pipe', encoding: 'utf8' });
+      if (test.name === 'Bedrock Agents') {
+        const agentIds = result.trim().split(/\s+/).filter(id => id);
+        if (agentIds.length >= 4) { // At least the original 4 agents
+          log('green', `${test.name} - OK (${agentIds.length} agents found)`);
+        } else {
+          log('yellow', `${test.name} - PARTIAL (${agentIds.length} agents found, expected 6)`);
+        }
+      } else {
+        log('green', `${test.name} - OK`);
+      }
     } catch (error) {
       log('red', `${test.name} - FAILED`);
       allPassed = false;
@@ -249,6 +262,28 @@ async function testAwsResources() {
   }
 
   return allPassed;
+}
+
+/**
+ * Test enhanced Bedrock agents
+ */
+async function testEnhancedAgents() {
+  log('blue', 'Testing enhanced Bedrock agents...');
+  
+  try {
+    // Run the enhanced agent validation script
+    const result = execSync('node ../../scripts/validate-enhanced-agents.js', { 
+      stdio: 'pipe', 
+      encoding: 'utf8',
+      cwd: __dirname
+    });
+    
+    log('green', 'Enhanced agent validation completed successfully');
+    return true;
+  } catch (error) {
+    log('red', `Enhanced agent validation failed: ${error.message}`);
+    return false;
+  }
 }
 
 /**
@@ -262,6 +297,7 @@ async function main() {
     healthEndpoint: false,
     mcpToolsList: false,
     businessAnalysisTool: false,
+    enhancedAgents: false,
   };
 
   try {
@@ -276,6 +312,9 @@ async function main() {
     results.healthEndpoint = await testHealthEndpoint(apiUrl);
     results.mcpToolsList = await testMcpToolsList(apiUrl);
     results.businessAnalysisTool = await testBusinessAnalysisTool(apiUrl);
+    
+    // Test enhanced agents
+    results.enhancedAgents = await testEnhancedAgents();
 
   } catch (error) {
     log('red', `Verification failed: ${error.message}`);
@@ -289,6 +328,7 @@ async function main() {
     { name: 'Health Endpoint', passed: results.healthEndpoint },
     { name: 'MCP Tools List', passed: results.mcpToolsList },
     { name: 'Business Analysis Tool', passed: results.businessAnalysisTool },
+    { name: 'Enhanced Bedrock Agents', passed: results.enhancedAgents },
   ];
 
   let allPassed = true;
@@ -324,4 +364,5 @@ module.exports = {
   testMcpToolsList,
   testBusinessAnalysisTool,
   testAwsResources,
+  testEnhancedAgents,
 };

@@ -268,47 +268,12 @@ export class MCPResponseFormatter {
   ): MCPToolResult {
     const content: MCPContent[] = [];
 
-    switch (contentType) {
-      case 'text':
-        content.push({
-          type: 'text',
-          text: typeof data === 'string' ? data : JSON.stringify(data, null, 2),
-        });
-        break;
-
-      case 'json':
-        content.push({
-          type: 'json',
-          json: {
-            success: true,
-            data,
-            timestamp: new Date().toISOString(),
-          },
-        });
-        break;
-
-      case 'markdown':
-        content.push({
-          type: 'markdown',
-          markdown: typeof data === 'string' ? data : this.formatAsMarkdown(data),
-        });
-        break;
-
-      case 'resource':
-        if (data.uri && data.mimeType) {
-          content.push({
-            type: 'resource',
-            resource: data,
-          });
-        } else {
-          // Fallback to JSON if not a proper resource
-          content.push({
-            type: 'json',
-            json: { success: true, data },
-          });
-        }
-        break;
-    }
+    // Force all content to 'text' type for MCP compatibility
+    // The MCP server in Kiro only supports text responses
+    content.push({
+      type: 'text',
+      text: typeof data === 'string' ? data : JSON.stringify(data, null, 2),
+    });
 
     return {
       content,

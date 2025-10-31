@@ -29,30 +29,72 @@ export class ComponentName {
 
 ## Key Components
 
-### Core Pipeline
-- **Intent Interpreter**: Natural language → structured requirements
-- **Business Analyzer**: Consulting frameworks (SWOT, Porter's Five Forces, BCG Matrix)
-- **Workflow Optimizer**: Efficiency analysis and optimization strategies
-- **Kiro Resource Optimizer**: 🚀 **FLAGSHIP** - Vibe/Spec mode optimization, 3.2x velocity improvements
-- **Spec Generator**: Analysis → Kiro specifications
+### ✅ Core MCP Tools (27 WORKING TOOLS)
 
-### Document Generation
+#### Business Analysis Suite
+- **analyze_business_opportunity** - Market opportunity assessment with competitive analysis
+- **assess_strategic_alignment** - Strategic alignment scoring against OKRs and mission
+- **validate_market_timing** - Market timing validation with confidence scoring
+- **optimize_resource_allocation** - Resource optimization with cost-benefit analysis
+- **monitor_market_conditions** - Real-time market monitoring and trend analysis
+
+#### Document Generation Suite  
+- **generate_business_case** - Comprehensive business cases with ROI analysis
+- **create_stakeholder_communication** - Executive communications (one-pagers, PR-FAQs, presentations)
+- **generate_management_onepager** - Executive summaries with key metrics
+- **generate_pr_faq** - Amazon Working Backwards PR-FAQ format
+- **generate_requirements** - Business requirements with MoSCoW prioritization
+- **generate_design_options** - Multiple design approaches with impact analysis
+- **generate_task_plan** - Implementation task plans with effort estimation
+
+#### Research & Citation Suite
+- **unified_citation_system** - Professional citation management with credibility scoring
+- **aws_docs_search** - AWS documentation search and retrieval
+- **aws_docs_read** - AWS documentation reading with context
+- **aws_contextual_info** - Contextual AWS service information
+- **aws_code_generator** - AWS SDK code generation
+- **aws_best_practices** - AWS best practices recommendations
+
+#### Enhanced Analysis Suite
+- **analyze_business_opportunity_enhanced** - Enhanced opportunity analysis with authoritative sources
+- **validate_idea_quick** - Quick validation framework for go/no-go decisions
+- **analyze_competitor_landscape** - Competitive analysis and positioning
+- **calculate_market_sizing** - TAM/SAM/SOM market sizing calculations
+
+### Core Pipeline Components
+- **Business Analyzer**: Consulting frameworks (SWOT, Porter's Five Forces, BCG Matrix)
+- **Market Analyzer**: TAM/SAM/SOM sizing and competitive intelligence
 - **PM Document Generator**: Executive documents using Pyramid Principle
 - **Amazon Mode Manager**: Working Backwards methodology (PR-FAQ → Assumptions → Hard Questions)
-- **Consulting Summary Generator**: Strategic summaries
-
-### Market Analysis
-- **Market Analyzer**: TAM/SAM/SOM sizing
-- **Competitor Analyzer**: Competitive landscape analysis
-- **Market Condition Detector**: Timing signals
+- **Consulting Summary Generator**: Strategic summaries with actionable recommendations
 
 ## Development Rules
 
-### MCP Tool Implementation
-- Follow `{action}_{subject}.ts` naming convention
-- Export handler functions with TypeScript interfaces
-- Orchestrate existing components, don't duplicate logic
-- Include confidence scores (0-1 scale) in all outputs
+### ✅ MCP Tool Implementation (VALIDATED)
+- Follow `{action}_{subject}.ts` naming convention ✅
+- Export handler functions with proper TypeScript interfaces ✅
+- Export schema and description for tool registration ✅
+- Include confidence scores and metadata in all outputs ✅
+- All 27 tools properly registered and tested ✅
+
+### Tool Registration Pattern (WORKING)
+```typescript
+// Each tool must export:
+export const toolNameSchema = { /* JSON schema */ };
+export const toolNameDescription = "Tool description";
+export async function toolName(args: ToolArgs): Promise<ToolResult> {
+  // Implementation
+}
+
+// Then register in MCP_TOOLS_REGISTRY
+export const MCP_TOOLS_REGISTRY = {
+  tool_name: {
+    handler: toolName,
+    schema: toolNameSchema,
+    description: toolNameDescription,
+  },
+};
+```
 
 ### Business Analysis Standards
 - Structure outputs: Executive Summary → Analysis → Recommendations → Appendix
