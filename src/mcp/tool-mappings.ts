@@ -21,6 +21,7 @@ export const KIRO_TOOL_MAPPINGS: Record<string, string> = {
   'generate_pr_faq': 'generate_pr_faq',
   'generate_task_plan': 'generate_task_plan',
   'enhance_citations': 'enhance_citations',
+  'trusted_citation_scraper': 'trusted_citation_scraper',
   'validate_and_audit_citations': 'validate_and_audit_citations',
   'monitor_market_conditions': 'monitor_market_conditions',
   'optimize_intent': 'optimize_intent',
@@ -60,6 +61,8 @@ export const KIRO_TOOL_DESCRIPTIONS: Record<string, string> = {
     'Creates detailed implementation task plan from design documents with Guardrails Check as Task 0, followed by phased Immediate Wins, Short-Term, and Long-Term tasks. Each task includes ID, name, description, acceptance criteria, effort estimation, impact assessment, and priority ranking.',
   'enhance_citations':
     'Enhances content with authoritative citations and source validation. Analyzes citation needs, validates source accessibility and credibility, identifies unsupported claims, suggests additional sources, and provides comprehensive quality assessment with confidence scoring and improvement recommendations.',
+  'trusted_citation_scraper':
+    'Scrapes trusted domains (.gov, .edu, McKinsey, HBR, Gartner, Statista, etc.) to deliver high-confidence citations with evidence highlights, robots.txt compliance checks, and citation quality metrics. Increases document confidence by grounding claims in verifiable authoritative sources.',
   'validate_and_audit_citations':
     'Validates and audits citations for accuracy and credibility with comprehensive quality assessment. Checks source accessibility, assesses credibility, verifies compliance, finds alternative sources for broken links, identifies quality gaps, and generates detailed improvement recommendations with audit trail.',
   'monitor_market_conditions':

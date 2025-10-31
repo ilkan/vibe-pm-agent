@@ -47,6 +47,12 @@ import {
 } from './validate_and_audit_citations';
 
 import {
+  trustedCitationScraper,
+  trustedCitationScraperSchema,
+  trustedCitationScraperDescription,
+} from './trusted_citation_scraper';
+
+import {
   generateBusinessCase,
   generateBusinessCaseSchema,
   generateBusinessCaseDescription,
@@ -92,6 +98,9 @@ export {
   validateAndAuditCitations,
   validateAndAuditCitationsSchema,
   validateAndAuditCitationsDescription,
+  trustedCitationScraper,
+  trustedCitationScraperSchema,
+  trustedCitationScraperDescription,
   generateBusinessCase,
   generateBusinessCaseSchema,
   generateBusinessCaseDescription,
@@ -136,6 +145,11 @@ export const MCP_TOOLS_REGISTRY = {
     handler: enhanceCitations,
     schema: enhanceCitationsSchema,
     description: enhanceCitationsDescription,
+  },
+  trusted_citation_scraper: {
+    handler: trustedCitationScraper,
+    schema: trustedCitationScraperSchema,
+    description: trustedCitationScraperDescription,
   },
   validate_and_audit_citations: {
     handler: validateAndAuditCitations,

@@ -53,6 +53,34 @@ export class CitationIntegration {
     options: CitationOptions = {},
     industry?: string
   ): Promise<EnhancedCitationResult> {
+    // Validate and convert input parameters
+    let processedContent: string;
+    if (typeof content !== 'string') {
+      console.warn('integrateCitations received non-string content:', typeof content);
+      // Convert object to string for processing
+      if (typeof content === 'object' && content !== null) {
+        processedContent = JSON.stringify(content, null, 2);
+      } else {
+        processedContent = String(content);
+      }
+    } else {
+      processedContent = content;
+    }
+
+    if (!processedContent || processedContent.trim().length === 0) {
+      console.warn('integrateCitations received empty content');
+      return {
+        citations: [],
+        bibliography: '',
+        citationContexts: [],
+        metrics: this.citationService.calculateCitationMetrics([]),
+        enhancedContent: processedContent,
+        qualityReport: await this.qualityAssessmentSystem.assessCitationQuality([]),
+        confidenceScores: this.confidenceScoringEngine.aggregateDocumentConfidence([]),
+        validationResults: [],
+      };
+    }
+
     // Set default options
     const citationOptions = {
       include_citations: options.include_citations ?? true,
@@ -80,7 +108,7 @@ export class CitationIntegration {
         bibliography: '',
         citationContexts: [],
         metrics: this.citationService.calculateCitationMetrics([]),
-        enhancedContent: content,
+        enhancedContent: processedContent,
         qualityReport: await this.qualityAssessmentSystem.assessCitationQuality([]),
         confidenceScores: this.confidenceScoringEngine.aggregateDocumentConfidence([]),
         validationResults: [],
@@ -88,7 +116,7 @@ export class CitationIntegration {
     }
 
     // Extract keywords from content for citation search
-    const keywords = this.extractKeywords(content, documentType);
+    const keywords = this.extractKeywords(processedContent, documentType);
 
     // Build search criteria
     const searchCriteria: CitationSearchCriteria = {
@@ -163,7 +191,7 @@ export class CitationIntegration {
 
     // Enhance content with inline citations and confidence indicators
     const enhancedContent = this.enhanceContentWithCitations(
-      content,
+      processedContent,
       validatedCitations,
       citationContexts,
       citationOptions.citation_style,
@@ -216,6 +244,12 @@ export class CitationIntegration {
    */
   private extractContentKeywords(content: string): string[] {
     const keywords: string[] = [];
+
+    // Ensure content is a string
+    if (typeof content !== 'string') {
+      console.warn('extractContentKeywords received non-string content:', typeof content);
+      return keywords;
+    }
 
     // Common business and tech terms to look for
     const businessTerms = [
