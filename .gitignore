@@ -11,6 +11,7 @@ build/
 tsconfig.dev.tsbuildinfo
 
 # Environment variables
+.aws
 .env
 .env.local
 .env.development.local
@@ -130,4 +131,28 @@ demo/comprehensive-showcase.js
 demo/run-all-demos.js
 demo/test-mcp-server.js
 demo/ai-code-review-assistant/
-demo/citation-quality/
+demo/citation-quality/#
+ AWS credentials and sensitive files
+.aws/
+aws-credentials/
+*.pem
+*.key
+*credentials*
+*secrets*
+
+# Environment files with sensitive data
+.env.*
+lambda-functions/.env.*
+deployment/aws/.env.*
+
+# Deployment artifacts with sensitive info
+deployment/aws/lambda-only/node_modules/
+bedrock-agentcore/
+
+# API keys and tokens
+*api-key*
+*token*
+*secret*# Se
+rverless deployment artifacts
+.serverless/
+deployment/**/.serverless/

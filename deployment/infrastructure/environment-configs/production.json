@@ -1,0 +1,116 @@
+{
+  "environment": "production",
+  "deploymentMode": "hybrid",
+  "region": "us-west-2",
+  "vpc": {
+    "cidr": "10.0.0.0/16",
+    "maxAzs": 3,
+    "natGateways": 3
+  },
+  "eks": {
+    "version": "1.28",
+    "nodeGroups": {
+      "gpu": {
+        "instanceTypes": ["g5.xlarge", "g5.2xlarge"],
+        "minSize": 2,
+        "maxSize": 10,
+        "desiredSize": 3,
+        "diskSize": 100,
+        "capacityType": "ON_DEMAND"
+      },
+      "cpu": {
+        "instanceTypes": ["m5.large", "m5.xlarge"],
+        "minSize": 3,
+        "maxSize": 15,
+        "desiredSize": 5,
+        "diskSize": 50,
+        "capacityType": "ON_DEMAND"
+      }
+    },
+    "addons": {
+      "enableClusterAutoscaler": true,
+      "enableIstio": true,
+      "enableNvidiaDevicePlugin": true
+    }
+  },
+  "sagemaker": {
+    "endpoints": {
+      "llama": {
+        "instanceType": "ml.g5.xlarge",
+        "initialInstanceCount": 2,
+        "autoScaling": {
+          "minCapacity": 2,
+          "maxCapacity": 10,
+          "targetValue": 70.0
+        },
+        "dataCapture": {
+          "enabled": true,
+          "samplingPercentage": 100
+        }
+      },
+      "embedding": {
+        "instanceType": "ml.g5.large",
+        "initialInstanceCount": 2,
+        "autoScaling": {
+          "minCapacity": 2,
+          "maxCapacity": 6,
+          "targetValue": 70.0
+        },
+        "dataCapture": {
+          "enabled": true,
+          "samplingPercentage": 100
+        }
+      }
+    },
+    "asyncInference": {
+      "enabled": true,
+      "maxConcurrentInvocations": 4
+    }
+  },
+  "lambda": {
+    "timeout": 900,
+    "memorySize": 1024,
+    "reservedConcurrency": 100,
+    "deadLetterQueue": {
+      "enabled": true,
+      "maxReceiveCount": 3
+    }
+  },
+  "monitoring": {
+    "logRetention": 30,
+    "metricsRetention": 90,
+    "enableXRay": true,
+    "enableDetailedMonitoring": true,
+    "alarms": {
+      "enabled": true,
+      "snsTopicArn": "arn:aws:sns:us-west-2:ACCOUNT:nvidia-nim-alerts"
+    },
+    "dashboards": {
+      "enabled": true,
+      "autoRefresh": true
+    }
+  },
+  "security": {
+    "enableVpcFlowLogs": true,
+    "enableGuardDuty": true,
+    "enableSecurityHub": true,
+    "encryption": {
+      "s3": "AES256",
+      "ebs": true,
+      "rds": true
+    }
+  },
+  "backup": {
+    "enabled": true,
+    "retentionDays": 30,
+    "crossRegionReplication": true
+  },
+  "tags": {
+    "Environment": "production",
+    "Project": "nvidia-nim-platform",
+    "Owner": "platform-team",
+    "CostCenter": "infrastructure",
+    "Compliance": "required",
+    "BackupRequired": "true"
+  }
+}

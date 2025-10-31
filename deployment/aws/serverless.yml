@@ -1,0 +1,313 @@
+# Serverless Framework Configuration for Vibe PM Agent
+# Deploys the MCP server as AWS Lambda functions with API Gateway
+
+service: vibe-pm-agent
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'prod'}
+  memorySize: 1024
+  timeout: 300
+  
+  # Environment variables
+  environment:
+    NODE_ENV: production
+    LOG_LEVEL: ${opt:log-level, 'info'}
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    
+  # IAM Role permissions
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: 
+            - 'arn:aws:logs:${self:provider.region}:*:log-group:/aws/lambda/*:*:*'
+        - Effect: Allow
+          Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+          Resource: 
+            - '${self:custom.bucketArn}/*'
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - '${self:custom.dynamoDbArn}'
+            - '${self:custom.dynamoDbArn}/index/*'
+
+  # API Gateway configuration
+  apiGateway:
+    restApiId: ${self:custom.apiGateway.restApiId}
+    restApiRootResourceId: ${self:custom.apiGateway.restApiRootResourceId}
+    
+  # VPC configuration (optional)
+  vpc:
+    securityGroupIds:
+      - ${self:custom.vpc.securityGroupId}
+    subnetIds:
+      - ${self:custom.vpc.subnetId1}
+      - ${self:custom.vpc.subnetId2}
+
+# Custom variables
+custom:
+  # Stage-specific configurations
+  stages:
+    dev:
+      logLevel: debug
+      memorySize: 512
+    staging:
+      logLevel: info
+      memorySize: 1024
+    prod:
+      logLevel: warn
+      memorySize: 2048
+      
+  # Resource names
+  bucketName: vibe-pm-agent-${self:provider.stage}-data
+  bucketArn: arn:aws:s3:::${self:custom.bucketName}
+  dynamoDbTableName: vibe-pm-agent-${self:provider.stage}-cache
+  dynamoDbArn: arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamoDbTableName}
+  
+  # API Gateway (if using existing)
+  apiGateway:
+    restApiId: ${env:API_GATEWAY_REST_API_ID, ''}
+    restApiRootResourceId: ${env:API_GATEWAY_ROOT_RESOURCE_ID, ''}
+    
+  # VPC configuration
+  vpc:
+    securityGroupId: ${env:VPC_SECURITY_GROUP_ID, ''}
+    subnetId1: ${env:VPC_SUBNET_ID_1, ''}
+    subnetId2: ${env:VPC_SUBNET_ID_2, ''}
+
+# Lambda functions
+functions:
+  # Main MCP server handler
+  mcpServer:
+    handler: dist/lambda/mcp-server-handler.handler
+    name: ${self:provider.stage}-vibe-pm-agent-mcp-server
+    description: Main MCP server for Vibe PM Agent business intelligence tools
+    events:
+      - http:
+          path: /mcp
+          method: post
+          cors: true
+      - http:
+          path: /mcp/health
+          method: get
+          cors: true
+    environment:
+      FUNCTION_NAME: mcpServer
+      
+  # Business analysis tools
+  businessAnalysis:
+    handler: dist/lambda/business-analysis-handler.handler
+    name: ${self:provider.stage}-vibe-pm-agent-business-analysis
+    description: Business opportunity analysis and strategic assessment
+    events:
+      - http:
+          path: /api/business/analyze
+          method: post
+          cors: true
+    environment:
+      FUNCTION_NAME: businessAnalysis
+      
+  # Document generation
+  documentGeneration:
+    handler: dist/lambda/document-generation-handler.handler
+    name: ${self:provider.stage}-vibe-pm-agent-document-generation
+    description: Executive communications and document generation
+    events:
+      - http:
+          path: /api/documents/generate
+          method: post
+          cors: true
+    environment:
+      FUNCTION_NAME: documentGeneration
+      
+  # Market intelligence
+  marketIntelligence:
+    handler: dist/lambda/market-intelligence-handler.handler
+    name: ${self:provider.stage}-vibe-pm-agent-market-intelligence
+    description: Real-time market analysis and competitive intelligence
+    events:
+      - http:
+          path: /api/market/analyze
+          method: post
+          cors: true
+    environment:
+      FUNCTION_NAME: marketIntelligence
+      
+  # Citation and validation
+  citationService:
+    handler: dist/lambda/citation-service-handler.handler
+    name: ${self:provider.stage}-vibe-pm-agent-citation-service
+    description: Professional citation management and validation
+    events:
+      - http:
+          path: /api/citations/validate
+          method: post
+          cors: true
+    environment:
+      FUNCTION_NAME: citationService
+
+# CloudFormation resources
+resources:
+  Resources:
+    # S3 bucket for data storage
+    DataBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        VersioningConfiguration:
+          Status: Enabled
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        LifecycleConfiguration:
+          Rules:
+            - Id: DeleteOldVersions
+              Status: Enabled
+              NoncurrentVersionExpirationInDays: 30
+              
+    # DynamoDB table for caching
+    CacheTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.dynamoDbTableName}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        SSESpecification:
+          SSEEnabled: true
+          
+    # CloudWatch Log Groups
+    McpServerLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:provider.stage}-vibe-pm-agent-mcp-server
+        RetentionInDays: 30
+        
+    BusinessAnalysisLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:provider.stage}-vibe-pm-agent-business-analysis
+        RetentionInDays: 30
+        
+    DocumentGenerationLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:provider.stage}-vibe-pm-agent-document-generation
+        RetentionInDays: 30
+        
+    MarketIntelligenceLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:provider.stage}-vibe-pm-agent-market-intelligence
+        RetentionInDays: 30
+        
+    CitationServiceLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:provider.stage}-vibe-pm-agent-citation-service
+        RetentionInDays: 30
+
+  # CloudFormation outputs
+  Outputs:
+    ApiGatewayRestApiId:
+      Value:
+        Ref: RestApiApigEvent
+      Export:
+        Name: ${self:provider.stage}-vibe-pm-agent-api-id
+        
+    ApiGatewayRestApiUrl:
+      Value:
+        Fn::Join:
+          - ''
+          - - 'https://'
+            - Ref: RestApiApigEvent
+            - '.execute-api.'
+            - ${self:provider.region}
+            - '.amazonaws.com/'
+            - ${self:provider.stage}
+      Export:
+        Name: ${self:provider.stage}-vibe-pm-agent-api-url
+        
+    DataBucketName:
+      Value: ${self:custom.bucketName}
+      Export:
+        Name: ${self:provider.stage}-vibe-pm-agent-bucket-name
+        
+    CacheTableName:
+      Value: ${self:custom.dynamoDbTableName}
+      Export:
+        Name: ${self:provider.stage}-vibe-pm-agent-cache-table-name
+
+# Plugins
+plugins:
+  - serverless-offline
+  - serverless-webpack
+  - serverless-prune-plugin
+  - serverless-plugin-tracing
+
+# Package configuration
+package:
+  individually: true
+  exclude:
+    - ./**
+  include:
+    - dist/**
+    - node_modules/**
+    - package.json
+
+# Webpack configuration
+webpack:
+  webpackConfig: 'webpack.config.js'
+  includeModules: true
+  packager: 'npm'
+
+# Plugin configurations
+prune:
+  automatic: true
+  number: 3
+
+tracing:
+  lambda: true
+  apiGateway: true

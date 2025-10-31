@@ -1,0 +1,60 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nim-fast-ssd
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+  iops: "3000"
+  throughput: "125"
+  encrypted: "true"
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nim-cache-pvc
+  namespace: nvidia-nim
+  labels:
+    app: nvidia-nim-llama
+    component: cache
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nim-fast-ssd
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nim-model-store-pvc
+  namespace: nvidia-nim
+  labels:
+    app: nvidia-nim-llama
+    component: model-store
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nim-fast-ssd
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nim-embedding-cache-pvc
+  namespace: nvidia-nim
+  labels:
+    app: nvidia-nim-embedding
+    component: cache
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nim-fast-ssd
+  resources:
+    requests:
+      storage: 50Gi

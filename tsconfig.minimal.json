@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": false,
+    "sourceMap": true,
+    "outDir": "./dist/lambda"
+  },
+  "include": [
+    "src/lambda/**/*",
+    "src/mcp/tools/analyze_business_opportunity.ts",
+    "src/mcp/tools/generate_business_case.ts",
+    "src/mcp/tools/create_stakeholder_communication.ts",
+    "src/mcp/tools/assess_strategic_alignment.ts",
+    "src/mcp/tools/validate_market_timing.ts",
+    "src/mcp/tools/optimize_resource_allocation.ts",
+    "src/components/business-analyzer/index.ts",
+    "src/components/market-analyzer/index.ts",
+    "src/components/strategic-alignment-assessor/index.ts",
+    "src/components/pm-document-generator/index.ts",
+    "src/components/amazon-mode-manager/index.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "src/components/consulting-summary-generator/**/*",
+    "src/models/**/*"
+  ]
+}

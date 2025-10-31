@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nvidia-nim-llama-service
+  namespace: nvidia-nim
+  labels:
+    app: nvidia-nim-llama
+    component: inference-engine
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: nvidia-nim-llama
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nvidia-nim-embedding-service
+  namespace: nvidia-nim
+  labels:
+    app: nvidia-nim-embedding
+    component: embedding-engine
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8001
+    targetPort: 8001
+    protocol: TCP
+    name: http
+  selector:
+    app: nvidia-nim-embedding
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nvidia-nim-gateway
+  namespace: nvidia-nim
+  labels:
+    app: nvidia-nim-gateway
+    component: api-gateway
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  - port: 443
+    targetPort: 8443
+    protocol: TCP
+    name: https
+  selector:
+    app: nvidia-nim-gateway

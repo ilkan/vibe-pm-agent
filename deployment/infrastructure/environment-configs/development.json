@@ -1,0 +1,66 @@
+{
+  "environment": "development",
+  "deploymentMode": "hybrid",
+  "region": "us-west-2",
+  "vpc": {
+    "cidr": "10.0.0.0/16",
+    "maxAzs": 2,
+    "natGateways": 1
+  },
+  "eks": {
+    "version": "1.28",
+    "nodeGroups": {
+      "gpu": {
+        "instanceTypes": ["g5.large"],
+        "minSize": 1,
+        "maxSize": 3,
+        "desiredSize": 1,
+        "diskSize": 50
+      },
+      "cpu": {
+        "instanceTypes": ["m5.large"],
+        "minSize": 1,
+        "maxSize": 5,
+        "desiredSize": 2,
+        "diskSize": 30
+      }
+    }
+  },
+  "sagemaker": {
+    "endpoints": {
+      "llama": {
+        "instanceType": "ml.g5.large",
+        "initialInstanceCount": 1,
+        "autoScaling": {
+          "minCapacity": 1,
+          "maxCapacity": 3
+        }
+      },
+      "embedding": {
+        "instanceType": "ml.g5.large",
+        "initialInstanceCount": 1,
+        "autoScaling": {
+          "minCapacity": 1,
+          "maxCapacity": 2
+        }
+      }
+    }
+  },
+  "lambda": {
+    "timeout": 300,
+    "memorySize": 512,
+    "reservedConcurrency": 10
+  },
+  "monitoring": {
+    "logRetention": 7,
+    "metricsRetention": 30,
+    "enableXRay": true,
+    "enableDetailedMonitoring": false
+  },
+  "tags": {
+    "Environment": "development",
+    "Project": "nvidia-nim-platform",
+    "Owner": "development-team",
+    "CostCenter": "engineering"
+  }
+}

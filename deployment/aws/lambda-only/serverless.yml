@@ -1,0 +1,39 @@
+service: vibe-pm-agent-simple
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 1024
+  timeout: 300
+  
+  environment:
+    NODE_ENV: production
+    LOG_LEVEL: ${opt:log-level, 'info'}
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+
+functions:
+  mcpServer:
+    handler: dist/mcp-server.handler
+    name: ${self:provider.stage}-vibe-pm-agent-mcp-server
+    description: Simple MCP server for Vibe PM Agent
+    events:
+      - http:
+          path: /mcp
+          method: post
+          cors: true
+      - http:
+          path: /mcp/health
+          method: get
+          cors: true
+
+package:
+  exclude:
+    - ./**
+  include:
+    - dist/**
+    - node_modules/**

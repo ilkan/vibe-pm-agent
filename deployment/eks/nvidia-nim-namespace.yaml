@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nvidia-nim
+  labels:
+    name: nvidia-nim
+    app.kubernetes.io/name: nvidia-nim-platform
+    app.kubernetes.io/version: "1.0.0"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: nvidia-nim-quota
+  namespace: nvidia-nim
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    requests.nvidia.com/gpu: "8"
+    limits.cpu: "40"
+    limits.memory: 80Gi
+    limits.nvidia.com/gpu: "8"
+    persistentvolumeclaims: "10"

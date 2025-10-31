@@ -1,0 +1,137 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: nvidia-nim-istio
+  namespace: istio-system
+spec:
+  values:
+    global:
+      meshID: nvidia-nim-mesh
+      multiCluster:
+        clusterName: nvidia-nim-cluster
+      network: nvidia-nim-network
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        service:
+          type: LoadBalancer
+          ports:
+          - port: 80
+            targetPort: 8080
+            name: http2
+          - port: 443
+            targetPort: 8443
+            name: https
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: nvidia-nim-gateway
+  namespace: nvidia-nim
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - nim-api.example.com
+    tls:
+      httpsRedirect: true
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: nim-tls-secret
+    hosts:
+    - nim-api.example.com
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nvidia-nim-vs
+  namespace: nvidia-nim
+spec:
+  hosts:
+  - nim-api.example.com
+  gateways:
+  - nvidia-nim-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /v1/chat/completions
+    route:
+    - destination:
+        host: nvidia-nim-llama-service
+        port:
+          number: 8000
+    timeout: 300s
+    retries:
+      attempts: 3
+      perTryTimeout: 100s
+  - match:
+    - uri:
+        prefix: /v1/embeddings
+    route:
+    - destination:
+        host: nvidia-nim-embedding-service
+        port:
+          number: 8001
+    timeout: 60s
+    retries:
+      attempts: 3
+      perTryTimeout: 20s
+  - match:
+    - uri:
+        prefix: /health
+    route:
+    - destination:
+        host: nvidia-nim-llama-service
+        port:
+          number: 8000
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: nvidia-nim-mtls
+  namespace: nvidia-nim
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: nvidia-nim-authz
+  namespace: nvidia-nim
+spec:
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/nvidia-nim/sa/default"]
+  - to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/v1/*", "/health"]

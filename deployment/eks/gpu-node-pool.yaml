@@ -1,0 +1,93 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: nvidia-nim-cluster
+  region: us-west-2
+  version: "1.28"
+
+iam:
+  withOIDC: true
+
+addons:
+- name: vpc-cni
+  version: latest
+- name: coredns
+  version: latest
+- name: kube-proxy
+  version: latest
+- name: aws-ebs-csi-driver
+  version: latest
+
+nodeGroups:
+- name: gpu-nodes
+  instanceType: g5.xlarge
+  desiredCapacity: 2
+  minSize: 1
+  maxSize: 8
+  volumeSize: 100
+  volumeType: gp3
+  volumeEncrypted: true
+  amiFamily: AmazonLinux2
+  ssh:
+    allow: true
+    publicKeyName: nvidia-nim-keypair
+  labels:
+    node-type: gpu
+    nvidia.com/gpu.present: "true"
+  taints:
+  - key: nvidia.com/gpu
+    value: "true"
+    effect: NoSchedule
+  tags:
+    k8s.io/cluster-autoscaler/enabled: "true"
+    k8s.io/cluster-autoscaler/nvidia-nim-cluster: "owned"
+    Environment: production
+    Project: nvidia-nim-platform
+  iam:
+    attachPolicyARNs:
+    - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+    - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+    - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+    - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+    withAddonPolicies:
+      ebs: true
+      efs: true
+      albIngress: true
+      cloudWatch: true
+
+- name: cpu-nodes
+  instanceType: m5.large
+  desiredCapacity: 3
+  minSize: 2
+  maxSize: 10
+  volumeSize: 50
+  volumeType: gp3
+  volumeEncrypted: true
+  amiFamily: AmazonLinux2
+  labels:
+    node-type: cpu
+  tags:
+    k8s.io/cluster-autoscaler/enabled: "true"
+    k8s.io/cluster-autoscaler/nvidia-nim-cluster: "owned"
+    Environment: production
+    Project: nvidia-nim-platform
+
+cloudWatch:
+  clusterLogging:
+    enable: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+    logRetentionInDays: 30
+
+vpc:
+  enableDnsHostnames: true
+  enableDnsSupport: true
+  cidr: "10.0.0.0/16"
+  subnets:
+    private:
+      us-west-2a: { cidr: "10.0.1.0/24" }
+      us-west-2b: { cidr: "10.0.2.0/24" }
+      us-west-2c: { cidr: "10.0.3.0/24" }
+    public:
+      us-west-2a: { cidr: "10.0.101.0/24" }
+      us-west-2b: { cidr: "10.0.102.0/24" }
+      us-west-2c: { cidr: "10.0.103.0/24" }

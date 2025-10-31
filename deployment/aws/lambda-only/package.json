@@ -1,0 +1,24 @@
+{
+  "name": "vibe-pm-agent-lambda",
+  "version": "1.0.0",
+  "description": "Standalone Lambda deployment for Vibe PM Agent",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "serverless deploy",
+    "remove": "serverless remove"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.0.0",
+    "@aws-sdk/client-cloudwatch-logs": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "serverless": "^3.38.0",
+    "serverless-webpack": "^5.13.0",
+    "webpack": "^5.89.0",
+    "ts-loader": "^9.5.1"
+  }
+}
